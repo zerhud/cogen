@@ -16,7 +16,7 @@ jinja_env = jinja2.Environment(
 
 def print_help():
 	print("usage ./jt.py -d data_file -t template_file -o output_file")
-	os.exit()
+	sys.exit()
 
 if __name__ == '__main__':
 
@@ -41,6 +41,8 @@ if __name__ == '__main__':
 		elif opt in ("-o", "--output_file"):
 			output = arg
 
+	if not os.path.isfile(tmpl_file):
+		print_help()
 
 	if data_file == '-':
 		data = json.loads(sys.stdin.read())
