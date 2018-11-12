@@ -42,11 +42,16 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		type_rule.name("type_definition");
 		type_rule = var_name[at_c<0>(_val)=_1] | (var_name[at_c<1>(_val)=_1] > lit('<') > var_name[at_c<0>(_val)=_1] > lit('>'));
 
+		version_rule.name("version_rule");
+		version_rule = lit('v') >> qi::uint_;
+
 		function_param_rule.name("function_param");
 		function_param_rule %= type_rule > var_name;
 
-		module_rule.name("module_rule");
-		module_rule = qi::lexeme[lit("module") > +blank > var_name[at_c<0>(_val)=_1]] > ':' > *(
+		module_rule.name("module_rule"); // module mod_name v123:
+		module_rule = qi::lexeme[lit("module")
+		                          > +blank > var_name[at_c<0>(_val)=_1]
+		                          > +blank > version_rule[at_c<2>(_val)=_1]] > ':' > *(
 		               (function_rule)[push_back(at_c<1>(_val),_1)] > lit(';')
 		               );
 
@@ -79,5 +84,6 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 	qi::rule<Iterator, func_param(), boost::spirit::qi::ascii::space_type> function_param_rule;
 	qi::rule<Iterator, module(), boost::spirit::qi::ascii::space_type> module_rule;
 	qi::rule<Iterator, std::vector<module>(), boost::spirit::qi::ascii::space_type> modules_rule;
+	qi::rule<Iterator, modegen::meta_parameters::version()> version_rule;
 };
 } // namespace modegen

@@ -10,6 +10,29 @@ namespace modegen {
 } // namespace modegen
 
 namespace modegen {
+class meta_parameter {
+public:
+	virtual ~meta_parameter() noexcept = default ;
+	virtual std::string_view name() const =0;
+	virtual std::string value() const =0;
+};
+
+namespace meta_parameters {
+struct version : meta_parameter {
+	version() noexcept ;
+	version(std::uint64_t v) noexcept ;
+	version& operator = (std::uint64_t v) noexcept ;
+
+	std::uint64_t val;
+	std::string_view name() const override;
+	std::string value() const override;
+};
+} // namespace meta_parameters
+} // namespace modegen
+
+BOOST_FUSION_ADAPT_STRUCT( modegen::meta_parameters::version, (std::uint64_t, val) )
+
+namespace modegen {
 	struct type {
 		std::string name;
 		std::string modificator;
@@ -57,7 +80,8 @@ namespace modegen {
 	struct module {
 		std::string name;
 		std::vector<std::variant<function>> content;
+		meta_parameters::version ver;
 	}; 
 } // namespace modegen
 
-BOOST_FUSION_ADAPT_STRUCT( modegen::module, name, content )
+BOOST_FUSION_ADAPT_STRUCT( modegen::module, (std::string, name), (std::vector<std::variant<modegen::function>>, content), (modegen::meta_parameters::version, ver) )

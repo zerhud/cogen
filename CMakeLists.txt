@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 find_package(Boost COMPONENTS program_options REQUIRED)
 
-set(sources parser/main.cpp)
+set(sources parser/main.cpp parser/modegen.cpp)
 set(headers parser/grammar.hpp parser/modegen.hpp)
 
 add_executable("${PROJECT_NAME}" ${sources} ${headers})
