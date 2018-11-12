@@ -6,6 +6,7 @@
 	, flex
 	, boost
 	, cmake
+	, cppjson
 }:
 
 stdenv.mkDerivation rec {
@@ -21,6 +22,7 @@ stdenv.mkDerivation rec {
 		];
 	buildInputs = [
 		boost
+		cppjson
 	];
 }
 	

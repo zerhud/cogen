@@ -1,10 +1,15 @@
 {
 	  system ? builtins.currentSystem
-	, pkgs ? import<nixpkgs> { inherit system; }
+	, pkgs ? import<nixos-unstable> { inherit system; }
 	, compiler_name ? "gcc8"
 }:
 
-pkgs.callPackage ./default.nix {
+let
+	cppjson = import ./cppjson.nix {};
+	stdenv = pkgs.overrideCC pkgs.stdenv pkgs.${compiler_name};
+
+in pkgs.callPackage ./default.nix {
+	inherit cppjson stdenv;
 	py_jinja = pkgs.python3Packages.jinja2;
 }
 
