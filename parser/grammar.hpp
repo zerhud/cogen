@@ -45,13 +45,17 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		version_rule.name("version_rule");
 		version_rule = lit('v') >> qi::uint_;
 
+		documentation_rule.name("documentation_rule");
+		documentation_rule %= *blank >> lit("#") >> *(char_[at_c<0>(_val)+=_1] - qi::eol) >> qi::eol;
+
 		function_param_rule.name("function_param");
 		function_param_rule %= type_rule > var_name;
 
 		module_rule.name("module_rule"); // module mod_name v123:
-		module_rule = qi::lexeme[lit("module")
+		module_rule = *documentation_rule[push_back(at_c<2>(_val),_1)] >>
+		              qi::lexeme[lit("module")
 		                          > +blank > var_name[at_c<0>(_val)=_1]
-		                          > +blank > version_rule[at_c<2>(_val)=_1]] > ':' > *(
+		                          > +blank > version_rule[push_back(at_c<2>(_val),_1)]] > ':' > *(
 		               (function_rule)[push_back(at_c<1>(_val),_1)] > lit(';')
 		               );
 
@@ -60,7 +64,11 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 
 		method_rule.name("method_rule");
 		function_rule.name("function_rule");
-		function_rule %= type_rule >> var_name >> lit('(') >> (-(function_param_rule % ',')) > lit(')');
+		function_rule = *documentation_rule[push_back(at_c<4>(_val),_1)]
+		              >> type_rule[at_c<0>(_val)=_1]
+		              >> var_name[at_c<1>(_val)=_1]
+		              >> lit('(') >> (-(function_param_rule[push_back(at_c<2>(_val),_1)] % ',')) > lit(')')
+		              ;
 		method_rule %= type_rule >> var_name >> lit('(') >> (-(function_param_rule % ',')) >> lit(')') >> mutable_mod;
 
 		qi::on_error<qi::fail>
@@ -85,5 +93,6 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 	qi::rule<Iterator, module(), boost::spirit::qi::ascii::space_type> module_rule;
 	qi::rule<Iterator, std::vector<module>(), boost::spirit::qi::ascii::space_type> modules_rule;
 	qi::rule<Iterator, modegen::meta_parameters::version()> version_rule;
+	qi::rule<Iterator, modegen::meta_parameters::documentation()> documentation_rule;
 };
 } // namespace modegen
