@@ -46,16 +46,8 @@ int main(int,char**)
 {
 	std::fstream file("pdata");
 	std::string pdata{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
-	auto begin = pdata.begin();
-	auto end = pdata.end();
 
-	std::vector<modegen::module> result;
-
-	modegen::grammar<decltype(begin)> mg_parser;
-	bool r = boost::spirit::qi::phrase_parse(begin,end, mg_parser, boost::spirit::ascii::space, result);
-
-	if(!r) return 1;
-
+	auto result = modegen::parse(pdata);
 	for(auto& mod:result) print_mod(mod);
 
 	return 0;
