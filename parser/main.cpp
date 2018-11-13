@@ -29,7 +29,10 @@ void print_mod(const modegen::module& mod)
 	for(auto& cnt:mod.content) {
 		auto* fnc = std::get_if<modegen::function>(&cnt);
 		if(fnc) {
-			std::cout << "\tfunc: " << fnc->return_type.name << " " << fnc->name << " " << fnc->mut << " => ";
+			std::cout << "\tfunc: " << fnc->return_type.name << " " << fnc->name << " ";
+			if(fnc->mut) std::cout << *fnc->mut;
+			else std::cout << "no_const" ;
+			std::cout << " => ";
 			for(auto& p:fnc->func_params) std::cout << p.param_type.name << " " << p.name << ", ";
 			std::cout << std::endl;
 			print_meta(fnc->meta_params);

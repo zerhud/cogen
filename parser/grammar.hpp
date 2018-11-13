@@ -62,14 +62,13 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		modules_rule.name("modules_rule");
 		modules_rule %= +module_rule;
 
-		method_rule.name("method_rule");
 		function_rule.name("function_rule");
 		function_rule = *documentation_rule[push_back(at_c<4>(_val),_1)]
 		              >> type_rule[at_c<0>(_val)=_1]
 		              >> var_name[at_c<1>(_val)=_1]
 		              >> lit('(') >> (-(function_param_rule[push_back(at_c<2>(_val),_1)] % ',')) > lit(')')
+		              >> -mutable_mod[at_c<3>(_val)=_1]
 		              ;
-		method_rule %= type_rule >> var_name >> lit('(') >> (-(function_param_rule % ',')) >> lit(')') >> mutable_mod;
 
 		qi::on_error<qi::fail>
 		(
@@ -88,7 +87,6 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 	qi::rule<Iterator, std::string()> var_name;
 	qi::rule<Iterator, type(), boost::spirit::qi::ascii::space_type> type_rule;
 	qi::rule<Iterator, function(), boost::spirit::qi::ascii::space_type> function_rule;
-	qi::rule<Iterator, function(), boost::spirit::qi::ascii::space_type> method_rule;
 	qi::rule<Iterator, func_param(), boost::spirit::qi::ascii::space_type> function_param_rule;
 	qi::rule<Iterator, module(), boost::spirit::qi::ascii::space_type> module_rule;
 	qi::rule<Iterator, std::vector<module>(), boost::spirit::qi::ascii::space_type> modules_rule;

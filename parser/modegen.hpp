@@ -72,7 +72,7 @@ namespace modegen {
 	struct function {
 		std::string name;
 		type return_type;
-		bool mut;
+		std::optional<bool> mut;
 		std::vector<func_param> func_params;
 		meta_parameters::parameter_set meta_params;
 	};
@@ -82,7 +82,7 @@ BOOST_FUSION_ADAPT_STRUCT( modegen::function
                            , (modegen::type, return_type)
                            , (std::string, name)
                            , (std::vector<modegen::func_param>, func_params)
-                           , (bool, mut)
+                           , (std::optional<bool>, mut)
                            , (modegen::meta_parameters::parameter_set, meta_params)
                           )
 
