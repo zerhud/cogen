@@ -38,8 +38,16 @@ struct documentation : meta_parameter {
 	bool add(const meta_parameter& other) override ;
 };
 
+struct deprication : meta_parameter {
+	std::string message;
+
+	std::string_view name() const override;
+	std::string value() const override;
+	bool add(const meta_parameter& other) override ;
+};
+
 struct parameter_set  {
-	typedef std::variant<version,documentation> parameter_type;
+	typedef std::variant<version,documentation,deprication> parameter_type;
 	std::vector<parameter_type> set;
 
 	void push_back(parameter_type p);
@@ -54,6 +62,7 @@ struct parameter_set  {
 
 BOOST_FUSION_ADAPT_STRUCT( modegen::meta_parameters::version, (std::uint64_t, val) )
 BOOST_FUSION_ADAPT_STRUCT( modegen::meta_parameters::documentation, (std::string, body) )
+BOOST_FUSION_ADAPT_STRUCT( modegen::meta_parameters::deprication, (std::string, message) )
 
 namespace modegen {
 	struct type {

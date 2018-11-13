@@ -63,3 +63,19 @@ void modegen::meta_parameters::parameter_set::push_back(modegen::meta_parameters
 	if(!set.empty() && std::visit(name_checker, set.back(), p) && std::visit(adder, set.back(), p)) return;
 	set.emplace_back(std::move(p));
 }
+
+std::string_view modegen::meta_parameters::deprication::name() const
+{
+	return "deprication"sv;
+}
+
+std::string modegen::meta_parameters::deprication::value() const
+{
+	return message;
+}
+
+bool modegen::meta_parameters::deprication::add(const modegen::meta_parameter& other)
+{
+	// we cannt have two deprication attribute
+	return false;
+}

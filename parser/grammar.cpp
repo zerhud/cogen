@@ -32,6 +32,9 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		using boost::phoenix::at_c;
 		using boost::phoenix::push_back;
 
+		quoted_string.name("quoted_string");
+		quoted_string = '"' >> *(char_[_val+=_1] - lit('"')) >> '"';
+
 		var_name.name("var_name");
 		var_name = qi::lexeme[qi::ascii::alpha[_val+=_1] >> *(qi::ascii::alpha[_val+=_1]|qi::ascii::digit[_val+=_1]|lit('_')[_val+='_'])];
 
@@ -46,6 +49,9 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 
 		documentation_rule.name("documentation_rule");
 		documentation_rule %= *blank >> lit("#") >> *(char_[at_c<0>(_val)+=_1] - qi::eol) >> qi::eol;
+
+		deprication_rule.name("depricated_rule");
+		deprication_rule %= lit("@depricated") > (space | ('(' > quoted_string > ')'));
 
 		function_param_rule.name("function_param");
 		function_param_rule %= type_rule > var_name;
@@ -63,6 +69,8 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 
 		function_rule.name("function_rule");
 		function_rule = *documentation_rule[push_back(at_c<4>(_val),_1)]
+		              >> -deprication_rule[push_back(at_c<4>(_val),_1)]
+		              >> -qi::lexeme['@' >> version_rule[push_back(at_c<4>(_val),_1)] >> space]
 		              >> type_rule[at_c<0>(_val)=_1]
 		              >> var_name[at_c<1>(_val)=_1]
 		              >> lit('(') >> (-(function_param_rule[push_back(at_c<2>(_val),_1)] % ',')) > lit(')')
@@ -84,6 +92,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 
 	qi::rule<Iterator, bool()> mutable_mod;
 	qi::rule<Iterator, std::string()> var_name;
+	qi::rule<Iterator, std::string()> quoted_string;
 	qi::rule<Iterator, type(), boost::spirit::qi::ascii::space_type> type_rule;
 	qi::rule<Iterator, function(), boost::spirit::qi::ascii::space_type> function_rule;
 	qi::rule<Iterator, func_param(), boost::spirit::qi::ascii::space_type> function_param_rule;
@@ -91,6 +100,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 	qi::rule<Iterator, std::vector<module>(), boost::spirit::qi::ascii::space_type> modules_rule;
 	qi::rule<Iterator, modegen::meta_parameters::version()> version_rule;
 	qi::rule<Iterator, modegen::meta_parameters::documentation()> documentation_rule;
+	qi::rule<Iterator, modegen::meta_parameters::deprication()> deprication_rule;
 };
 } // namespace modegen
 
