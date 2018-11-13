@@ -51,13 +51,20 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		documentation_rule %= *blank >> lit("#") >> *(char_[at_c<0>(_val)+=_1] - qi::eol) >> qi::eol;
 
 		deprication_rule.name("depricated_rule");
-		deprication_rule %= lit("@depricated") > (space | ('(' > quoted_string > ')'));
+		deprication_rule %= lit("@depricated") > -('(' > quoted_string > ')') > space;
+
+		meta_params_rule =
+		         *(
+		              (+(documentation_rule[push_back(_val,_1)]))
+		            | deprication_rule[push_back(_val,_1)]
+		            | ('@' > version_rule[push_back(_val,_1)])
+		          );
 
 		function_param_rule.name("function_param");
 		function_param_rule %= type_rule > var_name;
 
 		module_rule.name("module_rule"); // module mod_name v123:
-		module_rule = *documentation_rule[push_back(at_c<2>(_val),_1)] >>
+		module_rule = meta_params_rule[at_c<2>(_val)=_1] >>
 		              qi::lexeme[lit("module")
 		                          > +blank > var_name[at_c<0>(_val)=_1]
 		                          > +blank > version_rule[push_back(at_c<2>(_val),_1)]] > ':' > *(
@@ -68,9 +75,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		modules_rule %= +module_rule;
 
 		function_rule.name("function_rule");
-		function_rule = *documentation_rule[push_back(at_c<4>(_val),_1)]
-		              >> -deprication_rule[push_back(at_c<4>(_val),_1)]
-		              >> -qi::lexeme['@' >> version_rule[push_back(at_c<4>(_val),_1)] >> space]
+		function_rule = meta_params_rule[at_c<4>(_val)=_1]
 		              >> type_rule[at_c<0>(_val)=_1]
 		              >> var_name[at_c<1>(_val)=_1]
 		              >> lit('(') >> (-(function_param_rule[push_back(at_c<2>(_val),_1)] % ',')) > lit(')')
@@ -101,6 +106,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 	qi::rule<Iterator, modegen::meta_parameters::version()> version_rule;
 	qi::rule<Iterator, modegen::meta_parameters::documentation()> documentation_rule;
 	qi::rule<Iterator, modegen::meta_parameters::deprication()> deprication_rule;
+	qi::rule<Iterator, modegen::meta_parameters::parameter_set> meta_params_rule;
 };
 } // namespace modegen
 

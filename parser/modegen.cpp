@@ -66,7 +66,7 @@ void modegen::meta_parameters::parameter_set::push_back(modegen::meta_parameters
 
 std::string_view modegen::meta_parameters::deprication::name() const
 {
-	return "deprication"sv;
+	return "depricated"sv;
 }
 
 std::string modegen::meta_parameters::deprication::value() const
