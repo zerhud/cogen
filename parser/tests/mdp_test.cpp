@@ -53,4 +53,13 @@ BOOST_AUTO_TEST_CASE(simple)
 
 	for(auto mod:mods) BOOST_CHECK_EQUAL(modegen::parse(mod).size(), 1);
 }
+BOOST_AUTO_TEST_CASE(no_params)
+{
+	auto with_n = "module mod v1:\ntype\nname\n(\n)\n;"sv;
+	auto mods = modegen::parse(with_n);
+	BOOST_REQUIRE_EQUAL(mods.size(),1);
+	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),0);
+	BOOST_CHECK_EQUAL(std::get<modegen::function>(mods[0].content[0]).func_params.size(), 0);
+}
 BOOST_AUTO_TEST_SUITE_END()
