@@ -95,4 +95,20 @@ BOOST_AUTO_TEST_CASE(params)
 	BOOST_CHECK_EQUAL(e.ios[0], "one");
 	BOOST_CHECK_EQUAL(e.ios[1], "two");
 }
+BOOST_AUTO_TEST_CASE(gen_ops)
+{
+	auto two_mems = "module mod v1: enum +flags +auto_io lala{one=>'one' two=>'two' }"sv;
+	auto mods = modegen::parse(two_mems);
+	BOOST_REQUIRE_EQUAL(mods.size(),1);
+	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),1);
+
+	modegen::enumeration& e = std::get<modegen::enumeration>(mods[0].content[0]);
+	BOOST_CHECK_EQUAL(e.elements.size(), 2);
+	BOOST_REQUIRE_EQUAL(e.ios.size(), 2);
+	BOOST_CHECK_EQUAL(e.ios[0], "one");
+	BOOST_CHECK_EQUAL(e.ios[1], "two");
+	BOOST_CHECK_EQUAL(e.gen_io, true);
+	BOOST_CHECK_EQUAL(e.use_bitmask, true);
+}
 BOOST_AUTO_TEST_SUITE_END()
