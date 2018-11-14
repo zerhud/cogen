@@ -33,7 +33,10 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		using boost::phoenix::push_back;
 
 		quoted_string.name("quoted_string");
-		quoted_string = '"' >> *(char_[_val+=_1] - lit('"')) >> '"';
+		quoted_string =
+		        ('"' >> *(char_[_val+=_1] - lit('"')) >> '"') |
+		        ("'" >> *(char_[_val+=_1] - lit("'")) >> "'")
+		        ;
 
 		var_name.name("var_name");
 		var_name = qi::lexeme[qi::ascii::alpha[_val+=_1] >> *(qi::ascii::alpha[_val+=_1]|qi::ascii::digit[_val+=_1]|lit('_')[_val+='_'])];
@@ -68,7 +71,8 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		              qi::lexeme[lit("module")
 		                          > +blank > var_name[at_c<0>(_val)=_1]
 		                          > +blank > version_rule[push_back(at_c<2>(_val),_1)]] > ':' > *(
-		               (function_rule)[push_back(at_c<1>(_val),_1)] > lit(';')
+		                ((function_rule)[push_back(at_c<1>(_val),_1)] > lit(';'))
+		              | (enum_rule[push_back(at_c<1>(_val),_1)])
 		               );
 
 		modules_rule.name("modules_rule");
@@ -81,6 +85,17 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		              >> lit('(') >> (-(function_param_rule[push_back(at_c<2>(_val),_1)] % ',')) > lit(')')
 		              >> -mutable_mod[at_c<3>(_val)=_1]
 		              ;
+
+		enum_rule.name("enum_rule");
+		enum_rule = meta_params_rule[at_c<3>(_val)=_1]
+		          >> qi::lexeme[lit("enum") >> space]
+		          >> -qi::lexeme[lit("flags")[at_c<5>(_val)=true] >> space]
+		          >> -qi::lexeme[lit("auto_io")[at_c<4>(_val)=true] >> space]
+		          >> var_name[at_c<0>(_val)=_1]
+		          >> lit('{')
+		          >> *(var_name[push_back(at_c<1>(_val),_1)] >> -( lit("=>") >> -quoted_string[push_back(at_c<2>(_val),_1)]) )
+		          >> lit('}')
+		           ;
 
 		qi::on_error<qi::fail>
 		(
@@ -101,6 +116,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 	qi::rule<Iterator, type(), boost::spirit::qi::ascii::space_type> type_rule;
 	qi::rule<Iterator, function(), boost::spirit::qi::ascii::space_type> function_rule;
 	qi::rule<Iterator, func_param(), boost::spirit::qi::ascii::space_type> function_param_rule;
+	qi::rule<Iterator, enumeration(), boost::spirit::qi::ascii::space_type> enum_rule;
 	qi::rule<Iterator, module(), boost::spirit::qi::ascii::space_type> module_rule;
 	qi::rule<Iterator, std::vector<module>(), boost::spirit::qi::ascii::space_type> modules_rule;
 	qi::rule<Iterator, modegen::meta_parameters::version()> version_rule;

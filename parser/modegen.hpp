@@ -97,17 +97,16 @@ BOOST_FUSION_ADAPT_STRUCT( modegen::function
 
 namespace modegen {
 	struct enumeration {
-		int v;
+		std::string name;
 		std::vector<std::string> elements;
 		std::vector<std::string> ios;
-		bool gen_comparator;
-		bool gen_iterator;
-		bool use_bitmask;
-		bool gen_io;
+		meta_parameters::parameter_set meta_params;
+
+		bool gen_io=false;
+		bool use_bitmask=false;
 	};
 } // namespace modegen
-BOOST_FUSION_ADAPT_STRUCT( modegen::enumeration, v, elements, ios,
-	gen_comparator, gen_iterator, use_bitmask, gen_io )
+BOOST_FUSION_ADAPT_STRUCT( modegen::enumeration, name, elements, ios, meta_params, gen_io, use_bitmask )
 
 namespace modegen {
 	struct interface {
@@ -118,13 +117,13 @@ namespace modegen {
 namespace modegen {
 	struct module {
 		std::string name;
-		std::vector<std::variant<function>> content;
+		std::vector<std::variant<function,enumeration>> content;
 		meta_parameters::parameter_set meta_params;
 	}; 
 } // namespace modegen
 
 BOOST_FUSION_ADAPT_STRUCT(   modegen::module
-                           , (std::string, name)
-                           , (std::vector<std::variant<modegen::function>>, content)
-                           , (modegen::meta_parameters::parameter_set, meta_params)
+                           , name
+                           , content
+                           , meta_params
                          )

@@ -63,3 +63,36 @@ BOOST_AUTO_TEST_CASE(no_params)
 	BOOST_CHECK_EQUAL(std::get<modegen::function>(mods[0].content[0]).func_params.size(), 0);
 }
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(enumerations)
+BOOST_AUTO_TEST_CASE(simple)
+{
+	auto two_mems = "module mod v1: enum lala{one two}"sv;
+	auto mods = modegen::parse(two_mems);
+	BOOST_REQUIRE_EQUAL(mods.size(),1);
+	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),1);
+
+	modegen::enumeration& e = std::get<modegen::enumeration>(mods[0].content[0]);
+	BOOST_CHECK_EQUAL(e.name, "lala");
+	BOOST_CHECK_EQUAL(e.elements.size(), 2);
+	BOOST_CHECK_EQUAL(e.ios.size(), 0);
+	BOOST_CHECK_EQUAL(e.meta_params.set.size(), 0);
+	BOOST_CHECK_EQUAL(e.gen_io, false);
+	BOOST_CHECK_EQUAL(e.use_bitmask, false);
+}
+BOOST_AUTO_TEST_CASE(params)
+{
+	auto two_mems = "module mod v1: enum lala{one=>'one' two=>'two' }"sv;
+	auto mods = modegen::parse(two_mems);
+	BOOST_REQUIRE_EQUAL(mods.size(),1);
+	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),1);
+
+	modegen::enumeration& e = std::get<modegen::enumeration>(mods[0].content[0]);
+	BOOST_CHECK_EQUAL(e.elements.size(), 2);
+	BOOST_REQUIRE_EQUAL(e.ios.size(), 2);
+	BOOST_CHECK_EQUAL(e.ios[0], "one");
+	BOOST_CHECK_EQUAL(e.ios[1], "two");
+}
+BOOST_AUTO_TEST_SUITE_END()
