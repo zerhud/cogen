@@ -47,8 +47,15 @@ int main(int,char**)
 	std::fstream file("pdata");
 	std::string pdata{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
 
-	auto result = modegen::parse(pdata);
-	for(auto& mod:result) print_mod(mod);
+	try{
+		auto result = modegen::parse(pdata);
+		for(auto& mod:result) print_mod(mod);
+	}
+	catch(const std::runtime_error& ex)
+	{
+		std::cerr << ex.what() << std::endl;
+		return -1;
+	}
 
 	return 0;
 }

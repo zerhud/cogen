@@ -125,18 +125,6 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		                         >> *((function_rule[push_back(at_c<1>(_val),_1)] | constructor_rule[push_back(at_c<2>(_val),_1)]) >> lit(';'))
 		                         >> lit('}')
 		  ;
-
-		qi::on_error<qi::fail>
-		(
-		    modules_rule
-		  , std::cout
-		        << boost::phoenix::val("Error! Expecting ")
-		        << qi::_4                               // what failed?
-		        << boost::phoenix::val(" here: \"")
-		        << boost::phoenix::construct<std::string>(qi::_3, qi::_2)   // iterators to error-pos, end
-		        << boost::phoenix::val("\"")
-		        << std::endl
-		);
 	}
 
 	qi::rule<Iterator, bool()> mutable_mod;
@@ -157,7 +145,45 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 	qi::rule<Iterator, modegen::meta_parameters::deprication()> deprication_rule;
 	qi::rule<Iterator, modegen::meta_parameters::parameter_set> meta_params_rule;
 };
+
+namespace error_hander {
+struct printer
+{
+	typedef boost::spirit::utf8_string string;
+
+	mutable std::stringstream result;
+
+	void element(string const& tag, string const& value, int depth) const
+	{
+		for (int i = 0; i < (depth*4); ++i) // indent to depth
+			result << ' ';
+
+		result << "tag: " << tag;
+		if (value != "") result << ", value: " << value;
+		result << std::endl;
+	}
+};
+
+std::string print_info(boost::spirit::info const& what)
+{
+	using boost::spirit::basic_info_walker;
+
+	printer pr;
+	basic_info_walker<printer> walker(pr, what.tag, 0);
+	boost::apply_visitor(walker, what.value);
+
+	return pr.result.str();
+}
+
+struct inner_error : std::runtime_error {
+	//std::string w;
+	//inner_error(std::string s) : w(std::move(s)) {}
+	//const char* what() const noexcept override {return w.c_str();}
+	inner_error(std::string s) : std::runtime_error(s) {}
+};
+} // namespace error_handler
 } // namespace modegen
+
 
 std::vector<modegen::module> modegen::parse(std::string_view pdata)
 {
@@ -166,8 +192,16 @@ std::vector<modegen::module> modegen::parse(std::string_view pdata)
 
 	std::vector<modegen::module> result;
 
-	modegen::grammar<decltype(begin)> mg_parser;
-	bool r = boost::spirit::qi::phrase_parse(begin,end, mg_parser, boost::spirit::ascii::space, result);
+	bool r=false;
+	try {
+		modegen::grammar<decltype(begin)> mg_parser;
+		r = boost::spirit::qi::phrase_parse(begin,end, mg_parser, boost::spirit::ascii::space, result);
+	}
+	catch(boost::spirit::qi::expectation_failure<const char*>& ex) {
+		auto result = error_hander::print_info(ex.what_);
+		result += "\n\nnot parsed part:\n" + std::string(ex.first,ex.last);
+		throw error_hander::inner_error(std::move(result));
+	}
 
 	if(!r) throw std::runtime_error("cannot parse");
 	return result;
