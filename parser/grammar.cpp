@@ -47,6 +47,9 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		type_rule.name("type_definition");
 		type_rule = var_name[at_c<0>(_val)=_1] | (var_name[at_c<1>(_val)=_1] > lit('<') > var_name[at_c<0>(_val)=_1] > lit('>'));
 
+		using_rule.name("using_rule");
+		using_rule = lit("using") > +blank > var_name[at_c<0>(_val)=_1];
+
 		version_rule.name("version_rule");
 		version_rule = lit('v') >> qi::uint_;
 
@@ -73,6 +76,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		                          > +blank > version_rule[push_back(at_c<2>(_val),_1)]] > ':' > *(
 		                ((function_rule)[push_back(at_c<1>(_val),_1)] > lit(';'))
 		              | (enum_rule[push_back(at_c<1>(_val),_1)])
+		              | (using_rule[push_back(at_c<3>(_val),_1)])
 		               );
 
 		modules_rule.name("modules_rule");
@@ -113,6 +117,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 	qi::rule<Iterator, bool()> mutable_mod;
 	qi::rule<Iterator, std::string()> var_name;
 	qi::rule<Iterator, std::string()> quoted_string;
+	qi::rule<Iterator, modegen::using_directive> using_rule;
 	qi::rule<Iterator, type(), boost::spirit::qi::ascii::space_type> type_rule;
 	qi::rule<Iterator, function(), boost::spirit::qi::ascii::space_type> function_rule;
 	qi::rule<Iterator, func_param(), boost::spirit::qi::ascii::space_type> function_param_rule;

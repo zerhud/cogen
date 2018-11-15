@@ -39,6 +39,20 @@ BOOST_AUTO_TEST_CASE(module_params)
 	BOOST_REQUIRE_EQUAL(mods[0].meta_params.set[1].index(), 0);
 }
 
+BOOST_AUTO_TEST_CASE(using_rule)
+{
+	auto mods = modegen::parse("module mod v1: using some"sv);
+	BOOST_REQUIRE_EQUAL(mods.size(), 1);
+	BOOST_REQUIRE_EQUAL(mods[0].imports.size(), 1);
+	BOOST_CHECK_EQUAL(mods[0].imports[0].mod_name, "some" );
+
+	mods = modegen::parse("module mod v1: using some   "sv);
+	BOOST_REQUIRE_EQUAL(mods.size(), 1);
+
+	mods = modegen::parse("module mod v1: using some\n\n\n"sv);
+	BOOST_REQUIRE_EQUAL(mods.size(), 1);
+}
+
 BOOST_AUTO_TEST_SUITE(functions)
 BOOST_AUTO_TEST_CASE(simple)
 {

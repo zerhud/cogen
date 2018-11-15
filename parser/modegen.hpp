@@ -110,20 +110,35 @@ BOOST_FUSION_ADAPT_STRUCT( modegen::enumeration, name, elements, ios, meta_param
 
 namespace modegen {
 	struct interface {
-		int v;
+		std::string name;
+		std::vector<function> funcs;
+		meta_parameters::parameter_set meta_params;
+		bool realization_in_client = false;
+	};
+
+	struct record {
+		std::string name;
+		std::vector<func_param> members;
+		meta_parameters::parameter_set meta_params;
 	};
 } // namespace modegen
 
 namespace modegen {
-	struct module {
-		std::string name;
-		std::vector<std::variant<function,enumeration>> content;
-		meta_parameters::parameter_set meta_params;
-	}; 
+struct using_directive {
+	std::string mod_name;
+};
+struct module {
+	std::string name;
+	std::vector<std::variant<function,enumeration>> content;
+	meta_parameters::parameter_set meta_params;
+	std::vector<using_directive> imports;
+};
 } // namespace modegen
 
+BOOST_FUSION_ADAPT_STRUCT(   modegen::using_directive, mod_name )
 BOOST_FUSION_ADAPT_STRUCT(   modegen::module
                            , name
                            , content
                            , meta_params
+                           , imports
                          )
