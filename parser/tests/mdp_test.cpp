@@ -65,6 +65,23 @@ BOOST_AUTO_TEST_CASE(record_rule)
 	BOOST_REQUIRE_EQUAL(rec.members.size(), 2);
 }
 
+BOOST_AUTO_TEST_CASE(interfaceq_rule)
+{
+	auto mods = modegen::parse("module mod v1: interface inter{ static type some() const; type other() mutable;}");
+	BOOST_REQUIRE_EQUAL(mods.size(), 1);
+	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),3);
+
+	modegen::interface& i = std::get<modegen::interface>(mods[0].content[0]);
+	BOOST_CHECK_EQUAL(i.name, "inter");
+	BOOST_CHECK_EQUAL(i.realization_in_client, false);
+
+	BOOST_REQUIRE_EQUAL(i.mem_funcs.size(), 2);
+	BOOST_CHECK_EQUAL(i.mem_funcs[1].is_static.has_value(),false);
+	BOOST_REQUIRE_EQUAL(i.mem_funcs[0].is_static.has_value(),true);
+	BOOST_CHECK_EQUAL(*i.mem_funcs[0].is_static,true);
+}
+
 BOOST_AUTO_TEST_SUITE(functions)
 BOOST_AUTO_TEST_CASE(simple)
 {
