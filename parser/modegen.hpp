@@ -109,19 +109,21 @@ namespace modegen {
 BOOST_FUSION_ADAPT_STRUCT( modegen::enumeration, name, elements, ios, meta_params, gen_io, use_bitmask )
 
 namespace modegen {
-	struct interface {
-		std::string name;
-		std::vector<function> funcs;
-		meta_parameters::parameter_set meta_params;
-		bool realization_in_client = false;
-	};
-
 	struct record {
 		std::string name;
 		std::vector<func_param> members;
 		meta_parameters::parameter_set meta_params;
 	};
+
+	struct interface {
+		std::string name;
+		std::vector<function> mem_funcs;
+		meta_parameters::parameter_set meta_params;
+		bool realization_in_client = false;
+	};
 } // namespace modegen
+BOOST_FUSION_ADAPT_STRUCT( modegen::record, name, members, meta_params )
+BOOST_FUSION_ADAPT_STRUCT( modegen::interface, name, mem_funcs, meta_params, realization_in_client )
 
 namespace modegen {
 struct using_directive {
@@ -129,7 +131,7 @@ struct using_directive {
 };
 struct module {
 	std::string name;
-	std::vector<std::variant<function,enumeration>> content;
+	std::vector<std::variant<function,enumeration,record,interface>> content;
 	meta_parameters::parameter_set meta_params;
 	std::vector<using_directive> imports;
 };

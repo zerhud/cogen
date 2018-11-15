@@ -53,6 +53,18 @@ BOOST_AUTO_TEST_CASE(using_rule)
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
 }
 
+BOOST_AUTO_TEST_CASE(record_rule)
+{
+	auto mods = modegen::parse("module mod v1: record some{type some; type other;}"sv);
+	BOOST_REQUIRE_EQUAL(mods.size(), 1);
+	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),2);
+
+	modegen::record& rec = std::get<modegen::record>(mods[0].content[0]);
+	BOOST_REQUIRE_EQUAL(rec.name, "some");
+	BOOST_REQUIRE_EQUAL(rec.members.size(), 2);
+}
+
 BOOST_AUTO_TEST_SUITE(functions)
 BOOST_AUTO_TEST_CASE(simple)
 {
