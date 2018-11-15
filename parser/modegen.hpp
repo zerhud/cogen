@@ -86,8 +86,14 @@ namespace modegen {
 		std::vector<func_param> func_params;
 		meta_parameters::parameter_set meta_params;
 	};
+
+	struct constructor_fnc {
+		std::vector<func_param> func_params;
+		meta_parameters::parameter_set meta_params;
+	};
 } // namespace modegen
 BOOST_FUSION_ADAPT_STRUCT( modegen::func_param, (modegen::type, param_type), (std::string, name) )
+BOOST_FUSION_ADAPT_STRUCT( modegen::constructor_fnc, func_params, meta_params )
 BOOST_FUSION_ADAPT_STRUCT( modegen::function
                            , (modegen::type, return_type)
                            , (std::string, name)
@@ -120,12 +126,13 @@ namespace modegen {
 	struct interface {
 		std::string name;
 		std::vector<function> mem_funcs;
+		std::vector<constructor_fnc> constructors;
 		meta_parameters::parameter_set meta_params;
 		bool realization_in_client = false;
 	};
 } // namespace modegen
 BOOST_FUSION_ADAPT_STRUCT( modegen::record, name, members, meta_params )
-BOOST_FUSION_ADAPT_STRUCT( modegen::interface, name, mem_funcs, meta_params, realization_in_client )
+BOOST_FUSION_ADAPT_STRUCT( modegen::interface, name, mem_funcs, constructors, meta_params, realization_in_client )
 
 namespace modegen {
 struct using_directive {

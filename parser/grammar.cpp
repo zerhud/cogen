@@ -93,6 +93,12 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		              >> -mutable_mod[at_c<4>(_val)=_1]
 		              ;
 
+		constructor_rule.name("constructor_rule");
+		constructor_rule =  meta_params_rule[at_c<1>(_val)=_1] >> lit("constructor")
+		                 >> lit('(') >> (-(function_param_rule[push_back(at_c<0>(_val),_1)] % ',')) > lit(')')
+		  ;
+
+
 		enum_rule.name("enum_rule");
 		enum_rule = meta_params_rule[at_c<3>(_val)=_1]
 		          >> qi::lexeme[lit("enum") >> space]
@@ -113,10 +119,10 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		  ;
 
 		interface_rule.name("interface_rule");
-		interface_rule = meta_params_rule[at_c<2>(_val)=_1]
-		                         >> qi::lexeme[lit("interface") >> +space >> -lit("+i")[at_c<3>(_val)=true] >> var_name[at_c<0>(_val)=_1]]
+		interface_rule = meta_params_rule[at_c<3>(_val)=_1]
+		                         >> qi::lexeme[lit("interface") >> +space >> -lit("+i")[at_c<4>(_val)=true] >> var_name[at_c<0>(_val)=_1]]
 		                         >> lit('{')
-		                         >> *(function_rule[push_back(at_c<1>(_val),_1)] >> lit(';'))
+		                         >> *((function_rule[push_back(at_c<1>(_val),_1)] | constructor_rule[push_back(at_c<2>(_val),_1)]) >> lit(';'))
 		                         >> lit('}')
 		  ;
 
@@ -139,6 +145,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 	qi::rule<Iterator, modegen::using_directive> using_rule;
 	qi::rule<Iterator, type(), boost::spirit::qi::ascii::space_type> type_rule;
 	qi::rule<Iterator, function(), boost::spirit::qi::ascii::space_type> function_rule;
+	qi::rule<Iterator, constructor_fnc(), boost::spirit::qi::ascii::space_type> constructor_rule;
 	qi::rule<Iterator, func_param(), boost::spirit::qi::ascii::space_type> function_param_rule;
 	qi::rule<Iterator, enumeration(), boost::spirit::qi::ascii::space_type> enum_rule;
 	qi::rule<Iterator, record(), boost::spirit::qi::ascii::space_type> record_rule;
