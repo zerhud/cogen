@@ -17,14 +17,15 @@ public:
 	void operator ()(std::vector<module>& mods) const ;
 private:
 	void check_mod(const module& mod) const ;
-	void check_func(const function& f) const ;
-	void check_methd(const function& f) const ;
-	void check_class(const interface& i) const ;
-	void check_enum(const enumeration& e) const ;
+	void check(const record& f, const std::string& path) const ;
+	void check(const function& f, const std::string& path) const ;
+	void check(const interface& i, const std::string& path) const ;
+	void check(const enumeration& e, const std::string& path) const ;
 
 	void check_names(std::vector<std::string> nl, const std::string& path) const ;
 
 	std::string cur_file;
+	const static std::string pdel;
 };
 
 } // namespace modegen

@@ -1,5 +1,7 @@
 #include "check.h"
 
+const std::string modegen::checker::pdel = ".";
+
 modegen::error_info::error_info(std::string f, std::string p, std::string w)
     : std::runtime_error("in " + f + " " + p + ": " + w)
     , file(std::move(f))
@@ -22,6 +24,31 @@ void modegen::checker::check_mod(const modegen::module& mod) const
 	auto name_collector = [&nl](const auto& e){nl.emplace_back(e.name);};
 	for(auto& c:mod.content) std::visit(name_collector, c);
 	check_names(std::move(nl), mod.name);
+
+	auto check_caller = [this,&mod](const auto& v){check(v, mod.name);};
+	for(auto& c:mod.content) std::visit(check_caller, c);
+}
+
+void modegen::checker::check(const modegen::record& f, const std::string& path) const
+{
+
+}
+
+void modegen::checker::check(const modegen::function& f, const std::string& path) const
+{
+
+}
+
+void modegen::checker::check(const modegen::interface& i, const std::string& path) const
+{
+	std::vector<std::string> nl;
+	for(auto& fnc:i.mem_funcs) nl.emplace_back(fnc.name);
+	check_names(nl, path+pdel+i.name);
+}
+
+void modegen::checker::check(const modegen::enumeration& e, const std::string& path) const
+{
+
 }
 
 void modegen::checker::check_names(std::vector<std::string> nl, const std::string& path) const
