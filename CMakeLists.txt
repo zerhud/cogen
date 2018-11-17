@@ -4,8 +4,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 find_package(Boost COMPONENTS program_options unit_test_framework REQUIRED)
 
-set(sources parser/grammar.cpp parser/modegen.cpp)
-set(headers parser/grammar.hpp parser/modegen.hpp)
+set(sources parser/grammar.cpp parser/modegen.cpp parser/check.cpp)
+set(headers parser/grammar.hpp parser/modegen.hpp parser/check.h)
 
 add_library(modegen_tree ${sources} ${headers})
 target_link_libraries(modegen_tree PRIVATE ${Boost_LIBRARIES})
@@ -14,9 +14,13 @@ target_include_directories(modegen_tree PUBLIC parser)
 add_executable("${PROJECT_NAME}" parser/main.cpp)
 target_link_libraries("${PROJECT_NAME}" PRIVATE modegen_tree)
 
-add_executable(mdp_test "parser/tests/mdp_test.cpp")
-target_link_libraries(mdp_test PRIVATE modegen_tree ${Boost_LIBRARIES})
-
+set(tests mdp checker)
 enable_testing()
-add_test(NAME mdp COMMAND mdp_test)
+
+foreach(tname ${tests})
+	add_executable(${tname}_test "parser/tests/${tname}_test.cpp")
+	target_link_libraries(${tname}_test PRIVATE modegen_tree ${Boost_LIBRARIES})
+
+	add_test(NAME ${tname} COMMAND ${tname}_test)
+endforeach()
 

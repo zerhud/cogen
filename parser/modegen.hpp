@@ -143,6 +143,7 @@ struct module {
 	std::vector<std::variant<function,enumeration,record,interface>> content;
 	meta_parameters::parameter_set meta_params;
 	std::vector<using_directive> imports;
+	std::string file_name;
 };
 } // namespace modegen
 
