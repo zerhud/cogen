@@ -59,8 +59,8 @@ cppjson::value modegen::converters::to_json::as_object(const modegen::enumeratio
 	ret["use_bitmask"] = obj.use_bitmask;
 
 	for(std::size_t i=0;i<obj.elements.size();++i) {
-		//ret["members"][i]["name"] = obj.elements[i];
-		//ret["members"][i]["output"] = obj.ios[i];
+		ret["members"][i]["name"] = obj.elements[i].name;
+		ret["members"][i]["output"] = obj.elements[i].io;
 	}
 
 	return ret;
