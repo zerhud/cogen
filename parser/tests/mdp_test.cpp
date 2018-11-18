@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(simple)
 	modegen::enumeration& e = std::get<modegen::enumeration>(mods[0].content[0]);
 	BOOST_CHECK_EQUAL(e.name, "lala");
 	BOOST_CHECK_EQUAL(e.elements.size(), 2);
-	BOOST_CHECK_EQUAL(e.ios.size(), 0);
+	for(auto& el:e.elements) BOOST_CHECK(el.io.empty());
 	BOOST_CHECK_EQUAL(e.meta_params.set.size(), 0);
 	BOOST_CHECK_EQUAL(e.gen_io, false);
 	BOOST_CHECK_EQUAL(e.use_bitmask, false);
@@ -137,23 +137,25 @@ BOOST_AUTO_TEST_CASE(params)
 
 	modegen::enumeration& e = std::get<modegen::enumeration>(mods[0].content[0]);
 	BOOST_CHECK_EQUAL(e.elements.size(), 2);
-	BOOST_REQUIRE_EQUAL(e.ios.size(), 2);
-	BOOST_CHECK_EQUAL(e.ios[0], "one");
-	BOOST_CHECK_EQUAL(e.ios[1], "two");
+	BOOST_CHECK_EQUAL(e.elements[0].name, "one");
+	BOOST_CHECK_EQUAL(e.elements[0].io, "one");
+	BOOST_CHECK_EQUAL(e.elements[1].name, "two");
+	BOOST_CHECK_EQUAL(e.elements[1].io, "two");
 }
 BOOST_AUTO_TEST_CASE(gen_ops)
 {
-	auto two_mems = "module mod v1: enum +flags +auto_io lala{one=>'one' two=>'two' }"sv;
+	auto two_mems = "module mod v1: enum +flags +auto_io lala{one=>'oneio' two=>'twoio' }"sv;
 	auto mods = modegen::parse(two_mems);
 	BOOST_REQUIRE_EQUAL(mods.size(),1);
 	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
 	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),1);
 
 	modegen::enumeration& e = std::get<modegen::enumeration>(mods[0].content[0]);
-	BOOST_CHECK_EQUAL(e.elements.size(), 2);
-	BOOST_REQUIRE_EQUAL(e.ios.size(), 2);
-	BOOST_CHECK_EQUAL(e.ios[0], "one");
-	BOOST_CHECK_EQUAL(e.ios[1], "two");
+	BOOST_REQUIRE_EQUAL(e.elements.size(), 2);
+	BOOST_CHECK_EQUAL(e.elements[0].name, "one");
+	BOOST_CHECK_EQUAL(e.elements[1].name, "two");
+	BOOST_CHECK_EQUAL(e.elements[0].io, "oneio");
+	BOOST_CHECK_EQUAL(e.elements[1].io, "twoio");
 	BOOST_CHECK_EQUAL(e.gen_io, true);
 	BOOST_CHECK_EQUAL(e.use_bitmask, true);
 }

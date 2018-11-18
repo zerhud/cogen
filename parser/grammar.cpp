@@ -99,14 +99,17 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		  ;
 
 
+		enum_element_rule.name("enum_elemen");
+		enum_element_rule = var_name[at_c<0>(_val)=_1] >> -(lit("=>") >> quoted_string[at_c<1>(_val)=_1]);
+
 		enum_rule.name("enum_rule");
-		enum_rule = meta_params_rule[at_c<3>(_val)=_1]
+		enum_rule = meta_params_rule[at_c<2>(_val)=_1]
 		          >> qi::lexeme[lit("enum") >> space]
-		          >> -qi::lexeme[lit("+flags")[at_c<5>(_val)=true] >> space]
-		          >> -qi::lexeme[lit("+auto_io")[at_c<4>(_val)=true] >> space]
+		          >> -qi::lexeme[lit("+flags")[at_c<4>(_val)=true] >> space]
+		          >> -qi::lexeme[lit("+auto_io")[at_c<3>(_val)=true] >> space]
 		          >> var_name[at_c<0>(_val)=_1]
 		          >> lit('{')
-		          >> *(var_name[push_back(at_c<1>(_val),_1)] >> -( lit("=>") >> -quoted_string[push_back(at_c<2>(_val),_1)]) )
+		          >> *(enum_element_rule[push_back(at_c<1>(_val),_1)])
 		          >> lit('}')
 		           ;
 
@@ -135,6 +138,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 	qi::rule<Iterator, function(), boost::spirit::qi::ascii::space_type> function_rule;
 	qi::rule<Iterator, constructor_fnc(), boost::spirit::qi::ascii::space_type> constructor_rule;
 	qi::rule<Iterator, func_param(), boost::spirit::qi::ascii::space_type> function_param_rule;
+	qi::rule<Iterator, enum_element(), boost::spirit::qi::ascii::space_type> enum_element_rule;
 	qi::rule<Iterator, enumeration(), boost::spirit::qi::ascii::space_type> enum_rule;
 	qi::rule<Iterator, record(), boost::spirit::qi::ascii::space_type> record_rule;
 	qi::rule<Iterator, interface(), boost::spirit::qi::ascii::space_type> interface_rule;

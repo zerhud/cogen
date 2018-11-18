@@ -98,7 +98,10 @@ void modegen::checker::check(const modegen::interface& i, const std::string& pat
 void modegen::checker::check(const modegen::enumeration& e, const std::string& path) const
 {
 	check_version_is_overmin(e.meta_params, make_path(path, e.name));
-	check_names(e.elements, make_path(path,e.name));
+
+	std::vector<std::string> nl;
+	for(auto& en:e.elements) nl.emplace_back(en.name);
+	check_names(nl, make_path(path,e.name));
 }
 
 void modegen::checker::check_names(std::vector<std::string> nl, const std::string& path) const

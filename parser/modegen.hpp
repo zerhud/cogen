@@ -104,17 +104,21 @@ BOOST_FUSION_ADAPT_STRUCT( modegen::function
                           )
 
 namespace modegen {
+	struct enum_element {
+		std::string name;
+		std::string io;
+	};
 	struct enumeration {
 		std::string name;
-		std::vector<std::string> elements;
-		std::vector<std::string> ios;
+		std::vector<enum_element> elements;
 		meta_parameters::parameter_set meta_params;
 
 		bool gen_io=false;
 		bool use_bitmask=false;
 	};
 } // namespace modegen
-BOOST_FUSION_ADAPT_STRUCT( modegen::enumeration, name, elements, ios, meta_params, gen_io, use_bitmask )
+BOOST_FUSION_ADAPT_STRUCT( modegen::enum_element, name, io )
+BOOST_FUSION_ADAPT_STRUCT( modegen::enumeration, name, elements, meta_params, gen_io, use_bitmask )
 
 namespace modegen {
 	struct record {
