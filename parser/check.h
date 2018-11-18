@@ -24,6 +24,7 @@ private:
 
 	void check_names(std::vector<std::string> nl, const std::string& path) const ;
 	void check_version_is_single(const meta_parameters::parameter_set& p, const std::string& path) const ;
+	void check_version_is_overmin(const meta_parameters::parameter_set& p, const std::string& path) const ;
 	void check_deprication_is_single(const meta_parameters::parameter_set& p, const std::string& path) const ;
 	bool is_same_ver(const module& m1, const module& m2) const ;
 
@@ -36,7 +37,16 @@ private:
 		else return v1 + pdel + make_path(std::forward<Args>(v)...);
 	}
 
+	template<typename T>
+	void upgrade_cur_min_ver(const T& t) const
+	{
+		for(auto& p:t.meta_params) {
+			if(auto pv=std::get_if<meta_parameters::version>(&p); pv) cur_min_ver = pv->val;
+		}
+	}
+
 	mutable std::string cur_file;
+	mutable std::uint64_t cur_min_ver=0;
 	const static std::string pdel;
 };
 

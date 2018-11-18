@@ -53,6 +53,8 @@ void modegen::checker::check_mod(const modegen::module& mod) const
 	for(auto& c:mod.content) std::visit(name_collector, c);
 	check_names(std::move(nl), mod.name);
 
+	upgrade_cur_min_ver(mod);
+
 	auto check_caller = [this,&mod](const auto& v){check(v, mod.name);};
 	for(auto& c:mod.content) std::visit(check_caller, c);
 
@@ -62,6 +64,7 @@ void modegen::checker::check_mod(const modegen::module& mod) const
 
 void modegen::checker::check(const modegen::record& r, const std::string& path) const
 {
+	check_version_is_overmin(r.meta_params, make_path(path, r.name));
 	std::vector<std::string> nl;
 	for(auto& rm:r.members) nl.emplace_back(rm.name);
 	check_names(nl, make_path(path,r.name));
@@ -69,22 +72,32 @@ void modegen::checker::check(const modegen::record& r, const std::string& path) 
 
 void modegen::checker::check(const modegen::function& f, const std::string& path) const
 {
-
+	check_version_is_overmin(f.meta_params, make_path(path, f.name));
 }
 
 void modegen::checker::check(const modegen::interface& i, const std::string& path) const
 {
+	check_version_is_overmin(i.meta_params, make_path(path, i.name));
+
 	std::vector<std::string> nl;
 	for(auto& fnc:i.mem_funcs) nl.emplace_back(fnc.name);
 	check_names(nl, make_path(path,i.name));
 
-	for(auto& fnc:i.mem_funcs)
+	auto old_min_ver = cur_min_ver;
+	upgrade_cur_min_ver(i);
+
+	for(auto& fnc:i.mem_funcs) {
 		if(!fnc.is_mutable.has_value())
 			throw error_info(cur_file, make_path(path,i.name,fnc.name), "all methods must to be const or mutable");
+		check(fnc, make_path(path, i.name));
+	}
+
+	cur_min_ver = old_min_ver;
 }
 
 void modegen::checker::check(const modegen::enumeration& e, const std::string& path) const
 {
+	check_version_is_overmin(e.meta_params, make_path(path, e.name));
 	check_names(e.elements, make_path(path,e.name));
 }
 
@@ -105,6 +118,15 @@ void modegen::checker::check_version_is_single(const modegen::meta_parameters::p
 		if(std::holds_alternative<meta_parameters::version>(par)) {
 			if(par_was) throw error_info(cur_file, path, "double version parameter");
 			else par_was = true;
+		}
+	}
+}
+
+void modegen::checker::check_version_is_overmin(const modegen::meta_parameters::parameter_set& p, const std::string& path) const
+{
+	for(auto& par:p) {
+		if(auto pv=std::get_if<meta_parameters::version>(&par); pv) {
+			if(pv->val < cur_min_ver) throw error_info(cur_file, path, "veresion in module must be minimum");
 		}
 	}
 }
