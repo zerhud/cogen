@@ -23,6 +23,11 @@ private:
 	void check(const enumeration& e, const std::string& path) const ;
 
 	void check_names(std::vector<std::string> nl, const std::string& path) const ;
+	void check_version_is_single(const meta_parameters::parameter_set& p, const std::string& path) const ;
+	void check_deprication_is_single(const meta_parameters::parameter_set& p, const std::string& path) const ;
+	bool is_same_ver(const module& m1, const module& m2) const ;
+
+	bool combine(module& to, module& from) const ;
 
 	template<typename T, typename... Args>
 	static std::string make_path(T&& v1, Args... v)
@@ -31,7 +36,7 @@ private:
 		else return v1 + pdel + make_path(std::forward<Args>(v)...);
 	}
 
-	std::string cur_file;
+	mutable std::string cur_file;
 	const static std::string pdel;
 };
 

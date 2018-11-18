@@ -1,5 +1,8 @@
 #include "check.h"
 
+#include <memory>
+#include <cassert>
+
 const std::string modegen::checker::pdel = ".";
 
 modegen::error_info::error_info(std::string f, std::string p, std::string w)
@@ -12,10 +15,35 @@ modegen::error_info::error_info(std::string f, std::string p, std::string w)
 
 void modegen::checker::operator ()(std::vector<modegen::module>& mods, std::string_view file_name) const
 {
+	cur_file = file_name;
+	auto file_resetter = [this](char*){cur_file.clear();};
+	[[maybe_unused]] auto guard = std::unique_ptr<char,decltype(file_resetter)>{nullptr, file_resetter};
+
 	for(auto& mod:mods) {
 		mod.file_name = file_name;
 		check_mod(mod);
 	}
+}
+
+void modegen::checker::operator ()(std::vector<modegen::module>& mods) const
+{
+	if(mods.size()<2) return ;
+
+	auto end = mods.end();
+	for(auto beg = mods.begin();beg!=end;++beg) {
+		for(auto cmp=beg+1;cmp!=end;++cmp) {
+			if(beg->name == cmp->name && combine(*beg, *cmp)) {
+				if(--end == cmp--) break;;
+				*cmp = std::move(*end);
+			}
+		}
+
+		if(beg==end) break;
+	}
+
+	if(end != mods.end()) mods.erase(end, mods.end());
+
+	for(auto& mod:mods) check_mod(mod);
 }
 
 void modegen::checker::check_mod(const modegen::module& mod) const
@@ -27,6 +55,9 @@ void modegen::checker::check_mod(const modegen::module& mod) const
 
 	auto check_caller = [this,&mod](const auto& v){check(v, mod.name);};
 	for(auto& c:mod.content) std::visit(check_caller, c);
+
+	check_version_is_single(mod.meta_params, make_path(mod.name));
+	check_deprication_is_single(mod.meta_params, make_path(mod.name));
 }
 
 void modegen::checker::check(const modegen::record& r, const std::string& path) const
@@ -65,4 +96,57 @@ void modegen::checker::check_names(std::vector<std::string> nl, const std::strin
 		nl.pop_back();
 		if(!check(name)) throw error_info(cur_file, path, "duplicate name " + name);
 	}
+}
+
+void modegen::checker::check_version_is_single(const modegen::meta_parameters::parameter_set& p, const std::string& path) const
+{
+	bool par_was = false;
+	for(auto& par:p.set) {
+		if(std::holds_alternative<meta_parameters::version>(par)) {
+			if(par_was) throw error_info(cur_file, path, "double version parameter");
+			else par_was = true;
+		}
+	}
+}
+
+void modegen::checker::check_deprication_is_single(const modegen::meta_parameters::parameter_set& p, const std::string& path) const
+{
+	bool dep_was = false;
+	for(auto& par:p.set) {
+		if(std::holds_alternative<meta_parameters::deprication>(par)) {
+			if(dep_was) throw error_info(cur_file, path, "double deprication parameter");
+			else dep_was = true;
+		}
+	}
+}
+
+bool modegen::checker::is_same_ver(const modegen::module& m1, const modegen::module& m2) const
+{
+	for(auto& p1:m1.meta_params) {
+		if(std::holds_alternative<meta_parameters::version>(p1)) {
+			for(auto& p2:m2.meta_params) {
+				if(std::holds_alternative<meta_parameters::version>(p2)) {
+					return std::get<meta_parameters::version>(p1).val == std::get<meta_parameters::version>(p2).val;
+				}
+			}
+		}
+	}
+
+	throw error_info(cur_file, m1.name + " | " + m2.name, "one of this modules has no version tag");
+}
+
+bool modegen::checker::combine(modegen::module& to, modegen::module& from) const
+{
+	assert(to.name == from.name);
+
+	if(!is_same_ver(to, from)) return false;
+
+	to.file_name += "; " + from.file_name;
+	for(auto& cnt:from.content) to.content.emplace_back(std::move(cnt));
+	for(auto& imp:from.imports) to.imports.emplace_back(std::move(imp)); //TODO: duplicate imports?
+
+	//std::optional<meta_parameters::deprication> to_dep_param;
+	//for(auto& par:to.meta_params) if(std::holds_alternative<meta_parameters::deprication>(par)) to_dep_param.emplace(std::move(par));
+
+	return true;
 }
