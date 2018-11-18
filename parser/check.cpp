@@ -29,9 +29,11 @@ void modegen::checker::check_mod(const modegen::module& mod) const
 	for(auto& c:mod.content) std::visit(check_caller, c);
 }
 
-void modegen::checker::check(const modegen::record& f, const std::string& path) const
+void modegen::checker::check(const modegen::record& r, const std::string& path) const
 {
-
+	std::vector<std::string> nl;
+	for(auto& rm:r.members) nl.emplace_back(rm.name);
+	check_names(nl, make_path(path,r.name));
 }
 
 void modegen::checker::check(const modegen::function& f, const std::string& path) const
@@ -43,12 +45,16 @@ void modegen::checker::check(const modegen::interface& i, const std::string& pat
 {
 	std::vector<std::string> nl;
 	for(auto& fnc:i.mem_funcs) nl.emplace_back(fnc.name);
-	check_names(nl, path+pdel+i.name);
+	check_names(nl, make_path(path,i.name));
+
+	for(auto& fnc:i.mem_funcs)
+		if(!fnc.is_mutable.has_value())
+			throw error_info(cur_file, make_path(path,i.name,fnc.name), "all methods must to be const or mutable");
 }
 
 void modegen::checker::check(const modegen::enumeration& e, const std::string& path) const
 {
-
+	check_names(e.elements, make_path(path,e.name));
 }
 
 void modegen::checker::check_names(std::vector<std::string> nl, const std::string& path) const

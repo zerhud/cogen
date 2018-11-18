@@ -24,6 +24,8 @@ BOOST_AUTO_TEST_CASE(module)
 	BOOST_REQUIRE_EQUAL(mods.size(), 2);
 	modegen::checker ch;
 	check_exception(ch, mods, "mod2");
+	BOOST_CHECK_EQUAL(mods[0].file_name, "test");
+	BOOST_CHECK_EQUAL(mods[1].file_name, "test");
 }
 BOOST_AUTO_TEST_CASE(interface)
 {
@@ -33,3 +35,11 @@ BOOST_AUTO_TEST_CASE(interface)
 	check_exception(ch, mods, "mod.i2");
 }
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_CASE(method_const_mark)
+{
+	auto mods = modegen::parse("module mod v1: interface i1{type name() const;} interface i2{type name();}"sv);
+	BOOST_REQUIRE_EQUAL(mods.size(), 1);
+	modegen::checker ch;
+	check_exception(ch, mods, "mod.i2.name");
+}

@@ -24,6 +24,13 @@ private:
 
 	void check_names(std::vector<std::string> nl, const std::string& path) const ;
 
+	template<typename T, typename... Args>
+	static std::string make_path(T&& v1, Args... v)
+	{
+		if constexpr(sizeof...(Args)==0) return v1;
+		else return v1 + pdel + make_path(std::forward<Args>(v)...);
+	}
+
 	std::string cur_file;
 	const static std::string pdel;
 };
