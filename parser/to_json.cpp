@@ -90,6 +90,11 @@ cppjson::value modegen::converters::to_json::as_object(const modegen::record& ob
 	ret["name"] = obj.name;
 	ret["type"] = "record";
 	add_meta(ret, obj.meta_params);
+
+	for(std::size_t i=0; i<obj.members.size(); ++i) {
+		ret["members"][i] = as_object(obj.members[i]);
+	}
+
 	return ret;
 }
 

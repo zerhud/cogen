@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(enums)
 
 BOOST_AUTO_TEST_CASE(record)
 {
-	auto mods = modegen::parse("module mod v1: record rec {}");
+	auto mods = modegen::parse("module mod v1: record rec { type m1; list<other_type> m2;}");
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
 	cppjson::value result = modegen::converters::to_json(mods);
 	BOOST_CHECK_EQUAL(result[0]["name"], "mod");
@@ -74,6 +74,13 @@ BOOST_AUTO_TEST_CASE(record)
 	BOOST_CHECK(rec["v"].is_null());
 	BOOST_CHECK_EQUAL(rec["name"], "rec");
 	BOOST_CHECK_EQUAL(rec["type"], "record");
+
+	BOOST_REQUIRE_EQUAL(rec["members"].type(), cppjson::is_array);
+	BOOST_REQUIRE_EQUAL(rec["members"].array().size(), 2);
+	BOOST_CHECK_EQUAL(rec["members"][0]["name"], "m1");
+	BOOST_CHECK_EQUAL(rec["members"][1]["name"], "m2");
+	check_type(rec["members"][0]["par_type"], "type", "");
+	check_type(rec["members"][1]["par_type"], "other_type", "list");
 
 	std::cout << result << std::endl;
 }

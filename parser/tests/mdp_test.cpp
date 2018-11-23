@@ -1,6 +1,7 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE modegen_parser
 
+#include <iostream>
 #include <boost/test/unit_test.hpp>
 
 #include "grammar.hpp"
@@ -107,6 +108,29 @@ BOOST_AUTO_TEST_CASE(no_params)
 	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
 	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),0);
 	BOOST_CHECK_EQUAL(std::get<modegen::function>(mods[0].content[0]).func_params.size(), 0);
+}
+BOOST_AUTO_TEST_CASE(with_mod)
+{
+	std::vector<std::string_view> with_n = {
+	    "module mod v1:list<type> name();"sv,
+	    "module mod v1:list <type> name();"sv,
+	    "module mod v1:list < type > name();"sv
+	    "module mod v1:list\n<\ntype\n>\nname();"sv
+	};
+
+	auto checker = [](std::string_view str) {
+		std::cout << "try " << str << std::endl;
+		auto mods = modegen::parse(str);
+		BOOST_REQUIRE_EQUAL(mods.size(),1);
+		BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
+		BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),0);
+
+		modegen::function& fnc = std::get<modegen::function>(mods[0].content[0]);
+		BOOST_CHECK_EQUAL(fnc.func_params.size(), 0);
+		BOOST_CHECK_EQUAL(fnc.return_type.modificator, "list");
+	};
+
+	for(auto& str:with_n) checker(str);
 }
 BOOST_AUTO_TEST_SUITE_END()
 

@@ -45,7 +45,8 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		mutable_mod = qi::lexeme[(lit("const")[_val=false] | lit("mutable")[_val=true])];
 
 		type_rule.name("type_definition");
-		type_rule = var_name[at_c<0>(_val)=_1] | (var_name[at_c<1>(_val)=_1] > lit('<') > var_name[at_c<0>(_val)=_1] > lit('>'));
+		type_rule = (var_name[at_c<0>(_val)=_1] >> !lit('<'))
+		          | (var_name[at_c<1>(_val)=_1] >> *space >> lit('<') >> *space >> var_name[at_c<0>(_val)=_1] >> *space >> lit('>'));
 
 		using_rule.name("using_rule");
 		using_rule = lit("using") > +blank > var_name[at_c<0>(_val)=_1];
@@ -134,7 +135,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 	qi::rule<Iterator, std::string()> var_name;
 	qi::rule<Iterator, std::string()> quoted_string;
 	qi::rule<Iterator, modegen::using_directive> using_rule;
-	qi::rule<Iterator, type(), boost::spirit::qi::ascii::space_type> type_rule;
+	qi::rule<Iterator, type()> type_rule;
 	qi::rule<Iterator, function(), boost::spirit::qi::ascii::space_type> function_rule;
 	qi::rule<Iterator, constructor_fnc(), boost::spirit::qi::ascii::space_type> constructor_rule;
 	qi::rule<Iterator, func_param(), boost::spirit::qi::ascii::space_type> function_param_rule;
