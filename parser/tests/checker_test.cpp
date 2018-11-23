@@ -63,6 +63,25 @@ BOOST_AUTO_TEST_CASE(mod_ver_is_min)
 	check_exception(ch, m3, "mod.i.name");
 }
 
+BOOST_AUTO_TEST_CASE(enum_gen_io)
+{
+	auto mods = modegen::parse("module mod v1: enum +auto_io some_enum {one two three=>'3'}"sv);
+	BOOST_REQUIRE_EQUAL(mods.size(), 1);
+	BOOST_REQUIRE_EQUAL(mods[0].content.size(), 1);
+
+	modegen::enumeration& e = std::get<modegen::enumeration>(mods[0].content[0]);
+	BOOST_CHECK(e.gen_io);
+	BOOST_CHECK(e.elements[0].io.empty());
+
+	modegen::checker ch;
+	BOOST_CHECK_NO_THROW(ch(mods));
+
+	BOOST_CHECK_EQUAL(e.elements.size(), 3);
+	BOOST_CHECK_EQUAL(e.elements[0].io, e.elements[0].name);
+	BOOST_CHECK_EQUAL(e.elements[1].io, e.elements[1].name);
+	BOOST_CHECK_EQUAL(e.elements[2].io, "3");
+}
+
 BOOST_AUTO_TEST_SUITE(combination)
 BOOST_AUTO_TEST_CASE(diff_mods)
 {

@@ -27,26 +27,26 @@ void modegen::checker::operator ()(std::vector<modegen::module>& mods, std::stri
 
 void modegen::checker::operator ()(std::vector<modegen::module>& mods) const
 {
-	if(mods.size()<2) return ;
-
-	auto end = mods.end();
-	for(auto beg = mods.begin();beg!=end;++beg) {
-		for(auto cmp=beg+1;cmp!=end;++cmp) {
-			if(beg->name == cmp->name && combine(*beg, *cmp)) {
-				if(--end == cmp--) break;;
-				*cmp = std::move(*end);
+	if(1<mods.size()) {
+		auto end = mods.end();
+		for(auto beg = mods.begin();beg!=end;++beg) {
+			for(auto cmp=beg+1;cmp!=end;++cmp) {
+				if(beg->name == cmp->name && combine(*beg, *cmp)) {
+					if(--end == cmp--) break;;
+					*cmp = std::move(*end);
+				}
 			}
+
+			if(beg==end) break;
 		}
 
-		if(beg==end) break;
+		if(end != mods.end()) mods.erase(end, mods.end());
 	}
-
-	if(end != mods.end()) mods.erase(end, mods.end());
 
 	for(auto& mod:mods) check_mod(mod);
 }
 
-void modegen::checker::check_mod(const modegen::module& mod) const
+void modegen::checker::check_mod(modegen::module& mod) const
 {
 	std::vector<std::string> nl;
 	auto name_collector = [&nl](const auto& e){nl.emplace_back(e.name);};
@@ -55,7 +55,7 @@ void modegen::checker::check_mod(const modegen::module& mod) const
 
 	upgrade_cur_min_ver(mod);
 
-	auto check_caller = [this,&mod](const auto& v){check(v, mod.name);};
+	auto check_caller = [this,&mod](auto& v){check(v, mod.name);};
 	for(auto& c:mod.content) std::visit(check_caller, c);
 
 	check_version_is_single(mod.meta_params, make_path(mod.name));
@@ -95,13 +95,15 @@ void modegen::checker::check(const modegen::interface& i, const std::string& pat
 	cur_min_ver = old_min_ver;
 }
 
-void modegen::checker::check(const modegen::enumeration& e, const std::string& path) const
+void modegen::checker::check(modegen::enumeration& e, const std::string& path) const
 {
 	check_version_is_overmin(e.meta_params, make_path(path, e.name));
 
 	std::vector<std::string> nl;
 	for(auto& en:e.elements) nl.emplace_back(en.name);
 	check_names(nl, make_path(path,e.name));
+
+	if(e.gen_io) for(auto& en:e.elements) if(en.io.empty()) en.io = en.name;
 }
 
 void modegen::checker::check_names(std::vector<std::string> nl, const std::string& path) const

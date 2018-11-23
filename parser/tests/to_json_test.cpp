@@ -30,6 +30,8 @@ BOOST_AUTO_TEST_CASE(fnc)
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
 	cppjson::value result = modegen::converters::to_json(mods);
 	BOOST_CHECK_EQUAL(result[0]["name"], "mod");
+	BOOST_CHECK_EQUAL(result[0]["v"], 1);
+
 	cppjson::value& fnc = result[0]["content"][0];
 	BOOST_CHECK_EQUAL(fnc["name"], "some");
 	BOOST_CHECK_EQUAL(fnc["type"], "function");
@@ -41,7 +43,6 @@ BOOST_AUTO_TEST_CASE(fnc)
 	BOOST_CHECK_EQUAL(fnc["params"][1]["name"], "two");
 	check_type(fnc["params"][0]["par_type"], "type", "");
 	check_type(fnc["params"][1]["par_type"], "type", "");
-	std::cout << result << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(enums)
@@ -59,4 +60,20 @@ BOOST_AUTO_TEST_CASE(enums)
 	BOOST_CHECK_EQUAL(enum_rec["members"][0]["output"], "");
 	BOOST_CHECK_EQUAL(enum_rec["members"][1]["name"], "two");
 	BOOST_CHECK_EQUAL(enum_rec["members"][1]["output"], "");
+}
+
+BOOST_AUTO_TEST_CASE(record)
+{
+	auto mods = modegen::parse("module mod v1: record rec {}");
+	BOOST_REQUIRE_EQUAL(mods.size(), 1);
+	cppjson::value result = modegen::converters::to_json(mods);
+	BOOST_CHECK_EQUAL(result[0]["name"], "mod");
+	BOOST_CHECK_EQUAL(result[0]["v"], 1);
+
+	cppjson::value& rec = result[0]["content"][0];
+	BOOST_CHECK(rec["v"].is_null());
+	BOOST_CHECK_EQUAL(rec["name"], "rec");
+	BOOST_CHECK_EQUAL(rec["type"], "record");
+
+	std::cout << result << std::endl;
 }
