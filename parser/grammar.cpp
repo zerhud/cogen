@@ -39,13 +39,13 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		        ;
 
 		var_name.name("var_name");
-		var_name = qi::lexeme[qi::ascii::alpha[_val+=_1] >> *(qi::ascii::alpha[_val+=_1]|qi::ascii::digit[_val+=_1]|lit('_')[_val+='_'])];
+		var_name = +(char_("a-zA-Z0-9_")[_val+=_1]);
 
 		mutable_mod.name("mutable_mod");
 		mutable_mod = qi::lexeme[(lit("const")[_val=false] | lit("mutable")[_val=true])];
 
 		type_rule.name("type_definition");
-		type_rule = (var_name[at_c<0>(_val)=_1] >> !lit('<'))
+		type_rule = (var_name[at_c<0>(_val)=_1] >> !(*space >> lit('<')))
 		          | (var_name[at_c<1>(_val)=_1] >> *space >> lit('<') >> *space >> var_name[at_c<0>(_val)=_1] >> *space >> lit('>'));
 
 		using_rule.name("using_rule");
