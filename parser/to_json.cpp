@@ -51,6 +51,7 @@ cppjson::value modegen::converters::to_json::as_object(const modegen::function& 
 	if(obj.is_static) ret["static"] = *obj.is_static;
 	else ret["static"] = cppjson::null{};
 
+	ret["params"] = cppjson::array();
 	for(std::size_t i=0;i<obj.func_params.size();++i) ret["params"][i]=as_object(obj.func_params[i]);
 
 	add_meta(ret, obj.meta_params);
@@ -80,7 +81,15 @@ cppjson::value modegen::converters::to_json::as_object(const modegen::interface&
 	cppjson::value ret;
 	ret["name"] = obj.name;
 	ret["type"] = "interface";
+	ret["invert"] = obj.realization_in_client;
 	add_meta(ret, obj.meta_params);
+
+	for(std::size_t i=0;i<obj.mem_funcs.size();++i)
+		ret["members"][i] = as_object(obj.mem_funcs[i]);
+
+	for(std::size_t i=0;i<obj.constructors.size();++i)
+		ret["constructors"][i] = as_object(obj.constructors[i]);
+
 	return ret;
 }
 
@@ -113,6 +122,15 @@ cppjson::value modegen::converters::to_json::as_object(const modegen::func_param
 	ret["name"] = obj.name;
 	ret["type"] = "func_param";
 	ret["par_type"] = as_object(obj.param_type);
+	return ret;
+}
+
+cppjson::value modegen::converters::to_json::as_object(const modegen::constructor_fnc& obj) const
+{
+	cppjson::value ret;
+	ret["type"] = "constructor";
+	ret["params"] = cppjson::array();
+	for(std::size_t i=0;i<obj.func_params.size();++i) ret["params"][i]=as_object(obj.func_params[i]);
 	return ret;
 }
 
