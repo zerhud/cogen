@@ -21,6 +21,7 @@ public:
 namespace meta_parameters {
 struct version;
 bool operator < (const version& left, const version& right);
+bool operator <= (const version& left, const version& right);
 bool operator == (const version& left, const version& right);
 struct version : meta_parameter {
 	version() noexcept ;
