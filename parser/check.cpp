@@ -3,6 +3,8 @@
 #include <memory>
 #include <cassert>
 
+#include "helpers.hpp"
+
 const std::string modegen::checker::pdel = ".";
 
 modegen::error_info::error_info(std::string f, std::string p, std::string w)

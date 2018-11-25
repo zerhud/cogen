@@ -12,6 +12,19 @@ void modegen::split_by_version::operator ()(std::vector<modegen::module>& mods)
 	mods = result;
 }
 
+void modegen::split_by_version::set_ver(modegen::meta_parameters::parameter_set& set, const modegen::meta_parameters::version& v) const
+{
+	using modegen::meta_parameters::version;
+	for(auto& par:set) {
+		if(std::holds_alternative<version>(par)) {
+			std::get<version>(par) = v;
+			return;
+		}
+	}
+
+	set.set.emplace_back(v);
+}
+
 std::optional<modegen::meta_parameters::version> modegen::split_by_version::get_ver(const modegen::meta_parameters::parameter_set& set) const
 {
 	using modegen::meta_parameters::version;
@@ -44,12 +57,23 @@ void modegen::split_by_version::split(const modegen::function& obj)
 
 void modegen::split_by_version::split(const modegen::enumeration& obj)
 {
-
+	auto cur_ver = get_ver(obj.meta_params);
+	if(!cur_ver) base_mod().content.emplace_back(obj);
+	else add_by_version(obj, *cur_ver);
 }
 
 void modegen::split_by_version::split(const modegen::record& obj)
 {
+	//modegen::enumeration base(obj);
+	//base.elements.clear();
 
+	//std::size_t total_copied=0;
+	//std::optional<modegen::meta_parameters::version> last_ver;
+	//while(total_copied < obj.elements.size()) {
+	    //for(auto& el:obj.elements) {
+	        //auto el_ver = get_ver(el.)
+	    //}
+	//}
 }
 
 void modegen::split_by_version::split(const modegen::interface& obj)

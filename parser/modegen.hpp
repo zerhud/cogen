@@ -19,10 +19,6 @@ public:
 };
 
 namespace meta_parameters {
-struct version;
-bool operator < (const version& left, const version& right);
-bool operator <= (const version& left, const version& right);
-bool operator == (const version& left, const version& right);
 struct version : meta_parameter {
 	version() noexcept ;
 	version(std::uint64_t m, std::uint64_t i) noexcept ;
@@ -144,12 +140,13 @@ BOOST_FUSION_ADAPT_STRUCT( modegen::record, name, members, meta_params )
 BOOST_FUSION_ADAPT_STRUCT( modegen::interface, name, mem_funcs, constructors, meta_params, realization_in_client )
 
 namespace modegen {
+typedef std::variant<function,enumeration,record,interface> module_content;
 struct using_directive {
 	std::string mod_name;
 };
 struct module {
 	std::string name;
-	std::vector<std::variant<function,enumeration,record,interface>> content;
+	std::vector<module_content> content;
 	meta_parameters::parameter_set meta_params;
 	std::vector<using_directive> imports;
 	std::string file_name;
