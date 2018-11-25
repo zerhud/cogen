@@ -41,12 +41,12 @@ private:
 	void upgrade_cur_min_ver(const T& t) const
 	{
 		for(auto& p:t.meta_params) {
-			if(auto pv=std::get_if<meta_parameters::version>(&p); pv) cur_min_ver = pv->val;
+			if(auto pv=std::get_if<meta_parameters::version>(&p); pv) cur_min_ver = *pv;
 		}
 	}
 
 	mutable std::string cur_file;
-	mutable std::uint64_t cur_min_ver=0;
+	mutable modegen::meta_parameters::version cur_min_ver;
 	const static std::string pdel;
 };
 

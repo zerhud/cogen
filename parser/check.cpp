@@ -131,7 +131,7 @@ void modegen::checker::check_version_is_overmin(const modegen::meta_parameters::
 {
 	for(auto& par:p) {
 		if(auto pv=std::get_if<meta_parameters::version>(&par); pv) {
-			if(pv->val < cur_min_ver) throw error_info(cur_file, path, "veresion in module must be minimum");
+			if(*pv < cur_min_ver) throw error_info(cur_file, path, "veresion in module must be minimum");
 		}
 	}
 }
@@ -153,7 +153,7 @@ bool modegen::checker::is_same_ver(const modegen::module& m1, const modegen::mod
 		if(std::holds_alternative<meta_parameters::version>(p1)) {
 			for(auto& p2:m2.meta_params) {
 				if(std::holds_alternative<meta_parameters::version>(p2)) {
-					return std::get<meta_parameters::version>(p1).val == std::get<meta_parameters::version>(p2).val;
+					return std::get<meta_parameters::version>(p1) == std::get<meta_parameters::version>(p2);
 				}
 			}
 		}

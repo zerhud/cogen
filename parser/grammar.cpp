@@ -52,7 +52,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		using_rule = lit("using") > +blank > var_name[at_c<0>(_val)=_1];
 
 		version_rule.name("version_rule");
-		version_rule = lit('v') >> qi::uint_;
+		version_rule = lit('v') >> qi::uint_ >> lit('.') >> qi::uint_;
 
 		documentation_rule.name("documentation_rule");
 		documentation_rule %= *blank >> lit("#") >> *(char_[at_c<0>(_val)+=_1] - qi::eol) >> qi::eol;

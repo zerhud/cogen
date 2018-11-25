@@ -137,8 +137,11 @@ cppjson::value modegen::converters::to_json::as_object(const modegen::constructo
 void modegen::converters::to_json::add_meta(cppjson::value& val, const modegen::meta_parameters::parameter_set& params) const
 {
 	auto ver = extract<modegen::meta_parameters::version>(params);
-	if(ver) val["v"] = ver->val;
-	else val["v"] = cppjson::null{};
+	if(!ver) val["v"] = cppjson::null{};
+	else {
+		val["v"]["major"] = ver->major_v;
+		val["v"]["minor"] = ver->minor_v;
+	}
 
 	auto docs = extract<modegen::meta_parameters::documentation>(params);
 	if(docs) val["docs"] = docs->body;

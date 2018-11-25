@@ -2,18 +2,14 @@
 
 using namespace std::literals;
 
-modegen::meta_parameters::version::version() noexcept : version(0)
+modegen::meta_parameters::version::version() noexcept : version(0, 0)
 {
 }
 
-modegen::meta_parameters::version::version(uint64_t v) noexcept : val(v)
+modegen::meta_parameters::version::version(std::uint64_t m, std::uint64_t i) noexcept
+    : major_v(m)
+    , minor_v(i)
 {
-}
-
-modegen::meta_parameters::version& modegen::meta_parameters::version::operator = (std::uint64_t v) noexcept
-{
-	val = v;
-	return *this;
 }
 
 std::string_view modegen::meta_parameters::version::name() const
@@ -23,7 +19,7 @@ std::string_view modegen::meta_parameters::version::name() const
 
 std::string modegen::meta_parameters::version::value() const
 {
-	return std::to_string(val);
+	return std::to_string(major_v) + "." + std::to_string(minor_v);
 }
 
 bool modegen::meta_parameters::version::add(const modegen::meta_parameter& /*other*/)
@@ -78,4 +74,14 @@ bool modegen::meta_parameters::deprication::add(const modegen::meta_parameter& o
 {
 	// we cannt have two deprication attribute
 	return false;
+}
+
+bool modegen::meta_parameters::operator <(const modegen::meta_parameters::version& left, const modegen::meta_parameters::version& right)
+{
+	return left.major_v < right.major_v || left.minor_v < right.minor_v;
+}
+
+bool modegen::meta_parameters::operator ==(const modegen::meta_parameters::version& left, const modegen::meta_parameters::version& right)
+{
+	return left.major_v == right.major_v && left.minor_v == right.minor_v;
 }

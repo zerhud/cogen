@@ -20,7 +20,7 @@ void check_exception(const modegen::checker& ch, std::vector<modegen::module>& m
 BOOST_AUTO_TEST_SUITE(double_name)
 BOOST_AUTO_TEST_CASE(module)
 {
-	auto mods = modegen::parse("module mod v1: type name(); module mod2 v1: type name(); type name();"sv);
+	auto mods = modegen::parse("module mod v1.0: type name(); module mod2 v1.0: type name(); type name();"sv);
 	BOOST_REQUIRE_EQUAL(mods.size(), 2);
 	modegen::checker ch;
 	check_exception(ch, mods, "mod2");
@@ -29,14 +29,14 @@ BOOST_AUTO_TEST_CASE(module)
 }
 BOOST_AUTO_TEST_CASE(interface)
 {
-	auto mods = modegen::parse("module mod v1: interface i1{type name() const;} interface i2{type name() const; type name() const;}"sv);
+	auto mods = modegen::parse("module mod v1.0: interface i1{type name() const;} interface i2{type name() const; type name() const;}"sv);
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
 	modegen::checker ch;
 	check_exception(ch, mods, "mod.i2");
 }
 BOOST_AUTO_TEST_CASE(double_ver)
 {
-	auto mods = modegen::parse("@v1 module mod v1: interface i1{type name() const;}"sv);
+	auto mods = modegen::parse("@v1.0 module mod v1.0: interface i1{type name() const;}"sv);
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
 	modegen::checker ch;
 	check_exception(ch, mods, "mod");
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_CASE(method_const_mark)
 {
-	auto mods = modegen::parse("module mod v1: interface i1{type name() const;} interface i2{type name();}"sv);
+	auto mods = modegen::parse("module mod v1.0: interface i1{type name() const;} interface i2{type name();}"sv);
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
 	modegen::checker ch;
 	check_exception(ch, mods, "mod.i2.name");
@@ -53,8 +53,8 @@ BOOST_AUTO_TEST_CASE(method_const_mark)
 
 BOOST_AUTO_TEST_CASE(mod_ver_is_min)
 {
-	auto mods = modegen::parse("module mod v10: @v9 type some(); module mod2 v10: interface i{@v9 type name()const;}"
-	                           "module mod v9: @v11 interface i{@v10 type name()const;}"sv);
+	auto mods = modegen::parse("module mod v10.0: @v9.0 type some(); module mod2 v10.0: interface i{@v9.0 type name()const;}"
+	                           "module mod v9.0: @v10.1 interface i{@v10.0 type name()const;}"sv);
 	BOOST_REQUIRE_EQUAL(mods.size(), 3);
 	modegen::checker ch;
 	std::vector<modegen::module> m1{mods[0]}, m2{mods[1]}, m3{mods[2]};
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(mod_ver_is_min)
 
 BOOST_AUTO_TEST_CASE(enum_gen_io)
 {
-	auto mods = modegen::parse("module mod v1: enum +auto_io some_enum {one two three=>'3'}"sv);
+	auto mods = modegen::parse("module mod v1.0: enum +auto_io some_enum {one two three=>'3'}"sv);
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
 	BOOST_REQUIRE_EQUAL(mods[0].content.size(), 1);
 
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(enum_gen_io)
 BOOST_AUTO_TEST_SUITE(combination)
 BOOST_AUTO_TEST_CASE(diff_mods)
 {
-	auto mods = modegen::parse("module mod v1: type name(); module mod2 v1:"sv);
+	auto mods = modegen::parse("module mod v1.0: type name(); module mod2 v1.0:"sv);
 	BOOST_REQUIRE_EQUAL(mods.size(), 2);
 
 	modegen::checker ch;
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(diff_mods)
 }
 BOOST_AUTO_TEST_CASE(diff_mods_ver)
 {
-	auto mods = modegen::parse("module mod v1: type name(); module mod v2:"sv);
+	auto mods = modegen::parse("module mod v1.0: type name(); module mod v2.0:"sv);
 	BOOST_REQUIRE_EQUAL(mods.size(), 2);
 
 	modegen::checker ch;
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(diff_mods_ver)
 }
 BOOST_AUTO_TEST_CASE(combine)
 {
-	auto mods = modegen::parse("module mod v1: module mod v1: type name();"sv);
+	auto mods = modegen::parse("module mod v1.0: module mod v1.0: type name();"sv);
 	BOOST_REQUIRE_EQUAL(mods.size(), 2);
 
 	modegen::checker ch;
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(combine)
 }
 BOOST_AUTO_TEST_CASE(combine3)
 {
-	auto mods = modegen::parse("module mod v1: module mod v1: type name(); module mod v1: type name2();"sv);
+	auto mods = modegen::parse("module mod v1.0: module mod v1.0: type name(); module mod v1.0: type name2();"sv);
 	BOOST_REQUIRE_EQUAL(mods.size(), 3);
 
 	modegen::checker ch;

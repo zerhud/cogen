@@ -19,12 +19,16 @@ public:
 };
 
 namespace meta_parameters {
+struct version;
+bool operator < (const version& left, const version& right);
+bool operator == (const version& left, const version& right);
 struct version : meta_parameter {
 	version() noexcept ;
-	explicit version(std::uint64_t v) noexcept ;
-	version& operator = (std::uint64_t v) noexcept ;
+	version(std::uint64_t m, std::uint64_t i) noexcept ;
 
-	std::uint64_t val;
+	std::uint64_t major_v;
+	std::uint64_t minor_v;
+
 	std::string_view name() const override;
 	std::string value() const override;
 	bool add(const meta_parameter& other) override ;
@@ -60,7 +64,7 @@ struct parameter_set  {
 } // namespace meta_parameters
 } // namespace modegen
 
-BOOST_FUSION_ADAPT_STRUCT( modegen::meta_parameters::version, (std::uint64_t, val) )
+BOOST_FUSION_ADAPT_STRUCT( modegen::meta_parameters::version, (std::uint64_t, major_v), (std::uint64_t, minor_v) )
 BOOST_FUSION_ADAPT_STRUCT( modegen::meta_parameters::documentation, (std::string, body) )
 BOOST_FUSION_ADAPT_STRUCT( modegen::meta_parameters::deprication, (std::string, message) )
 
