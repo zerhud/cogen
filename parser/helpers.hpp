@@ -24,6 +24,12 @@ std::optional<P> get(const meta_parameters::parameter_set& set)
 	return std::nullopt;
 }
 
+template<typename P, typename MType>
+std::optional<P> get(const MType& mobj)
+{
+	return get<P>(mobj.meta_params);
+}
+
 template<typename P>
 bool has(const meta_parameters::parameter_set& set)
 {

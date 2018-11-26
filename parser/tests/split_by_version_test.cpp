@@ -42,10 +42,12 @@ BOOST_AUTO_TEST_CASE(functions)
 
 BOOST_AUTO_TEST_CASE(records)
 {
-	auto mods = modegen::parse("module mod v1.0: enum e1 {one two} @v1.1 enum e2 {three four}"sv);
+	auto mods = modegen::parse("module mod v1.0: record r1 {type field1; @v1.1 type field2;}"sv);
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
 
 	modegen::split_by_version sp;
 	sp(mods);
 	BOOST_REQUIRE_EQUAL(mods.size(), 2);
+	BOOST_REQUIRE_EQUAL(mods[0].content.size(), 1);
+	BOOST_REQUIRE_EQUAL(mods[1].content.size(), 2);
 }
