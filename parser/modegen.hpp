@@ -23,6 +23,11 @@ struct version : meta_parameter {
 	version() noexcept ;
 	version(std::uint64_t m, std::uint64_t i) noexcept ;
 
+	version(version&&) noexcept =default ;
+	version(const version&) noexcept =default ;
+	version& operator = (version&& other) noexcept =default ;
+	version& operator = (const version& other) noexcept =default ;
+
 	std::uint64_t major_v;
 	std::uint64_t minor_v;
 
@@ -41,6 +46,7 @@ struct documentation : meta_parameter {
 
 struct deprication : meta_parameter {
 	std::string message;
+	version since;
 
 	std::string_view name() const override;
 	std::string value() const override;
@@ -63,7 +69,7 @@ struct parameter_set  {
 
 BOOST_FUSION_ADAPT_STRUCT( modegen::meta_parameters::version, (std::uint64_t, major_v), (std::uint64_t, minor_v) )
 BOOST_FUSION_ADAPT_STRUCT( modegen::meta_parameters::documentation, (std::string, body) )
-BOOST_FUSION_ADAPT_STRUCT( modegen::meta_parameters::deprication, (std::string, message) )
+BOOST_FUSION_ADAPT_STRUCT( modegen::meta_parameters::deprication, (modegen::meta_parameters::version, since), (std::string, message) )
 
 namespace modegen {
 	struct type {

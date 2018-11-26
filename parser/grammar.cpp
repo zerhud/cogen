@@ -58,7 +58,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		documentation_rule %= *blank >> lit("#") >> *(char_[at_c<0>(_val)+=_1] - qi::eol) >> qi::eol;
 
 		deprication_rule.name("depricated_rule");
-		deprication_rule %= lit("@depricated") > -('(' > quoted_string > ')') > space;
+		deprication_rule %= lit("@depricated") > version_rule[at_c<0>(_val)=_1] > -('(' > quoted_string[at_c<1>(_val)=_1] > ')');
 
 		meta_params_rule =
 		         *(
@@ -154,8 +154,8 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 	qi::rule<Iterator, std::vector<module>(), boost::spirit::qi::ascii::space_type> modules_rule;
 	qi::rule<Iterator, modegen::meta_parameters::version()> version_rule;
 	qi::rule<Iterator, modegen::meta_parameters::documentation()> documentation_rule;
-	qi::rule<Iterator, modegen::meta_parameters::deprication()> deprication_rule;
-	qi::rule<Iterator, modegen::meta_parameters::parameter_set> meta_params_rule;
+	qi::rule<Iterator, modegen::meta_parameters::deprication(), boost::spirit::qi::ascii::space_type> deprication_rule;
+	qi::rule<Iterator, modegen::meta_parameters::parameter_set, boost::spirit::qi::ascii::space_type> meta_params_rule;
 };
 
 namespace error_hander {

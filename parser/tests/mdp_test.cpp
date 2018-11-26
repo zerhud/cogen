@@ -4,6 +4,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "grammar.hpp"
+#include "helpers.hpp"
 
 using namespace std::literals;
 
@@ -182,3 +183,21 @@ BOOST_AUTO_TEST_CASE(gen_ops)
 	BOOST_CHECK_EQUAL(e.use_bitmask, true);
 }
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_CASE(depricated_meta)
+{
+	using modegen::meta_parameters::deprication;
+	using modegen::meta_parameters::version;
+
+	auto mods = modegen::parse("module mod v1.0: @depricated v1.1 ('message') type f1();"sv);
+	BOOST_REQUIRE_EQUAL(mods.size(),1);
+	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
+
+	modegen::function& f = std::get<modegen::function>(mods[0].content[0]);
+	BOOST_REQUIRE_EQUAL(f.meta_params.set.size(), 1);
+
+	BOOST_REQUIRE(std::holds_alternative<deprication>(f.meta_params.set[0]));
+	deprication& dep = std::get<deprication>(f.meta_params.set[0]);
+	BOOST_CHECK_EQUAL(dep.message, "message");
+	BOOST_CHECK_EQUAL(dep.since, version(1,1));
+}
