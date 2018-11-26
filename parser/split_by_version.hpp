@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <functional>
 #include "modegen.hpp"
 #include "helpers.hpp"
 
@@ -24,6 +25,12 @@ private:
 
 	std::vector<modegen::module> result;
 	std::size_t base_index=0;
+
+	template<typename Prop, typename Content>
+	void copy_if(const std::vector<Content>& from, std::vector<Content>& to, const std::function<bool(const std::optional<Prop>&)>& pred) const
+	{
+		for(auto& c:from) if(pred(modegen::get<Prop>(c))) to.emplace_back(c);
+	}
 
 	template<typename O>
 	void add_by_version(const O& o, const modegen::meta_parameters::version& v)
