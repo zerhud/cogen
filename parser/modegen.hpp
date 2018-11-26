@@ -122,9 +122,15 @@ BOOST_FUSION_ADAPT_STRUCT( modegen::enum_element, name, io )
 BOOST_FUSION_ADAPT_STRUCT( modegen::enumeration, name, elements, meta_params, gen_io, use_bitmask )
 
 namespace modegen {
+	struct record_item {
+		std::string name;
+		type param_type;
+		meta_parameters::parameter_set meta_params;
+	};
+
 	struct record {
 		std::string name;
-		std::vector<func_param> members;
+		std::vector<record_item> members;
 		meta_parameters::parameter_set meta_params;
 	};
 
@@ -136,6 +142,7 @@ namespace modegen {
 		bool realization_in_client = false;
 	};
 } // namespace modegen
+BOOST_FUSION_ADAPT_STRUCT( modegen::record_item, meta_params, param_type, name )
 BOOST_FUSION_ADAPT_STRUCT( modegen::record, name, members, meta_params )
 BOOST_FUSION_ADAPT_STRUCT( modegen::interface, name, mem_funcs, constructors, meta_params, realization_in_client )
 

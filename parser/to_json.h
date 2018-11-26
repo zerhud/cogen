@@ -19,6 +19,7 @@ private:
 	cppjson::value as_object(const modegen::enumeration& obj) const ;
 	cppjson::value as_object(const modegen::interface& obj) const ;
 	cppjson::value as_object(const modegen::record& obj) const ;
+	cppjson::value as_object(const modegen::record_item& obj) const ;
 	cppjson::value as_object(const modegen::type& obj) const ;
 	cppjson::value as_object(const modegen::func_param& obj) const ;
 	cppjson::value as_object(const modegen::constructor_fnc& obj) const ;

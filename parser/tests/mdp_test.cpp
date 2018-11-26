@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(using_rule)
 
 BOOST_AUTO_TEST_CASE(record_rule)
 {
-	auto mods = modegen::parse("module mod v1.0: record some{type some; type other;}"sv);
+	auto mods = modegen::parse("module mod v1.0: record some{type some; @v4.0 type other;}"sv);
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
 	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
 	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),2);

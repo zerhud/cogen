@@ -107,6 +107,16 @@ cppjson::value modegen::converters::to_json::as_object(const modegen::record& ob
 	return ret;
 }
 
+cppjson::value modegen::converters::to_json::as_object(const modegen::record_item& obj) const
+{
+	cppjson::value ret;
+	ret["name"]=obj.name;
+	ret["type"]="record_item";
+	ret["par_type"]=as_object(obj.param_type);
+	add_meta(ret, obj.meta_params);
+	return ret;
+}
+
 cppjson::value modegen::converters::to_json::as_object(const modegen::type& obj) const
 {
 	cppjson::value ret;
