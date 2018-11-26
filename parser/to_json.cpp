@@ -144,15 +144,26 @@ cppjson::value modegen::converters::to_json::as_object(const modegen::constructo
 	return ret;
 }
 
+cppjson::value modegen::converters::to_json::as_object(const modegen::meta_parameters::version& obj) const
+{
+	cppjson::value ret;
+	ret["major"] = obj.major_v;
+	ret["minor"] = obj.minor_v;
+	return ret;
+}
+
 void modegen::converters::to_json::add_meta(cppjson::value& val, const modegen::meta_parameters::parameter_set& params) const
 {
 	auto ver = extract<modegen::meta_parameters::version>(params);
 	if(!ver) val["v"] = cppjson::null{};
-	else {
-		val["v"]["major"] = ver->major_v;
-		val["v"]["minor"] = ver->minor_v;
-	}
+	else val["v"] = as_object(*ver);
 
 	auto docs = extract<modegen::meta_parameters::documentation>(params);
 	if(docs) val["docs"] = docs->body;
+
+	auto dep = extract<modegen::meta_parameters::deprication>(params);
+	if(dep) {
+		val["depricated"]["since"] = as_object(dep->since);
+		val["depricated"]["message"] = dep->message;
+	}
 }
