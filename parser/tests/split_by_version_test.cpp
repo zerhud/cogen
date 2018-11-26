@@ -40,6 +40,31 @@ BOOST_AUTO_TEST_CASE(functions)
 	BOOST_CHECK(  modegen::has<version>(mods[1].content[1]) );
 }
 
+BOOST_AUTO_TEST_CASE(records)
+{
+	using modegen::meta_parameters::version;
+
+	auto mods = modegen::parse("module mod v1.0: @v1.1 record r1 {type f1; @v1.2 type f2; @v1.2 type f3;}"sv);
+	BOOST_REQUIRE_EQUAL(mods.size(), 1);
+
+	modegen::split_by_version sp;
+	sp(mods);
+	BOOST_REQUIRE_EQUAL(mods.size(), 3);
+	BOOST_REQUIRE_EQUAL(mods[0].content.size(), 0);
+	BOOST_REQUIRE_EQUAL(mods[1].content.size(), 1);
+	BOOST_REQUIRE_EQUAL(mods[2].content.size(), 1);
+
+	auto& r1 = std::get<modegen::record>(mods[1].content[0]);
+	BOOST_REQUIRE_EQUAL(r1.members.size(), 1);
+	BOOST_CHECK_EQUAL(r1.members[0].name, "f1");
+
+	auto& r2 = std::get<modegen::record>(mods[2].content[0]);
+	BOOST_REQUIRE_EQUAL(r2.members.size(), 3);
+	BOOST_CHECK_EQUAL(r2.members[0].name, "f1");
+	BOOST_CHECK_EQUAL(r2.members[1].name, "f2");
+	BOOST_CHECK_EQUAL(r2.members[2].name, "f3");
+}
+
 BOOST_AUTO_TEST_CASE(interfaces)
 {
 	using modegen::meta_parameters::version;

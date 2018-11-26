@@ -47,9 +47,21 @@ void modegen::split_by_version::split(const modegen::enumeration& obj)
 
 void modegen::split_by_version::split(const modegen::record& obj)
 {
-	auto cur_ver = modegen::get<version>(obj);
-	if(!cur_ver) base_mod().content.emplace_back(obj);
-	else add_by_version(obj, *cur_ver);
+	auto bver = modegen::get<version>(obj);
+
+	std::vector<version> obj_vers;
+	if(bver) obj_vers.emplace_back(*bver);
+	else obj_vers.emplace_back(base_ver());
+	for(auto& e:obj.members) if(auto v=modegen::get<version>(e);v) obj_vers.emplace_back(*v);
+	std::sort(obj_vers.begin(), obj_vers.end());
+	obj_vers.erase(std::unique(obj_vers.begin(), obj_vers.end()), obj_vers.end());
+
+	for(auto& iv:obj_vers) {
+		modegen::record base(obj);
+		base.members.clear();
+		copy_if<version>(obj.members, base.members, [&iv](const std::optional<version>& v){return !v || *v<=iv;});
+		add_by_version(base, iv);
+	}
 }
 
 void modegen::split_by_version::split(const modegen::interface& obj)
