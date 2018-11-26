@@ -1,6 +1,7 @@
 #include "split_by_version.hpp"
 
 #include <cassert>
+#include <algorithm>
 
 using modegen::meta_parameters::version;
 
@@ -46,21 +47,38 @@ void modegen::split_by_version::split(const modegen::enumeration& obj)
 
 void modegen::split_by_version::split(const modegen::record& obj)
 {
-	//modegen::enumeration base(obj);
-	//base.elements.clear();
-
-	//std::size_t total_copied=0;
-	//std::optional<modegen::meta_parameters::version> last_ver;
-	//while(total_copied < obj.elements.size()) {
-	    //for(auto& el:obj.elements) {
-	        //auto el_ver = get_ver(el.)
-	    //}
-	//}
+	auto cur_ver = modegen::get<version>(obj);
+	if(!cur_ver) base_mod().content.emplace_back(obj);
+	else add_by_version(obj, *cur_ver);
 }
 
 void modegen::split_by_version::split(const modegen::interface& obj)
 {
+	modegen::interface base(obj);
+	base.mem_funcs.clear();
 
+	std::size_t total_copied=obj.mem_funcs.size();
+	for(auto& field:obj.mem_funcs) {
+		if(!modegen::has<version>(field)) base.mem_funcs.emplace_back(field);
+		else if(modegen::get<version>(field) == base_ver()) base.mem_funcs.emplace_back(field);
+		else --total_copied;
+	}
+
+	auto bver = modegen::get<version>(base);
+	add_by_version(base, bver ? *bver : base_ver());
+
+	std::vector<version> obj_vers;
+	for(auto& e:obj.mem_funcs) if(auto v=modegen::get<version>(e);v) obj_vers.emplace_back(*v);
+	std::sort(obj_vers.begin(), obj_vers.end());
+
+	for(auto& bv:obj_vers) {
+		for(auto& el:obj.mem_funcs) {
+			auto el_ver = modegen::get<version>(el);
+			if(el_ver && *el_ver <= bv) base.mem_funcs.emplace_back(el);
+		}
+
+		add_by_version(base, bv);
+	}
 }
 
 modegen::module& modegen::split_by_version::base_mod()
