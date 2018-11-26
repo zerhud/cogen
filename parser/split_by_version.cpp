@@ -54,29 +54,27 @@ void modegen::split_by_version::split(const modegen::record& obj)
 
 void modegen::split_by_version::split(const modegen::interface& obj)
 {
-	modegen::interface base(obj);
-	base.mem_funcs.clear();
-	base.constructors.clear();
-
-	std::function<bool(const std::optional<version>&)> pred = [](const std::optional<version>& v){return !v.has_value();};
-	copy_if(obj.mem_funcs, base.mem_funcs, pred);
-	copy_if(obj.constructors, base.constructors, pred);
-
-	auto bver = modegen::get<version>(base);
-	add_by_version(base, bver ? *bver : base_ver());
+	auto bver = modegen::get<version>(obj);
 
 	std::vector<version> obj_vers;
+	if(bver) obj_vers.emplace_back(*bver);
+	else obj_vers.emplace_back(base_ver());
 	for(auto& e:obj.mem_funcs) if(auto v=modegen::get<version>(e);v) obj_vers.emplace_back(*v);
 	for(auto& e:obj.constructors) if(auto v=modegen::get<version>(e);v) obj_vers.emplace_back(*v);
 	std::sort(obj_vers.begin(), obj_vers.end());
+	obj_vers.erase(std::unique(obj_vers.begin(), obj_vers.end()), obj_vers.end());
 
-	for(auto& bv:obj_vers) {
-		std::function<bool(const std::optional<version>&)> pred =
-		        [&bv](const std::optional<version>& v){ return v.has_value() && *v <= bv;};
-		copy_if(obj.mem_funcs, base.mem_funcs, pred);
-		copy_if(obj.constructors, base.constructors, pred);
+	for(auto& iv:obj_vers) {
+		modegen::interface base(obj);
+		base.mem_funcs.clear();
+		base.constructors.clear();
 
-		add_by_version(base, bv);
+		std::function<bool(const std::optional<version>&)> ch =
+		        [&iv](const std::optional<version>& v){ return !v || *v<=iv;};
+		copy_if(obj.mem_funcs, base.mem_funcs, ch);
+		copy_if(obj.constructors, base.constructors, ch);
+
+		add_by_version(base, iv);
 	}
 }
 
