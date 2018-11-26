@@ -44,7 +44,9 @@ BOOST_AUTO_TEST_CASE(interfaces)
 {
 	using modegen::meta_parameters::version;
 
-	auto mods = modegen::parse("module mod v1.0: @v1.1 interface r1 {type func1() const; @v1.2 type func2() const; constructor(type a); @v1.3 constructor();}"sv);
+	auto mods = modegen::parse("module mod v1.0: @v1.1 interface r1 {type func1() const; @v1.2 type func2() const;"
+	                           "@v1.2 type func3() const; constructor(type a); @v1.3 constructor();}"sv
+	                           );
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
 
 	auto& i0 = std::get<modegen::interface>(mods[0].content[0]);
@@ -64,16 +66,18 @@ BOOST_AUTO_TEST_CASE(interfaces)
 	BOOST_CHECK_EQUAL(i1.constructors.size(), 1);
 
 	auto& i2 = std::get<modegen::interface>(mods[2].content[0]);
-	BOOST_REQUIRE_EQUAL(i2.mem_funcs.size(), 2);
+	BOOST_REQUIRE_EQUAL(i2.mem_funcs.size(), 3);
 	BOOST_CHECK_EQUAL(i2.mem_funcs[1].name, "func2");
+	BOOST_CHECK_EQUAL(i2.mem_funcs[2].name, "func3");
 	BOOST_REQUIRE_EQUAL(i1.constructors.size(), 1);
 	BOOST_CHECK_EQUAL(i1.constructors[0].func_params.size(), 1);
 
 	auto& i3 = std::get<modegen::interface>(mods[3].content[0]);
 	BOOST_CHECK(modegen::has<version>(mods[3]));
 	BOOST_CHECK_EQUAL(*modegen::get<version>(mods[3]), version(1, 3));
-	BOOST_REQUIRE_EQUAL(i3.mem_funcs.size(), 2);
+	BOOST_REQUIRE_EQUAL(i3.mem_funcs.size(), 3);
 	BOOST_CHECK_EQUAL(i3.mem_funcs[1].name, "func2");
+	BOOST_CHECK_EQUAL(i3.mem_funcs[2].name, "func3");
 	BOOST_REQUIRE_EQUAL(i3.constructors.size(), 2);
 	BOOST_CHECK_EQUAL(i3.constructors[0].func_params.size(), 1);
 	BOOST_CHECK_EQUAL(i3.constructors[1].func_params.size(), 0);

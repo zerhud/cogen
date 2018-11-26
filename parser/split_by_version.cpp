@@ -69,10 +69,9 @@ void modegen::split_by_version::split(const modegen::interface& obj)
 		base.mem_funcs.clear();
 		base.constructors.clear();
 
-		std::function<bool(const std::optional<version>&)> ch =
-		        [&iv](const std::optional<version>& v){ return !v || *v<=iv;};
-		copy_if(obj.mem_funcs, base.mem_funcs, ch);
-		copy_if(obj.constructors, base.constructors, ch);
+		auto ch = [&iv](const std::optional<version>& v){ return !v || *v<=iv;};
+		copy_if<version>(obj.mem_funcs, base.mem_funcs, ch);
+		copy_if<version>(obj.constructors, base.constructors, ch);
 
 		add_by_version(base, iv);
 	}
