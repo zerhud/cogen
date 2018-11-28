@@ -28,8 +28,9 @@ void write_output(const cppjson::value& mods, const std::string& file_name)
 {
 	if(file_name=="-") std::cout << mods << std::endl;
 	else {
-		std::fstream file(file_name);
+		std::fstream file(file_name, file.out);
 		file << mods;
+		file.flush();
 	}
 }
 
