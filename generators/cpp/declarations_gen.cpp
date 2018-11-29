@@ -1,8 +1,8 @@
 #include "declarations_gen.h"
 
-#include "to_json.h"
-
 #include <boost/process.hpp>
+
+#include "to_json.h"
 
 modegen::gen_options modegen::generators::cpp::declarations::options() const
 {
@@ -25,8 +25,17 @@ void modegen::generators::cpp::declarations::generate(std::vector<modegen::modul
 	using namespace boost::process;
 
 	cast_options(gopts, mods);
+	opstream pdata;
 	cppjson::value jsoned = modegen::converters::to_json(mods);
 
-	opstream pdata;
-	pdata << jsoned;
+	child a(
+	      "../generators/pythongen"
+	    , "-t", "../generators/cpp/declarations.hpp.jinja"
+	    , "-o", (output_file.generic_u8string().empty() ? "-" : output_file.generic_u8string())
+	    , std_out > stdout
+	    , std_in < pdata
+	    );
+	pdata << jsoned << std::endl;
+	pdata.pipe().close();
+	a.wait();
 }

@@ -16,6 +16,7 @@ jinja_env = jinja2.Environment(
 
 def print_help():
 	print("usage ./jt.py -d data_file -t template_file -o output_file")
+	print("got ", sys.argv)
 	sys.exit()
 
 if __name__ == '__main__':

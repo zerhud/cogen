@@ -3,12 +3,12 @@
 
 <%- for module in modules %>
 namespace <= module.name => {
-	<%- for obj in module.content -%>
-	<% if obj.type == "function" %>
-		 <= render.type(obj.ret_type) => <= obj.name =>(<= render.fparam(obj.params) =>);
-	<% elif obj.type == "enum" %>
+	<%- for obj in module.content %>
+	<% if obj.type == "function" -%>
+		 <=- render.type(obj.ret_type) => <= obj.name =>(<= render.fparam(obj.params) =>);
+	<%- elif obj.type == "enum" %>
 	enum
-	<% endif %>
+	<% endif -%>
 	<%- endfor %>
 } // namespace <= module.name =>
 <% endfor %>
