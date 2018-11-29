@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(functions)
 	auto mods = modegen::parse("module mod v1.0: type name(); @v2.0 type name2();"sv);
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
 
-	modegen::split_by_version sp;
+	modegen::converters::split_by_version sp;
 	sp(mods);
 
 	BOOST_REQUIRE_EQUAL(mods.size(), 2);
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(records)
 	auto mods = modegen::parse("module mod v1.0: @v1.1 record r1 {type f1; @v1.2 type f2; @v1.2 type f3;}"sv);
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
 
-	modegen::split_by_version sp;
+	modegen::converters::split_by_version sp;
 	sp(mods);
 	BOOST_REQUIRE_EQUAL(mods.size(), 3);
 	BOOST_REQUIRE_EQUAL(mods[0].content.size(), 0);
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(interfaces)
 	auto& i0 = std::get<modegen::interface>(mods[0].content[0]);
 	BOOST_CHECK_EQUAL(i0.constructors.size(), 2);
 
-	modegen::split_by_version sp;
+	modegen::converters::split_by_version sp;
 	sp(mods);
 	BOOST_REQUIRE_EQUAL(mods.size(), 4);
 	BOOST_REQUIRE_EQUAL(mods[0].content.size(), 0);

@@ -3,9 +3,12 @@
 #include <functional>
 
 #include <boost/program_options.hpp>
+#include <boost/process.hpp>
 
 #include "modegen.hpp"
 #include "grammar.hpp"
+#include "generator.hpp"
+#include "generators/defaults.h"
 
 #include "split_by_version.hpp"
 #include "to_json.h"
@@ -38,11 +41,13 @@ int main(int argc,char** argv)
 {
 	po::options_description desc("Allowed options");
 	desc.add_options()
-	        ("help", "produce help message")
-	        ("input,i", po::value<std::string>()->default_value("-"), "input file")
+	        ("help,h", "produce help message")
+	        ("input,i", po::value<std::vector<std::string>>(), "input file")
 	        ("output,o", po::value<std::string>()->default_value("-"), "output file")
 	        ("split-by-versions,s", "split generated output by version (one module is one version)")
 	        ("select", po::value<std::string>()->default_value(""), "produce output only for selected path")
+	        ("target,t", po::value<std::string>()->default_value("cpp"), "choice a target, cpp for exmple")
+	        ("generator,g", po::value<std::string>()->default_value(""), "choice a generator")
 	        ;
 
 	po::variables_map vm;
@@ -54,14 +59,27 @@ int main(int argc,char** argv)
 		return 1;
 	}
 
-	std::string pdata = read_input(vm["input"].as<std::string>());
+	std::string pdata;
+	std::vector<std::string> inputs_files = vm["input"].as<std::vector<std::string>>();
+	for(auto& i:inputs_files) pdata += read_input(i);
+	if(inputs_files.empty()) pdata = read_input("-");
 
-	modegen::split_by_version splitter;
+	modegen::generator_maker gmaker;
+	modegen::generators::reg_default_generators(&gmaker);
+
+	modegen::gen_options opts = modegen::gen_options::no_opts;
+	if(vm.count("split-by-version")) opts |= modegen::gen_options::split_version;
 
 	try {
+		auto gen = gmaker.make_generator(vm["target"].as<std::string>(), vm["generator"].as<std::string>());
+		if(!gen) return -1;
+
+		gen->options(opts);
+		std::string output = vm["output"].as<std::string>();
+		if(output != "-") gen->output(output);
+
 		auto result = modegen::parse(pdata);
-		if(vm.count("split-by-version")) splitter(result);
-		write_output(modegen::converters::to_json(result), vm["output"].as<std::string>());
+		gen->generate(result);
 	}
 	catch(const std::runtime_error& ex)
 	{

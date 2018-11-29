@@ -5,7 +5,7 @@
 #include "modegen.hpp"
 #include "helpers.hpp"
 
-namespace modegen {
+namespace modegen::converters {
 
 class split_by_version {
 public:
@@ -49,4 +49,4 @@ private:
 	}
 };
 
-} // namespace modegen
+} // namespace modegen::converters
