@@ -65,13 +65,17 @@ cppjson::value modegen::converters::to_json::as_object(const modegen::enumeratio
 	add_meta(ret, obj.meta_params);
 	ret["name"] = obj.name;
 	ret["type"] = "enumeration";
-	ret["gen_io"] = obj.gen_io;
 	ret["use_bitmask"] = obj.use_bitmask;
 
+	bool gen_io_required = false;
 	for(std::size_t i=0;i<obj.elements.size();++i) {
 		ret["members"][i]["name"] = obj.elements[i].name;
 		ret["members"][i]["output"] = obj.elements[i].io;
+		gen_io_required = gen_io_required || !obj.elements[i].io.empty();
 	}
+
+	if(gen_io_required) ret["gen_io"] = true;
+	else ret["gen_io"] = obj.gen_io;
 
 	return ret;
 }

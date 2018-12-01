@@ -5,3 +5,7 @@
 <%- macro fparam(params) -%>
 <% for param in params %><= type(param.par_type) => <= param.name =><= ", " if not loop.last =><% endfor %>
 <%- endmacro %>
+
+<%- macro gen_namespace_name(module) -%>
+<= module.name =>_v<= module.v.major =>_<= module.v.minor =>
+<%- endmacro %>
