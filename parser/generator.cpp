@@ -26,7 +26,7 @@ std::string modegen::generator_maker::make_path(std::string_view part, std::stri
 
 void modegen::cast_options(gen_options opts, std::vector<modegen::module>& mods)
 {
-	if(opts & gen_options::split_version) {
+	if((opts & gen_options::split_version)==gen_options::split_version) {
 		modegen::converters::split_by_version splitter;
 		splitter(mods);
 	}

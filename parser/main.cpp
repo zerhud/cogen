@@ -37,7 +37,7 @@ void write_output(const cppjson::value& mods, const std::string& file_name)
 	}
 }
 
-int main(int argc,char** argv)
+po::variables_map parse_command_line(int argc,char** argv)
 {
 	po::options_description desc("Allowed options");
 	desc.add_options()
@@ -49,15 +49,24 @@ int main(int argc,char** argv)
 	        ("target,t", po::value<std::string>()->default_value("cpp"), "choice a target, cpp for exmple")
 	        ("generator,g", po::value<std::string>()->default_value(""), "choice a generator")
 	        ;
+	po::positional_options_description positioned;
+	positioned.add("input", -1);
 
 	po::variables_map vm;
-	po::store(po::parse_command_line(argc,argv, desc), vm);
+	po::store(po::command_line_parser(argc,argv).options(desc).positional(positioned).run(), vm);
 	po::notify(vm);
 
 	if(vm.count("help")) {
 		std::cout << "use this program to prepare module data." << std::endl << desc << std::endl;
-		return 1;
+		std::exit(1);
 	}
+
+	return vm;
+}
+
+int main(int argc,char** argv)
+{
+	po::variables_map vm = parse_command_line(argc, argv);
 
 	std::string pdata;
 	std::vector<std::string> inputs_files = vm["input"].as<std::vector<std::string>>();

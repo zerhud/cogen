@@ -7,6 +7,14 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 
 namespace modegen {
+// templates for work with enums as flags
+template<class T> inline std::enable_if_t<std::is_enum_v<T>,T> operator~ (T a)      { return (T)(~(int)a); }
+template<class T> inline std::enable_if_t<std::is_enum_v<T>,T> operator| (T a, T b) { return (T)((int)a | (int)b); }
+template<class T> inline std::enable_if_t<std::is_enum_v<T>,T> operator& (T a, T b) { return (T)((int)a & (int)b); }
+template<class T> inline std::enable_if_t<std::is_enum_v<T>,T> operator^ (T a, T b) { return (T)((int)a ^ (int)b); }
+template<class T> inline std::enable_if_t<std::is_enum_v<T>,T&> operator|= (T& a, T b) { return (T&)((int&)a |= (int)b); }
+template<class T> inline std::enable_if_t<std::is_enum_v<T>,T&> operator&= (T& a, T b) { return (T&)((int&)a &= (int)b); }
+template<class T> inline std::enable_if_t<std::is_enum_v<T>,T&> operator^= (T& a, T b) { return (T&)((int&)a ^= (int)b); }
 } // namespace modegen
 
 namespace modegen {
@@ -154,6 +162,7 @@ BOOST_FUSION_ADAPT_STRUCT( modegen::interface, name, mem_funcs, constructors, me
 
 namespace modegen {
 typedef std::variant<function,enumeration,record,interface> module_content;
+enum class module_content_selector{function = 1 << 0, enumeration = 1 << 1, record = 1 << 2, interface = 1 << 3};
 struct using_directive {
 	std::string mod_name;
 };

@@ -18,14 +18,6 @@ enum class gen_options {
 	, split_version = 1 << 1
 };
 
-template<class T> inline std::enable_if_t<std::is_enum_v<T>,int> operator~ (T a)      { return ~(int)a; }
-template<class T> inline std::enable_if_t<std::is_enum_v<T>,int> operator| (T a, T b) { return ((int)a | (int)b); }
-template<class T> inline std::enable_if_t<std::is_enum_v<T>,int> operator& (T a, T b) { return ((int)a & (int)b); }
-template<class T> inline std::enable_if_t<std::is_enum_v<T>,int> operator^ (T a, T b) { return ((int)a ^ (int)b); }
-template<class T> inline std::enable_if_t<std::is_enum_v<T>,T&> operator|= (T& a, T b) { return (T&)((int&)a |= (int)b); }
-template<class T> inline std::enable_if_t<std::is_enum_v<T>,T&> operator&= (T& a, T b) { return (T&)((int&)a &= (int)b); }
-template<class T> inline std::enable_if_t<std::is_enum_v<T>,T&> operator^= (T& a, T b) { return (T&)((int&)a ^= (int)b); }
-
 //inline gen_options operator | (gen_options a, gen_options b)
 //{
     //int ret = static_cast<int>(a) | static_cast<int>(b);

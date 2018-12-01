@@ -4,6 +4,8 @@
 
 namespace modegen {
 
+bool is_selected(const module_content& cnt, module_content_selector s);
+
 template<typename Stream>
 Stream& operator << (Stream& s, const meta_parameter& p)
 {
