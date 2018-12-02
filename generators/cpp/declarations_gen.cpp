@@ -3,6 +3,7 @@
 #include <boost/process.hpp>
 
 #include "to_json.h"
+#include "type_converter.h"
 
 modegen::gen_options modegen::generators::cpp::declarations::options() const
 {
@@ -26,6 +27,7 @@ void modegen::generators::cpp::declarations::generate(std::vector<modegen::modul
 
 	cast_options(gopts, mods);
 	opstream pdata;
+	helpers::type_converter(module_content_selector::function, mods);
 	cppjson::value jsoned = modegen::converters::to_json(mods);
 
 	child a(

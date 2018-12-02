@@ -20,6 +20,7 @@ add_library(modegen_pgens ${gen_sources} ${gen_headers})
 target_link_libraries(modegen_pgens PRIVATE modegen_tree ${Boost_LIBRARIES} stdc++fs)
 target_include_directories(modegen_pgens PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_sources(modegen_pgens PRIVATE generators/cpp/make_includes.cpp generators/cpp/make_includes.h)
+target_sources(modegen_pgens PRIVATE generators/cpp/type_converter.cpp generators/cpp/type_converter.h)
 
 add_executable("${PROJECT_NAME}" parser/main.cpp)
 target_link_libraries("${PROJECT_NAME}" PRIVATE modegen_tree modegen_pgens)
