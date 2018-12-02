@@ -17,7 +17,6 @@ private:
 
 	void convert(modegen::type& t) const ;
 
-	mutable bool do_check = true;
 	module_content_selector selector;
 
 	static std::map<std::string,std::string> type_maps;
