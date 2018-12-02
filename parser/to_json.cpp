@@ -7,7 +7,7 @@ namespace pl = std::placeholders;
 
 modegen::converters::to_json::to_json(const std::vector<modegen::module>& mods)
 {
-	for(auto& m:mods) result.emplace_back(as_object(m));
+	for(std::size_t i=0;i<mods.size();++i) result["mods"][i] = as_object(mods[i]);
 }
 
 modegen::converters::to_json::operator cppjson::value() const

@@ -37,7 +37,7 @@ private:
 		return std::nullopt;
 	}
 
-	cppjson::array result;
+	cppjson::value result;
 };
 
 template<typename S>

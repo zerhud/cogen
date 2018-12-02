@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(empty)
 	auto mods = modegen::parse("module mod v1.0: #help mes\nmodule mod2 v1.0:");
 	BOOST_REQUIRE_EQUAL(mods.size(), 2);
 	std::string result = modegen::converters::to_json(mods);
-	BOOST_CHECK_EQUAL(result, R"-([{"name":"mod","type":"module","v":{"major":1,"minor":0}},{"docs":"help mes","name":"mod2","type":"module","v":{"major":1,"minor":0}}])-");
+	BOOST_CHECK_EQUAL(result, R"-({"mods":[{"name":"mod","type":"module","v":{"major":1,"minor":0}},{"docs":"help mes","name":"mod2","type":"module","v":{"major":1,"minor":0}}]})-");
 }
 
 BOOST_AUTO_TEST_CASE(fnc)
@@ -29,7 +29,8 @@ BOOST_AUTO_TEST_CASE(fnc)
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
 	BOOST_REQUIRE_EQUAL(mods[0].content.size(), 2);
 
-	cppjson::value result = modegen::converters::to_json(mods);
+	cppjson::value result_ = modegen::converters::to_json(mods);
+	cppjson::value result = result_["mods"];
 	BOOST_CHECK_EQUAL(result[0]["name"], "mod");
 	BOOST_CHECK_EQUAL(result[0]["v"]["major"], 1);
 	BOOST_CHECK_EQUAL(result[0]["v"]["minor"], 0);
@@ -56,7 +57,9 @@ BOOST_AUTO_TEST_CASE(enums)
 {
 	auto mods = modegen::parse("module mod v1.0: enum some{one two};");
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
-	cppjson::value result = modegen::converters::to_json(mods);
+	cppjson::value result_ = modegen::converters::to_json(mods);
+	cppjson::value result = result_["mods"];
+
 	cppjson::value& enum_rec = result[0]["content"][0];
 	BOOST_CHECK_EQUAL(enum_rec["name"], "some");
 	BOOST_CHECK_EQUAL(enum_rec["type"], "enumeration");
@@ -73,7 +76,9 @@ BOOST_AUTO_TEST_CASE(record)
 {
 	auto mods = modegen::parse("module mod v1.2: record rec { type m1; list<other_type> m2;}");
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
-	cppjson::value result = modegen::converters::to_json(mods);
+	cppjson::value result_ = modegen::converters::to_json(mods);
+	cppjson::value result = result_["mods"];
+
 	BOOST_CHECK_EQUAL(result[0]["name"], "mod");
 	BOOST_CHECK_EQUAL(result[0]["v"]["major"], 1);
 	BOOST_CHECK_EQUAL(result[0]["v"]["minor"], 2);
@@ -97,7 +102,9 @@ BOOST_AUTO_TEST_CASE(interface)
 	BOOST_REQUIRE_EQUAL(mods.size(), 1);
 	BOOST_REQUIRE_EQUAL(mods[0].content.size(), 1);
 
-	cppjson::value result = modegen::converters::to_json(mods);
+	cppjson::value result_ = modegen::converters::to_json(mods);
+	cppjson::value result = result_["mods"];
+
 	BOOST_CHECK_EQUAL(result[0]["name"], "mod");
 	BOOST_CHECK_EQUAL(result[0]["v"]["major"], 1);
 	BOOST_CHECK_EQUAL(result[0]["v"]["minor"], 0);
