@@ -132,6 +132,16 @@ BOOST_AUTO_TEST_CASE(with_mod)
 	};
 
 	for(auto& str:with_n) checker(str);
+
+	auto mods = modegen::parse("module mod v1.0:map<string,i8> name();"sv);
+	BOOST_REQUIRE_EQUAL(mods.size(),1);
+	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),0);
+	modegen::function& fnc = std::get<modegen::function>(mods[0].content[0]);
+	BOOST_CHECK_EQUAL(fnc.return_type.name, "map");
+	BOOST_REQUIRE_EQUAL(fnc.return_type.sub_types.size(),2);
+	BOOST_CHECK_EQUAL(fnc.return_type.sub_types[0].name, "string");
+	BOOST_CHECK_EQUAL(fnc.return_type.sub_types[1].name, "i8");
 }
 BOOST_AUTO_TEST_SUITE_END()
 

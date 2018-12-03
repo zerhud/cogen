@@ -1,5 +1,5 @@
 <% macro type(obj) -%>
-<% if obj.modificator != "" %><= obj.modificator =><<= obj.name =>><% else %><= obj.name =><% endif%>
+<= obj.name =><% if obj.sub[0] is defined %><<% for st in obj.sub %><= type(st) =><= ", " if not loop.last =><% endfor %>><% endif %>
 <%- endmacro %>
 
 <%- macro fparam(params) -%>
