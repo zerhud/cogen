@@ -31,6 +31,8 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 
 		using boost::phoenix::at_c;
 		using boost::phoenix::push_back;
+		using boost::phoenix::new_;
+		using boost::phoenix::construct;
 
 		quoted_string.name("quoted_string");
 		quoted_string =
@@ -45,8 +47,12 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		mutable_mod = qi::lexeme[(lit("const")[_val=false] | lit("mutable")[_val=true])];
 
 		type_rule.name("type_definition");
-		type_rule = (var_name[at_c<0>(_val)=_1] >> !(*space >> lit('<')))
-		          | (var_name[at_c<1>(_val)=_1] >> *space >> lit('<') >> *space >> var_name[at_c<0>(_val)=_1] >> *space >> lit('>'));
+		//type_rule = (var_name[push_back(at_c<0>(_val),_1)] >> !(*space >> lit('<')))
+		          //| (var_name[at_c<1>(_val)=_1] >> *space >> lit('<') >> *space >> (var_name[push_back(at_c<0>(_val),_1)]%',') >> *space >> lit('>'));
+		type_rule = var_name[at_c<0>(_val)=_1]
+		          >> -(lit('<')
+		          >> type_rule[at_c<1>(_val)=construct<std::unique_ptr<modegen::type>>(new_<modegen::type>(_1))]
+		          >> lit('>'));
 
 		using_rule.name("using_rule");
 		using_rule = lit("using") > +blank > var_name[at_c<0>(_val)=_1];
@@ -141,7 +147,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 	qi::rule<Iterator, std::string()> var_name;
 	qi::rule<Iterator, std::string()> quoted_string;
 	qi::rule<Iterator, modegen::using_directive> using_rule;
-	qi::rule<Iterator, type()> type_rule;
+	qi::rule<Iterator, type(), boost::spirit::qi::ascii::space_type> type_rule;
 	qi::rule<Iterator, function(), boost::spirit::qi::ascii::space_type> function_rule;
 	qi::rule<Iterator, constructor_fnc(), boost::spirit::qi::ascii::space_type> constructor_rule;
 	qi::rule<Iterator, func_param(), boost::spirit::qi::ascii::space_type> function_param_rule;

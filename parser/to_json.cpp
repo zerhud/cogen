@@ -124,9 +124,13 @@ cppjson::value modegen::converters::to_json::as_object(const modegen::record_ite
 cppjson::value modegen::converters::to_json::as_object(const modegen::type& obj) const
 {
 	cppjson::value ret;
-	ret["name"] = obj.name;
+
 	ret["type"] = "type";
-	ret["modificator"] = obj.modificator;
+
+	ret["name"] = obj.name;
+	if(obj.sub_type) ret["sub"] = as_object(*obj.sub_type);
+	else ret["sub"] = cppjson::null{};
+
 	return ret;
 }
 

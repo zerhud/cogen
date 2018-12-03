@@ -13,6 +13,9 @@ std::map<std::string,std::string> modegen::helpers::type_converter::type_maps =
     , {"string","std::string"}
     , {"date","std::chrono::system_clock::time_point"}
     , {"binary","std::vector<std::byte>"}
+    , {"list","std::vector"}
+    , {"map","std::map"}
+    , {"optional","std::optional"}
 };
 
 modegen::helpers::type_converter::type_converter(module_content_selector s, std::vector<modegen::module>& mods)
@@ -45,10 +48,8 @@ void modegen::helpers::type_converter::convert(modegen::interface& obj) const
 
 void modegen::helpers::type_converter::convert(modegen::type& t) const
 {
-	if(t.modificator == "list") t.modificator = "std::vector";
-	else if(t.modificator == "map") t.modificator = "std::map";
-	else if(t.modificator == "optional") t.modificator = "std::optional";
-
 	auto npos = type_maps.find(t.name);
 	if(npos!=type_maps.end()) t.name = npos->second;
+
+	if(t.sub_type) convert(*t.sub_type);
 }

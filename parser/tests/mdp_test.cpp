@@ -126,7 +126,9 @@ BOOST_AUTO_TEST_CASE(with_mod)
 
 		modegen::function& fnc = std::get<modegen::function>(mods[0].content[0]);
 		BOOST_CHECK_EQUAL(fnc.func_params.size(), 0);
-		BOOST_CHECK_EQUAL(fnc.return_type.modificator, "list");
+		BOOST_CHECK_EQUAL(fnc.return_type.name, "list");
+		BOOST_REQUIRE(fnc.return_type.sub_type);
+		BOOST_CHECK_EQUAL(fnc.return_type.sub_type->name,"type");
 	};
 
 	for(auto& str:with_n) checker(str);

@@ -10,9 +10,17 @@ using namespace std::literals;
 
 void check_type(const cppjson::value& v, const std::string& name, const std::string& mod)
 {
-	BOOST_CHECK_EQUAL(v["name"], name);
-	BOOST_CHECK_EQUAL(v["modificator"], mod);
 	BOOST_CHECK_EQUAL(v["type"], "type");
+
+	if(mod.empty()) {
+		BOOST_CHECK_EQUAL(v["sub"].type(), cppjson::is_null);
+		BOOST_CHECK_EQUAL(v["name"], name);
+	}
+	else {
+		BOOST_CHECK_EQUAL(v["sub"].type(), cppjson::is_object);
+		BOOST_CHECK_EQUAL(v["name"], mod);
+		BOOST_CHECK_EQUAL(v["sub"]["name"], name);
+	}
 }
 
 BOOST_AUTO_TEST_CASE(empty)
@@ -87,6 +95,9 @@ BOOST_AUTO_TEST_CASE(record)
 	BOOST_CHECK(rec["v"].is_null());
 	BOOST_CHECK_EQUAL(rec["name"], "rec");
 	BOOST_CHECK_EQUAL(rec["type"], "record");
+
+	modegen::type& m2type = std::get<modegen::record>(mods[0].content[0]).members[1].param_type;
+	BOOST_CHECK_EQUAL(m2type.name, "list");
 
 	BOOST_REQUIRE_EQUAL(rec["members"].type(), cppjson::is_array);
 	BOOST_REQUIRE_EQUAL(rec["members"].array().size(), 2);

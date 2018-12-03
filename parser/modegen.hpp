@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 #include <string>
 #include <variant>
@@ -81,11 +82,22 @@ BOOST_FUSION_ADAPT_STRUCT( modegen::meta_parameters::deprication, (modegen::meta
 
 namespace modegen {
 	struct type {
+		type() =default ;
+		type(const type& o) : name(o.name) {if(o.sub_type) sub_type = o.sub_type->clone();}
+		type& operator = (const type& o) {name = o.name; sub_type = o.sub_type ? o.sub_type->clone() : nullptr; return *this;}
+
+		std::unique_ptr<type> clone() const {
+			auto ret = std::make_unique<type>();
+			ret->name = name;
+			if(sub_type) ret->sub_type = sub_type->clone();
+			return ret;
+		}
+
 		std::string name;
-		std::string modificator;
+		std::unique_ptr<type> sub_type;
 	};
 } // namespace modegen
-BOOST_FUSION_ADAPT_STRUCT( modegen::type, (std::string, name), (std::string, modificator) )
+BOOST_FUSION_ADAPT_STRUCT( modegen::type, name, sub_type )
 
 namespace modegen {
 	struct func_param {
