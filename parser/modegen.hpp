@@ -1,10 +1,10 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 #include <string>
 #include <variant>
 #include <optional>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 
 namespace modegen {
@@ -83,21 +83,21 @@ BOOST_FUSION_ADAPT_STRUCT( modegen::meta_parameters::deprication, (modegen::meta
 namespace modegen {
 	struct type {
 		type() =default ;
-		type(const type& o) : name(o.name) {if(o.sub_type) sub_type = o.sub_type->clone();}
-		type& operator = (const type& o) {name = o.name; sub_type = o.sub_type ? o.sub_type->clone() : nullptr; return *this;}
+		type(const type& o) : name(o.name), sub_types(o.sub_types.begin(), o.sub_types.end()) {}
+		type& operator = (const type& o) {name = o.name; sub_types.assign(o.sub_types.begin(),o.sub_types.end()); return *this;}
 
 		std::unique_ptr<type> clone() const {
 			auto ret = std::make_unique<type>();
 			ret->name = name;
-			if(sub_type) ret->sub_type = sub_type->clone();
+			ret->sub_types.assign(sub_types.begin(), sub_types.end());
 			return ret;
 		}
 
 		std::string name;
-		std::unique_ptr<type> sub_type;
+		boost::ptr_vector<type> sub_types;
 	};
 } // namespace modegen
-BOOST_FUSION_ADAPT_STRUCT( modegen::type, name, sub_type )
+BOOST_FUSION_ADAPT_STRUCT( modegen::type, name, sub_types )
 
 namespace modegen {
 	struct func_param {

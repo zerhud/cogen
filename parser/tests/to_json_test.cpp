@@ -17,9 +17,9 @@ void check_type(const cppjson::value& v, const std::string& name, const std::str
 		BOOST_CHECK_EQUAL(v["name"], name);
 	}
 	else {
-		BOOST_CHECK_EQUAL(v["sub"].type(), cppjson::is_object);
+		BOOST_CHECK_EQUAL(v["sub"].type(), cppjson::is_array);
 		BOOST_CHECK_EQUAL(v["name"], mod);
-		BOOST_CHECK_EQUAL(v["sub"]["name"], name);
+		BOOST_CHECK_EQUAL(v["sub"][0]["name"], name);
 	}
 }
 

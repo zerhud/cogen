@@ -51,7 +51,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		          //| (var_name[at_c<1>(_val)=_1] >> *space >> lit('<') >> *space >> (var_name[push_back(at_c<0>(_val),_1)]%',') >> *space >> lit('>'));
 		type_rule = var_name[at_c<0>(_val)=_1]
 		          >> -(lit('<')
-		          >> type_rule[at_c<1>(_val)=construct<std::unique_ptr<modegen::type>>(new_<modegen::type>(_1))]
+		          >> (type_rule[push_back(at_c<1>(_val),(new_<modegen::type>(_1)))]%',')
 		          >> lit('>'));
 
 		using_rule.name("using_rule");

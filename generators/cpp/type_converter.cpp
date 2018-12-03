@@ -51,5 +51,5 @@ void modegen::helpers::type_converter::convert(modegen::type& t) const
 	auto npos = type_maps.find(t.name);
 	if(npos!=type_maps.end()) t.name = npos->second;
 
-	if(t.sub_type) convert(*t.sub_type);
+	for(auto& s:t.sub_types) convert(s);
 }
