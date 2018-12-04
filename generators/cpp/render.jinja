@@ -9,3 +9,17 @@
 <%- macro gen_namespace_name(module) -%>
 <= module.name =>_v<= module.v.major =>_<= module.v.minor =>
 <%- endmacro %>
+
+<%- macro decl_depricated(obj) -%>
+<%- if obj.depricated %>[[depricated<% if obj.depricated.message != '' %>("<= obj.depricated.message =>")<% endif %>]] <% endif %>
+<%- endmacro %>
+
+<%- macro decl_meta_params(mparams) -%>
+<%- if mparams.docs -%>///  <= mparams.docs =><% endif -%>
+<%- endmacro %>
+
+<%- macro function_header(obj) -%>
+<= decl_meta_params(obj) -=>
+<= decl_depricated(obj) -=>
+<= "static " if obj.mutable =><=- type(obj.ret_type) => <= obj.name =>(<= fparam(obj.params) =>)<= " const" if obj.mutable == False =>;
+<%- endmacro %>

@@ -4,12 +4,13 @@
 
 #include <memory>
 <% for module in cdata.mods %>
+<= render.decl_meta_params(module) =>
 namespace <= render.gen_namespace_name(module) => {
 	<%- for obj in module.content %>
-	<% if obj.type == "function" -%>
-		 <=- render.type(obj.ret_type) => <= obj.name =>(<= render.fparam(obj.params) =>);
+	<% if obj.type == "function" -%><= render.function_header(obj) =>
 	<%- elif obj.type == "enumeration" -%>
-	enum class <= obj.name =>
+	<= render.decl_meta_params(obj) =>
+	enum class <= render.decl_depricated(obj) =><= obj.name =>
 	{
 		<% for mem in obj.members -%> <= mem.name =>  <=- ", " if not loop.last => <%- endfor %>
 	};
@@ -19,10 +20,12 @@ namespace <= render.gen_namespace_name(module) => {
 	template<typename S> S& operator << (S& out, <= obj.name => o) { out << to_string(o); return out; }
 	<%- endif -%>
 	<%- elif obj.type == "interface" -%>
-	class <= obj.name => ;
+	<= render.decl_meta_params(obj) =>
+	class <= render.decl_depricated(obj) =><= obj.name => ;
 	using <= obj.name =>_ptr = std::shared_ptr<<= obj.name =>>;
 	<%- elif obj.type == "record" -%>
-	struct <= obj.name => ;
+	<= render.decl_meta_params(obj) =>
+	struct <= render.decl_depricated(obj) =><= obj.name => ;
 	<%- else -%> #error unknown derective <= obj.name => <%- endif -%>
 	<%- endfor %>
 } // namespace <= module.name =>
