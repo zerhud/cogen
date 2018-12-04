@@ -27,8 +27,10 @@ void modegen::generators::cpp::declarations::generate(std::vector<modegen::modul
 
 	cast_options(gopts, mods);
 	opstream pdata;
-	helpers::type_converter(module_content_selector::function, mods);
+	auto incs = helpers::type_converter(module_content_selector::function, mods).includes();
 	cppjson::value jsoned = modegen::converters::to_json(mods);
+
+	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i] = incs[i];
 
 	child a(
 	      "../generators/pythongen"

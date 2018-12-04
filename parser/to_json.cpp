@@ -35,6 +35,8 @@ cppjson::value modegen::converters::to_json::as_object(const modegen::module& ob
 		ret["content"][i] = std::visit(make_obj, obj.content[i]);
 	}
 
+	for(std::size_t i=0;i<obj.imports.size();++i) ret["imports"][i] = obj.imports[i].mod_name;
+
 	return ret;
 }
 

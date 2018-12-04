@@ -18,11 +18,45 @@ std::map<std::string,std::string> modegen::helpers::type_converter::type_maps =
     , {"optional","std::optional"}
 };
 
+std::map<std::string,std::string> modegen::helpers::type_converter::incs_maps =
+{
+      {"i8","cstdint"}
+    , {"i16","cstdint"}
+    , {"i32","cstdint"}
+    , {"i64","cstdint"}
+    , {"string","string"}
+    , {"date","chrono"}
+    , {"binary","vector"}
+    , {"list","vector"}
+    , {"map","map"}
+    , {"optional","optional"}
+};
+
 modegen::helpers::type_converter::type_converter(module_content_selector s, std::vector<modegen::module>& mods)
     : selector(s)
 {
 	auto v = [this](auto& mc) { convert(mc); };
-	for(auto& mod:mods) for(auto& mc:mod.content) if(is_selected(mc, selector)) std::visit(v, mc);
+	for(auto& mod:mods) {
+		cur_mod = &mod;
+		for(auto& mc:mod.content) if(is_selected(mc, selector)) std::visit(v, mc);
+
+		std::sort(cur_mod->imports.begin(),cur_mod->imports.end(),[](using_directive& left, using_directive& right){return left.mod_name < right.mod_name;});
+		auto upos = std::unique(cur_mod->imports.begin(),cur_mod->imports.end(),
+		                        [](using_directive& left, using_directive& right){return left.mod_name==right.mod_name;});
+		cur_mod->imports.erase(upos,cur_mod->imports.end());
+
+		for(auto& i:cur_mod->imports) total_incs.emplace_back(i.mod_name);
+	}
+
+	std::sort(total_incs.begin(),total_incs.end());
+	total_incs.erase(std::unique(total_incs.begin(),total_incs.end()), total_incs.end());
+
+	cur_mod = nullptr;
+}
+
+std::vector<std::string> modegen::helpers::type_converter::includes() const
+{
+	return total_incs;
 }
 
 void modegen::helpers::type_converter::convert(modegen::function& obj) const
@@ -33,6 +67,8 @@ void modegen::helpers::type_converter::convert(modegen::function& obj) const
 
 void modegen::helpers::type_converter::convert(modegen::record& obj) const
 {
+	assert(cur_mod);
+	cur_mod->imports.emplace_back(modegen::using_directive{"memory"});
 	for(auto& m:obj.members) convert(m.param_type);
 }
 
@@ -42,12 +78,19 @@ void modegen::helpers::type_converter::convert(modegen::enumeration& /*obj*/) co
 
 void modegen::helpers::type_converter::convert(modegen::interface& obj) const
 {
+	assert(cur_mod);
+	cur_mod->imports.emplace_back(modegen::using_directive{"memory"});
 	for(auto& f:obj.mem_funcs) convert(f);
 	for(auto& c:obj.constructors) for(auto cp:c.func_params) convert(cp.param_type);
 }
 
 void modegen::helpers::type_converter::convert(modegen::type& t) const
 {
+	assert(cur_mod);
+
+	auto ipos = incs_maps.find(t.name);
+	if(ipos!=incs_maps.end()) cur_mod->imports.emplace_back(modegen::using_directive{ipos->second});
+
 	auto npos = type_maps.find(t.name);
 	if(npos!=type_maps.end()) t.name = npos->second;
 
