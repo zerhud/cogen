@@ -45,7 +45,7 @@ modegen::helpers::type_converter::type_converter(module_content_selector s, std:
 		                        [](using_directive& left, using_directive& right){return left.mod_name==right.mod_name;});
 		cur_mod->imports.erase(upos,cur_mod->imports.end());
 
-		for(auto& i:cur_mod->imports) total_incs.emplace_back(i.mod_name);
+		for(auto& i:cur_mod->imports) if(i.is_system) total_incs.emplace_back(i.mod_name);
 	}
 
 	std::sort(total_incs.begin(),total_incs.end());
@@ -89,7 +89,7 @@ void modegen::helpers::type_converter::convert(modegen::type& t) const
 	assert(cur_mod);
 
 	auto ipos = incs_maps.find(t.name);
-	if(ipos!=incs_maps.end()) cur_mod->imports.emplace_back(modegen::using_directive{ipos->second});
+	if(ipos!=incs_maps.end()) cur_mod->imports.emplace_back(modegen::using_directive{ipos->second,true});
 
 	auto npos = type_maps.find(t.name);
 	if(npos!=type_maps.end()) t.name = npos->second;
