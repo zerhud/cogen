@@ -175,6 +175,7 @@ BOOST_FUSION_ADAPT_STRUCT( modegen::interface, name, mem_funcs, constructors, me
 namespace modegen {
 typedef std::variant<function,enumeration,record,interface> module_content;
 enum class module_content_selector{function = 1 << 0, enumeration = 1 << 1, record = 1 << 2, interface = 1 << 3, all = ~0};
+
 struct using_directive {
 	std::string mod_name;
 	bool is_system;

@@ -76,19 +76,19 @@ int main(int argc,char** argv)
 	modegen::generator_maker gmaker;
 	modegen::generators::reg_default_generators(&gmaker);
 
-	modegen::gen_options opts = modegen::gen_options::no_opts;
-	if(vm.count("split-by-version")) opts |= modegen::gen_options::split_version;
+	modegen::mod_selection selector;
+	selector.opts = modegen::gen_options::no_opts;
+	if(vm.count("split-by-version")) selector.opts |= modegen::gen_options::split_version;
 
 	try {
 		auto gen = gmaker.make_generator(vm["target"].as<std::string>(), vm["generator"].as<std::string>());
 		if(!gen) return -1;
 
-		gen->options(opts);
 		std::string output = vm["output"].as<std::string>();
-		if(output != "-") gen->output(output);
+		if(output != "-") selector.output.emplace(output);
 
 		auto result = modegen::parse(pdata);
-		gen->generate(result);
+		gen->generate(selector, result);
 	}
 	catch(const std::runtime_error& ex)
 	{

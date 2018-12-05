@@ -24,10 +24,15 @@ std::string modegen::generator_maker::make_path(std::string_view part, std::stri
 	return std::string(part) + std::string(".") + std::string(name);
 }
 
-void modegen::cast_options(gen_options opts, std::vector<modegen::module>& mods)
+static void /*modegen::*/cast_options(modegen::gen_options opts, std::vector<modegen::module>& mods)
 {
-	if((opts & gen_options::split_version)==gen_options::split_version) {
+	if((opts & modegen::gen_options::split_version)==modegen::gen_options::split_version) {
 		modegen::converters::split_by_version splitter;
 		splitter(mods);
 	}
+}
+
+void modegen::filter_by_selection(const modegen::mod_selection& query, std::vector<modegen::module>& mods)
+{
+	cast_options(query.opts, mods);
 }

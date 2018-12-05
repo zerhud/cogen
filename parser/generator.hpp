@@ -18,22 +18,28 @@ enum class gen_options {
 	, split_version = 1 << 1
 };
 
+struct mod_selection {
+	gen_options opts;
+	std::string mod_name;
+	std::string cnt_name;
+	module_content_selector sel;
+	std::optional<std::filesystem::path> output;
+};
+
 //inline gen_options operator | (gen_options a, gen_options b)
 //{
     //int ret = static_cast<int>(a) | static_cast<int>(b);
     //return static_cast<gen_options>(ret);
 //}
 
-void cast_options(gen_options opts, std::vector<modegen::module>& mods);
+//void cast_options(gen_options opts, std::vector<modegen::module>& mods);
+void filter_by_selection(const mod_selection& query, std::vector<modegen::module>& mods);
 
 class generator {
 public:
 	virtual ~generator() noexcept =default ;
 
-	virtual gen_options options() const =0 ;
-	virtual void options(gen_options opts) =0 ;
-	virtual void output(std::filesystem::path o) =0 ; ///< dir or file
-	virtual void generate(std::vector<modegen::module> mods) const =0 ;
+	virtual void generate(mod_selection query, std::vector<modegen::module> mods) const =0 ;
 };
 
 class generator_maker {
