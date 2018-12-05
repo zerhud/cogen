@@ -32,7 +32,21 @@ static void /*modegen::*/cast_options(modegen::gen_options opts, std::vector<mod
 	}
 }
 
+static void remove_empty(std::vector<modegen::module>& mods)
+{
+	auto rpos = std::remove_if(mods.begin(),mods.end(), [](const modegen::module& m){return m.content.empty();} );
+	mods.erase( rpos, mods.end() );
+
+}
+
 void modegen::filter_by_selection(const modegen::mod_selection& query, std::vector<modegen::module>& mods)
 {
 	cast_options(query.opts, mods);
+
+	for(auto& m:mods) {
+		auto rpos = std::remove_if(m.content.begin(), m.content.end(), [&query](const auto& c){return !is_selected(c, query.sel);} );
+		m.content.erase( rpos, m.content.end() );
+	}
+
+	remove_empty(mods);
 }

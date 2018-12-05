@@ -22,5 +22,5 @@
 <%- macro function_header(obj) -%>
 <= decl_meta_params(obj) -=>
 <= decl_depricated(obj) -=>
-<= "static " if obj.mutable =><=- type(obj.ret_type) => <= obj.name =>(<= fparam(obj.params) =>)<= " const" if obj.mutable == False =>;
+<= "static " if obj.static =><=- type(obj.ret_type) => <= obj.name =>(<= fparam(obj.params) =>)<= " const" if obj.mutable == False =>
 <%- endmacro %>
