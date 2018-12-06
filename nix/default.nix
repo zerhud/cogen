@@ -5,8 +5,9 @@
 	, bison2
 	, flex
 	, boost
-	, cmake
 	, cppjson
+	, cmake
+	, ninja
 }:
 
 stdenv.mkDerivation rec {
@@ -18,7 +19,7 @@ stdenv.mkDerivation rec {
 		# for generation
 		python3 py_jinja bison2 flex
 		# for build excutable file
-		cmake 
+		cmake ninja
 		];
 	buildInputs = [
 		boost

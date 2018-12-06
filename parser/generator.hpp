@@ -23,6 +23,8 @@ struct mod_selection {
 	std::string mod_name;
 	std::string cnt_name;
 	module_content_selector sel;
+
+	std::string what_generate;
 	std::optional<std::filesystem::path> output;
 };
 
@@ -39,6 +41,7 @@ class generator {
 public:
 	virtual ~generator() noexcept =default ;
 
+	virtual void set_option(const std::string& key, const std::string& val) =0 ;
 	virtual void generate(mod_selection query, std::vector<modegen::module> mods) const =0 ;
 };
 
