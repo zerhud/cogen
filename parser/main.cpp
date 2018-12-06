@@ -113,8 +113,8 @@ int main(int argc,char** argv)
 			}
 
 			std::cmatch m;
-			std::regex_match(val,m,target_match);
-			cur_gen = gmaker.make_generator(m[1],m[2]);
+			std::regex_match(val.data(),m,target_match);
+			cur_gen = gmaker.make_generator(m[1].str(),m[2].str());
 			if(!cur_gen) std::exit(101);
 			gen_opts.reset();
 			gen_opts.emplace();
@@ -123,15 +123,15 @@ int main(int argc,char** argv)
 		else if(key=="option") {
 			if(!cur_gen) std::exit(100);
 			std::cmatch m;
-			std::regex_match(val,m,option_match);
-			cur_gen->set_option(m[1], 3 < m.size() ? m[3] : "");
+			std::regex_match(val.data(),m,option_match);
+			cur_gen->set_option(m[1].str(), 3 < m.size() ? m[3].str() : "");
 		}
-		else if(key="output") {
+		else if(key=="output") {
 			if(!cur_gen) std::exit(100);
 			assert(gen_opts.has_value());
 
 			std::cmatch m;
-			std::regex_match(val,m,option_match);
+			std::regex_match(val.data(),m,option_match);
 			gen_opts->what_generate = m[1];
 			if(m[2]!="-") gen_opts->output = m[2];
 		}
