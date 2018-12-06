@@ -84,7 +84,7 @@ int main(int argc,char** argv)
 	// -t tests,cpp -oall=some/dir -t bridge,jni -oall=some/other_dir
 
 	std::regex target_match("([a-zA-Z]+),([a-zA-Z]+)", std::regex::egrep);
-	std::regex option_match("([a-zA-Z]+)(=([a-zA-Z]+))?", std::regex::egrep);
+	std::regex option_match("([a-zA-Z]+)(=([a-zA-Z_-]+))?", std::regex::egrep);
 
 	modegen::generator_maker gmaker;
 	modegen::generators::reg_default_generators(&gmaker);
@@ -131,8 +131,16 @@ int main(int argc,char** argv)
 			std::cmatch m;
 			std::regex_match(val.data(),m,option_match);
 			gen_opts->what_generate = m[1];
-			if(m[2]!="-") gen_opts->output = m[2];
+			if(m[3]!="-") gen_opts->output = m[3];
 		}
+	}
+
+	// last generator
+	if(cur_gen) {
+		assert(gen_opts.has_value());
+		cur_gen->generate(*gen_opts, mods);
+	} else {
+		std::exit(102);
 	}
 
 	return 0;
