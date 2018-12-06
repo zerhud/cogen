@@ -38,7 +38,7 @@ void write_output(const cppjson::value& mods, const std::string& file_name)
 	}
 }
 
-po::basic_parsed_options<char> parse_command_line(int argc,char** argv)
+std::tuple<po::basic_parsed_options<char>,po::variables_map> parse_command_line(int argc,char** argv)
 {
 	po::options_description desc("Allowed options");
 	desc.add_options()
@@ -63,7 +63,7 @@ po::basic_parsed_options<char> parse_command_line(int argc,char** argv)
 		std::exit(1);
 	}
 
-	return opts;
+	return {opts,vm};
 }
 
 std::vector<modegen::module> read_input(const std::vector<std::string>& inputs)
@@ -76,9 +76,7 @@ std::vector<modegen::module> read_input(const std::vector<std::string>& inputs)
 
 int main(int argc,char** argv)
 {
-	auto opts = parse_command_line(argc, argv);
-	po::variables_map vm;
-	po::store(opts, vm);
+	auto [opts,vm] = parse_command_line(argc, argv);
 
 	// try formats
 	// -t server,cpp -Osnake_case -Optr_postfix=_ptr -odeclarations=-
