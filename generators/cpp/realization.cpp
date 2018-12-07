@@ -61,6 +61,7 @@ void modegen::generators::cpp::realization::gen_cpp(modegen::mod_selection query
 	if(mods.size()==0) return;
 
 	cppjson::value jsoned = modegen::converters::to_json(mods);
+	jsoned["incs"][0] = "mod.hpp";
 
 	//TODO: add header file in includes
 

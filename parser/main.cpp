@@ -6,6 +6,7 @@
 #include <boost/program_options.hpp>
 #include <boost/process.hpp>
 
+#include "check.h"
 #include "modegen.hpp"
 #include "grammar.hpp"
 #include "generator.hpp"
@@ -68,10 +69,19 @@ std::tuple<po::basic_parsed_options<char>,po::variables_map> parse_command_line(
 
 std::vector<modegen::module> read_input(const std::vector<std::string>& inputs)
 {
-	std::string pdata;
-	for(auto& i:inputs) pdata += read_input(i);
-	if(inputs.empty()) pdata = read_input("-");
-	return modegen::parse(pdata);
+	modegen::checker check;
+	std::vector<modegen::module> mods;
+	auto add_input = [&mods, &check](const std::string& fn){
+		auto imods = modegen::parse(read_input(fn));
+		check(imods, fn);
+		for(auto& im:imods) mods.emplace_back(std::move(im));
+	};
+
+	if(inputs.empty()) add_input("-");
+	for(auto& i:inputs) add_input(i);
+
+	check(mods);
+	return mods;
 }
 
 int main(int argc,char** argv)
