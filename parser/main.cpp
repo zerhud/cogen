@@ -83,7 +83,7 @@ int main(int argc,char** argv)
 	// -t server,cpp -OcamelCase -oall=some/dir -odeclaration=-
 	// -t tests,cpp -oall=some/dir -t bridge,jni -oall=some/other_dir
 
-	std::regex target_match("([a-zA-Z]+),([a-zA-Z]+)", std::regex::egrep);
+	std::regex target_match("([a-zA-Z]+)(,([a-zA-Z]+))?", std::regex::egrep);
 	std::regex option_match("([a-zA-Z]+)(=([a-zA-Z_-]+))?", std::regex::egrep);
 
 	modegen::generator_maker gmaker;
@@ -112,11 +112,12 @@ int main(int argc,char** argv)
 
 			std::cmatch m;
 			std::regex_match(val.data(),m,target_match);
-			cur_gen = gmaker.make_generator(m[1].str(),m[2].str());
+			cur_gen = gmaker.make_generator(m[1].str(),m[3].str());
 			if(!cur_gen) std::exit(101);
 			gen_opts.reset();
 			gen_opts.emplace();
 			gen_opts->opts = modegen::gen_options::no_opts;
+			gen_opts->sel = modegen::module_content_selector::all;
 		}
 		else if(key=="option") {
 			if(!cur_gen) std::exit(100);
