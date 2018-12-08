@@ -12,6 +12,8 @@ public:
 	void set_option(const std::string& key, const std::string& val) override ;
 	void generate(mod_selection query, std::vector<modegen::module> mods) const override ;
 private:
+	static std::string pythongen_path() ;
+
 	void gen_hpp(mod_selection query, std::vector<modegen::module> mods) const ;
 	void gen_cpp(mod_selection query, std::vector<modegen::module> mods) const ;
 	void gen_def(mod_selection query, std::vector<modegen::module> mods) const ;

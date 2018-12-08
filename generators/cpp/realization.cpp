@@ -2,6 +2,7 @@
 
 #include <boost/process.hpp>
 
+#include "helpers.hpp"
 #include "to_json.h"
 #include "type_converter.h"
 
@@ -27,6 +28,11 @@ void modegen::generators::cpp::realization::generate(modegen::mod_selection quer
 	}
 }
 
+std::string modegen::generators::cpp::realization::pythongen_path()
+{
+	return get_self_dir() / "pythongen";
+}
+
 void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query, std::vector<modegen::module> mods) const
 {
 	query.sel = module_content_selector::interface;
@@ -40,7 +46,7 @@ void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query
 
 	opstream pdata;
 	child a(
-	      "../generators/pythongen"
+	      pythongen_path()
 	    , "-t", "../generators/cpp/realization.hpp.jinja"
 	    , "-o", out_path.generic_u8string()
 	    , std_out > stdout
@@ -67,7 +73,7 @@ void modegen::generators::cpp::realization::gen_cpp(modegen::mod_selection query
 
 	opstream pdata;
 	child a(
-	      "../generators/pythongen"
+	      pythongen_path()
 	    , "-t", "../generators/cpp/realization.cpp.jinja"
 	    , "-o", out_path.generic_u8string()
 	    , std_out > stdout
@@ -92,7 +98,7 @@ void modegen::generators::cpp::realization::gen_def(modegen::mod_selection query
 	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i] = incs[i];
 
 	child a(
-	      "../generators/pythongen"
+	      pythongen_path()
 	    , "-t", "../generators/cpp/declarations.hpp.jinja"
 	    , "-o", out_path.generic_u8string()
 	    , std_out > stdout

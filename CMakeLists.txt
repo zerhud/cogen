@@ -28,6 +28,15 @@ target_link_libraries("${PROJECT_NAME}" PRIVATE modegen_tree modegen_pgens)
 set(tests mdp checker to_json split_by_version)
 enable_testing()
 
+set(pygen_in "${CMAKE_CURRENT_SOURCE_DIR}/generators/pythongen")
+set(pygen_out "${CMAKE_CURRENT_BINARY_DIR}/pythongen")
+add_custom_command(
+    TARGET "${PROJECT_NAME}" PRE_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${pygen_in}" "${pygen_out}"
+    #DEPENDS "${pygen_in}"
+    )
+
+
 foreach(tname ${tests})
 	add_executable(${tname}_test "parser/tests/${tname}_test.cpp")
 	target_link_libraries(${tname}_test PRIVATE modegen_tree ${Boost_LIBRARIES})

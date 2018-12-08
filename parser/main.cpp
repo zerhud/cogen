@@ -17,6 +17,18 @@
 
 namespace po = boost::program_options;
 
+std::filesystem::path self_dir;
+std::filesystem::path modegen::get_self_dir()
+{
+	return self_dir;
+}
+static void set_self_dir(std::string self)
+{
+	assert(!self.empty());
+	self_dir = self;
+	self_dir = self_dir.parent_path();
+}
+
 std::string read_input(const std::string& file_name)
 {
 	if(file_name == "-") {
@@ -86,6 +98,8 @@ std::vector<modegen::module> read_input(const std::vector<std::string>& inputs)
 
 int main(int argc,char** argv)
 {
+	set_self_dir(argv[0]);
+
 	auto [opts,vm] = parse_command_line(argc, argv);
 
 	// try formats

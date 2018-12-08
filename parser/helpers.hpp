@@ -1,8 +1,11 @@
 #pragma once
 
+#include <filesystem>
 #include "modegen.hpp"
 
 namespace modegen {
+
+std::filesystem::path get_self_dir();
 
 bool is_selected(const module_content& cnt, module_content_selector s);
 
