@@ -44,8 +44,8 @@ std::tuple<po::basic_parsed_options<char>,po::variables_map> parse_command_line(
 	po::options_description desc("Allowed options");
 	desc.add_options()
 	        ("help,h", "produce help message")
-	        ("input,i", po::value<std::vector<std::string>>(), "input file")
-	        ("output,o", po::value<std::string>()->default_value("all=-"), "output file")
+	        ("input,i", po::value<std::vector<std::string>>(), "input files")
+	        ("output,o", po::value<std::vector<std::string>>(), "output files")
 	        ("split-by-versions,s", "split generated output by version (one module is one version)")
 	        ("select", po::value<std::string>()->default_value(""), "produce output only for selected path")
 	        ("target,t", po::value<std::string>()->default_value("server,cpp"), "choice a target, cpp for exmple")
@@ -94,7 +94,7 @@ int main(int argc,char** argv)
 	// -t tests,cpp -oall=some/dir -t bridge,jni -oall=some/other_dir
 
 	std::regex target_match("([a-zA-Z]+)(,([a-zA-Z]+))?", std::regex::egrep);
-	std::regex option_match("([a-zA-Z]+)(=([a-zA-Z_-]+))?", std::regex::egrep);
+	std::regex option_match("([a-zA-Z]+)(=(.+))?", std::regex::egrep);
 
 	modegen::generator_maker gmaker;
 	modegen::generators::reg_default_generators(&gmaker);
@@ -141,6 +141,7 @@ int main(int argc,char** argv)
 
 			std::cmatch m;
 			std::regex_match(val.data(),m,option_match);
+			std::cout << val << " " << m[1] << " " << m[2] << " " << m[3] << std::endl;
 			gen_opts->what_generate = m[1];
 			if(m[3]!="-") gen_opts->output = m[3];
 		}

@@ -34,3 +34,5 @@ foreach(tname ${tests})
 
 	add_test(NAME ${tname} COMMAND ${tname}_test)
 endforeach()
+
+#add_subdirectory(tests/srv-cpp)
