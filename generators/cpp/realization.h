@@ -22,6 +22,7 @@ private:
 	void set_out(std::filesystem::path base, std::string_view file, std::string_view part) const ;
 
 	std::string solve_option(std::string_view name) const ;
+	bool solve_bool_option(std::string_view name) const ;
 
 	std::map<std::string,std::string,std::less<>> options;
 	mutable std::filesystem::path out_path;

@@ -48,7 +48,7 @@ void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query
 
 	filter_by_selection(query, mods);
 	auto incs = helpers::type_converter(query.sel, mods).includes();
-	if(mods.size()==0) return;
+	if(mods.size()==0 && !solve_bool_option("gen_empty")) return;
 
 	cppjson::value jsoned = modegen::converters::to_json(mods);
 	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
@@ -75,7 +75,7 @@ void modegen::generators::cpp::realization::gen_cpp(modegen::mod_selection query
 
 	filter_by_selection(query, mods);
 	helpers::type_converter(query.sel, mods);
-	if(mods.size()==0) return;
+	if(mods.size()==0 && !solve_bool_option("gen_empty")) return;
 
 	cppjson::value jsoned = modegen::converters::to_json(mods);
 	jsoned["incs"][0]["n"] = solve_option("hpp");
@@ -104,7 +104,7 @@ void modegen::generators::cpp::realization::gen_def(modegen::mod_selection query
 
 	opstream pdata;
 	auto incs = helpers::type_converter(query.sel, mods).includes();
-	if(mods.size()==0) return ;
+	if(mods.size()==0 && !solve_bool_option("gen_empty")) return ;
 
 	cppjson::value jsoned = modegen::converters::to_json(mods);
 	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
@@ -145,4 +145,11 @@ std::string modegen::generators::cpp::realization::solve_option(std::string_view
 	if(name == "def"sv) return "declarations.hpp"s;
 
 	return ""s;
+}
+
+bool modegen::generators::cpp::realization::solve_bool_option(std::string_view name) const
+{
+	auto pos = options.find(name);
+	if(pos==options.end()) return false;
+	return pos->second.empty() || pos->second == "true" || pos->second == "True";
 }
