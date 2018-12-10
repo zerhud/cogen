@@ -6,6 +6,8 @@
 #include "to_json.h"
 #include "type_converter.h"
 
+#include "generators/config.hpp"
+
 using namespace boost::process;
 
 void modegen::generators::cpp::realization::set_option(const std::string &key, const std::string &val)
@@ -34,6 +36,12 @@ std::string modegen::generators::cpp::realization::pythongen_path()
 	return get_self_dir() / "pythongen";
 }
 
+std::string modegen::generators::cpp::realization::tmpl_path(std::string_view tn)
+{
+	static std::filesystem::path tmpl_dir(templates_dir);
+	return tmpl_dir / tn;
+}
+
 void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query, std::vector<modegen::module> mods) const
 {
 	query.sel = module_content_selector::interface;
@@ -50,7 +58,7 @@ void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query
 	opstream pdata;
 	child a(
 	      pythongen_path()
-	    , "-t", "../generators/cpp/realization.hpp.jinja"
+	    , "-t", tmpl_path("realization.hpp.jinja")
 	    , "-o", out_path.generic_u8string()
 	    , std_out > stdout
 	    , std_in < pdata
@@ -78,7 +86,7 @@ void modegen::generators::cpp::realization::gen_cpp(modegen::mod_selection query
 	opstream pdata;
 	child a(
 	      pythongen_path()
-	    , "-t", "../generators/cpp/realization.cpp.jinja"
+	    , "-t", tmpl_path("realization.cpp.jinja")
 	    , "-o", out_path.generic_u8string()
 	    , std_out > stdout
 	    , std_in < pdata
@@ -103,7 +111,7 @@ void modegen::generators::cpp::realization::gen_def(modegen::mod_selection query
 
 	child a(
 	      pythongen_path()
-	    , "-t", "../generators/cpp/declarations.hpp.jinja"
+	    , "-t", tmpl_path("declarations.hpp.jinja")
 	    , "-o", out_path.generic_u8string()
 	    , std_out > stdout
 	    , std_in < pdata

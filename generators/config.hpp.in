@@ -1,0 +1,9 @@
+#pragma once
+
+namespace modegen {
+const char* binary_dir = "@binary_dir@";
+namespace generators::cpp {
+const char* templates_dir = "@cpp_templates_dir@";
+} // namespace generators::cpp
+} // namespace modegen
+

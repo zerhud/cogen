@@ -22,6 +22,13 @@ target_include_directories(modegen_pgens PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_sources(modegen_pgens PRIVATE generators/cpp/realization.cpp generators/cpp/realization.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/type_converter.cpp generators/cpp/type_converter.h)
 
+set(templates_dir "${CMAKE_CURRENT_BINARY_DIR}/tmpls")
+set(cpp_templates_dir "${CMAKE_CURRENT_SOURCE_DIR}/generators/cpp")
+set(binary_dir "${CMAKE_CURRENT_BINARY_DIR}")
+configure_file("generators/config.hpp.in" "generators/config.hpp")
+target_sources(modegen_pgens PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generators/config.hpp")
+target_include_directories(modegen_pgens PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+
 add_executable("${PROJECT_NAME}" parser/main.cpp)
 target_link_libraries("${PROJECT_NAME}" PRIVATE modegen_tree modegen_pgens)
 
@@ -44,4 +51,4 @@ foreach(tname ${tests})
 	add_test(NAME ${tname} COMMAND ${tname}_test)
 endforeach()
 
-#add_subdirectory(tests/srv-cpp)
+add_subdirectory(tests/srv-cpp)

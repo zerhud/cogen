@@ -13,6 +13,7 @@ public:
 	void generate(mod_selection query, std::vector<modegen::module> mods) const override ;
 private:
 	static std::string pythongen_path() ;
+	static std::string tmpl_path(std::string_view tn) ;
 
 	void gen_hpp(mod_selection query, std::vector<modegen::module> mods) const ;
 	void gen_cpp(mod_selection query, std::vector<modegen::module> mods) const ;
