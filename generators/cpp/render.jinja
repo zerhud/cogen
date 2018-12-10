@@ -24,3 +24,9 @@
 <= decl_depricated(obj) -=>
 <= "static " if obj.static =><=- type(obj.ret_type) => <= obj.name =>(<= fparam(obj.params) =>)<= " const" if obj.mutable == False =>
 <%- endmacro %>
+
+<%- macro includes(incs) -%>
+<%- for inc in incs %>
+#include <= '"' if inc.local else '<' =><= inc.n =><= '"' if inc.local else '>' =>
+<%- endfor -%>
+<%- endmacro -%>

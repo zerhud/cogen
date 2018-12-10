@@ -3,9 +3,7 @@
 // this file contains realization of helpers function
 
 #include <cassert>
-<% for inc in cdata.incs %>
-#include <<= inc =>>
-<%- endfor %>
+<= render.includes(cdata.incs) =>
 
 <% for module in cdata.mods -%>
 // module <= module.name =>

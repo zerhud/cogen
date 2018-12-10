@@ -43,7 +43,9 @@ void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query
 	if(mods.size()==0) return;
 
 	cppjson::value jsoned = modegen::converters::to_json(mods);
-	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i] = incs[i];
+	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
+	jsoned["incs"][incs.size()]["n"] = solve_option("def");
+	jsoned["incs"][incs.size()]["local"] = true;
 
 	opstream pdata;
 	child a(
@@ -68,7 +70,8 @@ void modegen::generators::cpp::realization::gen_cpp(modegen::mod_selection query
 	if(mods.size()==0) return;
 
 	cppjson::value jsoned = modegen::converters::to_json(mods);
-	jsoned["incs"][0] = "mod.hpp";
+	jsoned["incs"][0]["n"] = solve_option("hpp");
+	jsoned["incs"][0]["local"] = true;
 
 	//TODO: add header file in includes
 
@@ -96,7 +99,7 @@ void modegen::generators::cpp::realization::gen_def(modegen::mod_selection query
 	if(mods.size()==0) return ;
 
 	cppjson::value jsoned = modegen::converters::to_json(mods);
-	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i] = incs[i];
+	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
 
 	child a(
 	      pythongen_path()
@@ -118,7 +121,20 @@ void modegen::generators::cpp::realization::set_out(std::filesystem::path base, 
 
 	auto* self = const_cast<realization*>(this);
 	auto ppos = self->options.find(part);
-	if(ppos == self->options.end()) self->options.emplace(std::make_pair(std::string(part), std::string(file)));
+	if(ppos == self->options.end()) self->options.emplace(std::make_pair(std::string(part), file.empty() ? base.filename().generic_u8string() : std::string(file)));
 
 	std::filesystem::create_directories(out_path.parent_path());
+}
+
+std::string modegen::generators::cpp::realization::solve_option(std::string_view name) const
+{
+	using namespace std::literals;
+
+	auto pos = options.find(name);
+	if(pos != options.end()) return pos->second;
+
+	if(name == "hpp"sv) return "mod.hpp"s;
+	if(name == "def"sv) return "declarations.hpp"s;
+
+	return ""s;
 }
