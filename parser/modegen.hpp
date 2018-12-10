@@ -178,7 +178,7 @@ enum class module_content_selector{function = 1 << 0, enumeration = 1 << 1, reco
 
 struct using_directive {
 	std::string mod_name;
-	bool is_system;
+	bool is_system = true;
 };
 struct module {
 	std::string name;

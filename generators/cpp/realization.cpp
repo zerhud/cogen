@@ -103,7 +103,7 @@ void modegen::generators::cpp::realization::gen_def(modegen::mod_selection query
 	filter_by_selection(query, mods);
 
 	opstream pdata;
-	auto incs = helpers::type_converter(module_content_selector::function, mods).includes();
+	auto incs = helpers::type_converter(query.sel, mods).includes();
 	if(mods.size()==0) return ;
 
 	cppjson::value jsoned = modegen::converters::to_json(mods);

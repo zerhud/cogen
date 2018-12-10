@@ -12,3 +12,5 @@ record rec {
 	string name;
 	string value;
 }
+
+enum +auto_io e1 { one two }

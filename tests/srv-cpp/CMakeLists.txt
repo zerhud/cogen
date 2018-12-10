@@ -20,4 +20,4 @@ set_source_files_properties(${gen_files} PROPERTIES GENERATED TRUE)
 
 add_executable("${PROJECT_NAME}" srv.cpp  ${gen_files})
 target_link_libraries("${PROJECT_NAME}" PRIVATE ${Boost_LIBRARIES})
-
+target_include_directories("${PROJECT_NAME}" PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/gen")
