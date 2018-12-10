@@ -18,13 +18,14 @@ void modegen::generators::cpp::realization::generate(modegen::mod_selection quer
 	std::filesystem::path base;
 	if(query.output.has_value()) base = *query.output;
 
+	set_out(base, "", query.what_generate);
 	if(query.what_generate=="def") gen_def(query, std::move(mods));
 	else if(query.what_generate=="hpp") gen_hpp(query, std::move(mods));
 	else if(query.what_generate=="cpp") gen_cpp(query, std::move(mods));
 	else if(query.what_generate=="all") {
-		set_out(base, "mod.hpp"); gen_hpp(query, mods);
-		set_out(base, "mod.cpp"); gen_cpp(query, mods);
-		set_out(base, "declarations.hpp"); gen_def(query, std::move(mods));
+		set_out(base, "mod.hpp", "hpp"); gen_hpp(query, mods);
+		set_out(base, "mod.cpp", "cpp"); gen_cpp(query, mods);
+		set_out(base, "declarations.hpp", "def"); gen_def(query, std::move(mods));
 	}
 }
 
@@ -109,8 +110,15 @@ void modegen::generators::cpp::realization::gen_def(modegen::mod_selection query
 	a.wait();
 }
 
-void modegen::generators::cpp::realization::set_out(std::filesystem::path base, std::string_view file) const
+void modegen::generators::cpp::realization::set_out(std::filesystem::path base, std::string_view file, std::string_view part) const
 {
 	if( base == "-" || base.empty() ) out_path = "-";
+	else if(file.empty()) out_path = base;
 	else out_path = base / file;
+
+	auto* self = const_cast<realization*>(this);
+	auto ppos = self->options.find(part);
+	if(ppos == self->options.end()) self->options.emplace(std::make_pair(std::string(part), std::string(file)));
+
+	std::filesystem::create_directories(out_path.parent_path());
 }

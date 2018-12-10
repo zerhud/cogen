@@ -18,9 +18,9 @@ private:
 	void gen_cpp(mod_selection query, std::vector<modegen::module> mods) const ;
 	void gen_def(mod_selection query, std::vector<modegen::module> mods) const ;
 
-	void set_out(std::filesystem::path base, std::string_view file) const ;
+	void set_out(std::filesystem::path base, std::string_view file, std::string_view part) const ;
 
-	std::map<std::string,std::string> options;
+	std::map<std::string,std::string,std::less<>> options;
 	mutable std::filesystem::path out_path;
 };
 

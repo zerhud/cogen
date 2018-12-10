@@ -107,7 +107,7 @@ int main(int argc,char** argv)
 	// -t server,cpp -OcamelCase -oall=some/dir -odeclaration=-
 	// -t tests,cpp -oall=some/dir -t bridge,jni -oall=some/other_dir
 
-	std::regex target_match("([a-zA-Z]+)(,([a-zA-Z]+))?", std::regex::egrep);
+	std::regex target_match("([a-zA-Z]+)(,(.+))?", std::regex::egrep);
 	std::regex option_match("([a-zA-Z]+)(=(.+))?", std::regex::egrep);
 
 	modegen::generator_maker gmaker;
@@ -129,11 +129,6 @@ int main(int argc,char** argv)
 
 		std::string& val = opt.value[0];
 		if(key=="target") {
-			if(cur_gen) {
-				assert(gen_opts.has_value());
-				cur_gen->generate(*gen_opts, mods);
-			}
-
 			std::cmatch m;
 			std::regex_match(val.data(),m,target_match);
 			cur_gen = gmaker.make_generator(m[1].str(),m[3].str());
@@ -155,18 +150,11 @@ int main(int argc,char** argv)
 
 			std::cmatch m;
 			std::regex_match(val.data(),m,option_match);
-			std::cout << val << " " << m[1] << " " << m[2] << " " << m[3] << std::endl;
 			gen_opts->what_generate = m[1];
 			if(m[3]!="-") gen_opts->output = m[3];
-		}
-	}
 
-	// last generator
-	if(cur_gen) {
-		assert(gen_opts.has_value());
-		cur_gen->generate(*gen_opts, mods);
-	} else {
-		std::exit(102);
+			cur_gen->generate(*gen_opts, mods);
+		}
 	}
 
 	return 0;
