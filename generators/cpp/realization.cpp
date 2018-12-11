@@ -151,5 +151,5 @@ bool modegen::generators::cpp::realization::solve_bool_option(std::string_view n
 {
 	auto pos = options.find(name);
 	if(pos==options.end()) return false;
-	return pos->second.empty() || pos->second == "true" || pos->second == "True";
+	return pos->second.empty() || pos->second == "true" || pos->second == "True" || pos->second == "1" ;
 }

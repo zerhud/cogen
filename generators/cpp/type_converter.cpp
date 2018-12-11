@@ -1,6 +1,7 @@
 #include "type_converter.h"
 
 #include "helpers.hpp"
+#include "errors.h"
 
 std::map<std::string,std::string> modegen::helpers::type_converter::type_maps =
 {
@@ -16,6 +17,7 @@ std::map<std::string,std::string> modegen::helpers::type_converter::type_maps =
     , {"list","std::vector"}
     , {"map","std::map"}
     , {"optional","std::optional"}
+    , {"void","void"}
 };
 
 std::map<std::string,std::string> modegen::helpers::type_converter::incs_maps =
@@ -33,12 +35,11 @@ std::map<std::string,std::string> modegen::helpers::type_converter::incs_maps =
 };
 
 modegen::helpers::type_converter::type_converter(module_content_selector s, std::vector<modegen::module>& mods)
-    : selector(s)
 {
 	auto v = [this](auto& mc) { convert(mc); };
 	for(auto& mod:mods) {
 		cur_mod = &mod;
-		for(auto& mc:mod.content) if(is_selected(mc, selector)) std::visit(v, mc);
+		for(auto& mc:mod.content) if(is_selected(mc, s)) std::visit(v, mc);
 
 		std::sort(cur_mod->imports.begin(),cur_mod->imports.end(),[](using_directive& left, using_directive& right){return left.mod_name < right.mod_name;});
 		auto upos = std::unique(cur_mod->imports.begin(),cur_mod->imports.end(),
@@ -70,10 +71,13 @@ void modegen::helpers::type_converter::convert(modegen::record& obj) const
 	assert(cur_mod);
 	cur_mod->imports.emplace_back(modegen::using_directive{"memory"});
 	for(auto& m:obj.members) convert(m.param_type);
+
+	solve_type(obj.name, modegen::module_content_selector::record);
 }
 
-void modegen::helpers::type_converter::convert(modegen::enumeration& /*obj*/) const
+void modegen::helpers::type_converter::convert(modegen::enumeration& obj) const
 {
+	solve_type(obj.name, modegen::module_content_selector::enumeration);
 }
 
 void modegen::helpers::type_converter::convert(modegen::interface& obj) const
@@ -82,6 +86,8 @@ void modegen::helpers::type_converter::convert(modegen::interface& obj) const
 	cur_mod->imports.emplace_back(modegen::using_directive{"memory"});
 	for(auto& f:obj.mem_funcs) convert(f);
 	for(auto& c:obj.constructors) for(auto cp:c.func_params) convert(cp.param_type);
+
+	solve_type(obj.name, modegen::module_content_selector::interface);
 }
 
 void modegen::helpers::type_converter::convert(modegen::type& t) const
@@ -89,10 +95,19 @@ void modegen::helpers::type_converter::convert(modegen::type& t) const
 	assert(cur_mod);
 
 	auto ipos = incs_maps.find(t.name);
-	if(ipos!=incs_maps.end()) cur_mod->imports.emplace_back(modegen::using_directive{ipos->second,true});
+	if(ipos!=incs_maps.end()) cur_mod->imports.emplace_back(using_directive{ipos->second,true});
 
 	auto npos = type_maps.find(t.name);
 	if(npos!=type_maps.end()) t.name = npos->second;
+	else {
+		if(!t.sub_types.empty()) throw errors::error("cpp_type_cvt", "defined type cannot have parameters");
+		defined_types.emplace_back(type_info{t});
+	}
 
 	for(auto& s:t.sub_types) convert(s);
+}
+
+void modegen::helpers::type_converter::solve_type(std::string_view name, modegen::module_content_selector from) const
+{
+	for(auto& t:defined_types) if(t.type.name == name) t.points = from;
 }
