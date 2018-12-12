@@ -10,7 +10,7 @@ enum class name_conversion{underscore, camel_case, title_case};
 
 std::vector<std::string> split_name(const std::string& name);
 
-std::string convert(const std::string& name, name_conversion);
+std::string convert(const std::string& name, name_conversion c);
 
 } // namespace generators
 } // namespace modegen

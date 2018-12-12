@@ -39,3 +39,32 @@ BOOST_AUTO_TEST_CASE(title)
 	check_some_name(ns);
 }
 BOOST_AUTO_TEST_SUITE_END() // split
+
+BOOST_AUTO_TEST_SUITE(convert)
+using modegen::generators::convert;
+using modegen::generators::name_conversion;
+BOOST_AUTO_TEST_CASE(one)
+{
+	BOOST_CHECK_EQUAL("foo", convert("foo", name_conversion::underscore));
+	BOOST_CHECK_EQUAL("foo", convert("foo", name_conversion::camel_case));
+	BOOST_CHECK_EQUAL("Foo", convert("foo", name_conversion::title_case));
+}
+BOOST_AUTO_TEST_CASE(underscore)
+{
+	BOOST_CHECK_EQUAL("foo_bar", convert("fooBar", name_conversion::underscore));
+	BOOST_CHECK_EQUAL("foo_bar", convert("FooBar", name_conversion::underscore));
+	BOOST_CHECK_EQUAL("foo_bar", convert("Foo_Bar", name_conversion::underscore));
+}
+BOOST_AUTO_TEST_CASE(camel)
+{
+	BOOST_CHECK_EQUAL("fooBar", convert("fooBar", name_conversion::camel_case));
+	BOOST_CHECK_EQUAL("fooBar", convert("FooBar", name_conversion::camel_case));
+	BOOST_CHECK_EQUAL("fooBar", convert("Foo_Bar", name_conversion::camel_case));
+}
+BOOST_AUTO_TEST_CASE(title)
+{
+	BOOST_CHECK_EQUAL("FooBar", convert("fooBar", name_conversion::title_case));
+	BOOST_CHECK_EQUAL("FooBar", convert("FooBar", name_conversion::title_case));
+	BOOST_CHECK_EQUAL("FooBar", convert("Foo_Bar", name_conversion::title_case));
+}
+BOOST_AUTO_TEST_SUITE_END() // convert
