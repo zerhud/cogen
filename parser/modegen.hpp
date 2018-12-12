@@ -187,9 +187,26 @@ struct module {
 	std::vector<using_directive> imports;
 	std::string file_name;
 };
+
+struct file {
+	file() =default ;
+	file(const std::vector<module>& m) : mods(m) {}
+
+	std::vector<module> mods;
+	std::vector<std::string> includes;
+	std::string path;
+
+	void push_back(module p);
+	auto begin() {return mods.begin(); }
+	auto end() {return mods.end(); }
+	auto begin() const {return mods.begin(); }
+	auto end() const {return mods.end(); }
+};
+
 } // namespace modegen
 
 BOOST_FUSION_ADAPT_STRUCT(   modegen::using_directive, mod_name )
+BOOST_FUSION_ADAPT_STRUCT(   modegen::file, mods, includes )
 BOOST_FUSION_ADAPT_STRUCT(   modegen::module
                            , name
                            , content

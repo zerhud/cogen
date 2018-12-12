@@ -84,9 +84,11 @@ std::vector<modegen::module> read_input(const std::vector<std::string>& inputs)
 	modegen::checker check;
 	std::vector<modegen::module> mods;
 	auto add_input = [&mods, &check](const std::string& fn){
-		auto imods = modegen::parse(read_input(fn));
-		check(imods, fn);
-		for(auto& im:imods) mods.emplace_back(std::move(im));
+		auto parsed_file = modegen::parse(read_input(fn));
+		parsed_file.path = fn;
+
+		check(parsed_file);
+		for(auto& im:parsed_file) mods.emplace_back(std::move(im));
 	};
 
 	if(inputs.empty()) add_input("-");

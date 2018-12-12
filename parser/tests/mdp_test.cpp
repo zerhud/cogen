@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(empty_module)
 	  , {"#docs\n@v3.0 module mod v1.0:"sv}
 	};
 
-	for(auto mod:mods) BOOST_CHECK_EQUAL(modegen::parse(mod).size(), 1);
+	for(auto mod:mods) BOOST_CHECK_EQUAL(modegen::parse(mod).mods.size(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(wrong_module)
@@ -34,46 +34,46 @@ BOOST_AUTO_TEST_CASE(wrong_module)
 
 BOOST_AUTO_TEST_CASE(module_params)
 {
-	auto mods = modegen::parse("#docs\nmodule mod v1.0:");
-	BOOST_REQUIRE_EQUAL(mods[0].meta_params.set.size(), 2);
-	BOOST_REQUIRE_EQUAL(mods[0].meta_params.set[0].index(), 1);
-	BOOST_REQUIRE_EQUAL(mods[0].meta_params.set[1].index(), 0);
+	auto pf = modegen::parse("#docs\nmodule mod v1.0:");
+	BOOST_REQUIRE_EQUAL(pf.mods[0].meta_params.set.size(), 2);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].meta_params.set[0].index(), 1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].meta_params.set[1].index(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(using_rule)
 {
-	auto mods = modegen::parse("module mod v1.0: using some"sv);
-	BOOST_REQUIRE_EQUAL(mods.size(), 1);
-	BOOST_REQUIRE_EQUAL(mods[0].imports.size(), 1);
-	BOOST_CHECK_EQUAL(mods[0].imports[0].mod_name, "some" );
+	auto pf = modegen::parse("module mod v1.0: using some"sv);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].imports.size(), 1);
+	BOOST_CHECK_EQUAL(pf.mods[0].imports[0].mod_name, "some" );
 
-	mods = modegen::parse("module mod v1.0: using some   "sv);
-	BOOST_REQUIRE_EQUAL(mods.size(), 1);
+	pf = modegen::parse("module mod v1.0: using some   "sv);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
 
-	mods = modegen::parse("module mod v1.0: using some\n\n\n"sv);
-	BOOST_REQUIRE_EQUAL(mods.size(), 1);
+	pf = modegen::parse("module mod v1.0: using some\n\n\n"sv);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(record_rule)
 {
-	auto mods = modegen::parse("module mod v1.0: record some{type some; @v4.0 type other;}"sv);
-	BOOST_REQUIRE_EQUAL(mods.size(), 1);
-	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
-	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),2);
+	auto pf = modegen::parse("module mod v1.0: record some{type some; @v4.0 type other;}"sv);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content[0].index(),2);
 
-	modegen::record& rec = std::get<modegen::record>(mods[0].content[0]);
+	modegen::record& rec = std::get<modegen::record>(pf.mods[0].content[0]);
 	BOOST_REQUIRE_EQUAL(rec.name, "some");
 	BOOST_REQUIRE_EQUAL(rec.members.size(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(interfaceq_rule)
 {
-	auto mods = modegen::parse("module mod v1.0: interface inter{ constructor(); static type some() const; type other() mutable;}");
-	BOOST_REQUIRE_EQUAL(mods.size(), 1);
-	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
-	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),3);
+	auto pf = modegen::parse("module mod v1.0: interface inter{ constructor(); static type some() const; type other() mutable;}");
+	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content[0].index(),3);
 
-	modegen::interface& i = std::get<modegen::interface>(mods[0].content[0]);
+	modegen::interface& i = std::get<modegen::interface>(pf.mods[0].content[0]);
 	BOOST_CHECK_EQUAL(i.name, "inter");
 	BOOST_CHECK_EQUAL(i.realization_in_client, false);
 
@@ -98,16 +98,16 @@ BOOST_AUTO_TEST_CASE(simple)
 	  , {"module mod v1.0:\ntype\nname\n(\n)\n;"sv}
 	};
 
-	for(auto mod:mods) BOOST_CHECK_EQUAL(modegen::parse(mod).size(), 1);
+	for(auto mod:mods) BOOST_CHECK_EQUAL(modegen::parse(mod).mods.size(), 1);
 }
 BOOST_AUTO_TEST_CASE(no_params)
 {
 	auto with_n = "module mod v1.0:\ntype\nname\n(\n)\n;"sv;
-	auto mods = modegen::parse(with_n);
-	BOOST_REQUIRE_EQUAL(mods.size(),1);
-	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
-	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),0);
-	BOOST_CHECK_EQUAL(std::get<modegen::function>(mods[0].content[0]).func_params.size(), 0);
+	auto pf = modegen::parse(with_n);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content[0].index(),0);
+	BOOST_CHECK_EQUAL(std::get<modegen::function>(pf.mods[0].content[0]).func_params.size(), 0);
 }
 BOOST_AUTO_TEST_CASE(with_mod)
 {
@@ -119,12 +119,12 @@ BOOST_AUTO_TEST_CASE(with_mod)
 	};
 
 	auto checker = [](std::string_view str) {
-		auto mods = modegen::parse(str);
-		BOOST_REQUIRE_EQUAL(mods.size(),1);
-		BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
-		BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),0);
+		auto pf = modegen::parse(str);
+		BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
+		BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),1);
+		BOOST_REQUIRE_EQUAL(pf.mods[0].content[0].index(),0);
 
-		modegen::function& fnc = std::get<modegen::function>(mods[0].content[0]);
+		modegen::function& fnc = std::get<modegen::function>(pf.mods[0].content[0]);
 		BOOST_CHECK_EQUAL(fnc.func_params.size(), 0);
 		BOOST_CHECK_EQUAL(fnc.return_type.name, "list");
 		BOOST_REQUIRE_EQUAL(fnc.return_type.sub_types.size(),1);
@@ -133,11 +133,11 @@ BOOST_AUTO_TEST_CASE(with_mod)
 
 	for(auto& str:with_n) checker(str);
 
-	auto mods = modegen::parse("module mod v1.0:map<string,i8> name();"sv);
-	BOOST_REQUIRE_EQUAL(mods.size(),1);
-	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
-	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),0);
-	modegen::function& fnc = std::get<modegen::function>(mods[0].content[0]);
+	auto pf = modegen::parse("module mod v1.0:map<string,i8> name();"sv);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content[0].index(),0);
+	modegen::function& fnc = std::get<modegen::function>(pf.mods[0].content[0]);
 	BOOST_CHECK_EQUAL(fnc.return_type.name, "map");
 	BOOST_REQUIRE_EQUAL(fnc.return_type.sub_types.size(),2);
 	BOOST_CHECK_EQUAL(fnc.return_type.sub_types[0].name, "string");
@@ -149,12 +149,12 @@ BOOST_AUTO_TEST_SUITE(enumerations)
 BOOST_AUTO_TEST_CASE(simple)
 {
 	auto two_mems = "module mod v1.0: enum lala{one two}"sv;
-	auto mods = modegen::parse(two_mems);
-	BOOST_REQUIRE_EQUAL(mods.size(),1);
-	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
-	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),1);
+	auto pf = modegen::parse(two_mems);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content[0].index(),1);
 
-	modegen::enumeration& e = std::get<modegen::enumeration>(mods[0].content[0]);
+	modegen::enumeration& e = std::get<modegen::enumeration>(pf.mods[0].content[0]);
 	BOOST_CHECK_EQUAL(e.name, "lala");
 	BOOST_CHECK_EQUAL(e.elements.size(), 2);
 	for(auto& el:e.elements) BOOST_CHECK(el.io.empty());
@@ -165,12 +165,12 @@ BOOST_AUTO_TEST_CASE(simple)
 BOOST_AUTO_TEST_CASE(params)
 {
 	auto two_mems = "module mod v1.0: enum lala{one=>'one' two=>'two' }"sv;
-	auto mods = modegen::parse(two_mems);
-	BOOST_REQUIRE_EQUAL(mods.size(),1);
-	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
-	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),1);
+	auto pf = modegen::parse(two_mems);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content[0].index(),1);
 
-	modegen::enumeration& e = std::get<modegen::enumeration>(mods[0].content[0]);
+	modegen::enumeration& e = std::get<modegen::enumeration>(pf.mods[0].content[0]);
 	BOOST_CHECK_EQUAL(e.elements.size(), 2);
 	BOOST_CHECK_EQUAL(e.elements[0].name, "one");
 	BOOST_CHECK_EQUAL(e.elements[0].io, "one");
@@ -180,12 +180,12 @@ BOOST_AUTO_TEST_CASE(params)
 BOOST_AUTO_TEST_CASE(gen_ops)
 {
 	auto two_mems = "module mod v1.0: enum +flags +auto_io lala{one=>'oneio' two=>'twoio' }"sv;
-	auto mods = modegen::parse(two_mems);
-	BOOST_REQUIRE_EQUAL(mods.size(),1);
-	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
-	BOOST_REQUIRE_EQUAL(mods[0].content[0].index(),1);
+	auto pf = modegen::parse(two_mems);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content[0].index(),1);
 
-	modegen::enumeration& e = std::get<modegen::enumeration>(mods[0].content[0]);
+	modegen::enumeration& e = std::get<modegen::enumeration>(pf.mods[0].content[0]);
 	BOOST_REQUIRE_EQUAL(e.elements.size(), 2);
 	BOOST_CHECK_EQUAL(e.elements[0].name, "one");
 	BOOST_CHECK_EQUAL(e.elements[1].name, "two");
@@ -201,11 +201,11 @@ BOOST_AUTO_TEST_CASE(depricated_meta)
 	using modegen::meta_parameters::deprication;
 	using modegen::meta_parameters::version;
 
-	auto mods = modegen::parse("module mod v1.0: @depricated v1.1 ('message') type f1();"sv);
-	BOOST_REQUIRE_EQUAL(mods.size(),1);
-	BOOST_REQUIRE_EQUAL(mods[0].content.size(),1);
+	auto pf = modegen::parse("module mod v1.0: @depricated v1.1 ('message') type f1();"sv);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),1);
 
-	modegen::function& f = std::get<modegen::function>(mods[0].content[0]);
+	modegen::function& f = std::get<modegen::function>(pf.mods[0].content[0]);
 	BOOST_REQUIRE_EQUAL(f.meta_params.set.size(), 1);
 
 	BOOST_REQUIRE(std::holds_alternative<deprication>(f.meta_params.set[0]));

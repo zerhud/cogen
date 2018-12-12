@@ -14,9 +14,9 @@ namespace pl = std::placeholders;
 
 namespace modegen {
 template<typename Iterator>
-struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boost::spirit::qi::ascii::space_type>
+struct grammar : boost::spirit::qi::grammar<Iterator, file(), boost::spirit::qi::ascii::space_type>
 {
-	grammar() : grammar::base_type(modules_rule, "modegen")
+	grammar() : grammar::base_type(file_rule, "modegen")
 	{
 		using qi::eps;
 		using qi::lit;
@@ -76,6 +76,11 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		function_param_rule.name("function_param");
 		function_param_rule %= type_rule > var_name;
 
+		file_rule.name("system_rule");
+		file_rule =
+		          +module_rule[push_back(at_c<0>(_val),_1)]
+		         ;
+
 		module_rule.name("module_rule"); // module mod_name v123:
 		module_rule = meta_params_rule[at_c<2>(_val)=_1] >>
 		              qi::lexeme[lit("module")
@@ -87,9 +92,6 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 		              | (interface_rule[push_back(at_c<1>(_val),_1)])
 		              | (using_rule[push_back(at_c<3>(_val),_1)])
 		               );
-
-		modules_rule.name("modules_rule");
-		modules_rule %= +module_rule;
 
 		function_rule.name("function_rule");
 		function_rule = meta_params_rule[at_c<3>(_val)=_1]
@@ -157,11 +159,11 @@ struct grammar : boost::spirit::qi::grammar<Iterator, std::vector<module>(), boo
 	qi::rule<Iterator, record(), boost::spirit::qi::ascii::space_type> record_rule;
 	qi::rule<Iterator, interface(), boost::spirit::qi::ascii::space_type> interface_rule;
 	qi::rule<Iterator, module(), boost::spirit::qi::ascii::space_type> module_rule;
-	qi::rule<Iterator, std::vector<module>(), boost::spirit::qi::ascii::space_type> modules_rule;
 	qi::rule<Iterator, modegen::meta_parameters::version()> version_rule;
 	qi::rule<Iterator, modegen::meta_parameters::documentation()> documentation_rule;
 	qi::rule<Iterator, modegen::meta_parameters::deprication(), boost::spirit::qi::ascii::space_type> deprication_rule;
 	qi::rule<Iterator, modegen::meta_parameters::parameter_set, boost::spirit::qi::ascii::space_type> meta_params_rule;
+	qi::rule<Iterator, file(), boost::spirit::qi::ascii::space_type> file_rule;
 };
 
 namespace error_hander {
@@ -203,12 +205,12 @@ struct inner_error : std::runtime_error {
 } // namespace modegen
 
 
-std::vector<modegen::module> modegen::parse(std::string_view pdata)
+modegen::file modegen::parse(std::string_view pdata)
 {
 	auto begin = pdata.begin();
 	auto end = pdata.end();
 
-	std::vector<modegen::module> result;
+	modegen::file result;
 
 	bool r=false;
 	try {
