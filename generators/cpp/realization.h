@@ -19,7 +19,7 @@ private:
 	void gen_cpp(mod_selection query, std::vector<modegen::module> mods) const ;
 	void gen_def(mod_selection query, std::vector<modegen::module> mods) const ;
 
-	void set_out(std::filesystem::path base, std::string_view file, std::string_view part) const ;
+	void set_out(std::filesystem::path base, std::string_view parsed_file, std::string_view part) const ;
 
 	std::string solve_option(std::string_view name) const ;
 	bool solve_bool_option(std::string_view name) const ;

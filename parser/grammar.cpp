@@ -14,7 +14,7 @@ namespace pl = std::placeholders;
 
 namespace modegen {
 template<typename Iterator>
-struct grammar : boost::spirit::qi::grammar<Iterator, file(), boost::spirit::qi::ascii::space_type>
+struct grammar : boost::spirit::qi::grammar<Iterator, parsed_file(), boost::spirit::qi::ascii::space_type>
 {
 	grammar() : grammar::base_type(file_rule, "modegen")
 	{
@@ -163,7 +163,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, file(), boost::spirit::qi:
 	qi::rule<Iterator, modegen::meta_parameters::documentation()> documentation_rule;
 	qi::rule<Iterator, modegen::meta_parameters::deprication(), boost::spirit::qi::ascii::space_type> deprication_rule;
 	qi::rule<Iterator, modegen::meta_parameters::parameter_set, boost::spirit::qi::ascii::space_type> meta_params_rule;
-	qi::rule<Iterator, file(), boost::spirit::qi::ascii::space_type> file_rule;
+	qi::rule<Iterator, parsed_file(), boost::spirit::qi::ascii::space_type> file_rule;
 };
 
 namespace error_hander {
@@ -205,12 +205,12 @@ struct inner_error : std::runtime_error {
 } // namespace modegen
 
 
-modegen::file modegen::parse(std::string_view pdata)
+modegen::parsed_file modegen::parse(std::string_view pdata)
 {
 	auto begin = pdata.begin();
 	auto end = pdata.end();
 
-	modegen::file result;
+	modegen::parsed_file result;
 
 	bool r=false;
 	try {

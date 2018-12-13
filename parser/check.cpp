@@ -15,13 +15,13 @@ modegen::error_info::error_info(std::string f, std::string p, std::string w)
 {
 }
 
-void modegen::checker::operator ()(modegen::file& file_info) const
+void modegen::checker::operator ()(modegen::parsed_file& finfo) const
 {
-	cur_file = file_info.path;
+	cur_file = finfo.path;
 	auto file_resetter = [this](char*){cur_file.clear();};
 	[[maybe_unused]] auto guard = std::unique_ptr<char,decltype(file_resetter)>{nullptr, file_resetter};
 
-	for(auto& mod:file_info) {
+	for(auto& mod:finfo) {
 		mod.file_name = cur_file;
 		check_mod(mod);
 	}

@@ -7,7 +7,7 @@
 
 using namespace std::literals;
 
-void check_exception(const modegen::checker& ch, modegen::file& fi, std::string_view path)
+void check_exception(const modegen::checker& ch, modegen::parsed_file& fi, std::string_view path)
 {
 	auto ech = [&path](const modegen::error_info& i){
 		BOOST_CHECK_EQUAL( i.path, path );
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(mod_ver_is_min)
 	                           "module mod v9.0: @v10.1 interface i{@v10.0 type name()const;}"sv);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 3);
 	modegen::checker ch;
-	modegen::file m1({pf.mods[0]}), m2({pf.mods[1]}), m3({pf.mods[2]});
+	modegen::parsed_file m1({pf.mods[0]}), m2({pf.mods[1]}), m3({pf.mods[2]});
 	check_exception(ch, m1, "mod.some");
 	check_exception(ch, m2, "mod2.i.name");
 	check_exception(ch, m3, "mod.i.name");

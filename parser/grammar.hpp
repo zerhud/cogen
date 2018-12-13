@@ -5,5 +5,5 @@
 #include "modegen.hpp"
 
 namespace modegen {
-modegen::file parse(std::string_view pdata);
+modegen::parsed_file parse(std::string_view pdata);
 } // namespace modegen

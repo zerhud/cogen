@@ -188,9 +188,9 @@ struct module {
 	std::string file_name;
 };
 
-struct file {
-	file() =default ;
-	file(const std::vector<module>& m) : mods(m) {}
+struct parsed_file {
+	parsed_file() =default ;
+	parsed_file(const std::vector<module>& m) : mods(m) {}
 
 	std::vector<module> mods;
 	std::vector<std::string> includes;
@@ -206,7 +206,7 @@ struct file {
 } // namespace modegen
 
 BOOST_FUSION_ADAPT_STRUCT(   modegen::using_directive, mod_name )
-BOOST_FUSION_ADAPT_STRUCT(   modegen::file, mods, includes )
+BOOST_FUSION_ADAPT_STRUCT(   modegen::parsed_file, mods, includes )
 BOOST_FUSION_ADAPT_STRUCT(   modegen::module
                            , name
                            , content
