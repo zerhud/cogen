@@ -13,7 +13,7 @@ struct error_info : std::runtime_error {
 
 class checker {
 public:
-	void operator ()(modegen::file file_info) const ;
+	void operator ()(modegen::file& file_info) const ;
 	void operator ()(std::vector<module>& mods) const ;
 private:
 	void check_mod(module& mod) const ;
