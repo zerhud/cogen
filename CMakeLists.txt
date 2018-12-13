@@ -8,11 +8,11 @@ find_package(Boost COMPONENTS program_options unit_test_framework REQUIRED)
 find_package(cppjson REQUIRED)
 
 set(sources parser/grammar.cpp parser/modegen.cpp parser/check.cpp
-    parser/to_json.cpp parser/split_by_version.cpp parser/helpers.cpp parser/generator.cpp
+    parser/to_json.cpp parser/loader.cpp parser/split_by_version.cpp parser/helpers.cpp parser/generator.cpp
     parser/errors.cpp
     )
 set(headers parser/grammar.hpp parser/modegen.hpp parser/check.h
-    parser/to_json.h   parser/split_by_version.hpp parser/helpers.hpp parser/generator.hpp
+    parser/to_json.h   parser/loader.h   parser/split_by_version.hpp parser/helpers.hpp parser/generator.hpp
     parser/errors.h
     )
 
