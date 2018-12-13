@@ -15,7 +15,7 @@ modegen::error_info::error_info(std::string f, std::string p, std::string w)
 {
 }
 
-void modegen::checker::operator ()(modegen::parsed_file& finfo) const
+modegen::checker &modegen::checker::operator ()(modegen::parsed_file& finfo)
 {
 	cur_file = finfo.path;
 	auto file_resetter = [this](char*){cur_file.clear();};
@@ -24,10 +24,21 @@ void modegen::checker::operator ()(modegen::parsed_file& finfo) const
 	for(auto& mod:finfo) {
 		mod.file_name = cur_file;
 		check_mod(mod);
+		resulting_set.emplace_back(mod);
 	}
+
+	return *this;
 }
 
-void modegen::checker::operator ()(std::vector<modegen::module>& mods) const
+std::vector<modegen::module> modegen::checker::extract_result()
+{
+	std::vector<modegen::module> ret;
+	ret.swap(resulting_set);
+	unite_mods(ret);
+	return ret;
+}
+
+void modegen::checker::unite_mods(std::vector<modegen::module> &mods) const
 {
 	if(1<mods.size()) {
 		auto end = mods.end();

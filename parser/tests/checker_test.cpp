@@ -7,7 +7,7 @@
 
 using namespace std::literals;
 
-void check_exception(const modegen::checker& ch, modegen::parsed_file& fi, std::string_view path)
+void check_exception(modegen::checker& ch, modegen::parsed_file& fi, std::string_view path)
 {
 	auto ech = [&path](const modegen::error_info& i){
 		BOOST_CHECK_EQUAL( i.path, path );
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(enum_gen_io)
 	BOOST_CHECK(e.elements[0].io.empty());
 
 	modegen::checker ch;
-	BOOST_CHECK_NO_THROW(ch(pf.mods));
+	BOOST_CHECK_NO_THROW(ch(pf));
 
 	BOOST_CHECK_EQUAL(e.elements.size(), 3);
 	BOOST_CHECK_EQUAL(e.elements[0].io, e.elements[0].name);
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(diff_mods)
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 2);
 
 	modegen::checker ch;
-	ch(pf.mods);
+	ch(pf);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 2);
 	BOOST_CHECK_EQUAL(pf.mods[0].name, "mod");
 	BOOST_CHECK_EQUAL(pf.mods[1].name, "mod2");
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(diff_mods_ver)
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 2);
 
 	modegen::checker ch;
-	ch(pf.mods);
+	ch(pf);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 2);
 	BOOST_CHECK_EQUAL(pf.mods[0].name, "mod");
 	BOOST_CHECK_EQUAL(pf.mods[1].name, "mod");
@@ -112,10 +112,10 @@ BOOST_AUTO_TEST_CASE(combine)
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 2);
 
 	modegen::checker ch;
-	ch(pf.mods);
-	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
-	BOOST_CHECK_EQUAL(pf.mods[0].name, "mod");
-	BOOST_CHECK_EQUAL(pf.mods[0].content.size(), 1);
+	auto mods = ch(pf).extract_result();
+	BOOST_REQUIRE_EQUAL(mods.size(), 1);
+	BOOST_CHECK_EQUAL(mods[0].name, "mod");
+	BOOST_CHECK_EQUAL(mods[0].content.size(), 1);
 }
 BOOST_AUTO_TEST_CASE(combine3)
 {
@@ -123,9 +123,9 @@ BOOST_AUTO_TEST_CASE(combine3)
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 3);
 
 	modegen::checker ch;
-	ch(pf.mods);
-	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
-	BOOST_CHECK_EQUAL(pf.mods[0].name, "mod");
-	BOOST_CHECK_EQUAL(pf.mods[0].content.size(), 2);
+	auto mods = ch(pf).extract_result();
+	BOOST_REQUIRE_EQUAL(mods.size(), 1);
+	BOOST_CHECK_EQUAL(mods[0].name, "mod");
+	BOOST_CHECK_EQUAL(mods[0].content.size(), 2);
 }
 BOOST_AUTO_TEST_SUITE_END()
