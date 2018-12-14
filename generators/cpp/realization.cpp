@@ -23,9 +23,9 @@ void modegen::generators::cpp::realization::generate(modegen::mod_selection quer
 	else if(query.what_generate=="hpp") gen_hpp(query, std::move(mods));
 	else if(query.what_generate=="cpp") gen_cpp(query, std::move(mods));
 	else if(query.what_generate=="all") {
+		set_out(base, "declarations.hpp", "def"); gen_def(query, std::move(mods));
 		set_out(base, "mod.hpp", "hpp"); gen_hpp(query, mods);
 		set_out(base, "mod.cpp", "cpp"); gen_cpp(query, mods);
-		set_out(base, "declarations.hpp", "def"); gen_def(query, std::move(mods));
 	}
 }
 

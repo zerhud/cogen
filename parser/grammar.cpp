@@ -78,7 +78,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, parsed_file(), boost::spir
 
 		file_rule.name("system_rule");
 		file_rule =
-		          +module_rule[push_back(at_c<0>(_val),_1)]
+		  *((lit("include") >> quoted_string[push_back(at_c<1>(_val),_1)]) | module_rule[push_back(at_c<0>(_val),_1)] )
 		         ;
 
 		module_rule.name("module_rule"); // module mod_name v123:
