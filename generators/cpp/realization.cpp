@@ -2,8 +2,8 @@
 
 #include <boost/process.hpp>
 
-#include "helpers.hpp"
-#include "to_json.h"
+#include "parser/helpers.hpp"
+#include "../to_json.h"
 #include "type_converter.h"
 
 #include "generators/config.hpp"

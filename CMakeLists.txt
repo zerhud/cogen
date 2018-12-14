@@ -8,23 +8,24 @@ find_package(Boost COMPONENTS program_options unit_test_framework REQUIRED)
 find_package(cppjson REQUIRED)
 
 set(sources parser/grammar.cpp parser/modegen.cpp parser/check.cpp
-    parser/to_json.cpp parser/loader.cpp parser/split_by_version.cpp parser/helpers.cpp parser/generator.cpp
+    parser/loader.cpp parser/helpers.cpp
     parser/errors.cpp
     )
 set(headers parser/grammar.hpp parser/modegen.hpp parser/check.h
-    parser/to_json.h   parser/loader.h   parser/split_by_version.hpp parser/helpers.hpp parser/generator.hpp
+    parser/loader.h   parser/helpers.hpp
     parser/errors.h
     )
 
 add_library(modegen_tree ${sources} ${headers})
-target_link_libraries(modegen_tree PRIVATE ${Boost_LIBRARIES} ${CMAKE_DL_LIBS} PUBLIC ${cppjson_LIBRARIES})
-target_include_directories(modegen_tree PUBLIC parser)
+target_link_libraries(modegen_tree PRIVATE ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+target_include_directories(modegen_tree PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/parser")
 
-set(gen_sources generators/defaults.cpp generators/json_tree.cpp)
-set(gen_headers generators/defaults.h   generators/json_tree.h)
+set(gen_sources generators/generator.cpp generators/defaults.cpp generators/to_json.cpp generators/json_tree.cpp)
+set(gen_headers generators/generator.hpp generators/defaults.h   generators/to_json.h   generators/json_tree.h)
 add_library(modegen_pgens ${gen_sources} ${gen_headers})
-target_link_libraries(modegen_pgens PRIVATE modegen_tree ${Boost_LIBRARIES} stdc++fs)
+target_link_libraries(modegen_pgens PRIVATE modegen_tree ${Boost_LIBRARIES} stdc++fs PUBLIC ${cppjson_LIBRARIES})
 target_include_directories(modegen_pgens PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_sources(modegen_pgens PRIVATE generators/split_by_version.cpp generators/split_by_version.hpp)
 target_sources(modegen_pgens PRIVATE generators/case_converter.cpp generators/case_converter.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/realization.cpp generators/cpp/realization.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/type_converter.cpp generators/cpp/type_converter.h)
@@ -49,8 +50,8 @@ add_custom_command(
     )
 
 
-set(tests mdp checker to_json split_by_version)
-set(generators_tests name_conversion)
+set(tests mdp checker)
+set(generators_tests to_json name_conversion split_by_version)
 enable_testing()
 foreach(tname ${tests})
 	add_executable(${tname}_test "parser/tests/${tname}_test.cpp")

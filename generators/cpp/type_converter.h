@@ -1,7 +1,7 @@
 #pragma once
 
 #include <map>
-#include "modegen.hpp"
+#include "parser/modegen.hpp"
 
 namespace modegen {
 namespace helpers {

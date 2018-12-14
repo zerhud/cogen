@@ -1,7 +1,7 @@
 #include "type_converter.h"
 
-#include "helpers.hpp"
-#include "errors.h"
+#include "parser/helpers.hpp"
+#include "parser/errors.h"
 
 std::map<std::string,std::string> modegen::helpers::type_converter::type_maps =
 {

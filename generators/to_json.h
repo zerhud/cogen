@@ -3,7 +3,7 @@
 #include <vector>
 #include <cppjson/json.h>
 
-#include "modegen.hpp"
+#include "parser/modegen.hpp"
 
 namespace modegen {
 namespace converters {

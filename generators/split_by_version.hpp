@@ -2,8 +2,8 @@
 
 #include <map>
 #include <functional>
-#include "modegen.hpp"
-#include "helpers.hpp"
+#include "parser/modegen.hpp"
+#include "parser/helpers.hpp"
 
 namespace modegen::converters {
 

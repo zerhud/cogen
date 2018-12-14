@@ -4,7 +4,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "split_by_version.hpp"
-#include "grammar.hpp"
+#include "parser/grammar.hpp"
 
 using namespace std::literals;
 

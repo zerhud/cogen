@@ -1,6 +1,6 @@
 #pragma once
 
-#include "generator.hpp"
+#include "../generator.hpp"
 
 namespace modegen {
 namespace generators {

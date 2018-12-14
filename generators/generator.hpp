@@ -6,7 +6,7 @@
 #include <string_view>
 #include <type_traits>
 
-#include "modegen.hpp"
+#include "parser/modegen.hpp"
 
 namespace modegen {
 
