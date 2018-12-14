@@ -8,8 +8,6 @@
 
 #include "generators/config.hpp"
 
-using namespace boost::process;
-
 void modegen::generators::cpp::realization::set_option(const std::string &key, const std::string &val)
 {
 	options[key]=val;
@@ -55,17 +53,7 @@ void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query
 	jsoned["incs"][incs.size()]["n"] = solve_option("def");
 	jsoned["incs"][incs.size()]["local"] = true;
 
-	opstream pdata;
-	child a(
-	      pythongen_path()
-	    , "-t", tmpl_path("realization.hpp.jinja")
-	    , "-o", out_path.generic_u8string()
-	    , std_out > stdout
-	    , std_in < pdata
-	    );
-	pdata << jsoned << std::endl;
-	pdata.pipe().close();
-	a.wait();
+	generate(jsoned, "realization.hpp.jinja");
 }
 
 void modegen::generators::cpp::realization::gen_cpp(modegen::mod_selection query, std::vector<modegen::module> mods) const
@@ -81,44 +69,20 @@ void modegen::generators::cpp::realization::gen_cpp(modegen::mod_selection query
 	jsoned["incs"][0]["n"] = solve_option("hpp");
 	jsoned["incs"][0]["local"] = true;
 
-	//TODO: add header file in includes
-
-	opstream pdata;
-	child a(
-	      pythongen_path()
-	    , "-t", tmpl_path("realization.cpp.jinja")
-	    , "-o", out_path.generic_u8string()
-	    , std_out > stdout
-	    , std_in < pdata
-	    );
-	pdata << jsoned << std::endl;
-	pdata.pipe().close();
-	a.wait();
+	generate(jsoned, "realization.cpp.jinja");
 }
 
 void modegen::generators::cpp::realization::gen_def(modegen::mod_selection query, std::vector<modegen::module> mods) const
 {
-	using namespace boost::process;
-
 	filter_by_selection(query, mods);
 
-	opstream pdata;
 	auto incs = helpers::type_converter(query.sel, mods).includes();
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return ;
 
 	cppjson::value jsoned = modegen::converters::to_json(mods);
 	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
 
-	child a(
-	      pythongen_path()
-	    , "-t", tmpl_path("declarations.hpp.jinja")
-	    , "-o", out_path.generic_u8string()
-	    , std_out > stdout
-	    , std_in < pdata
-	    );
-	pdata << jsoned << std::endl;
-	pdata.pipe().close();
-	a.wait();
+	generate(jsoned, "declarations.hpp.jinja");
 }
 
 void modegen::generators::cpp::realization::set_out(std::filesystem::path base, std::string_view file, std::string_view part) const
@@ -153,4 +117,21 @@ bool modegen::generators::cpp::realization::solve_bool_option(std::string_view n
 	auto pos = options.find(name);
 	if(pos==options.end()) return false;
 	return pos->second.empty() || pos->second == "true" || pos->second == "True" || pos->second == "1" ;
+}
+
+void modegen::generators::cpp::realization::generate(const cppjson::value& data, std::string_view t) const
+{
+	using namespace boost::process;
+
+	opstream pdata;
+	child a(
+		  pythongen_path()
+		, "-t", tmpl_path(t)
+		, "-o", out_path.generic_u8string()
+		, std_out > stdout
+		, std_in < pdata
+		);
+	pdata << data << std::endl;
+	pdata.pipe().close();
+	a.wait();
 }

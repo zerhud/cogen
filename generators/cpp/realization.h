@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cppjson/json.h>
 #include "../generator.hpp"
 
 namespace modegen {
@@ -23,6 +24,8 @@ private:
 
 	std::string solve_option(std::string_view name) const ;
 	bool solve_bool_option(std::string_view name) const ;
+
+	void generate(const cppjson::value& data, std::string_view t) const ;
 
 	std::map<std::string,std::string,std::less<>> options;
 	mutable std::filesystem::path out_path;
