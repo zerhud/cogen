@@ -6,7 +6,7 @@
 #include <boost/program_options.hpp>
 #include <boost/process.hpp>
 
-#include "check.h"
+#include "loader.h"
 #include "modegen.hpp"
 #include "grammar.hpp"
 #include "generator.hpp"
@@ -27,18 +27,6 @@ static void set_self_dir(std::string self)
 	assert(!self.empty());
 	self_dir = self;
 	self_dir = self_dir.parent_path();
-}
-
-std::string read_input(const std::string& file_name)
-{
-	if(file_name == "-") {
-		std::string pdata{std::istreambuf_iterator<char>(std::cin), std::istreambuf_iterator<char>()};
-		return pdata;
-	}
-
-	std::fstream file(file_name);
-	std::string pdata{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
-	return pdata;
 }
 
 void write_output(const cppjson::value& mods, const std::string& file_name)
@@ -79,22 +67,6 @@ std::tuple<po::basic_parsed_options<char>,po::variables_map> parse_command_line(
 	return {opts,vm};
 }
 
-std::vector<modegen::module> read_input(const std::vector<std::string>& inputs)
-{
-	modegen::checker check;
-	auto add_input = [&check](const std::string& fn){
-		auto parsed_file = modegen::parse(read_input(fn));
-		parsed_file.path = fn;
-
-		check(parsed_file);
-	};
-
-	if(inputs.empty()) add_input("-");
-	for(auto& i:inputs) add_input(i);
-
-	return check.extract_result();
-}
-
 int main(int argc,char** argv)
 {
 	set_self_dir(argv[0]);
@@ -115,7 +87,14 @@ int main(int argc,char** argv)
 	std::unique_ptr<modegen::generator> cur_gen;
 	std::optional<modegen::mod_selection> gen_opts;
 
-	auto mods = read_input(vm["input"].as<std::vector<std::string>>());
+	modegen::loader loader;
+	auto inputs = vm["input"].as<std::vector<std::string>>();
+	for(auto& i:inputs) {
+		if(i=="-") loader.load(std::cin, i);
+		else loader.load(i);
+	}
+
+	auto mods = loader.result();
 
 	for(auto& opt:opts.options) {
 		std::string& key = opt.string_key;
