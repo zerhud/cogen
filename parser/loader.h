@@ -16,8 +16,11 @@ public:
 
 	std::vector<modegen::module> result() ;
 private:
+	bool already_loaded(const std::filesystem::path f) const ;
+
 	std::filesystem::path cur_dir;
 	std::vector<std::filesystem::path> incs;
+	std::vector<std::filesystem::path> loaded_files;
 
 	checker ch;
 };

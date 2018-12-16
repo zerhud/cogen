@@ -27,6 +27,9 @@ void modegen::loader::load(std::istream &input, std::string fn)
 
 void modegen::loader::load(std::filesystem::path file)
 {
+	if(already_loaded(file)) return;
+	loaded_files.emplace_back(file);
+
 	std::fstream file_stream(file.generic_u8string());
 	load(file_stream, file.generic_u8string());
 }
@@ -34,4 +37,10 @@ void modegen::loader::load(std::filesystem::path file)
 std::vector<modegen::module> modegen::loader::result()
 {
 	return ch.extract_result();
+}
+
+bool modegen::loader::already_loaded(const std::filesystem::path f) const
+{
+	for(auto& i:loaded_files) if(i==f) return true;
+	return false;
 }

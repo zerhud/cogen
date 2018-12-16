@@ -124,6 +124,7 @@ void modegen::checker::check_names(std::vector<std::string> nl, const std::strin
 	auto check = [&nl](const std::string& v) {for(auto& n:nl)if(n==v)return false; return true;};
 	while(nl.size()!=0) {
 		auto name = std::move(nl.back());
+		if(name.empty()) throw error_info(cur_file, path, "empty name");
 		nl.pop_back();
 		if(!check(name)) throw error_info(cur_file, path, "duplicate name " + name);
 	}
