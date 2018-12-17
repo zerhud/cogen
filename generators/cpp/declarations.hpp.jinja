@@ -19,7 +19,8 @@ namespace <= render.gen_namespace_name(module) => {
 	<% if obj.gen_io -%>
 	std::string to_string(<= obj.name => v);
 	std::wstring to_wstring(<= obj.name => v);
-	template<typename S> S& operator << (S& out, <= obj.name => o) { out << to_string(o); return out; }
+	template<typename S> std::enable_if<std::is_same_v<char,S::CharT>,S&> operator << (S& out, <= obj.name => o) { out << to_string(o); return out; }
+	template<typename S> std::enable_if<std::is_same_v<wchar_t,S::CharT>,S&> operator << (S& out, <= obj.name => o) { out << to_wstring(o); return out; }
 	<%- endif -%>
 	<%- elif obj.type == "interface" -%>
 	<= render.decl_meta_params(obj) =>
