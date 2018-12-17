@@ -43,10 +43,11 @@ void modegen::checker::unite_mods(std::vector<modegen::module> &mods) const
 	if(1<mods.size()) {
 		auto end = mods.end();
 		for(auto beg = mods.begin();beg!=end;++beg) {
-			for(auto cmp=beg+1;cmp!=end;++cmp) {
+			for(auto cmp=std::next(beg);cmp!=end;++cmp) {
 				if(beg->name == cmp->name && combine(*beg, *cmp)) {
-					if(--end == cmp--) break;;
-					*cmp = std::move(*end);
+					std::advance(end,-1);
+					if(cmp!=end) *cmp = std::move(*end);
+					std::advance(cmp,-1);
 				}
 			}
 
@@ -61,10 +62,7 @@ void modegen::checker::unite_mods(std::vector<modegen::module> &mods) const
 
 void modegen::checker::check_mod(modegen::module& mod) const
 {
-	std::vector<std::string> nl;
-	auto name_collector = [&nl](const auto& e){nl.emplace_back(e.name);};
-	for(auto& c:mod.content) std::visit(name_collector, c);
-	check_names(std::move(nl), mod.name);
+	check_names(mod);
 
 	upgrade_cur_min_ver(mod);
 
@@ -117,6 +115,14 @@ void modegen::checker::check(modegen::enumeration& e, const std::string& path) c
 	check_names(nl, make_path(path,e.name));
 
 	if(e.gen_io) for(auto& en:e.elements) if(en.io.empty()) en.io = en.name;
+}
+
+void modegen::checker::check_names(const modegen::module& mod) const
+{
+	std::vector<std::string> nl;
+	auto name_collector = [&nl](const auto& e){nl.emplace_back(e.name);};
+	for(const auto& c:mod.content) std::visit(name_collector, c);
+	check_names(std::move(nl), mod.name);
 }
 
 void modegen::checker::check_names(std::vector<std::string> nl, const std::string& path) const
