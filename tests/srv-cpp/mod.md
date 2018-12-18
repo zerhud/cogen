@@ -14,3 +14,8 @@ record rec {
 }
 
 enum +auto_io e1 { one two }
+
+interface UglyInterface {
+	constructor(string param);
+	string getParam() const ;
+}
