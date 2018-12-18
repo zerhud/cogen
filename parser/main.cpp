@@ -91,7 +91,7 @@ int main(int argc,char** argv)
 	auto inputs = vm["input"].as<std::vector<std::string>>();
 	for(auto& i:inputs) {
 		if(i=="-") loader.load(std::cin, i);
-		else loader.load(i);
+		else loader.load(std::filesystem::absolute(i));
 	}
 
 	auto mods = loader.result();
