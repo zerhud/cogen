@@ -9,7 +9,7 @@ find_package(Boost COMPONENTS program_options REQUIRED)
 set(srv_cpp "${CMAKE_CURRENT_BINARY_DIR}/gen/srv.cpp")
 set(srv_hpp "${CMAKE_CURRENT_BINARY_DIR}/gen/srv.hpp")
 set(def_hpp "${CMAKE_CURRENT_BINARY_DIR}/gen/def.hpp")
-set(gen_files ${srv_cpp} ${srv_cpp} ${srv_cpp})
+set(gen_files ${srv_cpp} ${srv_hpp} ${def_hpp})
 
 add_custom_command(
 	OUTPUT ${gen_files}
