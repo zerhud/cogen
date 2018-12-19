@@ -2,6 +2,7 @@
 
 #include <map>
 #include "parser/modegen.hpp"
+#include "../case_converter.h"
 
 namespace modegen {
 namespace helpers {

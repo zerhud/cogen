@@ -38,6 +38,8 @@ std::string modegen::generators::convert(const std::string &name, modegen::gener
 {
 	std::string ret;
 
+	if(c==name_conversion::as_is) return ret;
+
 	auto split = split_name(name);
 	if(split.empty()) return ret;
 
@@ -63,4 +65,36 @@ std::string modegen::generators::convert(const std::string &name, modegen::gener
 	}
 
 	return ret;
+}
+
+std::string_view modegen::generators::to_string(modegen::generators::name_conversion c)
+{
+	using namespace std::literals;
+	if(c==name_conversion::as_is) return "asis"sv;
+	if(c==name_conversion::underscore) return "underscore"sv;
+	if(c==name_conversion::camel_case) return "camel"sv;
+	if(c==name_conversion::title_case) return "title"sv;
+	assert(false);
+	return "asis"sv;
+}
+
+modegen::generators::name_conversion modegen::generators::from_string(std::string_view n)
+{
+	using namespace std::literals;
+	if(n=="underscore"sv) return name_conversion::underscore;
+	if(n=="camel"sv) return name_conversion::camel_case;
+	if(n=="title"sv) return name_conversion::title_case;
+	return name_conversion::as_is;
+}
+
+void modegen::generators::convert(std::vector<modegen::module>& mods, modegen::generators::name_conversion c)
+{
+	struct {
+		name_conversion naming = name_conversion::as_is;
+		void convert(std::vector<module>& mods) { for(auto& m:mods) convert(m); }
+		void convert(module& mod) {for(auto& c:mod.content) std::visit([this](auto& c){convert(c);}, c); }
+	} cvt;
+
+	cvt.naming = c;
+	cvt.convert(mods);
 }

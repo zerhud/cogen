@@ -99,6 +99,11 @@ void modegen::generators::cpp::realization::set_out(std::filesystem::path base, 
 	if(!par_dir.empty()) std::filesystem::create_directories(par_dir);
 }
 
+modegen::generators::name_conversion modegen::generators::cpp::realization::naming_option() const
+{
+	return from_string(solve_option("naming"));
+}
+
 std::string modegen::generators::cpp::realization::solve_option(std::string_view name) const
 {
 	using namespace std::literals;

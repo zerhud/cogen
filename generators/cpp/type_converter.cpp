@@ -34,7 +34,9 @@ std::map<std::string,std::string> modegen::helpers::type_converter::incs_maps =
     , {"optional","optional"}
 };
 
-modegen::helpers::type_converter::type_converter(module_content_selector s, std::vector<modegen::module>& mods)
+modegen::helpers::type_converter::type_converter(module_content_selector s
+		, std::vector<modegen::module>& mods
+		)
 {
 	auto v = [this](auto& mc) { convert(mc); };
 	for(auto& mod:mods) {

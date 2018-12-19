@@ -2,6 +2,7 @@
 
 #include <cppjson/json.h>
 #include "../generator.hpp"
+#include "../case_converter.h"
 
 namespace modegen {
 namespace generators {
@@ -22,6 +23,7 @@ private:
 
 	void set_out(std::filesystem::path base, std::string_view parsed_file, std::string_view part) const ;
 
+	name_conversion naming_option() const ;
 	std::string solve_option(std::string_view name) const ;
 	bool solve_bool_option(std::string_view name) const ;
 

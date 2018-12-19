@@ -28,12 +28,6 @@ struct mod_selection {
 	std::optional<std::filesystem::path> output;
 };
 
-//inline gen_options operator | (gen_options a, gen_options b)
-//{
-    //int ret = static_cast<int>(a) | static_cast<int>(b);
-    //return static_cast<gen_options>(ret);
-//}
-
 //void cast_options(gen_options opts, std::vector<modegen::module>& mods);
 void filter_by_selection(const mod_selection& query, std::vector<modegen::module>& mods);
 
