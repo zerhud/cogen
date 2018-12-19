@@ -41,7 +41,7 @@ struct grammar : boost::spirit::qi::grammar<Iterator, parsed_file(), boost::spir
 		        ;
 
 		var_name.name("var_name");
-		var_name = +(char_("a-zA-Z0-9_")[_val+=_1]);
+		var_name = +(char_("a-zA-Z0-9:_")[_val+=_1]);
 
 		mutable_mod.name("mutable_mod");
 		mutable_mod = qi::lexeme[(lit("const")[_val=false] | lit("mutable")[_val=true])];

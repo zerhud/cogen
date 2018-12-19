@@ -24,6 +24,7 @@ private:
 	void check(const interface& i, const std::string& path) const ;
 	void check(enumeration& e, const std::string& path) const ;
 
+	void check_using(const modegen::module& mod) const ;
 	void check_names(const modegen::module& mod) const ;
 	void check_names(std::vector<std::string> nl, const std::string& path) const ;
 	void check_version_is_single(const meta_parameters::parameter_set& p, const std::string& path) const ;

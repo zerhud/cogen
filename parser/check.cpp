@@ -32,9 +32,10 @@ modegen::checker &modegen::checker::operator ()(modegen::parsed_file& finfo)
 
 std::vector<modegen::module> modegen::checker::extract_result()
 {
+	unite_mods(resulting_set);
+
 	std::vector<modegen::module> ret;
 	ret.swap(resulting_set);
-	unite_mods(ret);
 	return ret;
 }
 
@@ -62,8 +63,8 @@ void modegen::checker::unite_mods(std::vector<modegen::module> &mods) const
 
 void modegen::checker::check_mod(modegen::module& mod) const
 {
+	check_using(mod);
 	check_names(mod);
-
 	upgrade_cur_min_ver(mod);
 
 	auto check_caller = [this,&mod](auto& v){check(v, mod.name);};
@@ -115,6 +116,15 @@ void modegen::checker::check(modegen::enumeration& e, const std::string& path) c
 	check_names(nl, make_path(path,e.name));
 
 	if(e.gen_io) for(auto& en:e.elements) if(en.io.empty()) en.io = en.name;
+}
+
+void modegen::checker::check_using(const modegen::module& mod) const
+{
+	for(auto& u:mod.imports) {
+		bool ok = false;
+		for(auto& lm:resulting_set) if(lm.name == u.mod_name) ok=true;
+		if(!ok) throw error_info(cur_file, mod.name, "no module in using directive " + u.mod_name);
+	}
 }
 
 void modegen::checker::check_names(const modegen::module& mod) const
