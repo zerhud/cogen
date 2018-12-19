@@ -93,6 +93,10 @@ void modegen::generators::convert(std::vector<modegen::module>& mods, modegen::g
 		name_conversion naming = name_conversion::as_is;
 		void convert(std::vector<module>& mods) { for(auto& m:mods) convert(m); }
 		void convert(module& mod) {for(auto& c:mod.content) std::visit([this](auto& c){convert(c);}, c); }
+		void convert(function& obj) {}
+		void convert(enumeration& obj) {}
+		void convert(record& obj) {}
+		void convert(interface& obj) {}
 	} cvt;
 
 	cvt.naming = c;

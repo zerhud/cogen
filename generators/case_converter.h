@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-#include "modegen.hpp"
+#include "parser/modegen.hpp"
 
 namespace modegen {
 namespace generators {
