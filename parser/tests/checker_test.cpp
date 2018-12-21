@@ -4,6 +4,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "check.h"
+#include "helpers.hpp"
 
 using namespace std::literals;
 
@@ -129,3 +130,24 @@ BOOST_AUTO_TEST_CASE(combine3)
 	BOOST_CHECK_EQUAL(mods[0].content.size(), 2);
 }
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_CASE(exports)
+{
+	auto pf = modegen::parse("module mod v1.0: interface i{} record r{} enum e{} void f();"sv);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
+	modegen::checker ch;
+	auto mods = ch(pf).extract_result();
+
+	BOOST_REQUIRE_EQUAL(mods[0].exports.size(), 4);
+	BOOST_CHECK_EQUAL(mods[0].exports[0].name, "i");
+	BOOST_CHECK_EQUAL(mods[0].exports[0].type, modegen::module_content_selector::interface);
+
+	BOOST_CHECK_EQUAL(mods[0].exports[1].name, "r");
+	BOOST_CHECK_EQUAL(mods[0].exports[1].type, modegen::module_content_selector::record);
+
+	BOOST_CHECK_EQUAL(mods[0].exports[2].name, "e");
+	BOOST_CHECK_EQUAL(mods[0].exports[2].type, modegen::module_content_selector::enumeration);
+
+	BOOST_CHECK_EQUAL(mods[0].exports[3].name, "f");
+	BOOST_CHECK_EQUAL(mods[0].exports[3].type, modegen::module_content_selector::function);
+}

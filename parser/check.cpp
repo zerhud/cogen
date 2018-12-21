@@ -58,7 +58,10 @@ void modegen::checker::unite_mods(std::vector<modegen::module> &mods) const
 		if(end != mods.end()) mods.erase(end, mods.end());
 	}
 
-	for(auto& mod:mods) check_mod(mod);
+	for(auto& mod:mods) {
+		check_mod(mod);
+		collect_exports(mod);
+	}
 }
 
 void modegen::checker::check_mod(modegen::module& mod) const
@@ -206,4 +209,17 @@ bool modegen::checker::combine(modegen::module& to, modegen::module& from) const
 	//for(auto& par:to.meta_params) if(std::holds_alternative<meta_parameters::deprication>(par)) to_dep_param.emplace(std::move(par));
 
 	return true;
+}
+
+void modegen::checker::collect_exports(module& mod) const
+{
+	auto collector = [&mod](const auto& c) {
+		if(is_selected(c,module_content_selector::interface)) mod.exports.emplace_back(export_info{.name=c.name, .type=module_content_selector::interface});
+		if(is_selected(c,module_content_selector::record)) mod.exports.emplace_back(export_info{.name=c.name, .type=module_content_selector::record});
+		if(is_selected(c,module_content_selector::enumeration)) mod.exports.emplace_back(export_info{.name=c.name, .type=module_content_selector::enumeration});
+		if(is_selected(c,module_content_selector::function)) mod.exports.emplace_back(export_info{.name=c.name, .type=module_content_selector::function});
+	};
+
+	mod.exports.clear();
+	for(auto& c:mod.content) std::visit(collector, c);
 }

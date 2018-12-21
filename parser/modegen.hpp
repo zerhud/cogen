@@ -180,11 +180,16 @@ struct using_directive {
 	std::string mod_name;
 	bool is_system = true;
 };
+struct export_info {
+	std::string name;
+	module_content_selector type;
+};
 struct module {
 	std::string name;
 	std::vector<module_content> content;
 	meta_parameters::parameter_set meta_params;
 	std::vector<using_directive> imports;
+	std::vector<export_info> exports;
 	std::string file_name;
 };
 

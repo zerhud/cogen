@@ -34,6 +34,8 @@ private:
 
 	bool combine(module& to, module& from) const ;
 
+	void collect_exports(module& mod) const ;
+
 	template<typename T, typename... Args>
 	static std::string make_path(T&& v1, Args... v)
 	{

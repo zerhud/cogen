@@ -16,6 +16,17 @@ Stream& operator << (Stream& s, const meta_parameter& p)
 	return s;
 }
 
+template<typename Stream>
+Stream& operator << (Stream& out, const module_content_selector s)
+{
+	if(s == module_content_selector::all) out << "all";
+	if(s == module_content_selector::enumeration) out << "enum";
+	if(s == module_content_selector::interface) out << "interface";
+	if(s == module_content_selector::record) out << "record";
+	if(s == module_content_selector::function) out << "function";
+	return out;
+}
+
 namespace meta_parameters {
 bool operator < (const version& left, const version& right);
 bool operator <= (const version& left, const version& right);
