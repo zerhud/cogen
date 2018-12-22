@@ -22,14 +22,19 @@ BOOST_AUTO_TEST_CASE(empty_module)
 BOOST_AUTO_TEST_CASE(wrong_module)
 {
 	std::vector<std::string_view> mods = {
-	    {"module mod:"sv}
-	  , {"module\nmod v1.0:"sv}
-	  , {"module mod v1.0"sv}
-	  , {"#docs module mod v1.0:"sv}
-	  , {"#docs\n@v3.0 module mod v1.0"sv}
+	    {"module mod:"sv} // no version
+	  , {"module\nmod v1.0:"sv} // new line after module keyword
+	  , {"module mod v1.0"sv} // no : after definition
+	  , {"#docs\n@v3.0 module mod v1.0"sv} // extra version argument
 	};
 
-	for(auto mod:mods) BOOST_CHECK_THROW(modegen::parse(mod), std::runtime_error);
+	for(auto mod:mods) {
+		BOOST_CHECK_THROW(modegen::parse(mod), std::runtime_error);
+	}
+
+	// no new line after documentation (no module difinition)
+	auto no_mod = modegen::parse("#docs module mod v1.0:"sv);
+	BOOST_CHECK_EQUAL(no_mod.mods.size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(module_params)
