@@ -18,6 +18,8 @@ void modegen::generators::cpp::realization::generate(modegen::mod_selection quer
 	std::filesystem::path base;
 	if(query.output.has_value()) base = *query.output;
 
+	convert(mods, naming_option());
+
 	set_out(base, "", query.what_generate);
 	if(query.what_generate=="def") gen_def(query, std::move(mods));
 	else if(query.what_generate=="hpp") gen_hpp(query, std::move(mods));
@@ -113,6 +115,7 @@ std::string modegen::generators::cpp::realization::solve_option(std::string_view
 
 	if(name == "hpp"sv) return "mod.hpp"s;
 	if(name == "def"sv) return "declarations.hpp"s;
+	if(name == "naming"sv) return "underscore"s;
 
 	return ""s;
 }

@@ -19,7 +19,7 @@ std::vector<std::string> modegen::generators::split_name(const std::string &name
 	if(ret.empty()) {
 		std::string cur;
 		for(std::size_t i=0;i<name.size();++i) {
-			if(std::islower(name[i])) cur += name[i];
+			if(std::islower(name[i]) || std::isdigit(name[i])) cur += name[i];
 			else {
 				ret.emplace_back(cur);
 				cur = name[i];
@@ -34,7 +34,7 @@ std::vector<std::string> modegen::generators::split_name(const std::string &name
 	return ret;
 }
 
-std::string modegen::generators::convert(const std::string &name, modegen::generators::name_conversion c)
+std::string modegen::generators::convert(const std::string& name, modegen::generators::name_conversion c)
 {
 	std::string ret;
 
@@ -93,10 +93,14 @@ void modegen::generators::convert(std::vector<modegen::module>& mods, modegen::g
 		name_conversion naming = name_conversion::as_is;
 		void convert(std::vector<module>& mods) { for(auto& m:mods) convert(m); }
 		void convert(module& mod) {for(auto& c:mod.content) std::visit([this](auto& c){convert(c);}, c); }
-		void convert(function& obj) {}
-		void convert(enumeration& obj) {}
-		void convert(record& obj) {}
-		void convert(interface& obj) {}
+		void convert(function& obj) { obj.name = generators::convert(obj.name, naming); }
+		void convert(enumeration& obj) { obj.name = generators::convert(obj.name, naming); }
+		void convert(record& obj) { obj.name = generators::convert(obj.name, naming); }
+		void convert(interface& obj) {
+			if(naming!=name_conversion::camel_case) obj.name = generators::convert(obj.name, naming);
+			else obj.name = generators::convert(obj.name, name_conversion::title_case);
+			for(auto& m:obj.mem_funcs) convert(m);
+		}
 	} cvt;
 
 	cvt.naming = c;

@@ -38,6 +38,17 @@ BOOST_AUTO_TEST_CASE(title)
 	auto ns = modegen::generators::split_name("SomeName");
 	check_some_name(ns);
 }
+BOOST_AUTO_TEST_CASE(with_num)
+{
+	auto ns = modegen::generators::split_name("some1");
+	BOOST_REQUIRE_EQUAL(ns.size(), 1);
+	BOOST_CHECK_EQUAL(ns[0], "some1");
+
+	ns = modegen::generators::split_name("some1_name");
+	BOOST_REQUIRE_EQUAL(ns.size(), 2);
+	BOOST_CHECK_EQUAL(ns[0], "some1");
+	BOOST_CHECK_EQUAL(ns[1], "name");
+}
 BOOST_AUTO_TEST_SUITE_END() // split
 
 BOOST_AUTO_TEST_SUITE(convert)
@@ -48,6 +59,9 @@ BOOST_AUTO_TEST_CASE(one)
 	BOOST_CHECK_EQUAL("foo", convert("foo", name_conversion::underscore));
 	BOOST_CHECK_EQUAL("foo", convert("foo", name_conversion::camel_case));
 	BOOST_CHECK_EQUAL("Foo", convert("foo", name_conversion::title_case));
+	BOOST_CHECK_EQUAL("foo1", convert("foo1", name_conversion::underscore));
+	BOOST_CHECK_EQUAL("foo1", convert("foo1", name_conversion::camel_case));
+	BOOST_CHECK_EQUAL("Foo1", convert("foo1", name_conversion::title_case));
 }
 BOOST_AUTO_TEST_CASE(underscore)
 {

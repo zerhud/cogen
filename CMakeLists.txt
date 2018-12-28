@@ -65,4 +65,4 @@ foreach(tname ${generators_tests})
 	add_test(NAME ${tname} COMMAND ${tname}_test)
 endforeach()
 
-#add_subdirectory(tests/srv-cpp)
+add_subdirectory(tests/srv-cpp)
