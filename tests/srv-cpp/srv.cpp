@@ -40,7 +40,7 @@ int main(int, char**)
 
 	std::stringstream e1_test;
 	e1_test << mod_v1_0::e1::one << " " << mod_v1_0::e1::two ;
-	compare_str("mod::e1 putputs", e1_test.str(), "one two");
+	compare_str("mod::e1 outputs", e1_test.str(), "one two");
 
 	print_failed();
 	return 0;

@@ -46,8 +46,8 @@ std::tuple<po::basic_parsed_options<char>,po::variables_map> parse_command_line(
 	        ("help,h", "produce help message")
 	        ("input,i", po::value<std::vector<std::string>>(), "input files")
 	        ("output,o", po::value<std::vector<std::string>>(), "output files")
-	        ("split-by-versions,s", "split generated output by version (one module is one version)")
-	        ("select", po::value<std::string>()->default_value(""), "produce output only for selected path")
+	        ("splitver", "split generated output by version (one module is one version)")
+	        ("select,s", po::value<std::vector<std::string>>(), "produce output only for selected")
 	        ("target,t", po::value<std::string>()->default_value("server,cpp"), "choice a target, cpp for exmple")
 	        ("option,O", po::value<std::vector<std::string>>(), "pass an option to generator")
 	        ;
@@ -101,7 +101,7 @@ int main(int argc,char** argv)
 		std::string& key = opt.string_key;
 
 		if(opt.value.empty()) {
-			if(gen_opts && key == "split-by-version")
+			if(gen_opts && key == "splitver")
 				gen_opts->opts |= modegen::gen_options::split_version;
 			continue;
 		}

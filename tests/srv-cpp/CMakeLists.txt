@@ -6,9 +6,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Boost COMPONENTS program_options REQUIRED)
 
-set(srv_cpp "${CMAKE_CURRENT_BINARY_DIR}/gen/srv.cpp")
-set(srv_hpp "${CMAKE_CURRENT_BINARY_DIR}/gen/srv.hpp")
-set(def_hpp "${CMAKE_CURRENT_BINARY_DIR}/gen/def.hpp")
+set(srv_cpp "${CMAKE_CURRENT_BINARY_DIR}/gen/mod/srv.cpp")
+set(srv_hpp "${CMAKE_CURRENT_BINARY_DIR}/gen/mod/srv.hpp")
+set(def_hpp "${CMAKE_CURRENT_BINARY_DIR}/gen/mod/def.hpp")
 set(gen_files ${srv_cpp} ${srv_hpp} ${def_hpp})
 
 add_custom_command(
