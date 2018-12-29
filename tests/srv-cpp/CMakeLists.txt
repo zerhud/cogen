@@ -14,7 +14,7 @@ set(gen_files ${srv_cpp} ${srv_hpp} ${def_hpp})
 add_custom_command(
 	OUTPUT ${gen_files}
 	COMMAND "modegen_parser" -i ${CMAKE_CURRENT_SOURCE_DIR}/mod.md -t server,cpp -Ogen_empty -Onaming=underscore -o def="${def_hpp}" -o hpp="${srv_hpp}" -o cpp="${srv_cpp}"
-	DEPENDS mod.md
+	DEPENDS mod.md modegen_parser modegen_pgens
 	) 
 set_source_files_properties(${gen_files} PROPERTIES GENERATED TRUE)
 

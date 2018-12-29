@@ -49,8 +49,9 @@ std::tuple<po::basic_parsed_options<char>,po::variables_map> parse_command_line(
 	        ("split-by-versions,s", "split generated output by version (one module is one version)")
 	        ("select", po::value<std::string>()->default_value(""), "produce output only for selected path")
 	        ("target,t", po::value<std::string>()->default_value("server,cpp"), "choice a target, cpp for exmple")
-			("option,O", po::value<std::vector<std::string>>(), "pass an option to generator")
+	        ("option,O", po::value<std::vector<std::string>>(), "pass an option to generator")
 	        ;
+
 	po::positional_options_description positioned;
 	positioned.add("input", -1);
 

@@ -97,6 +97,7 @@ void modegen::generators::cpp::realization::set_out(std::filesystem::path base, 
 	auto ppos = self->options.find(part);
 	if(ppos == self->options.end()) self->options.emplace(std::make_pair(std::string(part), file.empty() ? base.filename().generic_u8string() : std::string(file)));
 
+	// TODO: is par_dir.empty possible?
 	auto par_dir = out_path.parent_path();
 	if(!par_dir.empty()) std::filesystem::create_directories(par_dir);
 }

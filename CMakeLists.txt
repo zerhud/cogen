@@ -29,6 +29,7 @@ target_sources(modegen_pgens PRIVATE generators/split_by_version.cpp generators/
 target_sources(modegen_pgens PRIVATE generators/case_converter.cpp generators/case_converter.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/realization.cpp generators/cpp/realization.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/type_converter.cpp generators/cpp/type_converter.h)
+target_sources(modegen_pgens PRIVATE generators/cpp/declarations.hpp.jinja generators/cpp/realization.hpp.jinja generators/cpp/realization.cpp.jinja)
 
 set(templates_dir "${CMAKE_CURRENT_BINARY_DIR}/tmpls")
 set(cpp_templates_dir "${CMAKE_CURRENT_SOURCE_DIR}/generators/cpp")
