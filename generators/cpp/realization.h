@@ -28,6 +28,7 @@ private:
 	bool solve_bool_option(std::string_view name) const ;
 
 	void generate(const cppjson::value& data, std::string_view t) const ;
+	void set_constructors_prefix(cppjson::value& output_data) const ;
 
 	std::map<std::string,std::string,std::less<>> options;
 	mutable std::filesystem::path out_path;

@@ -41,7 +41,7 @@ modegen::helpers::type_converter::type_converter(module_content_selector s
 	auto v = [this](auto& mc) { convert(mc); };
 	for(auto& mod:mods) {
 		cur_mod = &mod;
-		for(auto& mc:mod.content) if(is_selected(mc, s)) std::visit(v, mc);
+		for(auto& mc:mod.content) /*if(is_selected(mc, s))*/ std::visit(v, mc);
 
 		std::sort(cur_mod->imports.begin(),cur_mod->imports.end(),[](using_directive& left, using_directive& right){return left.mod_name < right.mod_name;});
 		auto upos = std::unique(cur_mod->imports.begin(),cur_mod->imports.end(),
@@ -85,9 +85,14 @@ void modegen::helpers::type_converter::convert(modegen::enumeration& obj) const
 void modegen::helpers::type_converter::convert(modegen::interface& obj) const
 {
 	assert(cur_mod);
+
 	cur_mod->imports.emplace_back(modegen::using_directive{"memory"});
 	for(auto& f:obj.mem_funcs) convert(f);
-	for(auto& c:obj.constructors) for(auto cp:c.func_params) convert(cp.param_type);
+	for(auto& c:obj.constructors) {
+		for(auto& cp:c.func_params) {
+			convert(cp.param_type);
+		}
+	}
 
 	solve_type(obj.name, modegen::module_content_selector::interface);
 }

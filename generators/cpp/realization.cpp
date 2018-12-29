@@ -83,6 +83,7 @@ void modegen::generators::cpp::realization::gen_def(modegen::mod_selection query
 
 	cppjson::value jsoned = modegen::converters::to_json(mods);
 	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
+	set_constructors_prefix(jsoned);
 
 	generate(jsoned, "declarations.hpp.jinja");
 }
@@ -143,4 +144,19 @@ void modegen::generators::cpp::realization::generate(const cppjson::value& data,
 	pdata << data << std::endl;
 	pdata.pipe().close();
 	a.wait();
+}
+
+void modegen::generators::cpp::realization::set_constructors_prefix(cppjson::value& output_data) const
+{
+	name_conversion naming = naming_option();
+
+	if(naming==name_conversion::title_case) {
+		output_data["cnst_prefix"] = "Create";
+	} else if(naming==name_conversion::underscore) {
+		output_data["cnst_prefix"] = "create_";
+		output_data["ptr_postfix"] = "_ptr";
+	} else {
+		output_data["cnst_prefix"] = "create";
+		output_data["ptr_postfix"] = "Ptr";
+	}
 }

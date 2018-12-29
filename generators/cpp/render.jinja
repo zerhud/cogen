@@ -30,3 +30,5 @@
 #include <= '"' if inc.local else '<' =><= inc.n =><= '"' if inc.local else '>' =>
 <%- endfor -%>
 <%- endmacro -%>
+
+<%- macro ptr(obj, cdata) -%><=obj.name=><=cdata.ptr_postfix=><% endmacro -%>
