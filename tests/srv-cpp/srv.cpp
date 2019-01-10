@@ -1,7 +1,7 @@
 #include <cassert>
 #include <sstream>
 #include <iostream>
-#include "srv.hpp"
+#include "mod/srv.hpp"
 
 std::vector<std::string_view> failed_tests;
 
