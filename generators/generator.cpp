@@ -44,10 +44,14 @@ void modegen::filter_by_selection(const modegen::mod_selection& query, std::vect
 {
 	cast_options(query.opts, mods);
 
-	const bool need_check_name = !query.mod_name.empty();
-	std::regex qname(query.mod_name);
+
+	const bool need_check_module_name = !query.mod_name.empty();
+	const bool need_check_content_name = !query.cnt_name.empty();
+	std::regex mname(query.mod_name);
+	std::regex cname(query.cnt_name);
+	auto cnt_name_check = [&cname](const auto& c){ return std::regex_match(c.name, cname); };
 	for(auto& m:mods) {
-		const bool entire_module_name_check_fail = need_check_name && !std::regex_match(m.name, qname);
+		const bool entire_module_name_check_fail = need_check_module_name && !std::regex_match(m.name, mname);
 		if( entire_module_name_check_fail ) {
 			m.content.clear();
 			continue;
@@ -55,6 +59,11 @@ void modegen::filter_by_selection(const modegen::mod_selection& query, std::vect
 
 		auto rpos = std::remove_if(m.content.begin(), m.content.end(), [&query](const auto& c){return !is_selected(c, query.sel);} );
 		m.content.erase( rpos, m.content.end() );
+
+		if(need_check_content_name) {
+			auto rpos = std::remove_if(m.content.begin(), m.content.end(), [&cnt_name_check](const auto& c){return !std::visit(cnt_name_check,c);} );
+			m.content.erase( rpos, m.content.end() );
+		}
 	}
 
 	remove_without_content(mods);

@@ -42,3 +42,23 @@ BOOST_AUTO_TEST_CASE(pattern)
 	BOOST_CHECK_EQUAL(pf.mods[1].name,"mod1"sv);
 }
 BOOST_AUTO_TEST_SUITE_END() // module_name
+
+BOOST_AUTO_TEST_SUITE(content_name)
+BOOST_AUTO_TEST_CASE(pattern)
+{
+	auto pf = modegen::parse("module mod v1.0: enum e1{} enum e2{} enum a3{}"sv);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),3);
+	modegen::mod_selection query;
+	query.cnt_name = "e[0-9]+";
+	modegen::filter_by_selection(query, pf.mods);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
+	std::vector<modegen::module_content>& cnt = pf.mods[0].content;
+	BOOST_CHECK_EQUAL(cnt.size(),2);
+
+	namespace pl = std::placeholders;
+	auto ncheck = [](const auto& n, const auto& c){ BOOST_CHECK_EQUAL(c.name,n); };
+	std::visit(std::bind(ncheck, "e1", pl::_1), cnt[0]);
+	std::visit(std::bind(ncheck, "e2", pl::_1), cnt[1]);
+}
+BOOST_AUTO_TEST_SUITE_END() // content_name
