@@ -22,7 +22,7 @@ struct mod_selection {
 	gen_options opts;
 	std::string mod_name;
 	std::string cnt_name;
-	module_content_selector sel;
+	module_content_selector sel=module_content_selector::all;
 
 	std::string what_generate;
 	std::optional<std::filesystem::path> output;

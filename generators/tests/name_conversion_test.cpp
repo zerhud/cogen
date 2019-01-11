@@ -1,5 +1,5 @@
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE modegen_parser
+#define BOOST_TEST_MODULE name_conversion
 
 #include <boost/test/unit_test.hpp>
 

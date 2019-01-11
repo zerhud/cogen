@@ -52,7 +52,7 @@ add_custom_command(
 
 
 set(tests mdp checker)
-set(generators_tests to_json name_conversion split_by_version)
+set(generators_tests to_json name_conversion split_by_version filter)
 enable_testing()
 foreach(tname ${tests})
 	add_executable(${tname}_test "parser/tests/${tname}_test.cpp")

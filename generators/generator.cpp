@@ -1,5 +1,6 @@
 #include "generator.hpp"
 
+#include <regex>
 #include "split_by_version.hpp"
 
 void modegen::generator_maker::register_gen(std::string_view part, std::string_view name, modegen::generator_creator crt)
@@ -32,7 +33,7 @@ static void /*modegen::*/cast_options(modegen::gen_options opts, std::vector<mod
 	}
 }
 
-static void remove_empty(std::vector<modegen::module>& mods)
+static void remove_without_content(std::vector<modegen::module>& mods)
 {
 	auto rpos = std::remove_if(mods.begin(),mods.end(), [](const modegen::module& m){return m.content.empty();} );
 	mods.erase( rpos, mods.end() );
@@ -43,10 +44,18 @@ void modegen::filter_by_selection(const modegen::mod_selection& query, std::vect
 {
 	cast_options(query.opts, mods);
 
+	const bool need_check_name = !query.mod_name.empty();
+	std::regex qname(query.mod_name);
 	for(auto& m:mods) {
+		const bool entire_module_name_check_fail = need_check_name && !std::regex_match(m.name, qname);
+		if( entire_module_name_check_fail ) {
+			m.content.clear();
+			continue;
+		}
+
 		auto rpos = std::remove_if(m.content.begin(), m.content.end(), [&query](const auto& c){return !is_selected(c, query.sel);} );
 		m.content.erase( rpos, m.content.end() );
 	}
 
-	remove_empty(mods);
+	remove_without_content(mods);
 }
