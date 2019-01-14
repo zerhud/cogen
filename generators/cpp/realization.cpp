@@ -44,10 +44,8 @@ std::string modegen::generators::cpp::realization::tmpl_path(std::string_view tn
 
 void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query, std::vector<modegen::module> mods) const
 {
-	query.sel = module_content_selector::interface;
-
 	filter_by_selection(query, mods);
-	auto incs = helpers::type_converter(query.sel, mods).includes();
+	auto incs = helpers::type_converter(mods).includes();
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return;
 
 	cppjson::value jsoned = modegen::converters::to_json(mods);
@@ -60,11 +58,8 @@ void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query
 
 void modegen::generators::cpp::realization::gen_cpp(modegen::mod_selection query, std::vector<modegen::module> mods) const
 {
-	// only realization for enum's functions...
-	query.sel = module_content_selector::enumeration;
-
 	filter_by_selection(query, mods);
-	helpers::type_converter(query.sel, mods);
+	helpers::type_converter(mods).includes();
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return;
 
 	cppjson::value jsoned = modegen::converters::to_json(mods);
@@ -78,7 +73,7 @@ void modegen::generators::cpp::realization::gen_def(modegen::mod_selection query
 {
 	filter_by_selection(query, mods);
 
-	auto incs = helpers::type_converter(query.sel, mods).includes();
+	auto incs = helpers::type_converter(mods).includes();
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return ;
 
 	cppjson::value jsoned = modegen::converters::to_json(mods);

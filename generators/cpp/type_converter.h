@@ -9,7 +9,7 @@ namespace helpers {
 
 class type_converter final {
 public:
-	type_converter(module_content_selector s, std::vector<modegen::module>& mods);
+	explicit type_converter(std::vector<modegen::module>& mods);
 	std::vector<std::string> includes() const ;
 private:
 	struct type_info {

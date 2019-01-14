@@ -1,3 +1,7 @@
+module notused v0.0:
+
+string some_function();
+
 module mod v1.0:
 
 string zz_not_used();
@@ -22,6 +26,9 @@ interface UglyInterface {
 	string getParam() const ;
 }
 
-module notused v0.0:
+module client v2.3:
+interface client_interface {
+	string entry() const ;
+	@v2.4 string new_item() const ;
+}
 
-string some_function();
