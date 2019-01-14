@@ -103,13 +103,18 @@ int main(int argc,char** argv)
 		std::string& key = opt.string_key;
 
 		if(opt.value.empty()) {
-			if(gen_opts && key == "splitver")
+			if(key == "splitver" && gen_opts.has_value() ) {
 				gen_opts->opts |= modegen::gen_options::split_version;
+			}
+
 			continue;
 		}
 
 		std::string& val = opt.value[0];
-		if(key=="target") {
+		     if(key=="fm" && gen_opts.has_value()) gen_opts->mod_name = val;
+		else if(key=="fc" && gen_opts.has_value()) gen_opts->cnt_name = val;
+		else if(key=="select" && gen_opts.has_value()) gen_opts->sel = modegen::from_string(val);
+		else if(key=="target") {
 			std::cmatch m;
 			std::regex_match(val.data(),m,target_match);
 			cur_gen = gmaker.make_generator(m[1].str(),m[3].str());
@@ -124,15 +129,6 @@ int main(int argc,char** argv)
 			std::cmatch m;
 			if( std::regex_match(val.data(),m,option_match) )
 				cur_gen->set_option(m[1].str(), 3 < m.size() ? m[3].str() : "");
-		}
-		else if(key=="fm") {
-			if(gen_opts.has_value()) gen_opts->mod_name = val;
-		}
-		else if(key=="fc") {
-			if(gen_opts.has_value()) gen_opts->cnt_name = val;
-		}
-		else if(key=="select") {
-			if(gen_opts.has_value()) gen_opts->sel = modegen::from_string(val);
 		}
 		else if(key=="output") {
 			if(!cur_gen) std::exit(100);
