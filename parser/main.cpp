@@ -47,9 +47,11 @@ std::tuple<po::basic_parsed_options<char>,po::variables_map> parse_command_line(
 	        ("input,i", po::value<std::vector<std::string>>(), "input files")
 	        ("output,o", po::value<std::vector<std::string>>(), "output files")
 	        ("splitver", "split generated output by version (one module is one version)")
-	        ("select,s", po::value<std::vector<std::string>>(), "produce output only for selected")
+	        ("select,s", po::value<std::vector<std::string>>(), "produce output only for selected (interface, function, enum, record)")
 	        ("target,t", po::value<std::string>()->default_value("server,cpp"), "choice a target, cpp for exmple")
 	        ("option,O", po::value<std::vector<std::string>>(), "pass an option to generator")
+		("fm", po::value<std::vector<std::string>>(), "filter by module name (regex), (used only last)")
+		("fc", po::value<std::vector<std::string>>(), "filter by module content's name (regex), (used only last)")
 	        ;
 
 	po::positional_options_description positioned;
@@ -122,6 +124,12 @@ int main(int argc,char** argv)
 			std::cmatch m;
 			if( std::regex_match(val.data(),m,option_match) )
 				cur_gen->set_option(m[1].str(), 3 < m.size() ? m[3].str() : "");
+		}
+		else if(key=="fm") {
+			if(gen_opts.has_value()) gen_opts->mod_name = val;
+		}
+		else if(key=="fc") {
+			if(gen_opts.has_value()) gen_opts->cnt_name = val;
 		}
 		else if(key=="output") {
 			if(!cur_gen) std::exit(100);

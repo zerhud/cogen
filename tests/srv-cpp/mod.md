@@ -1,5 +1,7 @@
 module mod v1.0:
 
+string zz_not_used();
+
 list<i8> function();
 
 interface inter {
@@ -19,3 +21,7 @@ interface UglyInterface {
 	constructor(string param);
 	string getParam() const ;
 }
+
+module notused v0.0:
+
+string some_function();
