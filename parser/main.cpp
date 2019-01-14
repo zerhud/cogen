@@ -131,6 +131,9 @@ int main(int argc,char** argv)
 		else if(key=="fc") {
 			if(gen_opts.has_value()) gen_opts->cnt_name = val;
 		}
+		else if(key=="select") {
+			if(gen_opts.has_value()) gen_opts->sel = modegen::from_string(val);
+		}
 		else if(key=="output") {
 			if(!cur_gen) std::exit(100);
 			assert(gen_opts.has_value());

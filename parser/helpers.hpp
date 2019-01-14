@@ -27,6 +27,8 @@ Stream& operator << (Stream& out, const module_content_selector s)
 	return out;
 }
 
+module_content_selector from_string(std::string_view v);
+
 namespace meta_parameters {
 bool operator < (const version& left, const version& right);
 bool operator <= (const version& left, const version& right);

@@ -30,3 +30,14 @@ bool modegen::is_selected(const modegen::module_content& cnt, modegen::module_co
 
 	return false;
 }
+
+modegen::module_content_selector modegen::from_string(std::string_view v)
+{
+	module_content_selector ret = module_content_selector::all;
+	if(v == "all") ret = module_content_selector::all;
+	if(v == "enum") ret = module_content_selector::enumeration;
+	if(v == "interface") ret = module_content_selector::interface;
+	if(v == "record") ret = module_content_selector::record;
+	if(v == "function") ret = module_content_selector::function;
+	return ret;
+}
