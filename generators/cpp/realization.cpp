@@ -48,15 +48,23 @@ std::string modegen::generators::cpp::realization::tmpl_path(std::string_view tn
 void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query, std::vector<modegen::module> mods) const
 {
 	filter_by_selection(query, mods);
-	auto incs = helpers::type_converter(mods).includes();
+	helpers::type_converter tconv(mods);
 	//converters::split_by_version()(mods);
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return;
 
-	cppjson::value jsoned = modegen::converters::to_json(mods);
-	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
-	jsoned["incs"][incs.size()]["n"] = solve_option("def");
-	jsoned["incs"][incs.size()]["local"] = true;
+	cppjson::value jsoned = modegen::converters::to_json(mods, module_content_selector::interface);
 
+	auto incs = tconv.includes();
+	incs.emplace_back(solve_option("def"));
+	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
+	jsoned["incs"][incs.size()-1]["local"] = true;
+
+	incs = tconv.selected_includes();
+	incs.emplace_back(solve_option("def"));
+	for(std::size_t i=0;i<incs.size();++i) jsoned["sel_incs"][i]["n"] = incs[i];
+	jsoned["sel_incs"][incs.size()-1]["local"] = true;
+
+	std::cout << "g: " << jsoned << std::endl;
 	generate(jsoned, "realization.hpp.jinja");
 }
 
@@ -66,7 +74,7 @@ void modegen::generators::cpp::realization::gen_cpp(modegen::mod_selection query
 	helpers::type_converter(mods).includes();
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return;
 
-	cppjson::value jsoned = modegen::converters::to_json(mods);
+	cppjson::value jsoned = modegen::converters::to_json(mods, module_content_selector::enumeration);
 	jsoned["incs"][0]["n"] = solve_option("hpp");
 	jsoned["incs"][0]["local"] = true;
 

@@ -34,7 +34,8 @@ std::map<std::string,std::string> modegen::helpers::type_converter::incs_maps =
     , {"optional","optional"}
 };
 
-modegen::helpers::type_converter::type_converter(std::vector<modegen::module>& mods)
+modegen::helpers::type_converter::type_converter(std::vector<modegen::module>& mods, modegen::module_content_selector sel)
+	: cur_sel(sel)
 {
 	auto v = [this](auto& mc) { convert(mc); };
 	for(auto& mod:mods) {
@@ -60,27 +61,38 @@ std::vector<std::string> modegen::helpers::type_converter::includes() const
 	return total_incs;
 }
 
-void modegen::helpers::type_converter::convert(modegen::function& obj) const
+std::vector<std::string> modegen::helpers::type_converter::selected_includes() const
+{
+	return selected_incs;
+}
+
+void modegen::helpers::type_converter::add_to_imports(const modegen::module_content& obj, modegen::using_directive&& d)
+{
+	if(is_selected(obj,cur_sel)) selected_incs.emplace_back(d.mod_name);
+	cur_mod->imports.emplace_back(std::move(d));
+}
+
+void modegen::helpers::type_converter::convert(modegen::function& obj)
 {
 	convert(obj.return_type);
 	for(auto& p:obj.func_params) convert(p.param_type);
 }
 
-void modegen::helpers::type_converter::convert(modegen::record& obj) const
+void modegen::helpers::type_converter::convert(modegen::record& obj)
 {
 	assert(cur_mod);
-	cur_mod->imports.emplace_back(modegen::using_directive{"memory"});
+	add_to_imports(obj, modegen::using_directive{"memory"});
 	for(auto& m:obj.members) convert(m.param_type);
 
-	solve_type(obj.name, modegen::module_content_selector::record);
+	define_type(obj.name, modegen::module_content_selector::record);
 }
 
-void modegen::helpers::type_converter::convert(modegen::enumeration& obj) const
+void modegen::helpers::type_converter::convert(modegen::enumeration& obj)
 {
-	solve_type(obj.name, modegen::module_content_selector::enumeration);
+	define_type(obj.name, modegen::module_content_selector::enumeration);
 }
 
-void modegen::helpers::type_converter::convert(modegen::interface& obj) const
+void modegen::helpers::type_converter::convert(modegen::interface& obj)
 {
 	assert(cur_mod);
 
@@ -92,10 +104,10 @@ void modegen::helpers::type_converter::convert(modegen::interface& obj) const
 		}
 	}
 
-	solve_type(obj.name, modegen::module_content_selector::interface);
+	define_type(obj.name, modegen::module_content_selector::interface);
 }
 
-void modegen::helpers::type_converter::convert(modegen::type& t) const
+void modegen::helpers::type_converter::convert(modegen::type& t)
 {
 	assert(cur_mod);
 
@@ -112,7 +124,7 @@ void modegen::helpers::type_converter::convert(modegen::type& t) const
 	for(auto& s:t.sub_types) convert(s);
 }
 
-void modegen::helpers::type_converter::solve_type(std::string_view name, modegen::module_content_selector from) const
+void modegen::helpers::type_converter::define_type(std::string_view name, modegen::module_content_selector from)
 {
 	for(auto& t:defined_types) if(t.type.name == name) t.points = from;
 }

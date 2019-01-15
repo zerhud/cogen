@@ -10,7 +10,7 @@ namespace converters {
 
 class to_json final {
 public:
-	to_json(const std::vector<modegen::module>& mods);
+	to_json(const std::vector<modegen::module>& mods, module_content_selector sel=module_content_selector::all);
 	operator std::string () const ;
 	operator cppjson::value () const ;
 private:
@@ -38,6 +38,7 @@ private:
 	}
 
 	cppjson::value result;
+	module_content_selector selector;
 };
 
 template<typename S>
