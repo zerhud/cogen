@@ -3,10 +3,13 @@
 #include <boost/process.hpp>
 
 #include "parser/helpers.hpp"
+
 #include "../to_json.h"
-#include "type_converter.h"
+#include "../split_by_version.hpp"
 
 #include "generators/config.hpp"
+
+#include "type_converter.h"
 
 void modegen::generators::cpp::realization::set_option(const std::string &key, const std::string &val)
 {
@@ -46,6 +49,7 @@ void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query
 {
 	filter_by_selection(query, mods);
 	auto incs = helpers::type_converter(mods).includes();
+	//converters::split_by_version()(mods);
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return;
 
 	cppjson::value jsoned = modegen::converters::to_json(mods);

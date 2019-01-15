@@ -32,3 +32,34 @@
 <%- endmacro -%>
 
 <%- macro ptr(obj, cdata) -%><=obj.name=><=cdata.ptr_postfix=><% endmacro -%>
+
+
+<%- macro interface(obj) -%>
+class <= decl_depricated(obj) =><= obj.name => {
+public:
+	virtual ~<= obj.name =>() noexcept =default;
+	<% for fnc in obj.members %>
+	virtual <= function_header(fnc) => =0 ;
+	<% endfor %>
+};
+<% endmacro -%>
+
+<% macro enum(obj, module) -%>
+<% set nn = gen_namespace_name(module) %>
+std::string <= nn =>::to_string(<=nn=>::<=obj.name=> v)
+{
+	<%- for i in  obj.members %>
+	if(v==<=obj.name=>::<=i.name=>) return "<=i.output=>";
+	<%-endfor%>
+	assert(false);
+	return "";
+}
+std::wstring <= nn =>::to_wstring(<=nn=>::<=obj.name=> v)
+{
+	<%- for i in  obj.members %>
+	if(v==<=obj.name=>::<=i.name=>) return L"<=i.output=>";
+	<%-endfor%>
+	assert(false);
+	return L"<=obj.output=>";
+}
+<% endmacro -%>

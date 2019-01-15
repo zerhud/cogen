@@ -7,25 +7,5 @@
 
 <% for module in cdata.mods -%>
 // module <= module.name =>
-<% for obj in module.content %>
-<% set nn = render.gen_namespace_name(module) %>
-<% if obj.gen_io -%>
-std::string <= nn =>::to_string(<=nn=>::<=obj.name=> v)
-{
-	<%- for i in  obj.members %>
-	if(v==<=obj.name=>::<=i.name=>) return "<=i.output=>";
-	<%-endfor%>
-	assert(false);
-	return "";
-}
-std::wstring <= nn =>::to_wstring(<=nn=>::<=obj.name=> v)
-{
-	<%- for i in  obj.members %>
-	if(v==<=obj.name=>::<=i.name=>) return L"<=i.output=>";
-	<%-endfor%>
-	assert(false);
-	return L"<=obj.output=>";
-}
-<% endif %>
-<% endfor %>
+<% for obj in module.content if obj.type == "enumeration" and obj.gen_io %><= render.enum(obj, module) =><% endfor %>
 <% endfor %>
