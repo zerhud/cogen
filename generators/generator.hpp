@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <string_view>
 #include <type_traits>
+#include <boost/property_tree/ptree.hpp>
 
 #include "parser/modegen.hpp"
 
@@ -35,7 +36,9 @@ class generator {
 public:
 	virtual ~generator() noexcept =default ;
 
-	virtual void set_option(const std::string& key, const std::string& val) =0 ;
+	virtual boost::property_tree::ptree& options() =0 ;
+	virtual const boost::property_tree::ptree& options() const =0 ;
+
 	virtual void generate(mod_selection query, std::vector<modegen::module> mods) const =0 ;
 };
 

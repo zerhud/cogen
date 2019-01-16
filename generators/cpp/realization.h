@@ -11,8 +11,10 @@ namespace cpp {
 class realization : public modegen::generator
 {
 public:
-	void set_option(const std::string& key, const std::string& val) override ;
 	void generate(mod_selection query, std::vector<modegen::module> mods) const override ;
+
+	boost::property_tree::ptree& options() override { return options; }
+	const boost::property_tree::ptree& options() const override { return options; }
 private:
 	static std::string pythongen_path() ;
 	static std::string tmpl_path(std::string_view tn) ;
@@ -26,11 +28,12 @@ private:
 	name_conversion naming_option() const ;
 	std::string solve_option(std::string_view name) const ;
 	bool solve_bool_option(std::string_view name) const ;
+	void try_to_set_option(std::string_view name, std::string val);
 
 	void generate(const cppjson::value& data, std::string_view t) const ;
 	void set_constructors_prefix(cppjson::value& output_data) const ;
 
-	std::map<std::string,std::string,std::less<>> options;
+	boost::property_tree::ptree options;
 	mutable std::filesystem::path out_path;
 };
 

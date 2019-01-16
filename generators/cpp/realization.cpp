@@ -11,11 +11,6 @@
 
 #include "type_converter.h"
 
-void modegen::generators::cpp::realization::set_option(const std::string &key, const std::string &val)
-{
-	options[key]=val;
-}
-
 void modegen::generators::cpp::realization::generate(modegen::mod_selection query, std::vector<modegen::module> mods) const
 {
 	std::filesystem::path base;
@@ -96,11 +91,11 @@ void modegen::generators::cpp::realization::set_out(std::filesystem::path base, 
 	else if(file.empty()) out_path = base;
 	else out_path = base / file;
 
+	TODO( remove const_cast )
 	auto* self = const_cast<realization*>(this);
-	auto ppos = self->options.find(part);
-	if(ppos == self->options.end()) self->options.emplace(std::make_pair(std::string(part), file.empty() ? base.filename().generic_u8string() : std::string(file)));
+	self->try_to_set_option( part, file.empty() ? base.filename().generic_u8string() : std::string(file) );
 
-	// TODO: is par_dir.empty possible?
+	TODO( is par_dir.empty possible? )
 	auto par_dir = out_path.parent_path();
 	if(!par_dir.empty()) std::filesystem::create_directories(par_dir);
 }
@@ -110,25 +105,27 @@ modegen::generators::name_conversion modegen::generators::cpp::realization::nami
 	return from_string(solve_option("naming"));
 }
 
+void modegen::generators::cpp::realization::try_to_set_option(std::string_view name, std::string val)
+{
+	options.put(name, options.get(name,val) );
+}
+
 std::string modegen::generators::cpp::realization::solve_option(std::string_view name) const
 {
 	using namespace std::literals;
 
-	auto pos = options.find(name);
-	if(pos != options.end()) return pos->second;
+	if(name == "hpp"sv) return options.get(name, "mod.hpp"s);
+	if(name == "def"sv) return options.get(name, "declarations.hpp"s);
+	if(name == "naming"sv) return options.get(name, "underscore"s);
 
-	if(name == "hpp"sv) return "mod.hpp"s;
-	if(name == "def"sv) return "declarations.hpp"s;
-	if(name == "naming"sv) return "underscore"s;
-
-	return ""s;
+	return options.get(name, ""s);
 }
 
 bool modegen::generators::cpp::realization::solve_bool_option(std::string_view name) const
 {
-	auto pos = options.find(name);
-	if(pos==options.end()) return false;
-	return pos->second.empty() || pos->second == "true" || pos->second == "True" || pos->second == "1" ;
+	using namespace std::literals;
+	std::string ret = options.get(name, "0"s);
+	return ret == "true"s || ret == "True"s || ret == "1"s;
 }
 
 void modegen::generators::cpp::realization::generate(const cppjson::value& data, std::string_view t) const

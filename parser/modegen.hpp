@@ -1,5 +1,12 @@
 #pragma once
 
+#define DO_PRAGMA(x) _Pragma (#x)
+#ifdef DEBUG
+#define TODO(x) DO_PRAGMA(message ("TODO - " #x))
+#else
+#define TODO(x)
+#endif
+
 #include <vector>
 #include <string>
 #include <variant>
