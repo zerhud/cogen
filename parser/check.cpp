@@ -203,7 +203,7 @@ bool modegen::checker::combine(modegen::module& to, modegen::module& from) const
 
 	to.file_name += "; " + from.file_name;
 	for(auto& cnt:from.content) to.content.emplace_back(std::move(cnt));
-	for(auto& imp:from.imports) to.imports.emplace_back(std::move(imp)); //TODO: duplicate imports?
+	for(auto& imp:from.imports) to.imports.emplace_back(std::move(imp)); TODO(duplicate imports?)
 
 	//std::optional<meta_parameters::deprication> to_dep_param;
 	//for(auto& par:to.meta_params) if(std::holds_alternative<meta_parameters::deprication>(par)) to_dep_param.emplace(std::move(par));

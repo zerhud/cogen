@@ -13,8 +13,8 @@ class realization : public modegen::generator
 public:
 	void generate(mod_selection query, std::vector<modegen::module> mods) const override ;
 
-	boost::property_tree::ptree& options() override { return options; }
-	const boost::property_tree::ptree& options() const override { return options; }
+	boost::property_tree::ptree& options() override { return opts; }
+	const boost::property_tree::ptree& options() const override { return opts; }
 private:
 	static std::string pythongen_path() ;
 	static std::string tmpl_path(std::string_view tn) ;
@@ -33,7 +33,7 @@ private:
 	void generate(const cppjson::value& data, std::string_view t) const ;
 	void set_constructors_prefix(cppjson::value& output_data) const ;
 
-	boost::property_tree::ptree options;
+	boost::property_tree::ptree opts;
 	mutable std::filesystem::path out_path;
 };
 

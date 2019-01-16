@@ -7,8 +7,11 @@ namespace generators {
 
 class json_tree : public modegen::generator
 {
+	boost::property_tree::ptree opts;
 public:
-	void set_option(const std::string& key, const std::string& val) override ;
+	boost::property_tree::ptree& options() override {return opts;}
+	const boost::property_tree::ptree& options() const override {return opts;}
+
 	void generate(mod_selection query, std::vector<modegen::module> mods) const override ;
 };
 

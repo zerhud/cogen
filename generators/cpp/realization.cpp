@@ -54,7 +54,6 @@ void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query
 	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
 	jsoned["incs"][incs.size()-1]["local"] = true;
 
-	std::cout << "g: " << jsoned << std::endl;
 	generate(jsoned, "realization.hpp.jinja");
 }
 
@@ -107,24 +106,27 @@ modegen::generators::name_conversion modegen::generators::cpp::realization::nami
 
 void modegen::generators::cpp::realization::try_to_set_option(std::string_view name, std::string val)
 {
-	options.put(name, options.get(name,val) );
+	std::string _n(name);
+	opts.put(_n, opts.get(_n,val) );
 }
 
 std::string modegen::generators::cpp::realization::solve_option(std::string_view name) const
 {
 	using namespace std::literals;
 
-	if(name == "hpp"sv) return options.get(name, "mod.hpp"s);
-	if(name == "def"sv) return options.get(name, "declarations.hpp"s);
-	if(name == "naming"sv) return options.get(name, "underscore"s);
+	std::string _n(name);
+	if(name == "hpp"sv) return opts.get(_n, "mod.hpp"s);
+	if(name == "def"sv) return opts.get(_n, "declarations.hpp"s);
+	if(name == "naming"sv) return opts.get(_n, "underscore"s);
 
-	return options.get(name, ""s);
+	return opts.get(_n, ""s);
 }
 
 bool modegen::generators::cpp::realization::solve_bool_option(std::string_view name) const
 {
 	using namespace std::literals;
-	std::string ret = options.get(name, "0"s);
+	std::string _n(name);
+	std::string ret = opts.get(_n, "0"s);
 	return ret == "true"s || ret == "True"s || ret == "1"s;
 }
 

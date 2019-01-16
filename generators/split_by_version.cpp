@@ -24,7 +24,7 @@ void modegen::converters::split_by_version::split_mod(const modegen::module& mod
 
 void modegen::converters::split_by_version::set_base(const modegen::module& mod)
 {
-	//TODO: copy it more effective
+	TODO(copy it more effective)
 	//modegen::module base_mod = mod;
 	//base_mod.content.clear();
 	result.emplace_back(mod).content.clear();

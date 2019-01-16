@@ -128,7 +128,7 @@ int main(int argc,char** argv)
 			if(!cur_gen) std::exit(100);
 			std::cmatch m;
 			if( std::regex_match(val.data(),m,option_match) )
-				cur_gen->set_option(m[1].str(), 3 < m.size() ? m[3].str() : "");
+				cur_gen->options().put(m[1].str(), 3 < m.size() ? m[3].str() : "");
 		}
 		else if(key=="output") {
 			if(!cur_gen) std::exit(100);

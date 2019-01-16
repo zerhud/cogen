@@ -7,7 +7,7 @@
 namespace modegen {
 namespace helpers {
 
-//TODO: move type_converter to modegen::generators::cpp namespace
+TODO( move type_converter to modegen::generators::cpp namespace )
 class type_converter final {
 public:
 	explicit type_converter(std::vector<modegen::module>& mods);
