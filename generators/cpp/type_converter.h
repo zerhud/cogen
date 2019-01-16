@@ -23,7 +23,7 @@ private:
 	void convert(modegen::enumeration& obj) ;
 	void convert(modegen::interface& obj) ;
 
-	void convert(modegen::type& t) ;
+	void convert(modegen::type& t, const modegen::export_info& ei) ;
 
 	void define_type(std::string_view name, modegen::module_content_selector from) ;
 

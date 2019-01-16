@@ -78,15 +78,18 @@ void modegen::helpers::type_converter::add_to_imports(std::string mn, bool sys, 
 
 void modegen::helpers::type_converter::convert(modegen::function& obj)
 {
-	convert(obj.return_type);
-	for(auto& p:obj.func_params) convert(p.param_type);
+	export_info ei{obj.name, module_content_selector::function};
+	convert(obj.return_type, ei);
+	for(auto& p:obj.func_params) convert(p.param_type, ei);
 }
 
 void modegen::helpers::type_converter::convert(modegen::record& obj)
 {
 	assert(cur_mod);
-	add_to_imports("memory"s, true, export_info{obj.name, module_content_selector::record});
-	for(auto& m:obj.members) convert(m.param_type);
+
+	export_info ei{obj.name, module_content_selector::record};
+	add_to_imports("memory"s, true, ei);
+	for(auto& m:obj.members) convert(m.param_type, ei);
 
 	define_type(obj.name, modegen::module_content_selector::record);
 }
@@ -101,23 +104,24 @@ void modegen::helpers::type_converter::convert(modegen::interface& obj)
 {
 	assert(cur_mod);
 
-	add_to_imports("memory"s, true, export_info{obj.name, module_content_selector::interface});
+	export_info ei{obj.name, module_content_selector::interface};
+	add_to_imports("memory"s, true, ei);
 	for(auto& f:obj.mem_funcs) convert(f);
 	for(auto& c:obj.constructors) {
 		for(auto& cp:c.func_params) {
-			convert(cp.param_type);
+			convert(cp.param_type, ei);
 		}
 	}
 
 	define_type(obj.name, modegen::module_content_selector::interface);
 }
 
-void modegen::helpers::type_converter::convert(modegen::type& t)
+void modegen::helpers::type_converter::convert(modegen::type& t, const modegen::export_info& ei)
 {
 	assert(cur_mod);
 
 	auto ipos = incs_maps.find(t.name);
-	if(ipos!=incs_maps.end()) add_to_imports(ipos->second, true, std::nullopt);
+	if(ipos!=incs_maps.end()) add_to_imports(ipos->second, true, ei);
 
 	auto npos = type_maps.find(t.name);
 	if(npos!=type_maps.end()) t.name = npos->second;
@@ -126,7 +130,7 @@ void modegen::helpers::type_converter::convert(modegen::type& t)
 		defined_types.emplace_back(type_info{t});
 	}
 
-	for(auto& s:t.sub_types) convert(s);
+	for(auto& s:t.sub_types) convert(s, ei);
 }
 
 void modegen::helpers::type_converter::define_type(std::string_view name, modegen::module_content_selector from)
