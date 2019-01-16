@@ -3,39 +3,40 @@
 #include "parser/helpers.hpp"
 #include "parser/errors.h"
 
+using namespace std::literals;
+
 std::map<std::string,std::string> modegen::helpers::type_converter::type_maps =
 {
-      {"i8","std::int8_t"}
-    , {"i16","std::int16_t"}
-    , {"i32","std::int32_t"}
-    , {"i64","std::int64_t"}
-    , {"f32","float"}
-    , {"f64","double"}
-    , {"string","std::string"}
-    , {"date","std::chrono::system_clock::time_point"}
-    , {"binary","std::vector<std::byte>"}
-    , {"list","std::vector"}
-    , {"map","std::map"}
-    , {"optional","std::optional"}
-    , {"void","void"}
+      {"i8"s,"std::int8_t"s}
+    , {"i16"s,"std::int16_t"s}
+    , {"i32"s,"std::int32_t"s}
+    , {"i64"s,"std::int64_t"s}
+    , {"f32"s,"float"s}
+    , {"f64"s,"double"s}
+    , {"string"s,"std::string"s}
+    , {"date"s,"std::chrono::system_clock::time_point"s}
+    , {"binary"s,"std::vector<std::byte>"s}
+    , {"list"s,"std::vector"s}
+    , {"map"s,"std::map"s}
+    , {"optional"s,"std::optional"s}
+    , {"void"s,"void"s}
 };
 
 std::map<std::string,std::string> modegen::helpers::type_converter::incs_maps =
 {
-      {"i8","cstdint"}
-    , {"i16","cstdint"}
-    , {"i32","cstdint"}
-    , {"i64","cstdint"}
-    , {"string","string"}
-    , {"date","chrono"}
-    , {"binary","vector"}
-    , {"list","vector"}
-    , {"map","map"}
-    , {"optional","optional"}
+      {"i8"s,"cstdint"s}
+    , {"i16"s,"cstdint"s}
+    , {"i32"s,"cstdint"s}
+    , {"i64"s,"cstdint"s}
+    , {"string"s,"string"s}
+    , {"date"s,"schrono"s}
+    , {"binary"s,"vector"s}
+    , {"list"s,"vector"s}
+    , {"map"s,"map"s}
+    , {"optional"s,"optional"s}
 };
 
-modegen::helpers::type_converter::type_converter(std::vector<modegen::module>& mods, modegen::module_content_selector sel)
-	: cur_sel(sel)
+modegen::helpers::type_converter::type_converter(std::vector<modegen::module>& mods)
 {
 	auto v = [this](auto& mc) { convert(mc); };
 	for(auto& mod:mods) {
@@ -47,7 +48,7 @@ modegen::helpers::type_converter::type_converter(std::vector<modegen::module>& m
 		                        [](using_directive& left, using_directive& right){return left.mod_name==right.mod_name;});
 		cur_mod->imports.erase(upos,cur_mod->imports.end());
 
-		for(auto& i:cur_mod->imports) if(i.is_system) total_incs.emplace_back(i.mod_name);
+		for(auto& i:cur_mod->imports) if(i.is_from_system()) total_incs.emplace_back(i.mod_name);
 	}
 
 	std::sort(total_incs.begin(),total_incs.end());
@@ -61,15 +62,18 @@ std::vector<std::string> modegen::helpers::type_converter::includes() const
 	return total_incs;
 }
 
-std::vector<std::string> modegen::helpers::type_converter::selected_includes() const
+void modegen::helpers::type_converter::add_to_imports(std::string mn, bool sys, std::optional<export_info> ei)
 {
-	return selected_incs;
-}
-
-void modegen::helpers::type_converter::add_to_imports(const modegen::module_content& obj, modegen::using_directive&& d)
-{
-	if(is_selected(obj,cur_sel)) selected_incs.emplace_back(d.mod_name);
-	cur_mod->imports.emplace_back(std::move(d));
+	auto pos = std::find(cur_mod->imports.begin(), cur_mod->imports.end(), mn);
+	if(pos==cur_mod->imports.end()) {
+		using_directive item{mn,sys,{}};
+		if(ei) item.dest_items.emplace_back(std::move(*ei));
+		cur_mod->imports.emplace_back(std::move(item));
+	}
+	else if(ei) {
+		auto ipos = std::find(pos->dest_items.begin(),pos->dest_items.end(), ei->name);
+		if(ipos == pos->dest_items.end()) pos->dest_items.emplace_back(std::move(*ei));
+	}
 }
 
 void modegen::helpers::type_converter::convert(modegen::function& obj)
@@ -81,7 +85,7 @@ void modegen::helpers::type_converter::convert(modegen::function& obj)
 void modegen::helpers::type_converter::convert(modegen::record& obj)
 {
 	assert(cur_mod);
-	add_to_imports(obj, modegen::using_directive{"memory"});
+	add_to_imports("memory"s, true, export_info{obj.name, module_content_selector::record});
 	for(auto& m:obj.members) convert(m.param_type);
 
 	define_type(obj.name, modegen::module_content_selector::record);
@@ -89,6 +93,7 @@ void modegen::helpers::type_converter::convert(modegen::record& obj)
 
 void modegen::helpers::type_converter::convert(modegen::enumeration& obj)
 {
+	add_to_imports("string"s, true, export_info{obj.name, module_content_selector::enumeration});
 	define_type(obj.name, modegen::module_content_selector::enumeration);
 }
 
@@ -96,7 +101,7 @@ void modegen::helpers::type_converter::convert(modegen::interface& obj)
 {
 	assert(cur_mod);
 
-	cur_mod->imports.emplace_back(modegen::using_directive{"memory"});
+	add_to_imports("memory"s, true, export_info{obj.name, module_content_selector::interface});
 	for(auto& f:obj.mem_funcs) convert(f);
 	for(auto& c:obj.constructors) {
 		for(auto& cp:c.func_params) {
@@ -112,7 +117,7 @@ void modegen::helpers::type_converter::convert(modegen::type& t)
 	assert(cur_mod);
 
 	auto ipos = incs_maps.find(t.name);
-	if(ipos!=incs_maps.end()) cur_mod->imports.emplace_back(using_directive{ipos->second,true});
+	if(ipos!=incs_maps.end()) add_to_imports(ipos->second, true, std::nullopt);
 
 	auto npos = type_maps.find(t.name);
 	if(npos!=type_maps.end()) t.name = npos->second;

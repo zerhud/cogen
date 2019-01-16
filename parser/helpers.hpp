@@ -8,6 +8,7 @@ namespace modegen {
 std::filesystem::path get_self_dir();
 
 bool is_selected(const module_content& cnt, module_content_selector s);
+module_content_selector which_selected(const module_content& cnt);
 
 template<typename Stream>
 Stream& operator << (Stream& s, const meta_parameter& p)
@@ -28,6 +29,10 @@ Stream& operator << (Stream& out, const module_content_selector s)
 }
 
 module_content_selector from_string(std::string_view v);
+
+bool operator == (const using_directive& left, const using_directive& right);
+bool operator == (const using_directive& left, std::string_view right);
+bool operator == (const export_info& left, std::string_view right);
 
 namespace meta_parameters {
 bool operator < (const version& left, const version& right);

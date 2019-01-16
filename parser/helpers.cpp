@@ -31,6 +31,17 @@ bool modegen::is_selected(const modegen::module_content& cnt, modegen::module_co
 	return false;
 }
 
+modegen::module_content_selector modegen::which_selected(const modegen::module_content& cnt)
+{
+	if(std::holds_alternative<modegen::function>(cnt)) return module_content_selector::function;
+	if(std::holds_alternative<modegen::enumeration>(cnt)) return module_content_selector::enumeration;
+	if(std::holds_alternative<modegen::record>(cnt)) return module_content_selector::record;
+	if(std::holds_alternative<modegen::interface>(cnt)) return module_content_selector::interface;
+
+	assert(false);
+	return module_content_selector::all;
+}
+
 modegen::module_content_selector modegen::from_string(std::string_view v)
 {
 	module_content_selector ret = module_content_selector::all;
@@ -40,4 +51,19 @@ modegen::module_content_selector modegen::from_string(std::string_view v)
 	if(v == "record") ret = module_content_selector::record;
 	if(v == "function") ret = module_content_selector::function;
 	return ret;
+}
+
+bool modegen::operator == (const modegen::using_directive& left, const modegen::using_directive& right)
+{
+	return left.mod_name == right.mod_name && left.is_from_system() == right.is_from_system();
+}
+
+bool modegen::operator == (const modegen::using_directive& left, std::string_view right)
+{
+	return left.mod_name == right;
+}
+
+bool modegen::operator == (const export_info& left, std::string_view right)
+{
+	return left.name == right;
 }

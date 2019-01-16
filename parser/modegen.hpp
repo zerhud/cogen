@@ -176,13 +176,18 @@ namespace modegen {
 typedef std::variant<function,enumeration,record,interface> module_content;
 enum class module_content_selector{function = 1 << 0, enumeration = 1 << 1, record = 1 << 2, interface = 1 << 3, all = ~0};
 
-struct using_directive {
-	std::string mod_name;
-	bool is_system = true;
-};
 struct export_info {
 	std::string name;
 	module_content_selector type;
+};
+struct using_directive {
+	std::string mod_name;
+	bool is_system = false;
+	std::vector<export_info> dest_items;
+
+	bool is_from_system() const { return is_system; }
+	bool is_from_other_module() const { return !is_from_system() && dest_items.empty(); }
+	bool is_extra() const { return !is_from_system() && !dest_items.empty(); }
 };
 struct module {
 	std::string name;

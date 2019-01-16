@@ -59,11 +59,6 @@ void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query
 	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
 	jsoned["incs"][incs.size()-1]["local"] = true;
 
-	incs = tconv.selected_includes();
-	incs.emplace_back(solve_option("def"));
-	for(std::size_t i=0;i<incs.size();++i) jsoned["sel_incs"][i]["n"] = incs[i];
-	jsoned["sel_incs"][incs.size()-1]["local"] = true;
-
 	std::cout << "g: " << jsoned << std::endl;
 	generate(jsoned, "realization.hpp.jinja");
 }
