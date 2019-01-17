@@ -47,7 +47,7 @@ void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query
 	//converters::split_by_version()(mods);
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return;
 
-	cppjson::value jsoned = modegen::converters::to_json(mods, module_content_selector::interface);
+	cppjson::value jsoned = modegen::converters::to_json(mods);
 
 	auto incs = tconv.includes();
 	incs.emplace_back(solve_option("def"));
@@ -63,7 +63,7 @@ void modegen::generators::cpp::realization::gen_cpp(modegen::mod_selection query
 	helpers::type_converter(mods).includes();
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return;
 
-	cppjson::value jsoned = modegen::converters::to_json(mods, module_content_selector::enumeration);
+	cppjson::value jsoned = modegen::converters::to_json(mods);
 	jsoned["incs"][0]["n"] = solve_option("hpp");
 	jsoned["incs"][0]["local"] = true;
 

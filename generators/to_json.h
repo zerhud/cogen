@@ -8,9 +8,24 @@
 namespace modegen {
 namespace converters {
 
+class to_json_aspect {
+public:
+	virtual ~to_json_aspect() noexcept =default ;
+	virtual void as_object(cppjson::value& jval, const modegen::module& obj) {(void)obj; (void)jval;}
+	virtual void as_object(cppjson::value& jval, const modegen::function& obj) {(void)obj; (void)jval;}
+	virtual void as_object(cppjson::value& jval, const modegen::enumeration& obj) {(void)obj; (void)jval;}
+	virtual void as_object(cppjson::value& jval, const modegen::interface& obj) {(void)obj; (void)jval;}
+	virtual void as_object(cppjson::value& jval, const modegen::record& obj) {(void)obj; (void)jval;}
+	virtual void as_object(cppjson::value& jval, const modegen::record_item& obj) {(void)obj; (void)jval;}
+	virtual void as_object(cppjson::value& jval, const modegen::type& obj) {(void)obj; (void)jval;}
+	virtual void as_object(cppjson::value& jval, const modegen::func_param& obj) {(void)obj; (void)jval;}
+	virtual void as_object(cppjson::value& jval, const modegen::constructor_fnc& obj) {(void)obj; (void)jval;}
+	virtual void as_object(cppjson::value& jval, const modegen::meta_parameters::version& obj) {(void)obj; (void)jval;}
+};
+
 class to_json final {
 public:
-	to_json(const std::vector<modegen::module>& mods, module_content_selector sel=module_content_selector::all);
+	to_json(const std::vector<modegen::module>& mods);
 	operator std::string () const ;
 	operator cppjson::value () const ;
 private:
@@ -38,7 +53,6 @@ private:
 	}
 
 	cppjson::value result;
-	module_content_selector selector;
 };
 
 template<typename S>
