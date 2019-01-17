@@ -13,7 +13,17 @@
 
 namespace modegen::generators::cpp {
 struct json_aspect : converters::to_json_aspect {
-	//type_converter* cvt;
+	std::string link_name;
+	helpers::type_converter* cvt;
+	json_aspect(helpers::type_converter* c, std::string l) : cvt(c), link_name(l) {}
+	void final_object(cppjson::value& jval) override
+	{
+		std::vector<std::string> incs;
+		if(cvt) incs = cvt->includes();
+		if(!link_name.empty()) incs.emplace_back(link_name);
+		for(std::size_t i=0;i<incs.size();++i) jval["incs"][i]["n"] = incs[i];
+		if(!link_name.empty()) jval["incs"][incs.size()-1]["local"] = true;
+	}
 };
 } // modegen::generators::cpp
 
@@ -53,12 +63,8 @@ void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query
 	//converters::split_by_version()(mods);
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return;
 
-	cppjson::value jsoned = modegen::converters::to_json(mods);
-
-	auto incs = tconv.includes();
-	incs.emplace_back(solve_option("def"));
-	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
-	jsoned["incs"][incs.size()-1]["local"] = true;
+	json_aspect igen(&tconv, solve_option("def"));
+	cppjson::value jsoned = modegen::converters::to_json(mods, igen);
 
 	generate(jsoned, "realization.hpp.jinja");
 }
@@ -69,9 +75,8 @@ void modegen::generators::cpp::realization::gen_cpp(modegen::mod_selection query
 	helpers::type_converter(mods).includes();
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return;
 
-	cppjson::value jsoned = modegen::converters::to_json(mods);
-	jsoned["incs"][0]["n"] = solve_option("hpp");
-	jsoned["incs"][0]["local"] = true;
+	json_aspect igen(nullptr, solve_option("hpp"));
+	cppjson::value jsoned = modegen::converters::to_json(mods, igen);
 
 	generate(jsoned, "realization.cpp.jinja");
 }
@@ -80,11 +85,11 @@ void modegen::generators::cpp::realization::gen_def(modegen::mod_selection query
 {
 	filter_by_selection(query, mods);
 
-	auto incs = helpers::type_converter(mods).includes();
+	helpers::type_converter tconv(mods);
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return ;
 
-	cppjson::value jsoned = modegen::converters::to_json(mods);
-	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
+	json_aspect igen(&tconv, "");
+	cppjson::value jsoned = modegen::converters::to_json(mods, igen);
 	set_constructors_prefix(jsoned);
 
 	generate(jsoned, "declarations.hpp.jinja");

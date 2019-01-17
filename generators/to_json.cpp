@@ -20,6 +20,7 @@ modegen::converters::to_json::to_json(const std::vector<modegen::module>& m, to_
 void modegen::converters::to_json::generate()
 {
 	for(std::size_t i=0;i<mods.size();++i) result["mods"][i] = as_object(mods[i]);
+	if(aspect) aspect->final_object(result);
 }
 
 modegen::converters::to_json::operator cppjson::value()
