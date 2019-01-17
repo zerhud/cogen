@@ -25,10 +25,13 @@ public:
 
 class to_json final {
 public:
-	to_json(const std::vector<modegen::module>& mods);
-	operator std::string () const ;
-	operator cppjson::value () const ;
+	to_json(const std::vector<modegen::module>& m);
+	to_json(const std::vector<modegen::module>& m, to_json_aspect& asp);
+	operator std::string () ;
+	operator cppjson::value () ;
 private:
+	void generate() ;
+
 	cppjson::value as_object(const modegen::module& obj) const ;
 	cppjson::value as_object(const modegen::function& obj) const ;
 	cppjson::value as_object(const modegen::enumeration& obj) const ;
@@ -52,7 +55,10 @@ private:
 		return std::nullopt;
 	}
 
+	const std::vector<modegen::module>& mods;
 	cppjson::value result;
+
+	to_json_aspect* aspect=nullptr;
 };
 
 template<typename S>

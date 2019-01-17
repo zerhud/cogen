@@ -11,6 +11,12 @@
 
 #include "type_converter.h"
 
+namespace modegen::generators::cpp {
+struct json_aspect : converters::to_json_aspect {
+	//type_converter* cvt;
+};
+} // modegen::generators::cpp
+
 void modegen::generators::cpp::realization::generate(modegen::mod_selection query, std::vector<modegen::module> mods) const
 {
 	std::filesystem::path base;
