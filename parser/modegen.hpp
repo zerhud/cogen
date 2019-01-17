@@ -1,18 +1,12 @@
 #pragma once
 
-#define DO_PRAGMA(x) _Pragma (#x)
-#ifdef NDEBUG
-#define TODO(x)
-#else
-#define TODO(x) DO_PRAGMA(message ("TODO - " #x))
-#endif
-
 #include <vector>
 #include <string>
 #include <variant>
 #include <optional>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
+#include "config.hpp"
 
 namespace modegen {
 // templates for work with enums as flags

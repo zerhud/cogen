@@ -4,8 +4,14 @@ project(modegen_parser VERSION 0.0.0.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+option(ENABLE_TODO "enable todo warnings in debug mode" ON)
+
 find_package(Boost COMPONENTS program_options unit_test_framework REQUIRED)
 find_package(cppjson REQUIRED)
+
+set(config_file_dir "${CMAKE_CURRENT_BINARY_DIR}")
+set(config_file "${config_file_dir}/config.hpp")
+configure_file("config.hpp.in" "${config_file}")
 
 set(sources parser/grammar.cpp parser/modegen.cpp parser/check.cpp
     parser/loader.cpp parser/helpers.cpp
@@ -16,15 +22,15 @@ set(headers parser/grammar.hpp parser/modegen.hpp parser/check.h
     parser/errors.h
     )
 
-add_library(modegen_tree ${sources} ${headers})
+add_library(modegen_tree ${config_file} ${sources} ${headers})
 target_link_libraries(modegen_tree PRIVATE ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
-target_include_directories(modegen_tree PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/parser")
+target_include_directories(modegen_tree PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/parser" "${config_file_dir}")
 
 set(gen_sources generators/generator.cpp generators/defaults.cpp generators/to_json.cpp generators/json_tree.cpp)
 set(gen_headers generators/generator.hpp generators/defaults.h   generators/to_json.h   generators/json_tree.h)
-add_library(modegen_pgens ${gen_sources} ${gen_headers})
+add_library(modegen_pgens ${config_file} ${gen_sources} ${gen_headers})
 target_link_libraries(modegen_pgens PRIVATE modegen_tree ${Boost_LIBRARIES} stdc++fs PUBLIC ${cppjson_LIBRARIES})
-target_include_directories(modegen_pgens PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(modegen_pgens PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${config_file_dir}")
 target_sources(modegen_pgens PRIVATE generators/split_by_version.cpp generators/split_by_version.hpp)
 target_sources(modegen_pgens PRIVATE generators/case_converter.cpp generators/case_converter.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/realization.cpp generators/cpp/realization.h)
@@ -39,7 +45,7 @@ target_sources(modegen_pgens PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generators/con
 target_include_directories(modegen_pgens PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 target_include_directories(modegen_pgens INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/generators")
 
-add_executable("${PROJECT_NAME}" parser/main.cpp)
+add_executable("${PROJECT_NAME}" ${config_file} parser/main.cpp)
 target_link_libraries("${PROJECT_NAME}" PRIVATE modegen_tree modegen_pgens)
 
 set(pygen_in "${CMAKE_CURRENT_SOURCE_DIR}/generators/pythongen")
