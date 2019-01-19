@@ -15,7 +15,12 @@ modegen::meta_parameters::version::version(std::uint64_t m, std::uint64_t i) noe
 std::string_view modegen::meta_parameters::version::name() const
 {
 	return "version"sv;
- }
+}
+
+std::string modegen::meta_parameters::version::value(std::string_view sep) const
+{
+	return std::to_string(major_v) + std::string(sep) + std::to_string(minor_v);
+}
 
 std::string modegen::meta_parameters::version::value() const
 {

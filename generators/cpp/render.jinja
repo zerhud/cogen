@@ -8,7 +8,7 @@
 
 <%- macro gen_namespace_name(module, cdata) -%>
 <% for n in cdata.namespaces %><=n=>::<% endfor -%>
-<= module.name =>_v<= module.v.major =>_<= module.v.minor =>
+<= module.namespace =>
 <%- endmacro %>
 
 <%- macro decl_depricated(obj) -%>

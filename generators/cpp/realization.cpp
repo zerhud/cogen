@@ -11,6 +11,8 @@
 
 #include "type_converter.h"
 
+using namespace std::literals;
+
 namespace modegen::generators::cpp {
 struct json_extra_info : converters::to_json_aspect {
 	std::string link_name;
@@ -23,6 +25,11 @@ struct json_extra_info : converters::to_json_aspect {
 		if(!link_name.empty()) incs.emplace_back(link_name);
 		for(std::size_t i=0;i<incs.size();++i) jval["incs"][i]["n"] = incs[i];
 		if(!link_name.empty()) jval["incs"][incs.size()-1]["local"] = true;
+	}
+	
+	void as_object(cppjson::value& jval, const modegen::module& obj) override
+	{
+		jval["namespace"] = obj.name + "_v"s + get_version(obj).value("_"sv) ;
 	}
 };
 } // modegen::generators::cpp
@@ -129,7 +136,6 @@ void modegen::generators::cpp::realization::try_to_set_option(std::string_view n
 
 std::string modegen::generators::cpp::realization::solve_option(std::string_view name) const
 {
-	using namespace std::literals;
 
 	std::string _n(name);
 	if(name == "hpp"sv) return opts.get(_n, "mod.hpp"s);
@@ -141,7 +147,6 @@ std::string modegen::generators::cpp::realization::solve_option(std::string_view
 
 bool modegen::generators::cpp::realization::solve_bool_option(std::string_view name) const
 {
-	using namespace std::literals;
 	std::string _n(name);
 	std::string ret = opts.get(_n, "0"s);
 	return ret == "true"s || ret == "True"s || ret == "1"s;

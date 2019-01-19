@@ -43,6 +43,7 @@ struct version : meta_parameter {
 
 	std::string_view name() const override;
 	std::string value() const override;
+	std::string value(std::string_view sep) const ;
 	bool add(const meta_parameter& other) override ;
 };
 

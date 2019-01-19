@@ -73,6 +73,13 @@ bool has(const module_content& c)
 	return std::visit(ch, c);
 }
 
+template<typename MType>
+meta_parameters::version get_version(const MType& mobj)
+{
+	assert( has<meta_parameters::version>(mobj) );
+	return *get<meta_parameters::version>(mobj);
+}
+
 template<typename P>
 void set(meta_parameters::parameter_set& set, P p)
 {
