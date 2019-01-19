@@ -12,10 +12,10 @@
 #include "type_converter.h"
 
 namespace modegen::generators::cpp {
-struct json_aspect : converters::to_json_aspect {
+struct json_extra_info : converters::to_json_aspect {
 	std::string link_name;
 	helpers::type_converter* cvt;
-	json_aspect(helpers::type_converter* c, std::string l) : cvt(c), link_name(l) {}
+	json_extra_info(helpers::type_converter* c, std::string l) : cvt(c), link_name(l) {}
 	void final_object(cppjson::value& jval) override
 	{
 		std::vector<std::string> incs;
@@ -63,7 +63,7 @@ void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query
 	//converters::split_by_version()(mods);
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return;
 
-	json_aspect igen(&tconv, solve_option("def"));
+	json_extra_info igen(&tconv, solve_option("def"));
 	cppjson::value jsoned = modegen::converters::to_json(mods, igen);
 
 	generate(jsoned, "realization.hpp.jinja");
@@ -75,7 +75,7 @@ void modegen::generators::cpp::realization::gen_cpp(modegen::mod_selection query
 	helpers::type_converter(mods).includes();
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return;
 
-	json_aspect igen(nullptr, solve_option("hpp"));
+	json_extra_info igen(nullptr, solve_option("hpp"));
 	cppjson::value jsoned = modegen::converters::to_json(mods, igen);
 
 	generate(jsoned, "realization.cpp.jinja");
@@ -88,7 +88,7 @@ void modegen::generators::cpp::realization::gen_def(modegen::mod_selection query
 	helpers::type_converter tconv(mods);
 	if(mods.size()==0 && !solve_bool_option("gen_empty")) return ;
 
-	json_aspect igen(&tconv, "");
+	json_extra_info igen(&tconv, "");
 	cppjson::value jsoned = modegen::converters::to_json(mods, igen);
 	set_constructors_prefix(jsoned);
 
