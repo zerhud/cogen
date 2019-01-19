@@ -29,8 +29,6 @@ struct json_extra_info : converters::to_json_aspect {
 
 modegen::generators::cpp::realization::realization()
 {
-	opts.add("namespace","generated");
-	opts.add("namespace","cpp");
 }
 
 void modegen::generators::cpp::realization::generate(modegen::mod_selection query, std::vector<modegen::module> mods) const
