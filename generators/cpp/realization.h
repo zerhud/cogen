@@ -11,6 +11,7 @@ namespace cpp {
 class realization : public modegen::generator
 {
 public:
+	realization();
 	void generate(mod_selection query, std::vector<modegen::module> mods) const override ;
 
 	boost::property_tree::ptree& options() override { return opts; }
@@ -31,7 +32,10 @@ private:
 	void try_to_set_option(std::string_view name, std::string val);
 
 	void generate(const cppjson::value& data, std::string_view t) const ;
-	void set_constructors_prefix(cppjson::value& output_data) const ;
+
+	void add_extra_info(cppjson::value& cdata) const ;
+	void set_constructors_prefix(cppjson::value& cdata) const ;
+	void set_extra_namespaces(cppjson::value& cdata) const ;
 
 	boost::property_tree::ptree opts;
 	mutable std::filesystem::path out_path;

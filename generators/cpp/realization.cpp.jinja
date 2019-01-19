@@ -7,5 +7,5 @@
 
 <% for module in cdata.mods -%>
 // module <= module.name =>
-<% for obj in module.content if obj.type == "enumeration" and obj.gen_io %><= render.enum(obj, module) =><% endfor %>
+<% for obj in module.content if obj.type == "enumeration" and obj.gen_io %><= render.enum(obj, module, cdata) =><% endfor %>
 <% endfor %>

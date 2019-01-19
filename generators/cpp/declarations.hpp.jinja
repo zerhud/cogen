@@ -7,7 +7,7 @@
 <% for module in cdata.mods -%>
 
 <= render.decl_meta_params(module) =>
-namespace <= render.gen_namespace_name(module) => {
+namespace <= render.gen_namespace_name(module, cdata) => {
 	<%- for obj in module.content %>
 	<% if obj.type == "function" -%><= render.function_header(obj) =>;
 	<%- elif obj.type == "enumeration" -%>
@@ -32,6 +32,6 @@ namespace <= render.gen_namespace_name(module) => {
 	struct <= render.decl_depricated(obj) =><= obj.name => ;
 	<%- else -%> #error unknown derective <= obj.name => <%- endif -%>
 	<%- endfor %>
-} // namespace <= render.gen_namespace_name(module) =>
+} // namespace <= render.gen_namespace_name(module, cdata) =>
 <% endfor %>
 

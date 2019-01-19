@@ -27,6 +27,12 @@ struct json_extra_info : converters::to_json_aspect {
 };
 } // modegen::generators::cpp
 
+modegen::generators::cpp::realization::realization()
+{
+	opts.add("namespace","generated");
+	opts.add("namespace","cpp");
+}
+
 void modegen::generators::cpp::realization::generate(modegen::mod_selection query, std::vector<modegen::module> mods) const
 {
 	std::filesystem::path base;
@@ -65,6 +71,7 @@ void modegen::generators::cpp::realization::gen_hpp(modegen::mod_selection query
 
 	json_extra_info igen(&tconv, solve_option("def"));
 	cppjson::value jsoned = modegen::converters::to_json(mods, igen);
+	add_extra_info(jsoned);
 
 	generate(jsoned, "realization.hpp.jinja");
 }
@@ -77,6 +84,7 @@ void modegen::generators::cpp::realization::gen_cpp(modegen::mod_selection query
 
 	json_extra_info igen(nullptr, solve_option("hpp"));
 	cppjson::value jsoned = modegen::converters::to_json(mods, igen);
+	add_extra_info(jsoned);
 
 	generate(jsoned, "realization.cpp.jinja");
 }
@@ -90,7 +98,7 @@ void modegen::generators::cpp::realization::gen_def(modegen::mod_selection query
 
 	json_extra_info igen(&tconv, "");
 	cppjson::value jsoned = modegen::converters::to_json(mods, igen);
-	set_constructors_prefix(jsoned);
+	add_extra_info(jsoned);
 
 	generate(jsoned, "declarations.hpp.jinja");
 }
@@ -158,17 +166,33 @@ void modegen::generators::cpp::realization::generate(const cppjson::value& data,
 	a.wait();
 }
 
-void modegen::generators::cpp::realization::set_constructors_prefix(cppjson::value& output_data) const
+void modegen::generators::cpp::realization::add_extra_info(cppjson::value& cdata) const
+{
+	set_constructors_prefix(cdata);
+	set_extra_namespaces(cdata);
+}
+
+void modegen::generators::cpp::realization::set_constructors_prefix(cppjson::value& cdata) const
 {
 	name_conversion naming = naming_option();
 
 	if(naming==name_conversion::title_case) {
-		output_data["cnst_prefix"] = "Create";
+		cdata["cnst_prefix"] = "Create";
 	} else if(naming==name_conversion::underscore) {
-		output_data["cnst_prefix"] = "create_";
-		output_data["ptr_postfix"] = "_ptr";
+		cdata["cnst_prefix"] = "create_";
+		cdata["ptr_postfix"] = "_ptr";
 	} else {
-		output_data["cnst_prefix"] = "create";
-		output_data["ptr_postfix"] = "Ptr";
+		cdata["cnst_prefix"] = "create";
+		cdata["ptr_postfix"] = "Ptr";
+	}
+}
+
+void modegen::generators::cpp::realization::set_extra_namespaces(cppjson::value& cdata) const
+{
+	std::size_t i=0;
+	for(auto& en:opts) {
+		if(en.first=="namespace") {
+			cdata["namespaces"][i++] = en.second.get_value<std::string>();
+		}
 	}
 }

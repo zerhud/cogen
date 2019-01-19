@@ -6,7 +6,8 @@
 <% for param in params %><= type(param.par_type) => <= param.name =><= ", " if not loop.last =><% endfor %>
 <%- endmacro %>
 
-<%- macro gen_namespace_name(module) -%>
+<%- macro gen_namespace_name(module, cdata) -%>
+<% for n in cdata.namespaces %><=n=>::<% endfor -%>
 <= module.name =>_v<= module.v.major =>_<= module.v.minor =>
 <%- endmacro %>
 
@@ -44,8 +45,8 @@ public:
 };
 <% endmacro -%>
 
-<% macro enum(obj, module) -%>
-<% set nn = gen_namespace_name(module) %>
+<% macro enum(obj, module, cdata) -%>
+<% set nn = gen_namespace_name(module, cdata) %>
 std::string <= nn =>::to_string(<=nn=>::<=obj.name=> v)
 {
 	<%- for i in  obj.members %>

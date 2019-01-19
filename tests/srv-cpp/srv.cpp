@@ -4,6 +4,8 @@
 #include <iostream>
 #include "mod/srv.hpp"
 
+using namespace generated::cpp;
+
 std::vector<std::string_view> failed_tests;
 
 void print_failed()
