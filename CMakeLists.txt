@@ -6,8 +6,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(ENABLE_TODO "enable todo warnings in debug mode" ON)
 
-find_package(Boost COMPONENTS program_options unit_test_framework REQUIRED)
+find_package(Boost COMPONENTS program_options unit_test_framework system REQUIRED)
 find_package(cppjson REQUIRED)
+find_package(Threads REQUIRED)
 
 set(config_file_dir "${CMAKE_CURRENT_BINARY_DIR}")
 set(config_file "${config_file_dir}/config.hpp")
@@ -31,9 +32,12 @@ set(gen_headers generators/generator.hpp generators/defaults.h   generators/to_j
 add_library(modegen_pgens ${config_file} ${gen_sources} ${gen_headers})
 target_link_libraries(modegen_pgens PRIVATE modegen_tree ${Boost_LIBRARIES} stdc++fs PUBLIC ${cppjson_LIBRARIES})
 target_include_directories(modegen_pgens PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${config_file_dir}")
+target_sources(modegen_pgens PRIVATE generators/pythongen.cpp generators/pythongen.cpp)
 target_sources(modegen_pgens PRIVATE generators/split_by_version.cpp generators/split_by_version.hpp)
 target_sources(modegen_pgens PRIVATE generators/case_converter.cpp generators/case_converter.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/realization.cpp generators/cpp/realization.h)
+target_sources(modegen_pgens PRIVATE generators/cpp/interface.cpp generators/cpp/interface.h)
+target_sources(modegen_pgens PRIVATE generators/cpp/file_controller.cpp generators/cpp/file_controller.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/type_converter.cpp generators/cpp/type_converter.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/declarations.hpp.jinja generators/cpp/realization.hpp.jinja generators/cpp/realization.cpp.jinja)
 
@@ -46,7 +50,7 @@ target_include_directories(modegen_pgens PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 target_include_directories(modegen_pgens INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/generators")
 
 add_executable("${PROJECT_NAME}" ${config_file} parser/main.cpp)
-target_link_libraries("${PROJECT_NAME}" PRIVATE modegen_tree modegen_pgens)
+target_link_libraries("${PROJECT_NAME}" PRIVATE modegen_tree modegen_pgens ${CMAKE_THREAD_LIBS_INIT})
 
 set(pygen_in "${CMAKE_CURRENT_SOURCE_DIR}/generators/pythongen")
 set(pygen_out "${CMAKE_CURRENT_BINARY_DIR}/pythongen")
@@ -58,7 +62,7 @@ add_custom_command(
 
 
 set(tests mdp checker)
-set(generators_tests to_json name_conversion split_by_version filter)
+set(generators_tests to_json name_conversion split_by_version filter common_generators)
 enable_testing()
 foreach(tname ${tests})
 	add_executable(${tname}_test "parser/tests/${tname}_test.cpp")

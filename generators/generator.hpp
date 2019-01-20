@@ -29,8 +29,21 @@ struct mod_selection {
 	std::optional<std::filesystem::path> output;
 };
 
+struct generator_request {
+	std::vector<modegen::module> data;
+	boost::property_tree::ptree options;
+	mod_selection selector;
+};
+
+generator_request& operator | (generator_request& req, const std::function<void(generator_request&)>& gen);
+
 //void cast_options(gen_options opts, std::vector<modegen::module>& mods);
 void filter_by_selection(const mod_selection& query, std::vector<modegen::module>& mods);
+
+namespace generation {
+/// applay filter_by_selection to the request
+void select(generator_request& req);
+} // namespace generation
 
 class generator {
 public:
