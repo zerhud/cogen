@@ -33,6 +33,8 @@ struct generator_request {
 	std::vector<modegen::module> data;
 	boost::property_tree::ptree options;
 	mod_selection selector;
+
+	generator_request& operator |= (const std::function<void(generator_request&)>& gen);
 };
 
 generator_request& operator | (generator_request& req, const std::function<void(generator_request&)>& gen);

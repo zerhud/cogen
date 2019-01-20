@@ -74,6 +74,11 @@ void modegen::generation::select(modegen::generator_request& req)
 	filter_by_selection(req.selector, req.data);
 }
 
+modegen::generator_request& modegen::generator_request::operator |= (const std::function<void(modegen::generator_request&)>& gen)
+{
+	return *this | gen;
+}
+
 modegen::generator_request& modegen::operator |(modegen::generator_request& req, const std::function<void (modegen::generator_request&)>& gen)
 {
 	if(gen) gen(req);
