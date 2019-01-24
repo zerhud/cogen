@@ -34,10 +34,9 @@ target_link_libraries(modegen_pgens PRIVATE modegen_tree ${Boost_LIBRARIES} stdc
 target_include_directories(modegen_pgens PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${config_file_dir}")
 target_sources(modegen_pgens PRIVATE generators/pythongen.cpp generators/pythongen.cpp)
 target_sources(modegen_pgens PRIVATE generators/split_by_version.cpp generators/split_by_version.hpp)
-target_sources(modegen_pgens PRIVATE generators/case_converter.cpp generators/case_converter.h)
+target_sources(modegen_pgens PRIVATE generators/converters/case.cpp generators/converters/case.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/realization.cpp generators/cpp/realization.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/interface.cpp generators/cpp/interface.h)
-target_sources(modegen_pgens PRIVATE generators/cpp/file_controller.cpp generators/cpp/file_controller.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/type_converter.cpp generators/cpp/type_converter.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/declarations.hpp.jinja generators/cpp/realization.hpp.jinja generators/cpp/realization.cpp.jinja)
 

@@ -11,6 +11,7 @@ namespace converters {
 class to_json_aspect {
 public:
 	virtual ~to_json_aspect() noexcept =default ;
+	TODO(do we realy need final_object? it can be changed after convertor);
 	virtual void final_object(cppjson::value& jval) { (void)jval; }
 	virtual void as_object(cppjson::value& jval, const modegen::module& obj) {(void)obj; (void)jval;}
 	virtual void as_object(cppjson::value& jval, const modegen::function& obj) {(void)obj; (void)jval;}

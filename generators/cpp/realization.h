@@ -16,6 +16,9 @@ public:
 
 	boost::property_tree::ptree& options() override { return opts; }
 	const boost::property_tree::ptree& options() const override { return opts; }
+
+	void output_name(std::string_view name, std::string_view value) override {}
+	void create_definitions(std::string_view part, std::vector<modegen::module> mods) const override {}
 private:
 	static std::string pythongen_path() ;
 	static std::string tmpl_path(std::string_view tn) ;

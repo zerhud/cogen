@@ -69,17 +69,12 @@ void modegen::filter_by_selection(const modegen::mod_selection& query, std::vect
 	remove_without_content(mods);
 }
 
-void modegen::generation::select(modegen::generator_request& req)
-{
-	filter_by_selection(req.selector, req.data);
-}
-
-modegen::generator_request& modegen::generator_request::operator |= (const std::function<void(modegen::generator_request&)>& gen)
+modegen::generation_request& modegen::generation_request::operator |= (const modegen::generation_request::modificator_t& gen)
 {
 	return *this | gen;
 }
 
-modegen::generator_request& modegen::operator |(modegen::generator_request& req, const std::function<void (modegen::generator_request&)>& gen)
+modegen::generation_request& modegen::operator |(modegen::generation_request& req, const modegen::generation_request::modificator_t& gen)
 {
 	if(gen) gen(req);
 	return req;

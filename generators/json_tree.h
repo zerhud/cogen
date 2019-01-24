@@ -13,6 +13,9 @@ public:
 	const boost::property_tree::ptree& options() const override {return opts;}
 
 	void generate(mod_selection query, std::vector<modegen::module> mods) const override ;
+
+	void output_name(std::string_view name, std::string_view value) override {}
+	void create_definitions(std::string_view part, std::vector<modegen::module> mods) const override {}
 };
 
 } // namespace generators

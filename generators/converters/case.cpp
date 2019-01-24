@@ -1,9 +1,29 @@
-#include "case_converter.h"
+#include "case.h"
 
 #include <cassert>
 #include <algorithm>
 
-std::vector<std::string> modegen::generators::split_name(const std::string &name)
+std::string_view modegen::cvt::to_string(modegen::cvt::name_conversion c)
+{
+	using namespace std::literals;
+	if(c==name_conversion::as_is) return "asis"sv;
+	if(c==name_conversion::underscore) return "underscore"sv;
+	if(c==name_conversion::camel_case) return "camel"sv;
+	if(c==name_conversion::title_case) return "title"sv;
+	assert(false);
+	return "asis"sv;
+}
+
+modegen::cvt::name_conversion modegen::cvt::from_string(std::string_view n)
+{
+	using namespace std::literals;
+	if(n=="underscore"sv) return name_conversion::underscore;
+	if(n=="camel"sv) return name_conversion::camel_case;
+	if(n=="title"sv) return name_conversion::title_case;
+	return name_conversion::as_is;
+}
+
+std::vector<std::string> modegen::cvt::naming::split_name(const std::string &name)
 {
 	std::vector<std::string> ret;
 
@@ -34,10 +54,11 @@ std::vector<std::string> modegen::generators::split_name(const std::string &name
 	return ret;
 }
 
-std::string modegen::generators::convert(const std::string& name, modegen::generators::name_conversion c)
+std::string modegen::cvt::naming::convert(const std::string& name, modegen::cvt::name_conversion c)
 {
 	std::string ret;
 
+	TODO(it will return empty string)
 	if(c==name_conversion::as_is) return ret;
 
 	auto split = split_name(name);
@@ -67,27 +88,11 @@ std::string modegen::generators::convert(const std::string& name, modegen::gener
 	return ret;
 }
 
-std::string_view modegen::generators::to_string(modegen::generators::name_conversion c)
+modegen::cvt::naming::naming(modegen::cvt::name_conversion c) : conver(c)
 {
-	using namespace std::literals;
-	if(c==name_conversion::as_is) return "asis"sv;
-	if(c==name_conversion::underscore) return "underscore"sv;
-	if(c==name_conversion::camel_case) return "camel"sv;
-	if(c==name_conversion::title_case) return "title"sv;
-	assert(false);
-	return "asis"sv;
 }
 
-modegen::generators::name_conversion modegen::generators::from_string(std::string_view n)
-{
-	using namespace std::literals;
-	if(n=="underscore"sv) return name_conversion::underscore;
-	if(n=="camel"sv) return name_conversion::camel_case;
-	if(n=="title"sv) return name_conversion::title_case;
-	return name_conversion::as_is;
-}
-
-void modegen::generators::convert(std::vector<modegen::module>& mods, modegen::generators::name_conversion c)
+void modegen::cvt::naming::operator() (std::vector<modegen::module>& mods) const
 {
 	struct {
 		name_conversion naming = name_conversion::as_is;
@@ -103,6 +108,7 @@ void modegen::generators::convert(std::vector<modegen::module>& mods, modegen::g
 		}
 	} cvt;
 
-	cvt.naming = c;
+	cvt.naming = conver;
 	cvt.convert(mods);
 }
+

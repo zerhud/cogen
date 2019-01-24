@@ -47,6 +47,7 @@ std::tuple<po::basic_parsed_options<char>,po::variables_map> parse_command_line(
 	        ("input,i", po::value<std::vector<std::string>>(), "input files")
 	        ("output,o", po::value<std::vector<std::string>>(), "output files")
 	        ("splitver", "split generated output by version (one module is one version)")
+	        ("naming,n", po::value<std::vector<std::string>>(), "name conversion (camel, title, underscore)")
 	        ("select,s", po::value<std::vector<std::string>>(), "produce output only for selected (interface, function, enum, record)")
 	        ("target,t", po::value<std::string>()->default_value("server,cpp"), "choice a target, cpp for exmple")
 	        ("option,O", po::value<std::vector<std::string>>(), "pass an option to generator")
@@ -74,21 +75,11 @@ int main(int argc,char** argv)
 {
 	set_self_dir(argv[0]);
 
+	TODO(list avaible generators);
 	auto [opts,vm] = parse_command_line(argc, argv);
-
-	// try formats
-	// -t server,cpp -Osnake_case -Optr_postfix=_ptr -odeclarations=-
-	// -t server,cpp -OcamelCase -oall=some/dir -odeclaration=-
-	// -t tests,cpp -oall=some/dir -t bridge,jni -oall=some/other_dir
-
-	std::regex target_match("([a-zA-Z_]+)(,(.+))?", std::regex::egrep);
-	std::regex option_match("([a-zA-Z_]+)(=(.+))?", std::regex::egrep);
 
 	modegen::generator_maker gmaker;
 	modegen::generators::reg_default_generators(&gmaker);
-
-	std::unique_ptr<modegen::generator> cur_gen;
-	std::optional<modegen::mod_selection> gen_opts;
 
 	modegen::loader loader;
 	auto inputs = vm["input"].as<std::vector<std::string>>();
@@ -99,50 +90,54 @@ int main(int argc,char** argv)
 
 	auto mods = loader.result();
 
+	modegen::generation_request request;
+	std::unique_ptr<modegen::generator> cur_gen;
+
 	for(auto& opt:opts.options) {
 		std::string& key = opt.string_key;
 
 		if(opt.value.empty()) {
-			if(key == "splitver" && gen_opts.has_value() ) {
-				gen_opts->opts |= modegen::gen_options::split_version;
-			}
-
+			     if(key == "splitver") request.opts |= modegen::gen_options::split_version;
+			else if(key == "splitmod") request.opts |= modegen::gen_options::split_modules;
 			continue;
 		}
 
 		std::string& val = opt.value[0];
-		     if(key=="fm" && gen_opts.has_value()) gen_opts->mod_name = val;
-		else if(key=="fc" && gen_opts.has_value()) gen_opts->cnt_name = val;
-		else if(key=="select" && gen_opts.has_value()) gen_opts->sel = modegen::from_string(val);
+		     if(key=="fm") request.mod_name = val;
+		else if(key=="fc") request.cnt_name = val;
+		else if(key=="select") request.sel = modegen::from_string(val);
 		else if(key=="target") {
 			std::cmatch m;
+			std::regex target_match("([a-zA-Z_]+)(,(.+))?", std::regex::egrep);
 			std::regex_match(val.data(),m,target_match);
+
+			if(cur_gen) cur_gen->create_definitions(request, mods);
 			cur_gen = gmaker.make_generator(m[1].str(),m[3].str());
 			if(!cur_gen) std::exit(101);
-			gen_opts.reset();
-			gen_opts.emplace();
-			gen_opts->opts = modegen::gen_options::no_opts;
-			gen_opts->sel = modegen::module_content_selector::all;
 		}
 		else if(key=="option") {
 			if(!cur_gen) std::exit(100);
+
 			std::cmatch m;
-			if( std::regex_match(val.data(),m,option_match) )
+			std::regex option_match("([a-zA-Z_]+)(=(.+))?", std::regex::egrep);
+			if( std::regex_match(val.data(),m,option_match) ) {
 				cur_gen->options().add(m[1].str(), 3 < m.size() ? m[3].str() : "");
+			}
 		}
 		else if(key=="output") {
 			if(!cur_gen) std::exit(100);
 			assert(gen_opts.has_value());
 
 			std::cmatch m;
+			std::regex option_match("([a-zA-Z_]+)(=(.+))?", std::regex::egrep);
 			if( std::regex_match(val.data(),m,option_match) ) {
-				gen_opts->what_generate = m[1];
-				if(m[3]!="-") gen_opts->output = m[3];
+				cur_gen->output_name(m[1], m[3]);
 			}
-
-			cur_gen->generate(*gen_opts, mods);
 		}
 	}
+
+	if(cur_gen) cur_gen->create_definitions(request, mods);
+	else std::exit(110); // useless start?
 
 	return 0;
 }

@@ -1,6 +1,5 @@
 #include "realization.h"
 
-#include <boost/process.hpp>
 
 #include "parser/helpers.hpp"
 
@@ -154,19 +153,6 @@ bool modegen::generators::cpp::realization::solve_bool_option(std::string_view n
 
 void modegen::generators::cpp::realization::generate(const cppjson::value& data, std::string_view t) const
 {
-	using namespace boost::process;
-
-	opstream pdata;
-	child a(
-		  pythongen_path()
-		, "-t", tmpl_path(t)
-		, "-o", out_path.generic_u8string()
-		, std_out > stdout
-		, std_in < pdata
-		);
-	pdata << data << std::endl;
-	pdata.pipe().close();
-	a.wait();
 }
 
 void modegen::generators::cpp::realization::add_extra_info(cppjson::value& cdata) const
