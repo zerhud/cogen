@@ -8,6 +8,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "parser/modegen.hpp"
+#include "converters/case.h"
 
 namespace modegen {
 
@@ -31,7 +32,7 @@ struct mod_selection {
 };
 
 struct generation_request {
-	name_conversion naming = name_conversion::underscore;
+	cvt::name_conversion naming = cvt::name_conversion::underscore;
 	gen_options opts = gen_options::no_opts;
 	module_content_selector sel=module_content_selector::all;
 	std::string mod_name; ///< module regex
@@ -54,7 +55,7 @@ public:
 	/// empty file name switchs off output of part.
 	/// @param name name of part (for example cpp)
 	/// @param value file name for part.
-	virtual void output_name(std::string_view name, std::string_view value) =0 ;
+	virtual void output_name(const std::string& name, const std::string& value) =0 ;
 
 	/// generate output (definition for the interface).
 	/// @param querty generation request (parameters) @param mods is declared interface

@@ -10,9 +10,9 @@ public:
 	boost::property_tree::ptree& options() override { return opts; }
 	const boost::property_tree::ptree& options() const override { return opts; }
 
-	void output_name(std::string_view name, std::string_view value) override { outputs[name] = value; }
+	void output_name(const std::string& name, const std::string& value) override { outputs[name] = value; }
 
-	void create_definitions(std::string_view part, std::vector<modegen::module> mods) const override ;
+	void create_definitions(generation_request query, std::vector<modegen::module> mods) const override ;
 
 	void generate(mod_selection query, std::vector<modegen::module> mods) const override {}
 private:

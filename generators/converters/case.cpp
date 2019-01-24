@@ -98,12 +98,12 @@ void modegen::cvt::naming::operator() (std::vector<modegen::module>& mods) const
 		name_conversion naming = name_conversion::as_is;
 		void convert(std::vector<module>& mods) { for(auto& m:mods) convert(m); }
 		void convert(module& mod) {for(auto& c:mod.content) std::visit([this](auto& c){convert(c);}, c); }
-		void convert(function& obj) { obj.name = generators::convert(obj.name, naming); }
-		void convert(enumeration& obj) { obj.name = generators::convert(obj.name, naming); }
-		void convert(record& obj) { obj.name = generators::convert(obj.name, naming); }
+		void convert(function& obj) { obj.name = naming::convert(obj.name, naming); }
+		void convert(enumeration& obj) { obj.name = naming::convert(obj.name, naming); }
+		void convert(record& obj) { obj.name = naming::convert(obj.name, naming); }
 		void convert(interface& obj) {
-			if(naming!=name_conversion::camel_case) obj.name = generators::convert(obj.name, naming);
-			else obj.name = generators::convert(obj.name, name_conversion::title_case);
+			if(naming!=name_conversion::camel_case) obj.name = naming::convert(obj.name, naming);
+			else obj.name = naming::convert(obj.name, name_conversion::title_case);
 			for(auto& m:obj.mem_funcs) convert(m);
 		}
 	} cvt;

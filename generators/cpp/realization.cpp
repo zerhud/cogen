@@ -11,6 +11,7 @@
 #include "type_converter.h"
 
 using namespace std::literals;
+using modegen::cvt::name_conversion;
 
 namespace modegen::generators::cpp {
 struct json_extra_info : converters::to_json_aspect {
@@ -42,7 +43,7 @@ void modegen::generators::cpp::realization::generate(modegen::mod_selection quer
 	std::filesystem::path base;
 	if(query.output.has_value()) base = *query.output;
 
-	convert(mods, naming_option());
+	cvt::naming{naming_option()}(mods);
 
 	set_out(base, "", query.what_generate);
 	if(query.what_generate=="def") gen_def(query, std::move(mods));
@@ -122,9 +123,9 @@ void modegen::generators::cpp::realization::set_out(std::filesystem::path base, 
 	if(!par_dir.empty()) std::filesystem::create_directories(par_dir);
 }
 
-modegen::generators::name_conversion modegen::generators::cpp::realization::naming_option() const
+modegen::cvt::name_conversion modegen::generators::cpp::realization::naming_option() const
 {
-	return from_string(solve_option("naming"));
+	return cvt::from_string(solve_option("naming"));
 }
 
 void modegen::generators::cpp::realization::try_to_set_option(std::string_view name, std::string val)

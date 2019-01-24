@@ -126,7 +126,6 @@ int main(int argc,char** argv)
 		}
 		else if(key=="output") {
 			if(!cur_gen) std::exit(100);
-			assert(gen_opts.has_value());
 
 			std::cmatch m;
 			std::regex option_match("([a-zA-Z_]+)(=(.+))?", std::regex::egrep);
