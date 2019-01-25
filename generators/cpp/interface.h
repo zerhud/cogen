@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include "../generator.hpp"
 
 namespace modegen::generation::cpp {
@@ -16,8 +17,10 @@ public:
 
 	void generate(mod_selection query, std::vector<modegen::module> mods) const override {}
 private:
+	std::filesystem::path path(std::string_view part) const ;
+
 	boost::property_tree::ptree opts;
-	std::map<std::string,std::string,std::less<>> outputs;
+	std::map<std::string,std::filesystem::path,std::less<>> outputs;
 };
 
 } // namespace modegen::generation::cpp
