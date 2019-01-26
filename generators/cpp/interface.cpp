@@ -10,6 +10,8 @@
 #include "converters/filter.h"
 #include "type_converter.h"
 
+#include "generators/config.hpp"
+
 using namespace std::literals;
 
 namespace modegen::generation::cpp {
@@ -37,24 +39,41 @@ void modegen::generation::cpp::interface::create_definitions(modegen::generation
 	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
 
 	jinja_file_generator gen(path("generator"sv));
-	//gen(path("tdef"sv), path("def"sv), jsoned);
-	//gen(path("thpp"sv), path("hpp"sv), jsoned);
-	//gen(path("tcpp"sv), path("cpp"sv), jsoned);
+	gen(path("tdef"sv), path("def"sv), add_includes({}, jsoned));
+	gen(path("thpp"sv), path("hpp"sv), add_includes({part_name("def"sv)}, jsoned));
+	gen(path("tcpp"sv), path("cpp"sv), add_includes({part_name("hpp"sv)}, jsoned));
 }
 
 std::filesystem::path modegen::generation::cpp::interface::path(std::string_view part) const 
 {
+	namespace fs = std::filesystem;
 	if(outputs.empty()) {
 		if(part=="def"sv) return "declarations.hpp"s;
 		if(part=="hpp"sv) return "module.hpp"s;
 		if(part=="cpp"sv) return "module.hpp"s;
-		if(part=="tdef"sv) return "declarations.hpp.jinja"s;
-		if(part=="thpp"sv) return "module.hpp.jinja"s;
-		if(part=="tcpp"sv) return "module.hpp.jinja"s;
+		if(part=="tdef"sv) return fs::path(cpp::templates_dir) / "declarations.hpp.jinja"s;
+		if(part=="thpp"sv) return fs::path(cpp::templates_dir) / "module.hpp.jinja"s;
+		if(part=="tcpp"sv) return fs::path(cpp::templates_dir) / "module.hpp.jinja"s;
 		return ""s;
 	}
 
 	auto pos = outputs.find(part);
 	if(pos==outputs.end()) return ""s;
 	return pos->second;
+}
+
+std::string modegen::generation::cpp::interface::part_name(std::string_view part) const
+{
+	if(outputs.empty()) {
+		if(part=="def"sv) return "declarations.hpp"s;
+		if(part=="hpp"sv) return "module.hpp"s;
+		if(part=="cpp"sv) return "module.hpp"s;
+	}
+
+	throw std::runtime_error("unknown part "s + std::string(part));
+}
+
+cppjson::value modegen::generation::cpp::interface::add_includes(std::vector<std::string> incs, cppjson::value val) const
+{
+	return val;
 }

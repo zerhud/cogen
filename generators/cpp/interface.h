@@ -17,7 +17,8 @@ public:
 	void create_definitions(generation_request query, std::vector<modegen::module> mods) const override ;
 private:
 	std::filesystem::path path(std::string_view part) const ;
-	void add_includes(std::vector<std::string> incs, cppjson::value& val) const ;
+	std::string part_name(std::string_view part) const ;
+	cppjson::value add_includes(std::vector<std::string> incs, cppjson::value val) const ;
 
 	boost::property_tree::ptree opts;
 	std::map<std::string,std::filesystem::path,std::less<>> outputs;

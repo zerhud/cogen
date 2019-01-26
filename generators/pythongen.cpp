@@ -8,6 +8,7 @@ modegen::generation::jinja_file_generator::jinja_file_generator(std::filesystem:
 	: generator(std::move(gen))
 {
 	if(generator.empty()) throw std::runtime_error("jinja pythone generator cannot work without path to generator");
+	if(!std::filesystem::exists(generator)) throw std::runtime_error("file " + generator.string() + " doesn't exists");
 }
 
 void modegen::generation::jinja_file_generator::operator () (std::filesystem::path tmpl, std::filesystem::path out, const cppjson::value& data) const

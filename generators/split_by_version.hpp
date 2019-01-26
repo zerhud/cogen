@@ -7,6 +7,7 @@
 
 namespace modegen::converters {
 
+TODO(move to converers and make converter from it)
 class split_by_version {
 public:
 	void operator () (std::vector<modegen::module>& mods) ;

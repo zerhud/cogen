@@ -102,7 +102,7 @@ int main(int argc,char** argv)
 
 			if(cur_gen) cur_gen->create_definitions(request, mods);
 			cur_gen = gmaker.make_generator(m[1].str(),m[3].str());
-			cur_gen->path("generator", modegen::get_self_dir() / "pathongen");
+			cur_gen->path("generator", modegen::get_self_dir() / "pythongen");
 			if(!cur_gen) std::exit(101);
 		}
 		else if(key=="option") {
