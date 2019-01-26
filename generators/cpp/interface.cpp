@@ -36,7 +36,7 @@ void modegen::generation::cpp::interface::create_definitions(modegen::generation
 	auto incs = tconv.includes();
 	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
 
-	//jinja_file_generator gen(solve_option("generator"));
+	jinja_file_generator gen(path("generator"sv));
 	//gen(path("tdef"sv), path("def"sv), jsoned);
 	//gen(path("thpp"sv), path("hpp"sv), jsoned);
 	//gen(path("tcpp"sv), path("cpp"sv), jsoned);

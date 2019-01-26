@@ -5,7 +5,7 @@
 
 #include "converters/to_json.h"
 
-void modegen::generators::json_tree::generate(modegen::mod_selection query, std::vector<modegen::module> mods) const
+void modegen::generators::json_tree::create_definitions(modegen::generation_request query, std::vector<modegen::module> mods) const
 {
 	//filter_by_selection(query, mods);
 

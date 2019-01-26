@@ -1,11 +1,13 @@
 #include "pythongen.hpp"
 
+#include <exception>
 #include <boost/process.hpp>
 
 
 modegen::generation::jinja_file_generator::jinja_file_generator(std::filesystem::path gen)
 	: generator(std::move(gen))
 {
+	if(generator.empty()) throw std::runtime_error("jinja pythone generator cannot work without path to generator");
 }
 
 void modegen::generation::jinja_file_generator::operator () (std::filesystem::path tmpl, std::filesystem::path out, const cppjson::value& data) const

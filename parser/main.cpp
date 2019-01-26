@@ -34,7 +34,7 @@ std::tuple<po::basic_parsed_options<char>,po::variables_map> parse_command_line(
 	desc.add_options()
 	        ("help,h", "produce help message")
 	        ("input,i", po::value<std::vector<std::string>>(), "input files")
-	        ("output,o", po::value<std::vector<std::string>>(), "output files")
+	        ("path,p", po::value<std::vector<std::string>>(), "path to files needed for selected generator (or output)")
 	        ("splitver", "split generated output by version (one module is one version)")
 	        ("naming,n", po::value<std::vector<std::string>>(), "name conversion (camel, title, underscore)")
 	        ("select,s", po::value<std::vector<std::string>>(), "produce output only for selected (interface, function, enum, record)")
@@ -102,6 +102,7 @@ int main(int argc,char** argv)
 
 			if(cur_gen) cur_gen->create_definitions(request, mods);
 			cur_gen = gmaker.make_generator(m[1].str(),m[3].str());
+			cur_gen->path("generator", modegen::get_self_dir() / "pathongen");
 			if(!cur_gen) std::exit(101);
 		}
 		else if(key=="option") {
@@ -119,7 +120,7 @@ int main(int argc,char** argv)
 			std::cmatch m;
 			std::regex option_match("([a-zA-Z_]+)(=(.+))?", std::regex::egrep);
 			if( std::regex_match(val.data(),m,option_match) ) {
-				cur_gen->output_name(m[1], m[3]);
+				cur_gen->path(m[1], m[3]);
 			}
 		}
 	}
