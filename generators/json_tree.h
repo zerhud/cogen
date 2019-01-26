@@ -3,6 +3,7 @@
 #include "generator.hpp"
 
 namespace modegen {
+TODO(change namespace to generation)
 namespace generators {
 
 class json_tree : public modegen::generator

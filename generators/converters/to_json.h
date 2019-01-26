@@ -2,17 +2,14 @@
 
 #include <vector>
 #include <cppjson/json.h>
+#include <boost/ptr_container/ptr_vector.hpp>
+#include "../converters.hpp"
 
-#include "parser/modegen.hpp"
-
-namespace modegen {
-namespace converters {
+namespace modegen::cvt {
 
 class to_json_aspect {
 public:
 	virtual ~to_json_aspect() noexcept =default ;
-	TODO(do we realy need final_object? it can be changed after convertor);
-	virtual void final_object(cppjson::value& jval) { (void)jval; }
 	virtual void as_object(cppjson::value& jval, const modegen::module& obj) {(void)obj; (void)jval;}
 	virtual void as_object(cppjson::value& jval, const modegen::function& obj) {(void)obj; (void)jval;}
 	virtual void as_object(cppjson::value& jval, const modegen::enumeration& obj) {(void)obj; (void)jval;}
@@ -25,12 +22,14 @@ public:
 	virtual void as_object(cppjson::value& jval, const modegen::meta_parameters::version& obj) {(void)obj; (void)jval;}
 };
 
-class to_json final {
+class to_json {
 public:
-	to_json(const std::vector<modegen::module>& m);
-	to_json(const std::vector<modegen::module>& m, to_json_aspect& asp);
-	operator std::string () ;
-	operator cppjson::value () ;
+	to_json();
+	to_json(std::unique_ptr<to_json_aspect> gen_aspect);
+	to_json(boost::ptr_vector<to_json_aspect> gen_aspects);
+	to_json& operator () (std::vector<module>& m) ;
+	operator std::string () const ;
+	operator cppjson::value () const ;
 private:
 	void generate() ;
 
@@ -47,6 +46,12 @@ private:
 
 	void add_meta(cppjson::value& val, const modegen::meta_parameters::parameter_set& params) const ;
 
+	template<typename T>
+	void applay_asp(cppjson::value& val, const T& obj) const
+	{
+		for(auto a:gen_asps) a.as_object(val, obj);
+	}
+
 	template<typename P, typename O>
 	std::optional<P> extract(const O& o) const
 	{
@@ -57,18 +62,12 @@ private:
 		return std::nullopt;
 	}
 
-	const std::vector<modegen::module>& mods;
+	std::vector<modegen::module> mods;
 	cppjson::value result;
 
-	to_json_aspect* aspect=nullptr;
+	boost::ptr_vector<to_json_aspect> gen_asps;
 };
 
-template<typename S>
-S& operator << (S& out, const to_json& o)
-{
-	out << (cppjson::value)o ;
-	return out;
-}
+} // namespace modegen::cvt
 
-} // namespace converters
-} // namespace modegen
+

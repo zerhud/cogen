@@ -2,7 +2,7 @@
 
 #include "generator.hpp"
 
-namespace modegen::generators {
+namespace modegen::generation {
 
 void reg_default_generators(modegen::generator_maker* gm);
 

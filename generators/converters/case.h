@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-#include "parser/modegen.hpp"
+#include "../converters.hpp"
 
 namespace modegen::cvt {
 
@@ -13,7 +13,7 @@ name_conversion from_string(std::string_view n);
 class naming {
 public:
 	naming(name_conversion c);
-	void operator () (std::vector<module>& mods) const ;
+	std::vector<module>& operator () (std::vector<module>& mods) const ;
 
 	static std::vector<std::string> split_name(const std::string& name);
 	static std::string convert(const std::string& name, name_conversion c);

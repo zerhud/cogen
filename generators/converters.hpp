@@ -1,11 +1,26 @@
 #pragma once
 
-namespace modegen::converters {
+#include "parser/modegen.hpp"
 
-class conveter {
-public:
-	virtual ~conveter() noexcept =default ;
-};
+namespace modegen {
 
-} // namespace modegen::converters
+template<typename Cvt>
+std::result_of_t<Cvt(std::vector<modegen::module>&)> operator | (std::vector<modegen::module>& m, Cvt& c)
+{
+	return c(m);
+}
+
+template<typename Cvt>
+std::result_of_t<Cvt(std::vector<modegen::module>&)> operator | (std::vector<modegen::module>& m, const Cvt& c)
+{
+	return c(m);
+}
+
+template<typename Cvt>
+std::result_of_t<Cvt(std::vector<modegen::module>&)> operator | (std::vector<modegen::module>& m, Cvt&& c)
+{
+	return c(m);
+}
+
+} // namespace modegen
 

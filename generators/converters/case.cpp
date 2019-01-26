@@ -92,7 +92,7 @@ modegen::cvt::naming::naming(modegen::cvt::name_conversion c) : conver(c)
 {
 }
 
-void modegen::cvt::naming::operator() (std::vector<modegen::module>& mods) const
+std::vector<modegen::module>& modegen::cvt::naming::operator() (std::vector<modegen::module>& mods) const
 {
 	struct {
 		name_conversion naming = name_conversion::as_is;
@@ -110,5 +110,7 @@ void modegen::cvt::naming::operator() (std::vector<modegen::module>& mods) const
 
 	cvt.naming = conver;
 	cvt.convert(mods);
+
+	return mods;
 }
 

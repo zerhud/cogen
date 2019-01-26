@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <cppjson/json.h>
 #include "../generator.hpp"
 
 namespace modegen::generation::cpp {
@@ -18,6 +19,7 @@ public:
 	void generate(mod_selection query, std::vector<modegen::module> mods) const override {}
 private:
 	std::filesystem::path path(std::string_view part) const ;
+	void add_includes(std::vector<std::string> incs, cppjson::value& val) const ;
 
 	boost::property_tree::ptree opts;
 	std::map<std::string,std::filesystem::path,std::less<>> outputs;

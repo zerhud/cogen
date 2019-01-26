@@ -13,7 +13,6 @@
 #include "generators/defaults.h"
 
 #include "split_by_version.hpp"
-#include "to_json.h"
 
 namespace po = boost::program_options;
 
@@ -27,16 +26,6 @@ static void set_self_dir(std::string self)
 	assert(!self.empty());
 	self_dir = self;
 	self_dir = self_dir.parent_path();
-}
-
-void write_output(const cppjson::value& mods, const std::string& file_name)
-{
-	if(file_name=="-") std::cout << mods << std::endl;
-	else {
-		std::fstream file(file_name, file.out);
-		file << mods;
-		file.flush();
-	}
 }
 
 std::tuple<po::basic_parsed_options<char>,po::variables_map> parse_command_line(int argc,char** argv)
@@ -79,7 +68,7 @@ int main(int argc,char** argv)
 	auto [opts,vm] = parse_command_line(argc, argv);
 
 	modegen::generator_maker gmaker;
-	modegen::generators::reg_default_generators(&gmaker);
+	modegen::generation::reg_default_generators(&gmaker);
 
 	modegen::loader loader;
 	auto inputs = vm["input"].as<std::vector<std::string>>();

@@ -5,6 +5,7 @@
 
 #include "parser/grammar.hpp"
 #include "generator.hpp"
+#include "converters/filter.h"
 
 using namespace std::literals;
 
@@ -13,8 +14,8 @@ BOOST_AUTO_TEST_CASE(no_filter)
 {
 	auto pf = modegen::parse("module mod v1.0: enum e{}"sv);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
-	modegen::mod_selection query;
-	modegen::filter_by_selection(query, pf.mods);
+	modegen::generation_request query;
+	modegen::cvt::filter{query}(pf.mods);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
 	BOOST_CHECK_EQUAL(pf.mods[0].content.size(),1);
 }
@@ -22,9 +23,9 @@ BOOST_AUTO_TEST_CASE(exactly)
 {
 	auto pf = modegen::parse("module mod v1.0: enum e{} module mod1 v1.0: enum e{}"sv);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),2);
-	modegen::mod_selection query;
+	modegen::generation_request query;
 	query.mod_name = "mod";
-	modegen::filter_by_selection(query, pf.mods);
+	modegen::cvt::filter{query}(pf.mods);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
 	BOOST_CHECK_EQUAL(pf.mods[0].content.size(),1);
 	BOOST_CHECK_EQUAL(pf.mods[0].name,"mod"sv);
@@ -33,9 +34,9 @@ BOOST_AUTO_TEST_CASE(pattern)
 {
 	auto pf = modegen::parse("module mod v1.0: enum e{} module mad1 v1.0: enum e{} module mod1 v1.0: enum e{}"sv);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),3);
-	modegen::mod_selection query;
+	modegen::generation_request query;
 	query.mod_name = "mo.*";
-	modegen::filter_by_selection(query, pf.mods);
+	modegen::cvt::filter{query}(pf.mods);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),2);
 	BOOST_CHECK_EQUAL(pf.mods[0].content.size(),1);
 	BOOST_CHECK_EQUAL(pf.mods[0].name,"mod"sv);
@@ -49,9 +50,9 @@ BOOST_AUTO_TEST_CASE(pattern)
 	auto pf = modegen::parse("module mod v1.0: enum e1{} enum e2{} enum a3{}"sv);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
 	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),3);
-	modegen::mod_selection query;
+	modegen::generation_request query;
 	query.cnt_name = "e[0-9]+";
-	modegen::filter_by_selection(query, pf.mods);
+	modegen::cvt::filter{query}(pf.mods);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
 	std::vector<modegen::module_content>& cnt = pf.mods[0].content;
 	BOOST_CHECK_EQUAL(cnt.size(),2);

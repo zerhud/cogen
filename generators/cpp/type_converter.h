@@ -2,7 +2,7 @@
 
 #include <map>
 #include "parser/modegen.hpp"
-#include "converters/case.h"
+#include "converters.hpp"
 
 namespace modegen {
 namespace helpers {
@@ -10,7 +10,8 @@ namespace helpers {
 TODO( move type_converter to modegen::generators::cpp namespace )
 class type_converter final {
 public:
-	explicit type_converter(std::vector<modegen::module>& mods);
+	explicit type_converter();
+	std::vector<modegen::module>& operator() (std::vector<modegen::module>& mods) ;
 	std::vector<std::string> includes() const ;
 private:
 	struct type_info {

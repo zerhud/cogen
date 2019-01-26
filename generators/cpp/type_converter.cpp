@@ -36,7 +36,11 @@ std::map<std::string,std::string> modegen::helpers::type_converter::incs_maps =
     , {"optional"s,"optional"s}
 };
 
-modegen::helpers::type_converter::type_converter(std::vector<modegen::module>& mods)
+modegen::helpers::type_converter::type_converter()
+{
+}
+
+std::vector<modegen::module>& modegen::helpers::type_converter::operator()(std::vector<modegen::module>& mods)
 {
 	auto v = [this](auto& mc) { convert(mc); };
 	for(auto& mod:mods) {
@@ -55,6 +59,8 @@ modegen::helpers::type_converter::type_converter(std::vector<modegen::module>& m
 	total_incs.erase(std::unique(total_incs.begin(),total_incs.end()), total_incs.end());
 
 	cur_mod = nullptr;
+
+	return mods;
 }
 
 std::vector<std::string> modegen::helpers::type_converter::includes() const

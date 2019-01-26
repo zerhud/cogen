@@ -39,10 +39,6 @@ struct generation_request {
 	std::string cnt_name; ///< content regex
 };
 
-
-//void cast_options(gen_options opts, std::vector<modegen::module>& mods);
-void filter_by_selection(const mod_selection& query, std::vector<modegen::module>& mods);
-
 class generator {
 public:
 	virtual ~generator() noexcept =default ;
