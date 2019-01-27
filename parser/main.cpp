@@ -114,7 +114,7 @@ int main(int argc,char** argv)
 				cur_gen->options().add(m[1].str(), 3 < m.size() ? m[3].str() : "");
 			}
 		}
-		else if(key=="output") {
+		else if(key=="path") {
 			if(!cur_gen) std::exit(100);
 
 			std::cmatch m;

@@ -70,6 +70,10 @@ std::string modegen::generation::cpp::interface::part_name(std::string_view part
 		if(part=="cpp"sv) return "module.hpp"s;
 	}
 
+	auto pos = outputs.find(part);
+	if(pos!=outputs.end()) return pos->second;
+	return ""s;
+
 	throw std::runtime_error("unknown part "s + std::string(part));
 }
 
