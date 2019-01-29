@@ -15,3 +15,8 @@ const char *modegen::errors::error::what() const noexcept
 {
 	return what_.c_str();
 }
+
+modegen::errors::gen_error::gen_error(std::string gen_name, std::string w)
+    : error(std::move(gen_name), std::move(w))
+{
+}

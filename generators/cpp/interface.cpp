@@ -1,5 +1,6 @@
 #include "interface.h"
 
+#include "parser/errors.h"
 #include "parser/helpers.hpp"
 
 #include "pythongen.hpp"
@@ -23,10 +24,18 @@ struct json_extra_info : cvt::to_json_aspect {
 };
 } // modegen::generators::cpp
 
+modegen::generation::cpp::interface::interface(std::shared_ptr<generation_provider> p)
+    : provider(std::move(p))
+{
+	if(!provider) throw errors::gen_error("cpp", "cannot create cpp generator withotu generation_provider");
+}
 
 void modegen::generation::cpp::interface::create_definitions(modegen::generation_request query, std::vector<modegen::module> mods) const
 {
 	using namespace modegen::cvt;
+
+	assert(provider);
+
 	helpers::type_converter tconv;
 	TODO(applay commented filters)
 	cppjson::value jsoned = mods
@@ -38,7 +47,9 @@ void modegen::generation::cpp::interface::create_definitions(modegen::generation
 	auto incs = tconv.includes();
 	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
 
-	jinja_file_generator gen(path("generator"sv));
+	std::shared_ptr<json_jinja_generator> _gen = provider->jinja_generator();
+	json_jinja_generator& gen = *_gen;
+
 	gen(path("tdef"sv), path("def"sv), add_includes({}, jsoned));
 	gen(path("thpp"sv), path("hpp"sv), add_includes({part_name("def"sv)}, jsoned));
 	gen(path("tcpp"sv), path("cpp"sv), add_includes({part_name("hpp"sv)}, jsoned));

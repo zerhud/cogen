@@ -4,14 +4,14 @@
 #include <boost/process.hpp>
 
 
-modegen::generation::jinja_file_generator::jinja_file_generator(std::filesystem::path gen)
+modegen::generation::jinja_python_generator::jinja_python_generator(std::filesystem::path gen)
 	: generator(std::move(gen))
 {
 	if(generator.empty()) throw std::runtime_error("jinja pythone generator cannot work without path to generator");
 	if(!std::filesystem::exists(generator)) throw std::runtime_error("file " + generator.string() + " doesn't exists");
 }
 
-void modegen::generation::jinja_file_generator::operator () (std::filesystem::path tmpl, std::filesystem::path out, const cppjson::value& data) const
+const modegen::json_jinja_generator& modegen::generation::jinja_python_generator::operator () (std::filesystem::path tmpl, std::filesystem::path out, const cppjson::value& data) const
 {
 	using namespace boost::process;
 
@@ -26,5 +26,7 @@ void modegen::generation::jinja_file_generator::operator () (std::filesystem::pa
 	pdata << data << std::endl;
 	pdata.pipe().close();
 	a.wait();
+
+	return *this;
 }
 

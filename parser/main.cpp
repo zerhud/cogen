@@ -11,10 +11,32 @@
 #include "grammar.hpp"
 #include "generator.hpp"
 #include "generators/defaults.h"
+#include "generators/config.hpp"
 
 #include "split_by_version.hpp"
 
 namespace po = boost::program_options;
+
+class gprov : public modegen::generation_provider {
+	std::shared_ptr<modegen::json_jinja_generator> jgen;
+public:
+	gprov(std::filesystem::path p) : jgen(std::make_shared<modegen::generation::jinja_python_generator>(std::move(p)))
+	{
+		assert(jgen);
+	}
+
+	std::shared_ptr<modegen::json_jinja_generator> jinja_generator() const override
+	{
+		return jgen;
+	}
+
+	std::filesystem::path template_files_dir(std::string_view template_name) const override
+	{
+		TODO(fix pathes);
+		if(template_name=="cpp") return std::filesystem::path(modegen::generation::cpp::templates_dir);
+		return "";
+	}
+};
 
 std::filesystem::path self_dir;
 std::filesystem::path modegen::get_self_dir()
@@ -81,6 +103,7 @@ int main(int argc,char** argv)
 
 	modegen::generation_request request;
 	std::unique_ptr<modegen::generator> cur_gen;
+	std::shared_ptr<modegen::generation_provider> prov = std::make_shared<gprov>("");
 
 	for(auto& opt:opts.options) {
 		std::string& key = opt.string_key;
@@ -101,7 +124,7 @@ int main(int argc,char** argv)
 			std::regex_match(val.data(),m,target_match);
 
 			if(cur_gen) cur_gen->create_definitions(request, mods);
-			cur_gen = gmaker.make_generator(m[1].str(),m[3].str());
+			cur_gen = gmaker.make_generator(prov, m[1].str(),m[3].str());
 			cur_gen->path("generator", modegen::get_self_dir() / "pythongen");
 			if(!cur_gen) std::exit(101);
 		}

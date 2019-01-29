@@ -13,5 +13,9 @@ struct error : std::exception {
 	std::string what_;
 };
 
+struct gen_error : error {
+	gen_error(std::string gen_name, std::string w);
+};
+
 } // namespace errors
 } // namespace modegen

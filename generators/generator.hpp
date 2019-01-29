@@ -7,18 +7,29 @@
 #include <type_traits>
 #include <boost/property_tree/ptree.hpp>
 
+#include "pythongen.hpp"
 #include "parser/modegen.hpp"
 #include "converters/case.h"
 
 namespace modegen {
 
-class generator;
-typedef std::function<std::unique_ptr<generator>()> generator_creator;
-
 enum class gen_options {
 	  no_opts = 1 << 0
 	, split_version = 1 << 1
 	, split_modules = 1 << 2
+};
+
+class generator;
+class generation_provider;
+struct generation_request;
+typedef std::function<std::unique_ptr<generator>(std::shared_ptr<generation_provider>)> generator_creator;
+
+/// object of this class provides information for generator.
+class generation_provider {
+public:
+	virtual ~generation_provider() noexcept =default ;
+	virtual std::shared_ptr<json_jinja_generator> jinja_generator() const =0 ;
+	virtual std::filesystem::path template_files_dir(std::string_view template_name) const =0 ;
 };
 
 struct generation_request {
@@ -49,7 +60,7 @@ public:
 class generator_maker {
 public:
 	void register_gen(std::string_view part, std::string_view name, generator_creator crt);
-	std::unique_ptr<generator> make_generator(std::string_view part, std::string_view name) const ;
+	std::unique_ptr<generator> make_generator(std::shared_ptr<generation_provider> p, std::string_view part, std::string_view name) const ;
 private:
 	static std::string make_path(std::string_view part, std::string_view name) ;
 	std::map<std::string, generator_creator> gens;

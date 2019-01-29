@@ -10,12 +10,13 @@ void modegen::generator_maker::register_gen(std::string_view part, std::string_v
 	gens[path] = crt;
 }
 
-std::unique_ptr<modegen::generator> modegen::generator_maker::make_generator(std::string_view part, std::string_view name) const
+std::unique_ptr<modegen::generator> modegen::generator_maker::make_generator(
+        std::shared_ptr<generation_provider> p, std::string_view part, std::string_view name) const
 {
 	auto path = make_path(part,name);
 	auto pos = gens.find(path);
 	if(pos==gens.end()) return nullptr;
-	return pos->second();
+	return pos->second(std::move(p));
 }
 
 std::string modegen::generator_maker::make_path(std::string_view part, std::string_view name)
