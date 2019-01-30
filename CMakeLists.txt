@@ -40,6 +40,7 @@ target_sources(modegen_pgens PRIVATE generators/converters/filter.cpp generators
 target_sources(modegen_pgens PRIVATE generators/converters/to_json.cpp generators/converters/to_json.h)
 #target_sources(modegen_pgens PRIVATE generators/cpp/realization.cpp generators/cpp/realization.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/interface.cpp generators/cpp/interface.h)
+target_sources(modegen_pgens PRIVATE generators/cpp/common.cpp generators/cpp/common.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/type_converter.cpp generators/cpp/type_converter.h)
 target_sources(modegen_pgens PRIVATE generators/cpp/declarations.hpp.jinja generators/cpp/realization.hpp.jinja generators/cpp/realization.cpp.jinja)
 
