@@ -32,6 +32,7 @@ public:
 	virtual std::filesystem::path template_files_dir(std::string_view template_name) const =0 ;
 };
 
+/// common generation request. it not depends from generator.
 struct generation_request {
 	cvt::name_conversion naming = cvt::name_conversion::underscore;
 	gen_options opts = gen_options::no_opts;
@@ -50,6 +51,9 @@ public:
 	/// set path needed for the generator. - is std::cout.
 	/// @param name path to what
 	/// @param value the path
+	/// @warning depricated: common generator will use options only:
+	/// in general there may be no relevant output path.
+	[[deprecated("use options for it")]]
 	virtual void path(const std::string& name, const std::string& value) =0 ;
 
 	/// generate output (definition for the interface).

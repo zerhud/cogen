@@ -1,0 +1,18 @@
+name "interface"
+generator_name "cpp"
+templates_dir "." ; a directory of all cpp templates
+def {
+	result "declarations.hpp"
+	template "declarations.hpp.jinja"
+}
+cpp {
+	result "realization.hpp"
+	template "realization.hpp.jinja"
+	local_includes "def"
+	local_includes "hpp"
+}
+hpp {
+	result "realization.cpp"
+	template "realization.cpp.jinja"
+	local_includes "def"
+}
