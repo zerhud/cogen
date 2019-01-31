@@ -35,6 +35,7 @@ target_include_directories(modegen_pgens PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "$
 target_include_directories(modegen_pgens PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/generators" "${config_file_dir}")
 target_sources(modegen_pgens PRIVATE generators/pythongen.cpp generators/pythongen.hpp)
 target_sources(modegen_pgens PRIVATE generators/split_by_version.cpp generators/split_by_version.hpp)
+target_sources(modegen_pgens PRIVATE generators/common.cpp generators/common.h)
 target_sources(modegen_pgens PRIVATE generators/converters/case.cpp generators/converters/case.h)
 target_sources(modegen_pgens PRIVATE generators/converters/filter.cpp generators/converters/filter.h)
 target_sources(modegen_pgens PRIVATE generators/converters/to_json.cpp generators/converters/to_json.h)
