@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 project(modegen_parser VERSION 0.0.0.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -33,6 +33,7 @@ target_sources(modegen_interfaces PRIVATE errors.h errors.cpp)
 # interface declaration
 target_sources(modegen_interfaces PRIVATE parser/interface/grammar.hpp parser/interface/grammar.cpp)
 target_sources(modegen_interfaces PRIVATE parser/interface/modegen.hpp parser/interface/modegen.cpp)
+target_sources(modegen_interfaces PRIVATE parser/interface/meta_parameters.hpp parser/interface/meta_parameters.cpp)
 target_sources(modegen_interfaces PRIVATE parser/interface/helpers.hpp parser/interface/helpers.cpp)
 target_sources(modegen_interfaces PRIVATE parser/interface/loader.hpp parser/interface/loader.cpp)
 target_sources(modegen_interfaces PRIVATE parser/interface/check.hpp parser/interface/check.cpp)
