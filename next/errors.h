@@ -17,5 +17,12 @@ struct gen_error : error {
 	gen_error(std::string gen_name, std::string w);
 };
 
+struct error_info : error {
+	std::string file;
+	std::string path;
+	std::string what;
+	error_info(std::string f, std::string p, std::string w) ;
+};
+
 } // namespace errors
 } // namespace modegen
