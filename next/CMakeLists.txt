@@ -15,12 +15,17 @@ set(config_files_dir "${CMAKE_CURRENT_BINARY_DIR}/cfg")
 set(main_config_file "${config_files_dir}/config.hpp")
 set(templates_dir "share/modegen")
 set(dbg_templates_dir "${config_files_dir}/${templates_dir}")
-set(rls_templates_dir "${CMAKE_INSTALL_PREFIX}/${config_files_dir}/${templates_dir}")
+set(rls_templates_dir "${CMAKE_INSTALL_PREFIX}/${templates_dir}")
+set(dbg_cpp_templates_dir "generation/cpp")
+set(dbg_cpp_templates_dir "${dbg_templates_dir}/cpp")
+set(rls_cpp_templates_dir "${rls_templates_dir}/cpp")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
 	set(templates_dir_path "${rls_templates_dir}")
+	set(cpp_templates_dir "${rls_cpp_templates_dir}")
 else()
 	set(templates_dir_path "${dbg_templates_dir}")
+	set(cpp_templates_dir "${dbg_cpp_templates_dir}")
 endif()
 
 configure_file("config.hpp.in" "${main_config_file}")
@@ -42,6 +47,7 @@ target_sources_local(modegen_interfaces loader.hpp          loader.cpp          
 target_sources_local(modegen_interfaces check.hpp           check.cpp           "parser/interface/")
 # interface generator
 target_sources_local(modegen_interfaces pythongen.hpp pythongen.cpp "generation/")
+target_sources_local(modegen_interfaces provider.hpp  provider.cpp  "generation/")
 target_sources_local(modegen_interfaces common.hpp    common.cpp    "generation/")
 target_sources_local(modegen_interfaces cpp.hpp       cpp.cpp       "generation/")
 target_sources(modegen_interfaces PRIVATE
@@ -57,7 +63,7 @@ target_link_libraries(modegen modegen_interfaces ${Boost_LIBRARIES} ${CMAKE_THRE
 # unit tests...
 enable_testing()
 set(tests_interface
-	#mdp
+	mdp
 	#checker
 	#to_json
 	#name_conversion
@@ -66,8 +72,8 @@ set(tests_interface
 	#common_generators
 	)
 foreach(tname ${tests_interface})
-	#add_executable(${tname}_test "tests/interface/${tname}_test.cpp")
-	#target_link_libraries(${tname}_test PRIVATE modegen_interfaces ${Boost_LIBRARIES})
-	#add_test(NAME ${tname} COMMAND ${tname}_test)
+	add_executable(${tname}_test "tests/interface/${tname}_test.cpp")
+	target_link_libraries(${tname}_test PRIVATE modegen_interfaces ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+	add_test(NAME ${tname} COMMAND ${tname}_test)
 endforeach()
 

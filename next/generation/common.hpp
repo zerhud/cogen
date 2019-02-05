@@ -10,13 +10,13 @@
 namespace modegen {
 namespace generation {
 
-class json_jinja_generator; /// generate file from template and json
+class json_jinja_generator; /// generates file from template and json
 typedef std::shared_ptr<json_jinja_generator> jsin_jinja_gen_ptr;
 
-class provider; ///< provide data for generation
+class provider; ///< provides data for generation
 typedef std::shared_ptr<provider> provider_ptr;
 
-/// generate files from info file and parameters
+/// generates files from info file and parameters
 class generator {
 public:
 	/// @param p provider @param i path to info file
