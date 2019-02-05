@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(modegen_parser VERSION 0.0.0.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -25,24 +25,27 @@ endif()
 
 configure_file("config.hpp.in" "${main_config_file}")
 
+include(cmake/target_sources_local.cmake)
+
 # interface library: parse interface definitions and generate code by templates
 add_library(modegen_interfaces ${main_config_file})
 target_link_libraries(modegen_interfaces PRIVATE stdc++fs PUBLIC ${Boost_LIBRARIES} ${CPPJSON_LIBRARIES})
 target_include_directories(modegen_interfaces PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${config_files_dir}")
-target_sources(modegen_interfaces PRIVATE errors.h errors.cpp)
+target_sources_local(modegen_interfaces errors.h errors.cpp "")
 # interface declaration
-target_sources(modegen_interfaces PRIVATE parser/loader.hpp parser/loader.cpp)
-target_sources(modegen_interfaces PRIVATE parser/interface/grammar.hpp parser/interface/grammar.cpp)
-target_sources(modegen_interfaces PRIVATE parser/interface/modegen.hpp parser/interface/modegen.cpp)
-target_sources(modegen_interfaces PRIVATE parser/interface/meta_parameters.hpp parser/interface/meta_parameters.cpp)
-target_sources(modegen_interfaces PRIVATE parser/interface/helpers.hpp parser/interface/helpers.cpp)
-target_sources(modegen_interfaces PRIVATE parser/interface/loader.hpp parser/interface/loader.cpp)
-target_sources(modegen_interfaces PRIVATE parser/interface/check.hpp parser/interface/check.cpp)
+target_sources_local(modegen_interfaces parser/loader.hpp parser/loader.cpp "")
+target_sources_local(modegen_interfaces grammar.hpp         grammar.cpp         "parser/interface/")
+target_sources_local(modegen_interfaces modegen.hpp         modegen.cpp         "parser/interface/")
+target_sources_local(modegen_interfaces meta_parameters.hpp meta_parameters.cpp "parser/interface/")
+target_sources_local(modegen_interfaces helpers.hpp         helpers.cpp         "parser/interface/")
+target_sources_local(modegen_interfaces loader.hpp          loader.cpp          "parser/interface/")
+target_sources_local(modegen_interfaces check.hpp           check.cpp           "parser/interface/")
 # interface generator
-target_sources(modegen_interfaces PRIVATE generation/pythongen.cpp generation/pythongen.hpp generation/pythongen)
-target_sources(modegen_interfaces PRIVATE generation/common.hpp generation/common.cpp)
-target_sources(modegen_interfaces PRIVATE generation/cpp.hpp generation/cpp.cpp)
+target_sources_local(modegen_interfaces pythongen.hpp pythongen.cpp "generation/")
+target_sources_local(modegen_interfaces common.hpp    common.cpp    "generation/")
+target_sources_local(modegen_interfaces cpp.hpp       cpp.cpp       "generation/")
 target_sources(modegen_interfaces PRIVATE
+	generation/pythongen
 	generation/cpp/declarations.info generation/cpp/declarations.jinja
 	generation/cpp/header.jinja generation/cpp/definitions.jinja
 	)
@@ -53,7 +56,15 @@ target_link_libraries(modegen modegen_interfaces ${Boost_LIBRARIES} ${CMAKE_THRE
 
 # unit tests...
 enable_testing()
-set(tests_interface mdp checker to_json name_conversion split_by_version filter common_generators)
+set(tests_interface
+	#mdp
+	#checker
+	#to_json
+	#name_conversion
+	#split_by_version
+	#filter
+	#common_generators
+	)
 foreach(tname ${tests_interface})
 	#add_executable(${tname}_test "tests/interface/${tname}_test.cpp")
 	#target_link_libraries(${tname}_test PRIVATE modegen_interfaces ${Boost_LIBRARIES})
