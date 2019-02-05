@@ -28,9 +28,10 @@ configure_file("config.hpp.in" "${main_config_file}")
 # interface library: parse interface definitions and generate code by templates
 add_library(modegen_interfaces ${main_config_file})
 target_link_libraries(modegen_interfaces PRIVATE stdc++fs PUBLIC ${Boost_LIBRARIES} ${CPPJSON_LIBRARIES})
-target_include_directories(modegen_interfaces PUBLIC "${config_files_dir}")
+target_include_directories(modegen_interfaces PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${config_files_dir}")
 target_sources(modegen_interfaces PRIVATE errors.h errors.cpp)
 # interface declaration
+target_sources(modegen_interfaces PRIVATE parser/loader.hpp parser/loader.cpp)
 target_sources(modegen_interfaces PRIVATE parser/interface/grammar.hpp parser/interface/grammar.cpp)
 target_sources(modegen_interfaces PRIVATE parser/interface/modegen.hpp parser/interface/modegen.cpp)
 target_sources(modegen_interfaces PRIVATE parser/interface/meta_parameters.hpp parser/interface/meta_parameters.cpp)

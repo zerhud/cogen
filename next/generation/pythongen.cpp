@@ -11,7 +11,7 @@ modegen::generation::jinja_python_generator::jinja_python_generator(std::filesys
 	if(!std::filesystem::exists(generator)) throw std::runtime_error("file " + generator.string() + " doesn't exists");
 }
 
-const modegen::json_jinja_generator& modegen::generation::jinja_python_generator::operator () (std::filesystem::path tmpl, std::filesystem::path out, const cppjson::value& data) const
+const modegen::generation::json_jinja_generator& modegen::generation::jinja_python_generator::operator () (std::filesystem::path tmpl, std::filesystem::path out, const cppjson::value& data) const
 {
 	using namespace boost::process;
 

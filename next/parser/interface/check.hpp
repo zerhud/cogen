@@ -6,7 +6,7 @@ namespace modegen::parser::interface {
 
 class checker {
 public:
-	checker& operator ()(modegen::parsed_file& finfo) ;
+	checker& operator ()(modegen::parser::interface::parsed_file& finfo) ;
 	std::vector<module> extract_result() ;
 private:
 	void unite_mods(std::vector<module>& mods) const ;
@@ -17,8 +17,8 @@ private:
 	void check(const interface& i, const std::string& path) const ;
 	void check(enumeration& e, const std::string& path) const ;
 
-	void check_using(const modegen::module& mod) const ;
-	void check_names(const modegen::module& mod) const ;
+	void check_using(const modegen::parser::interface::module& mod) const ;
+	void check_names(const modegen::parser::interface::module& mod) const ;
 	void check_names(std::vector<std::string> nl, const std::string& path) const ;
 	void check_version_is_single(const meta_parameters::parameter_set& p, const std::string& path) const ;
 	void check_version_is_overmin(const meta_parameters::parameter_set& p, const std::string& path) const ;
@@ -46,7 +46,7 @@ private:
 
 	std::vector<module> resulting_set;
 	std::string cur_file;
-	mutable modegen::meta_parameters::version cur_min_ver;
+	mutable modegen::parser::interface::meta_parameters::version cur_min_ver;
 	const static std::string pdel;
 };
 

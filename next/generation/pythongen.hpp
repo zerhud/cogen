@@ -4,6 +4,7 @@
 #include <cppjson/json.h>
 
 namespace modegen {
+namespace generation {
 
 class json_jinja_generator {
 public:
@@ -11,7 +12,6 @@ public:
 	virtual const json_jinja_generator& operator() (std::filesystem::path tmpl, std::filesystem::path out, const cppjson::value& data) const =0 ;
 };
 
-namespace generation {
 
 class jinja_python_generator : public json_jinja_generator {
 public:

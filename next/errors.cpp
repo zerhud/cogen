@@ -21,8 +21,8 @@ modegen::errors::gen_error::gen_error(std::string gen_name, std::string w)
 {
 }
 
-modegen::error_info::error_info(std::string f, std::string p, std::string w)
-    : std::error(f + " " + p + ": ", w)
+modegen::errors::error_info::error_info(std::string f, std::string p, std::string w)
+    : modegen::errors::error(f + " " + p + ": ", w)
     , file(std::move(f))
     , path(std::move(p))
     , what(std::move(w))
