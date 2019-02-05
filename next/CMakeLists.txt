@@ -45,7 +45,7 @@ target_sources_local(modegen_interfaces meta_parameters.hpp meta_parameters.cpp 
 target_sources_local(modegen_interfaces helpers.hpp         helpers.cpp         "parser/interface/")
 target_sources_local(modegen_interfaces loader.hpp          loader.cpp          "parser/interface/")
 target_sources_local(modegen_interfaces check.hpp           check.cpp           "parser/interface/")
-# interface generator
+# generations
 target_sources_local(modegen_interfaces pythongen.hpp pythongen.cpp "generation/")
 target_sources_local(modegen_interfaces provider.hpp  provider.cpp  "generation/")
 target_sources_local(modegen_interfaces common.hpp    common.cpp    "generation/")

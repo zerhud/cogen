@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(record_rule)
 
 BOOST_AUTO_TEST_CASE(interfaceq_rule)
 {
-	auto pf = modegen::parser::interface::parse("module mod v1.0: interface inter{ constructor(); static type some() const; type other() mutable;}");
+	auto pf = modegen::parser::interface::parse("module mod v1.0: interface inter{ constructor(); static type some() const; type other() mutable;}"sv);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
 	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),1);
 	BOOST_REQUIRE_EQUAL(pf.mods[0].content[0].index(),3);
