@@ -8,6 +8,7 @@
 	, cppjson
 	, cmake
 	, ninja
+        , turtle
 }:
 
 stdenv.mkDerivation rec {
@@ -22,7 +23,7 @@ stdenv.mkDerivation rec {
 		cmake ninja
 		];
 	buildInputs = [
-		boost
+		boost turtle
 		cppjson
 	];
 }
