@@ -3,16 +3,13 @@
 #include <memory>
 #include <filesystem>
 #include <string_view>
+#include <cppjson/json.h>
 #include <boost/property_tree/ptree.hpp>
 
 #include "parser/interface/modegen.hpp"
 
 namespace modegen {
 namespace generation {
-
-TODO(do we realy need it?)
-class json_jinja_generator; /// generates file from template and json
-typedef std::shared_ptr<json_jinja_generator> json_jinja_gen_ptr;
 
 class provider; ///< provides data for generation
 typedef std::shared_ptr<provider> provider_ptr;
@@ -36,6 +33,7 @@ public:
 private:
 	std::filesystem::path output_path(std::string_view part) const ;
 	std::filesystem::path tmpl_path(std::string_view part) const ;
+	cppjson::value generate_data(std::string_view part) const ;
 
 	provider_ptr prov;
 	boost::property_tree::ptree opts;

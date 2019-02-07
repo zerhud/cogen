@@ -51,6 +51,7 @@ target_sources_local(modegen_interfaces check.hpp           check.cpp           
 target_sources_local(modegen_interfaces pythongen.hpp pythongen.cpp "generation/")
 target_sources_local(modegen_interfaces provider.hpp  provider.cpp  "generation/")
 target_sources_local(modegen_interfaces common.hpp    common.cpp    "generation/")
+target_sources_local(modegen_interfaces file_data.hpp file_data.cpp "generation/")
 target_sources_local(modegen_interfaces cpp.hpp       cpp.cpp       "generation/")
 target_sources(modegen_interfaces PRIVATE
 	generation/pythongen

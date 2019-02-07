@@ -26,21 +26,39 @@ const boost::property_tree::ptree& mg::generator::options() const
 
 void mg::generator::generate(const std::filesystem::path& output_dir) const
 {
+	assert( prov );
+	for(auto& part:opts.get_child("gen")) {
+		cppjson::value data = generate_data(part.first);
+		prov->json_jinja( data, tmpl_path(part.first), output_dir / output_path(part.first) );
+	}
 }
 
 void mg::generator::generate_stdout(std::string_view part) const
 {
 	assert( prov );
-	cppjson::value data;
-	boost::property_tree::write_info(std::cout, opts);
+	cppjson::value data = generate_data(part);
 	prov->json_jinja( data, tmpl_path(part), std::nullopt );
+}
+
+cppjson::value mg::generator::generate_data(std::string_view part) const
+{
+	assert( prov );
+
+	auto target_name = opts.get<std::string>("gen."s+std::string(part)+".target"s);
+	auto tl = prov->target_data(target_name);
+	auto tg = prov->target_generator(target_name);
+
+	assert(tl);
+	assert(tg);
+	options_view props(opts, target_name);
+	return tg->jsoned_data(std::move(tl), std::move(props));
 }
 
 std::filesystem::path mg::generator::output_path(std::string_view part) const
 {
 	std::string p(part);
 	std::string path = "gen." + p + ".output";
-	std::cout << path << std::endl;
+	//std::cout << path << std::endl;
 	return opts.get(path, p + ".hpp");
 }
 
@@ -48,7 +66,7 @@ std::filesystem::path mg::generator::tmpl_path(std::string_view part) const
 {
 	std::string p(part);
 	std::string path = "gen." + p + ".input";
-	std::cout << path << std::endl;
+	//std::cout << path << std::endl;
 	return opts.get(path, p + ".jinja");
 }
 
