@@ -70,7 +70,7 @@ enable_testing()
 set(tests_gcommon common cpp to_json)
 set(tests_interface
 	mdp
-	#checker
+	checker
 	#name_conversion
 	#split_by_version
 	#filter
