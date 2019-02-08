@@ -25,4 +25,4 @@ public:
 	virtual cppjson::value jsoned_data(parser::loader_ptr data_loader, options_view opts) const =0 ;
 };
 
-} // namespace modegen::generation {
+} // namespace modegen::generation
