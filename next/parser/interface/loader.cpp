@@ -5,17 +5,17 @@
 
 #include "errors.h"
 
-modegen::parser::interface::loader::loader() : loader(std::vector<std::filesystem::path>{})
+modegen::parser::interface::loader_impl::loader_impl() : loader_impl(std::vector<std::filesystem::path>{})
 {
 }
 
-modegen::parser::interface::loader::loader(std::vector<std::filesystem::path> includes)
+modegen::parser::interface::loader_impl::loader_impl(std::vector<std::filesystem::path> includes)
     : incs(std::move(includes))
 {
 	for(auto& i:incs) if(i.is_relative()) i = std::filesystem::absolute(i);
 }
 
-void modegen::parser::interface::loader::load(std::istream &input, std::string fn)
+void modegen::parser::interface::loader_impl::load(std::istream &input, std::string fn)
 {
 	std::string pdata{std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()};
 	auto pfile = parse(pdata);
@@ -27,7 +27,7 @@ void modegen::parser::interface::loader::load(std::istream &input, std::string f
 	ch(pfile);
 }
 
-void modegen::parser::interface::loader::load(std::filesystem::path file)
+void modegen::parser::interface::loader_impl::load(std::filesystem::path file)
 {
 	if(!file.is_absolute()) throw errors::error("cannot load relative path");
 
@@ -42,19 +42,24 @@ void modegen::parser::interface::loader::load(std::filesystem::path file)
 	load(file_stream, file.generic_u8string());
 }
 
-std::vector<modegen::parser::interface::module> modegen::parser::interface::loader::result()
+void modegen::parser::interface::loader_impl::finish_loads()
 {
 	cur_dir.clear();
-	return ch.extract_result();
+	result_cache = ch.extract_result();
 }
 
-bool modegen::parser::interface::loader::already_loaded(const std::filesystem::path f) const
+std::vector<modegen::parser::interface::module> modegen::parser::interface::loader_impl::result() const
+{
+	return result_cache;
+}
+
+bool modegen::parser::interface::loader_impl::already_loaded(const std::filesystem::path f) const
 {
 	for(auto& i:loaded_files) if(i==f) return true;
 	return false;
 }
 
-std::filesystem::path modegen::parser::interface::loader::search_file(std::filesystem::path f) const
+std::filesystem::path modegen::parser::interface::loader_impl::search_file(std::filesystem::path f) const
 {
 	for(auto i=cur_dir.rbegin();i!=cur_dir.rend();++i) {
 		assert(i->is_absolute());

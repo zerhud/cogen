@@ -22,6 +22,7 @@ MOCK_BASE_CLASS( provider_mock, modegen::generation::provider )
 class fake_target : public modegen::parser::loader {
 	void load(std::istream& input, std::string fn) override {}
 	void load(std::filesystem::path file) override {}
+	void finish_loads() override {}
 };
 
 class fake_data_gen : public modegen::generation::file_data {

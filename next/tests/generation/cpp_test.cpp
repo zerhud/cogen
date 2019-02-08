@@ -1,0 +1,53 @@
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE modegen_parser
+
+#include <boost/test/unit_test.hpp>
+#include <turtle/mock.hpp>
+
+#include "generation/cpp.hpp"
+#include "parser/interface/loader.hpp"
+
+// tests cpp generation (don't test correctly working of filters)
+
+namespace mi = modegen::parser::interface;
+namespace mg = modegen::generation;
+namespace pt = boost::property_tree;
+
+using namespace std::literals;
+
+struct fake_mi_loader : public mi::loader {
+	std::vector<mi::module> data;
+	
+	void load(std::istream& input, std::string fn) override {}
+	void load(std::filesystem::path file) override {}
+	void finish_loads() override {}
+
+	std::vector<mi::module> result() const override
+	{
+		return data;
+	}
+};
+
+BOOST_AUTO_TEST_CASE( no_data_no_work )
+{
+	pt::ptree opts_tree;
+	mg::cpp_generator gen;
+	mg::options_view opts(opts_tree, "def"sv);
+
+	cppjson::value data = gen.jsoned_data(std::make_shared<fake_mi_loader>(), opts);
+	BOOST_CHECK(data.is_undefined());
+}
+
+BOOST_AUTO_TEST_CASE( without_includes )
+{
+	pt::ptree opts_tree;
+	mg::cpp_generator gen;
+	mg::options_view opts(opts_tree, "def"sv);
+
+	auto ldr = std::make_shared<fake_mi_loader>();
+	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
+
+	cppjson::value data = gen.jsoned_data(ldr, opts);
+	BOOST_REQUIRE(!data.is_undefined());
+	BOOST_FAIL("no tests for result");
+}

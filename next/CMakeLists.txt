@@ -65,7 +65,7 @@ target_link_libraries(modegen modegen_interfaces ${Boost_LIBRARIES} ${CMAKE_THRE
 
 # unit tests...
 enable_testing()
-set(tests_gcommon common)
+set(tests_gcommon common cpp)
 set(tests_interface
 	mdp
 	#checker

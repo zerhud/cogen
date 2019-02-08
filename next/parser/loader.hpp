@@ -13,6 +13,7 @@ public:
 
 	virtual void load(std::istream& input, std::string fn) =0 ;
 	virtual void load(std::filesystem::path file) =0 ;
+	virtual void finish_loads() =0 ;
 };
 
 loader_ptr create_loader(std::string_view name, std::vector<std::filesystem::path> includes);
