@@ -65,7 +65,7 @@ target_link_libraries(modegen modegen_interfaces ${Boost_LIBRARIES} ${CMAKE_THRE
 
 # unit tests...
 enable_testing()
-set(tests_common common)
+set(tests_gcommon common)
 set(tests_interface
 	mdp
 	#checker
@@ -81,8 +81,8 @@ foreach(tname ${tests_interface})
 	target_include_directories(${tname}_test SYSTEM PRIVATE "${turtle}")
 	add_test(NAME ${tname} COMMAND ${tname}_test)
 endforeach()
-foreach(tname ${tests_common})
-	add_executable(${tname}_test "tests/${tname}_test.cpp")
+foreach(tname ${tests_gcommon})
+	add_executable(${tname}_test "tests/generation/${tname}_test.cpp")
 	target_link_libraries(${tname}_test PRIVATE modegen_interfaces ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
 	target_include_directories(${tname}_test SYSTEM PRIVATE "${turtle}")
 	add_test(NAME ${tname} COMMAND ${tname}_test)
