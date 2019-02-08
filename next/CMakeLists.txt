@@ -67,25 +67,23 @@ target_link_libraries(modegen modegen_interfaces ${Boost_LIBRARIES} ${CMAKE_THRE
 
 # unit tests...
 enable_testing()
-set(tests_gcommon common cpp to_json)
-set(tests_interface
-	mdp
-	checker
+macro(add_unit_test tname path lib)
+	add_executable(${tname}_test "${path}${tname}_test.cpp")
+	target_link_libraries(${tname}_test PRIVATE ${lib} ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+	target_include_directories(${tname}_test SYSTEM PRIVATE "${turtle}")
+	add_test(NAME ${tname} COMMAND ${tname}_test)
+endmacro()
+set(tests_gcommon common cpp to_json
 	#name_conversion
 	#split_by_version
 	#filter
 	#common_generators
 	)
+set(tests_interface mdp checker )
 foreach(tname ${tests_interface})
-	add_executable(${tname}_test "tests/interface/${tname}_test.cpp")
-	target_link_libraries(${tname}_test PRIVATE modegen_interfaces ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
-	target_include_directories(${tname}_test SYSTEM PRIVATE "${turtle}")
-	add_test(NAME ${tname} COMMAND ${tname}_test)
+	add_unit_test(${tname} "tests/interface/" "modegen_interfaces")
 endforeach()
 foreach(tname ${tests_gcommon})
-	add_executable(${tname}_test "tests/generation/${tname}_test.cpp")
-	target_link_libraries(${tname}_test PRIVATE modegen_interfaces ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
-	target_include_directories(${tname}_test SYSTEM PRIVATE "${turtle}")
-	add_test(NAME ${tname} COMMAND ${tname}_test)
+	add_unit_test(${tname} "tests/generation/" "modegen_interfaces")
 endforeach()
 

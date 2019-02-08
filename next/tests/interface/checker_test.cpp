@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(method_const_mark)
 BOOST_AUTO_TEST_CASE(mod_ver_is_min)
 {
 	auto pf = mi::parse("module mod v10.0: @v9.0 type some(); module mod2 v10.0: interface i{@v9.0 type name()const;}"
-	                           "module mod v9.0: @v10.1 interface i{@v10.0 type name()const;}"sv);
+	                    "module mod v9.0: @v10.1 interface i{@v10.0 type name()const;}"sv);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 3);
 	mi::checker ch;
 	mi::parsed_file m1({pf.mods[0]}), m2({pf.mods[1]}), m3({pf.mods[2]});
