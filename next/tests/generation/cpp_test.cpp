@@ -1,9 +1,11 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE modegen_parser
 
+#include <iostream>
 #include <boost/test/unit_test.hpp>
 #include <turtle/mock.hpp>
 
+#include "errors.h"
 #include "generation/cpp.hpp"
 #include "parser/interface/loader.hpp"
 
@@ -49,5 +51,27 @@ BOOST_AUTO_TEST_CASE( without_includes )
 
 	cppjson::value data = gen.jsoned_data(ldr, opts);
 	BOOST_REQUIRE(!data.is_undefined());
-	BOOST_FAIL("no tests for result");
+	BOOST_REQUIRE_EQUAL( data["mods"].array().size(), 1 );
+	BOOST_REQUIRE_EQUAL( data["mods"][0]["content"].array().size(), 1 );
+	BOOST_CHECK_EQUAL( data["mods"][0]["content"][0]["type"], "function" );
+
+	BOOST_REQUIRE( !data["incs"].is_undefined() );
 }
+
+BOOST_AUTO_TEST_SUITE( error_data )
+BOOST_AUTO_TEST_CASE(wrong_loader)
+{
+	struct fake_wrong_loader : public modegen::parser::loader {
+		void load(std::istream& input, std::string fn) override {}
+		void load(std::filesystem::path file) override {}
+		void finish_loads() override {}
+	};
+
+	pt::ptree opts_tree;
+	mg::cpp_generator gen;
+	mg::options_view opts(opts_tree, "def"sv);
+
+	BOOST_CHECK_THROW( gen.jsoned_data(nullptr, opts), modegen::errors::gen_error );
+	BOOST_CHECK_THROW( gen.jsoned_data(std::make_shared<fake_wrong_loader>(), opts), modegen::errors::gen_error );
+}
+BOOST_AUTO_TEST_SUITE_END() // error_data

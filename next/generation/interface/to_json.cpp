@@ -1,30 +1,30 @@
-#include "to_json.h"
+#include "to_json.hpp"
 
 #include <sstream>
 #include <functional>
 
-#include "helpers.hpp"
+#include "parser/interface/helpers.hpp"
 
 namespace pl = std::placeholders;
-namespace mg = modegen::generation;
+namespace mg = modegen::generation::interface;
 namespace mi = modegen::parser::interface;
 
 
-modegen::cvt::to_json::to_json()
+mg::to_json::to_json()
 {
 }
 
-modegen::cvt::to_json::to_json(std::unique_ptr<modegen::cvt::to_json_aspect> gen_aspect)
+mg::to_json::to_json(std::unique_ptr<mg::to_json_aspect> gen_aspect)
 {
 	gen_asps.push_back(std::move(gen_aspect));
 }
 
-modegen::cvt::to_json::to_json(boost::ptr_vector<modegen::cvt::to_json_aspect> gen_aspects)
+mg::to_json::to_json(boost::ptr_vector<mg::to_json_aspect> gen_aspects)
 	: gen_asps(std::move(gen_aspects))
 {
 }
 
-modegen::cvt::to_json& modegen::cvt::to_json::operator () (std::vector<modegen::module>& m)
+mg::to_json& mg::to_json::operator () (std::vector<modegen::parser::interface::module>& m)
 {
 	mods = std::move(m);
 	generate();
@@ -32,24 +32,24 @@ modegen::cvt::to_json& modegen::cvt::to_json::operator () (std::vector<modegen::
 	return *this;
 }
 
-modegen::cvt::to_json::operator std::string () const
+mg::to_json::operator std::string () const
 {
 	std::stringstream out;
 	out << result;
 	return out.str();
 }
 
-modegen::cvt::to_json::operator cppjson::value () const
+mg::to_json::operator cppjson::value () const
 {
 	return result;
 }
 
-void modegen::cvt::to_json::generate()
+void mg::to_json::generate()
 {
 	for(std::size_t i=0;i<mods.size();++i) result["mods"][i] = as_object(mods[i]);
 }
 
-cppjson::value modegen::cvt::to_json::as_object(const modegen::module& obj) const
+cppjson::value mg::to_json::as_object(const modegen::parser::interface::module& obj) const
 {
 	cppjson::value ret;
 	ret["name"] = obj.name;
@@ -70,7 +70,7 @@ cppjson::value modegen::cvt::to_json::as_object(const modegen::module& obj) cons
 	return ret;
 }
 
-cppjson::value modegen::cvt::to_json::as_object(const modegen::function& obj) const
+cppjson::value mg::to_json::as_object(const modegen::parser::interface::function& obj) const
 {
 	cppjson::value ret;
 	ret["name"] = obj.name;
@@ -93,7 +93,7 @@ cppjson::value modegen::cvt::to_json::as_object(const modegen::function& obj) co
 	return ret;
 }
 
-cppjson::value modegen::cvt::to_json::as_object(const modegen::enumeration& obj) const
+cppjson::value mg::to_json::as_object(const modegen::parser::interface::enumeration& obj) const
 {
 	cppjson::value ret;
 	add_meta(ret, obj.meta_params);
@@ -116,7 +116,7 @@ cppjson::value modegen::cvt::to_json::as_object(const modegen::enumeration& obj)
 	return ret;
 }
 
-cppjson::value modegen::cvt::to_json::as_object(const modegen::interface& obj) const
+cppjson::value mg::to_json::as_object(const modegen::parser::interface::interface& obj) const
 {
 	cppjson::value ret;
 	ret["name"] = obj.name;
@@ -135,7 +135,7 @@ cppjson::value modegen::cvt::to_json::as_object(const modegen::interface& obj) c
 	return ret;
 }
 
-cppjson::value modegen::cvt::to_json::as_object(const modegen::record& obj) const
+cppjson::value mg::to_json::as_object(const modegen::parser::interface::record& obj) const
 {
 	cppjson::value ret;
 	ret["name"] = obj.name;
@@ -151,7 +151,7 @@ cppjson::value modegen::cvt::to_json::as_object(const modegen::record& obj) cons
 	return ret;
 }
 
-cppjson::value modegen::cvt::to_json::as_object(const modegen::record_item& obj) const
+cppjson::value mg::to_json::as_object(const modegen::parser::interface::record_item& obj) const
 {
 	cppjson::value ret;
 	ret["name"]=obj.name;
@@ -164,7 +164,7 @@ cppjson::value modegen::cvt::to_json::as_object(const modegen::record_item& obj)
 	return ret;
 }
 
-cppjson::value modegen::cvt::to_json::as_object(const modegen::type& obj) const
+cppjson::value mg::to_json::as_object(const modegen::parser::interface::type& obj) const
 {
 	cppjson::value ret;
 
@@ -180,7 +180,7 @@ cppjson::value modegen::cvt::to_json::as_object(const modegen::type& obj) const
 	return ret;
 }
 
-cppjson::value modegen::cvt::to_json::as_object(const modegen::func_param& obj) const
+cppjson::value mg::to_json::as_object(const modegen::parser::interface::func_param& obj) const
 {
 	cppjson::value ret;
 	ret["name"] = obj.name;
@@ -191,7 +191,7 @@ cppjson::value modegen::cvt::to_json::as_object(const modegen::func_param& obj) 
 	return ret;
 }
 
-cppjson::value modegen::cvt::to_json::as_object(const modegen::constructor_fnc& obj) const
+cppjson::value mg::to_json::as_object(const modegen::parser::interface::constructor_fnc& obj) const
 {
 	cppjson::value ret;
 	ret["type"] = "constructor";
@@ -202,7 +202,7 @@ cppjson::value modegen::cvt::to_json::as_object(const modegen::constructor_fnc& 
 	return ret;
 }
 
-cppjson::value modegen::cvt::to_json::as_object(const modegen::meta_parameters::version& obj) const
+cppjson::value mg::to_json::as_object(const modegen::parser::interface::meta_parameters::version& obj) const
 {
 	cppjson::value ret;
 	ret["major"] = obj.major_v;
@@ -212,16 +212,18 @@ cppjson::value modegen::cvt::to_json::as_object(const modegen::meta_parameters::
 	return ret;
 }
 
-void modegen::cvt::to_json::add_meta(cppjson::value& val, const modegen::meta_parameters::parameter_set& params) const
+void mg::to_json::add_meta(cppjson::value& val, const modegen::parser::interface::meta_parameters::parameter_set& params) const
 {
-	auto ver = extract<modegen::meta_parameters::version>(params);
+	using namespace modegen::parser::interface::meta_parameters;
+
+	auto ver = extract<version>(params);
 	if(!ver) val["v"] = cppjson::null{};
 	else val["v"] = as_object(*ver);
 
-	auto docs = extract<modegen::meta_parameters::documentation>(params);
+	auto docs = extract<documentation>(params);
 	if(docs) val["docs"] = docs->body;
 
-	auto dep = extract<modegen::meta_parameters::deprication>(params);
+	auto dep = extract<deprication>(params);
 	if(dep) {
 		val["depricated"]["since"] = as_object(dep->since);
 		val["depricated"]["message"] = dep->message;

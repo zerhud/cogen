@@ -58,6 +58,8 @@ target_sources(modegen_interfaces PRIVATE
 	generation/cpp/declarations.info generation/cpp/declarations.jinja
 	generation/cpp/header.jinja generation/cpp/definitions.jinja
 	)
+# generator part for interface
+target_sources_local(modegen_interfaces to_json.hpp to_json.cpp "generation/interface/")
 
 # main programm: run selected generator and sets options
 add_executable(modegen modegen/main.cpp)
@@ -65,11 +67,10 @@ target_link_libraries(modegen modegen_interfaces ${Boost_LIBRARIES} ${CMAKE_THRE
 
 # unit tests...
 enable_testing()
-set(tests_gcommon common cpp)
+set(tests_gcommon common cpp to_json)
 set(tests_interface
 	mdp
 	#checker
-	#to_json
 	#name_conversion
 	#split_by_version
 	#filter

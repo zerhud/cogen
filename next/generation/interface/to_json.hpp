@@ -28,7 +28,7 @@ public:
 	to_json();
 	to_json(std::unique_ptr<to_json_aspect> gen_aspect);
 	to_json(boost::ptr_vector<to_json_aspect> gen_aspects);
-	to_json& operator () (std::vector<module>& m) ;
+	to_json& operator () (std::vector<modegen::parser::interface::module>& m) ;
 	operator std::string () const ;
 	operator cppjson::value () const ;
 private:
@@ -70,5 +70,3 @@ private:
 };
 
 } // namespace modegen::generation::interface
-
-
