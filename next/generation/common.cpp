@@ -10,6 +10,7 @@ namespace mg = modegen::generation;
 
 mg::generator::generator(mg::provider_ptr p, const std::filesystem::path& i)
 	: prov(std::move(p))
+	, info_directory(i)
 {
 	if(!prov) throw errors::gen_error("common"s, "cannot create generator without provider"s);
 }
@@ -50,7 +51,7 @@ cppjson::value mg::generator::generate_data(std::string_view part) const
 
 	assert(tl);
 	assert(tg);
-	options_view props(opts, target_name);
+	options_view props(opts, part);
 	return tg->jsoned_data(std::move(tl), std::move(props));
 }
 
@@ -58,7 +59,6 @@ std::filesystem::path mg::generator::output_path(std::string_view part) const
 {
 	std::string p(part);
 	std::string path = "gen." + p + ".output";
-	//std::cout << path << std::endl;
 	return opts.get(path, p + ".hpp");
 }
 
@@ -66,7 +66,7 @@ std::filesystem::path mg::generator::tmpl_path(std::string_view part) const
 {
 	std::string p(part);
 	std::string path = "gen." + p + ".input";
-	//std::cout << path << std::endl;
-	return opts.get(path, p + ".jinja");
+	std::filesystem::path input_file = opts.get(path, p + ".jinja");
+	return info_directory / input_file;
 }
 

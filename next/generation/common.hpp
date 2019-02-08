@@ -14,6 +14,12 @@ namespace generation {
 class provider; ///< provides data for generation
 typedef std::shared_ptr<provider> provider_ptr;
 
+class file_data ; ///< provides data for concreate file generation
+typedef std::shared_ptr<file_data> file_data_ptr;
+
+/// options for generations (read only)
+class options_view;
+
 /// generates files from info file and parameters
 class generator {
 public:
@@ -37,6 +43,7 @@ private:
 
 	provider_ptr prov;
 	boost::property_tree::ptree opts;
+	std::filesystem::path info_directory;
 };
 
 } // namespace generation

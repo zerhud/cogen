@@ -1,14 +1,13 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
+#include <cppjson/json.h>
+#include <boost/property_tree/ptree.hpp>
 #include "parser/loader.hpp"
 
 namespace modegen::generation {
 
-class file_data ;
-typedef std::shared_ptr<file_data> file_data_ptr;
-
-/// options for generations (read only)
 class options_view final {
 	const boost::property_tree::ptree& opts;
 	std::string_view part;
@@ -20,7 +19,6 @@ public:
 	const boost::property_tree::ptree& gen_data() const ;
 };
 
-/// provides data for concreate file generation
 class file_data {
 public:
 	virtual ~file_data() noexcept =default ;
