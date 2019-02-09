@@ -54,6 +54,19 @@ BOOST_AUTO_TEST_CASE( without_includes )
 	BOOST_REQUIRE_EQUAL( data["mods"][0]["content"].array().size(), 1 );
 	BOOST_CHECK_EQUAL( data["mods"][0]["content"][0]["type"], "function" );
 
+	BOOST_REQUIRE( data["incs"].is_undefined() );
+}
+
+BOOST_AUTO_TEST_CASE(with_includes)
+{
+	pt::ptree opts_tree;
+	mg::cpp_generator gen;
+	mg::options_view opts(opts_tree, "def"sv);
+
+	auto ldr = std::make_shared<fake_mi_loader>();
+	ldr->data = mi::parse("module mod v1.0: string foo(date d, list<i8> l);"sv).mods;
+
+	cppjson::value data = gen.jsoned_data(ldr, opts);
 	BOOST_REQUIRE( !data["incs"].is_undefined() );
 }
 

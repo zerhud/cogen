@@ -4,6 +4,7 @@
 #include <cppjson/json.h>
 #include <boost/ptr_container/ptr_vector.hpp>
 
+#include "common.hpp"
 #include "parser/interface/modegen.hpp"
 
 namespace modegen::generation::interface {
