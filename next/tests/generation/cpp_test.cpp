@@ -1,7 +1,6 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE modegen_parser
 
-#include <iostream>
 #include <boost/test/unit_test.hpp>
 #include <turtle/mock.hpp>
 

@@ -58,8 +58,10 @@ target_sources(modegen_interfaces PRIVATE
 	generation/cpp/declarations.info generation/cpp/declarations.jinja
 	generation/cpp/header.jinja generation/cpp/definitions.jinja
 	)
-# generator part for interface
+# generation part for interface
 target_sources_local(modegen_interfaces to_json.hpp to_json.cpp "generation/interface/")
+# generation part for cpp
+target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "generation/cpp/")
 
 # main programm: run selected generator and sets options
 add_executable(modegen modegen/main.cpp)
@@ -73,7 +75,9 @@ macro(add_unit_test tname path lib)
 	target_include_directories(${tname}_test SYSTEM PRIVATE "${turtle}")
 	add_test(NAME ${tname} COMMAND ${tname}_test)
 endmacro()
-set(tests_gcommon common cpp to_json
+set(tests_gcommon
+	common to_json
+	cpp cpp_type_cvt
 	#name_conversion
 	#split_by_version
 	#filter

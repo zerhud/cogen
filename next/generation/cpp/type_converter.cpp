@@ -1,11 +1,12 @@
-#include "type_converter.h"
+#include "type_converter.hpp"
 
-#include "parser/helpers.hpp"
-#include "parser/errors.h"
+#include "parser/interface/helpers.hpp"
+#include "errors.h"
 
 using namespace std::literals;
+namespace mi = modegen::parser::interface;
 
-std::map<std::string,std::string> modegen::helpers::type_converter::type_maps =
+std::map<std::string,std::string> modegen::generation::cpp::type_converter::type_maps =
 {
       {"i8"s,"std::int8_t"s}
     , {"i16"s,"std::int16_t"s}
@@ -22,7 +23,7 @@ std::map<std::string,std::string> modegen::helpers::type_converter::type_maps =
     , {"void"s,"void"s}
 };
 
-std::map<std::string,std::string> modegen::helpers::type_converter::incs_maps =
+std::map<std::string,std::string> modegen::generation::cpp::type_converter::incs_maps =
 {
       {"i8"s,"cstdint"s}
     , {"i16"s,"cstdint"s}
@@ -36,12 +37,14 @@ std::map<std::string,std::string> modegen::helpers::type_converter::incs_maps =
     , {"optional"s,"optional"s}
 };
 
-modegen::helpers::type_converter::type_converter()
+modegen::generation::cpp::type_converter::type_converter()
 {
 }
 
-std::vector<modegen::module>& modegen::helpers::type_converter::operator()(std::vector<modegen::module>& mods)
+std::vector<mi::module>& modegen::generation::cpp::type_converter::operator()(std::vector<mi::module>& mods)
 {
+	using namespace mi;
+
 	auto v = [this](auto& mc) { convert(mc); };
 	for(auto& mod:mods) {
 		cur_mod = &mod;
@@ -63,13 +66,15 @@ std::vector<modegen::module>& modegen::helpers::type_converter::operator()(std::
 	return mods;
 }
 
-std::vector<std::string> modegen::helpers::type_converter::includes() const
+std::vector<std::string> modegen::generation::cpp::type_converter::includes() const
 {
 	return total_incs;
 }
 
-void modegen::helpers::type_converter::add_to_imports(std::string mn, bool sys, std::optional<export_info> ei)
+void modegen::generation::cpp::type_converter::add_to_imports(std::string mn, bool sys, std::optional<parser::interface::export_info> ei)
 {
+	using namespace mi;
+
 	auto pos = std::find(cur_mod->imports.begin(), cur_mod->imports.end(), mn);
 	if(pos==cur_mod->imports.end()) {
 		using_directive item{mn,sys,{}};
@@ -82,32 +87,40 @@ void modegen::helpers::type_converter::add_to_imports(std::string mn, bool sys, 
 	}
 }
 
-void modegen::helpers::type_converter::convert(modegen::function& obj)
+void modegen::generation::cpp::type_converter::convert(mi::function& obj)
 {
+	using namespace mi;
+
 	export_info ei{obj.name, module_content_selector::function};
 	convert(obj.return_type, ei);
 	for(auto& p:obj.func_params) convert(p.param_type, ei);
 }
 
-void modegen::helpers::type_converter::convert(modegen::record& obj)
+void modegen::generation::cpp::type_converter::convert(mi::record& obj)
 {
+	using namespace mi;
+
 	assert(cur_mod);
 
 	export_info ei{obj.name, module_content_selector::record};
 	add_to_imports("memory"s, true, ei);
 	for(auto& m:obj.members) convert(m.param_type, ei);
 
-	define_type(obj.name, modegen::module_content_selector::record);
+	define_type(obj.name, mi::module_content_selector::record);
 }
 
-void modegen::helpers::type_converter::convert(modegen::enumeration& obj)
+void modegen::generation::cpp::type_converter::convert(mi::enumeration& obj)
 {
+	using namespace mi;
+
 	add_to_imports("string"s, true, export_info{obj.name, module_content_selector::enumeration});
-	define_type(obj.name, modegen::module_content_selector::enumeration);
+	define_type(obj.name, module_content_selector::enumeration);
 }
 
-void modegen::helpers::type_converter::convert(modegen::interface& obj)
+void modegen::generation::cpp::type_converter::convert(mi::interface& obj)
 {
+	using namespace mi;
+
 	assert(cur_mod);
 
 	export_info ei{obj.name, module_content_selector::interface};
@@ -119,10 +132,10 @@ void modegen::helpers::type_converter::convert(modegen::interface& obj)
 		}
 	}
 
-	define_type(obj.name, modegen::module_content_selector::interface);
+	define_type(obj.name, mi::module_content_selector::interface);
 }
 
-void modegen::helpers::type_converter::convert(modegen::type& t, const modegen::export_info& ei)
+void modegen::generation::cpp::type_converter::convert(mi::type& t, const mi::export_info& ei)
 {
 	assert(cur_mod);
 
@@ -139,7 +152,7 @@ void modegen::helpers::type_converter::convert(modegen::type& t, const modegen::
 	for(auto& s:t.sub_types) convert(s, ei);
 }
 
-void modegen::helpers::type_converter::define_type(std::string_view name, modegen::module_content_selector from)
+void modegen::generation::cpp::type_converter::define_type(std::string_view name, mi::module_content_selector from)
 {
 	for(auto& t:defined_types) if(t.type.name == name) t.points = from;
 }
