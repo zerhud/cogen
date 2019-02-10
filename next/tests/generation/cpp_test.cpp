@@ -82,7 +82,45 @@ BOOST_AUTO_TEST_CASE(with_sys_includes)
 
 BOOST_AUTO_TEST_CASE(with_local_includes)
 {
-	BOOST_FAIL("no test");
+	pt::ptree opts_tree;
+	opts_tree.add("gen.hpp.inc_part", "def");
+	opts_tree.add("gen.hpp.inc_part", "test");
+	opts_tree.add("gen.hpp.inc_local", "local.hpp");
+	opts_tree.add("gen.hpp.inc_local", "local2.hpp");
+	opts_tree.add("gen.hpp.inc_sys", "sys.hpp");
+	opts_tree.add("gen.hpp.inc_sys", "sys2.hpp");
+	opts_tree.put("gen.def.ouput", "definitions.hpp");
+	opts_tree.put("gen.test.ouput", "t/test.hpp");
+
+	mg::cpp_generator gen;
+	mg::options_view opts(opts_tree, "hpp"sv);
+
+	auto ldr = std::make_shared<fake_mi_loader>();
+	ldr->data = mi::parse("module mod v1.0: string foo(date d, list<i8> l);"sv).mods;
+	cppjson::value data = gen.jsoned_data(ldr, opts);
+
+	BOOST_REQUIRE( !data["incs"].is_undefined() );
+	BOOST_REQUIRE_EQUAL( data["incs"].array().size(), 11 );
+	BOOST_CHECK_EQUAL( data["incs"][0]["sys"], true );
+	BOOST_CHECK_EQUAL( data["incs"][1]["sys"], true );
+	BOOST_CHECK_EQUAL( data["incs"][2]["sys"], true );
+	BOOST_CHECK_EQUAL( data["incs"][3]["sys"], true );
+
+	BOOST_CHECK_EQUAL( data["incs"][5]["n"], "sys.hpp" );
+	BOOST_CHECK_EQUAL( data["incs"][5]["sys"], true );
+	BOOST_CHECK_EQUAL( data["incs"][6]["n"], "sys2.hpp" );
+	BOOST_CHECK_EQUAL( data["incs"][6]["sys"], true );
+
+	BOOST_CHECK_EQUAL( data["incs"][7]["n"], "definitions.hpp" );
+	BOOST_CHECK_EQUAL( data["incs"][7]["sys"], false );
+
+	BOOST_CHECK_EQUAL( data["incs"][8]["n"], "t/test.hpp" );
+	BOOST_CHECK_EQUAL( data["incs"][8]["sys"], false );
+
+	BOOST_CHECK_EQUAL( data["incs"][9]["n"], "local.hpp" );
+	BOOST_CHECK_EQUAL( data["incs"][9]["sys"], false );
+	BOOST_CHECK_EQUAL( data["incs"][10]["n"], "local2.hpp" );
+	BOOST_CHECK_EQUAL( data["incs"][10]["sys"], false );
 }
 
 BOOST_AUTO_TEST_SUITE( error_data )
