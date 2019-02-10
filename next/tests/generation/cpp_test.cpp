@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE( without_includes )
 	BOOST_REQUIRE( data["incs"].is_undefined() );
 }
 
-BOOST_AUTO_TEST_CASE(with_includes)
+BOOST_AUTO_TEST_CASE(with_sys_includes)
 {
 	pt::ptree opts_tree;
 	mg::cpp_generator gen;
@@ -74,10 +74,15 @@ BOOST_AUTO_TEST_CASE(with_includes)
 	BOOST_CHECK_EQUAL( data["incs"][1]["n"], "cstdint" );
 	BOOST_CHECK_EQUAL( data["incs"][2]["n"], "string" );
 	BOOST_CHECK_EQUAL( data["incs"][3]["n"], "vector" );
+	BOOST_CHECK_EQUAL( data["incs"][0]["sys"], true );
 	BOOST_CHECK_EQUAL( data["incs"][1]["sys"], true );
 	BOOST_CHECK_EQUAL( data["incs"][2]["sys"], true );
 	BOOST_CHECK_EQUAL( data["incs"][3]["sys"], true );
-	BOOST_CHECK_EQUAL( data["incs"][4]["sys"], true );
+}
+
+BOOST_AUTO_TEST_CASE(with_local_includes)
+{
+	BOOST_FAIL("no test");
 }
 
 BOOST_AUTO_TEST_SUITE( error_data )
