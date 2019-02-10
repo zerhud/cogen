@@ -18,8 +18,13 @@ cppjson::value mg::cpp_generator::jsoned_data(parser::loader_ptr data_loader, op
 	cpp::type_converter tcvt;
 
 	auto data = ildr->result();
-	data = data | tcvt ;
+	//data = data | tcvt ;
 
-	return interface::to_json()(data);
+	cppjson::value jsoned = data | tcvt | interface::to_json();
+
+	auto incs = tcvt.includes();
+	for(std::size_t i=0;i<incs.size();++i) jsoned["incs"][i]["n"] = incs[i];
+
+	return jsoned;
 }
 

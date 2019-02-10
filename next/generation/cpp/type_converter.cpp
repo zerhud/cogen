@@ -30,7 +30,7 @@ std::map<std::string,std::string> modegen::generation::cpp::type_converter::incs
     , {"i32"s,"cstdint"s}
     , {"i64"s,"cstdint"s}
     , {"string"s,"string"s}
-    , {"date"s,"schrono"s}
+    , {"date"s,"chrono"s}
     , {"binary"s,"vector"s}
     , {"list"s,"vector"s}
     , {"map"s,"map"s}
