@@ -39,6 +39,7 @@ BOOST_AUTO_TEST_CASE( no_data_no_work )
 	BOOST_CHECK(data.is_undefined());
 }
 
+BOOST_AUTO_TEST_SUITE(includes)
 BOOST_AUTO_TEST_CASE( without_includes )
 {
 	pt::ptree opts_tree;
@@ -57,7 +58,7 @@ BOOST_AUTO_TEST_CASE( without_includes )
 	BOOST_REQUIRE( data["incs"].is_undefined() );
 }
 
-BOOST_AUTO_TEST_CASE(with_sys_includes)
+BOOST_AUTO_TEST_CASE(with_lnag_includes)
 {
 	pt::ptree opts_tree;
 	mg::cpp_generator gen;
@@ -80,7 +81,7 @@ BOOST_AUTO_TEST_CASE(with_sys_includes)
 	BOOST_CHECK_EQUAL( data["incs"][3]["sys"], true );
 }
 
-BOOST_AUTO_TEST_CASE(with_local_includes)
+BOOST_AUTO_TEST_CASE(with_setts_includes)
 {
 	pt::ptree opts_tree;
 	opts_tree.add("gen.hpp.inc_part", "def");
@@ -122,6 +123,7 @@ BOOST_AUTO_TEST_CASE(with_local_includes)
 	BOOST_CHECK_EQUAL( data["incs"][10]["n"], "local2.hpp" );
 	BOOST_CHECK_EQUAL( data["incs"][10]["sys"], false );
 }
+BOOST_AUTO_TEST_SUITE_END() // includes
 
 BOOST_AUTO_TEST_SUITE( error_data )
 BOOST_AUTO_TEST_CASE(wrong_loader)
