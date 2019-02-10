@@ -16,6 +16,7 @@ public:
 
 	std::string_view part_name() const ;
 	boost::property_tree::ptree part_data() const ;
+	boost::property_tree::ptree part_data(std::string_view name) const ;
 	const boost::property_tree::ptree& gen_data() const ;
 };
 

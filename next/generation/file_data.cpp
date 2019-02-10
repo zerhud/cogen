@@ -1,4 +1,5 @@
 #include "file_data.hpp"
+#include "errors.h"
 
 using namespace std::literals;
 namespace mg = modegen::generation;
@@ -16,7 +17,7 @@ std::string_view mg::options_view::part_name() const
 
 boost::property_tree::ptree mg::options_view::part_data() const
 {
-	return opts.get_child("gen."s+std::string(part));
+	return part_data(part);
 }
 
 const boost::property_tree::ptree& mg::options_view::gen_data() const
@@ -24,3 +25,10 @@ const boost::property_tree::ptree& mg::options_view::gen_data() const
 	return opts.get_child("gen"s);
 }
 
+
+boost::property_tree::ptree mg::options_view::part_data(std::string_view name) const
+{
+	auto part = opts.get_child_optional("gen."s+std::string(name));
+	if(!part) throw errors::error("no options for part"s + std::string(name));
+	return *part;
+}

@@ -84,3 +84,14 @@ BOOST_AUTO_TEST_CASE(common_generation)
 	gen.generate("some_dir");
 }
 
+BOOST_AUTO_TEST_SUITE(options_view)
+BOOST_AUTO_TEST_CASE(part_data)
+{
+	BOOST_FAIL("no test");
+}
+BOOST_AUTO_TEST_CASE(gen_data)
+{
+	TODO(checks for throws error with generator name: get it from gen settings)
+	BOOST_FAIL("no test");
+}
+BOOST_AUTO_TEST_SUITE_END() // options_view
