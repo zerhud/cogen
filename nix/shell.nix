@@ -12,5 +12,6 @@ let
 in pkgs.callPackage ./default.nix {
 	inherit cppjson stdenv turtle;
 	py_jinja = pkgs.python3Packages.jinja2;
+        clang = pkgs.clang_7;
 }
 

@@ -7,7 +7,7 @@
 using namespace std::literals;
 namespace mg = modegen::generation;
 
-mg::generator::generator(mg::provider_ptr p, const std::filesystem::path& i)
+mg::generator::generator(mg::provider_ptr p, const FS::path& i)
 	: prov(std::move(p))
 	, info_directory(i)
 {
@@ -24,7 +24,7 @@ const boost::property_tree::ptree& mg::generator::options() const
 	return opts;
 }
 
-void mg::generator::generate(const std::filesystem::path& output_dir) const
+void mg::generator::generate(const FS::path& output_dir) const
 {
 	assert( prov );
 	for(auto& part:opts.get_child("gen")) {
@@ -54,18 +54,18 @@ cppjson::value mg::generator::generate_data(std::string_view part) const
 	return tg->jsoned_data(std::move(tl), std::move(props));
 }
 
-std::filesystem::path mg::generator::output_path(std::string_view part) const
+FS::path mg::generator::output_path(std::string_view part) const
 {
 	std::string p(part);
 	std::string path = "gen." + p + ".output";
 	return opts.get(path, p + ".hpp");
 }
 
-std::filesystem::path mg::generator::tmpl_path(std::string_view part) const
+FS::path mg::generator::tmpl_path(std::string_view part) const
 {
 	std::string p(part);
 	std::string path = "gen." + p + ".input";
-	std::filesystem::path input_file = opts.get(path, p + ".jinja");
+	FS::path input_file = opts.get(path, p + ".jinja");
 	return info_directory / input_file;
 }
 

@@ -3,12 +3,21 @@
 #include <string_view>
 
 #cmakedefine ENABLE_TODO
+#cmakedefine HAVE_FILESYSTEM
 
 #define DO_PRAGMA(x) _Pragma (#x)
 #if !defined(NDEBUG) && defined(ENABLE_TODO)
 #define TODO(x) DO_PRAGMA(message ("TODO - " #x))
 #else 
 #define TODO(x)
+#endif
+
+#if defined(HAVE_FILESYSTEM)
+# define FILESYSTEM <filesystem>
+# define FS std::filesystem
+#else
+# define FILESYSTEM <experimental/filesystem>
+# define FS std::experimental::filesystem
 #endif
 
 namespace modegen {

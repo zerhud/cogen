@@ -10,9 +10,11 @@ find_package(Boost COMPONENTS program_options unit_test_framework system REQUIRE
 find_package(cppjson REQUIRED)
 find_package(Threads REQUIRED)
 find_file(turtle turtle/mock.hpp)
+include(CheckIncludeFile)
 get_filename_component(turtle "${turtle}" DIRECTORY)
 get_filename_component(turtle "${turtle}" DIRECTORY)
 
+check_include_file("filesystem" HAVE_FILESYSTEM)
 set(config_files_dir "${CMAKE_CURRENT_BINARY_DIR}/cfg")
 set(main_config_file "${config_files_dir}/config.hpp")
 set(templates_dir "share/modegen")

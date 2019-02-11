@@ -5,14 +5,14 @@
 
 #include "errors.h"
 
-modegen::parser::interface::loader_impl::loader_impl() : loader_impl(std::vector<std::filesystem::path>{})
+modegen::parser::interface::loader_impl::loader_impl() : loader_impl(std::vector<FS::path>{})
 {
 }
 
-modegen::parser::interface::loader_impl::loader_impl(std::vector<std::filesystem::path> includes)
+modegen::parser::interface::loader_impl::loader_impl(std::vector<FS::path> includes)
     : incs(std::move(includes))
 {
-	for(auto& i:incs) if(i.is_relative()) i = std::filesystem::absolute(i);
+	for(auto& i:incs) if(i.is_relative()) i = FS::absolute(i);
 }
 
 void modegen::parser::interface::loader_impl::load(std::istream &input, std::string fn)
@@ -27,7 +27,7 @@ void modegen::parser::interface::loader_impl::load(std::istream &input, std::str
 	ch(pfile);
 }
 
-void modegen::parser::interface::loader_impl::load(std::filesystem::path file)
+void modegen::parser::interface::loader_impl::load(FS::path file)
 {
 	if(!file.is_absolute()) throw errors::error("cannot load relative path");
 
@@ -53,24 +53,24 @@ std::vector<modegen::parser::interface::module> modegen::parser::interface::load
 	return result_cache;
 }
 
-bool modegen::parser::interface::loader_impl::already_loaded(const std::filesystem::path f) const
+bool modegen::parser::interface::loader_impl::already_loaded(const FS::path f) const
 {
 	for(auto& i:loaded_files) if(i==f) return true;
 	return false;
 }
 
-std::filesystem::path modegen::parser::interface::loader_impl::search_file(std::filesystem::path f) const
+FS::path modegen::parser::interface::loader_impl::search_file(FS::path f) const
 {
 	for(auto i=cur_dir.rbegin();i!=cur_dir.rend();++i) {
 		assert(i->is_absolute());
 		auto cur_file = *i / f;
-		if(std::filesystem::exists(cur_file)) return cur_file;
+		if(FS::exists(cur_file)) return cur_file;
 	}
 
 	for(const auto& i:incs) {
 		assert(i.is_absolute());
 		auto cur_file = i/f;
-		if(std::filesystem::exists(cur_file)) return cur_file;
+		if(FS::exists(cur_file)) return cur_file;
 	}
 
 	throw errors::error("file " + f.generic_u8string() + " not found");

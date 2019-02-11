@@ -11,7 +11,7 @@
 using namespace std::literals;
 namespace mg = modegen::generation;
 namespace mp = modegen::parser;
-namespace fs = std::filesystem;
+namespace fs = FS;
 
 MOCK_BASE_CLASS( provider_mock, modegen::generation::provider )
 {
@@ -22,7 +22,7 @@ MOCK_BASE_CLASS( provider_mock, modegen::generation::provider )
 
 class fake_target : public modegen::parser::loader {
 	void load(std::istream& input, std::string fn) override {}
-	void load(std::filesystem::path file) override {}
+	void load(FS::path file) override {}
 	void finish_loads() override {}
 };
 

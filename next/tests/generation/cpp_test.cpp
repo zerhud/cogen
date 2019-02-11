@@ -20,7 +20,7 @@ struct fake_mi_loader : public mi::loader {
 	std::vector<mi::module> data;
 	
 	void load(std::istream& input, std::string fn) override {}
-	void load(std::filesystem::path file) override {}
+	void load(FS::path file) override {}
 	void finish_loads() override {}
 
 	std::vector<mi::module> result() const override
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(wrong_loader)
 {
 	struct fake_wrong_loader : public modegen::parser::loader {
 		void load(std::istream& input, std::string fn) override {}
-		void load(std::filesystem::path file) override {}
+		void load(FS::path file) override {}
 		void finish_loads() override {}
 	};
 

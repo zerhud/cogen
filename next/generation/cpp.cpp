@@ -11,6 +11,7 @@ namespace mg = modegen::generation;
 cppjson::value mg::cpp_generator::jsoned_data(parser::loader_ptr data_loader, options_view opts) const
 {
 	using namespace modegen::generation::interface;
+	using modegen::generation::interface::operator |;
 
 	auto* ildr = dynamic_cast<parser::interface::loader*>(data_loader.get());
 	if(!ildr) throw errors::gen_error("cpp"s, "cannot generate cpp not from interface declaration or with wrong loader"s);

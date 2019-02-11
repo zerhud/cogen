@@ -1,6 +1,7 @@
 #pragma once
 
-#include <filesystem>
+#include "config.hpp"
+#include FILESYSTEM
 #include <cppjson/json.h>
 
 namespace modegen {
@@ -9,16 +10,16 @@ namespace generation {
 class json_jinja_generator {
 public:
 	virtual ~json_jinja_generator() noexcept =default ;
-	virtual const json_jinja_generator& operator() (std::filesystem::path tmpl, std::filesystem::path out, const cppjson::value& data) const =0 ;
+	virtual const json_jinja_generator& operator() (FS::path tmpl, FS::path out, const cppjson::value& data) const =0 ;
 };
 
 
 class jinja_python_generator : public json_jinja_generator {
 public:
-	jinja_python_generator(std::filesystem::path gen);
-	const json_jinja_generator& operator () (std::filesystem::path tmpl, std::filesystem::path out, const cppjson::value& data) const override ;
+	jinja_python_generator(FS::path gen);
+	const json_jinja_generator& operator () (FS::path tmpl, FS::path out, const cppjson::value& data) const override ;
 private:
-	std::filesystem::path generator;
+	FS::path generator;
 };
 
 } // namespace generators
