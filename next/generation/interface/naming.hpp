@@ -13,7 +13,8 @@ name_conversion from_string(std::string_view n);
 
 class naming {
 public:
-	naming(name_conversion c);
+	explicit naming(name_conversion c);
+	explicit naming(std::string_view sn);
 	std::vector<parser::interface::module>& operator () (std::vector<parser::interface::module>& mods) const ;
 
 	static std::vector<std::string> split_name(const std::string& name);

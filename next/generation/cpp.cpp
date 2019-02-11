@@ -1,6 +1,7 @@
 #include "cpp.hpp"
 
 #include "errors.h"
+#include "interface/naming.hpp"
 #include "interface/to_json.hpp"
 #include "cpp/type_converter.hpp"
 #include "parser/interface/loader.hpp"
@@ -20,7 +21,12 @@ cppjson::value mg::cpp_generator::jsoned_data(parser::loader_ptr data_loader, op
 
 	auto data = ildr->result();
 
-	cppjson::value jsoned = data | tcvt | interface::to_json();
+	cppjson::value jsoned =
+	          data
+	        | tcvt
+	        | naming(opts.part_data().get("naming",""s))
+	        | interface::to_json()
+	        ;
 
 	auto incs = includes(tcvt.includes(), opts);
 	for(std::size_t i=0;i<incs.size();++i) {

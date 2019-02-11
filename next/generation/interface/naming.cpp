@@ -91,6 +91,10 @@ std::string mg::naming::convert(const std::string& name, mg::name_conversion c)
 	return ret;
 }
 
+mg::naming::naming(std::string_view sn) : naming(from_string(sn))
+{
+}
+
 mg::naming::naming(mg::name_conversion c) : conver(c)
 {
 }
