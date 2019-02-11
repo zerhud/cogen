@@ -1,6 +1,5 @@
 #include "common.hpp"
 
-#include <iostream>
 #include <boost/property_tree/info_parser.hpp>
 #include "provider.hpp"
 #include "errors.h"
