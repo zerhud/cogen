@@ -3,40 +3,41 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "parser/grammar.hpp"
-#include "generator.hpp"
-#include "converters/filter.h"
+#include "parser/interface/grammar.hpp"
+#include "generation/interface/filter.hpp"
 
 using namespace std::literals;
+using modegen::generation::interface::filter;
+namespace mi = modegen::parser::interface;
 
 BOOST_AUTO_TEST_SUITE(module_name)
 BOOST_AUTO_TEST_CASE(no_filter)
 {
-	auto pf = modegen::parse("module mod v1.0: enum e{}"sv);
+	auto pf = mi::parse("module mod v1.0: enum e{}"sv);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
-	modegen::generation_request query;
-	modegen::cvt::filter{query}(pf.mods);
+	filter::request query;
+	filter{query}(pf.mods);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
 	BOOST_CHECK_EQUAL(pf.mods[0].content.size(),1);
 }
 BOOST_AUTO_TEST_CASE(exactly)
 {
-	auto pf = modegen::parse("module mod v1.0: enum e{} module mod1 v1.0: enum e{}"sv);
+	auto pf = mi::parse("module mod v1.0: enum e{} module mod1 v1.0: enum e{}"sv);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),2);
-	modegen::generation_request query;
+	filter::request query;
 	query.mod_name = "mod";
-	modegen::cvt::filter{query}(pf.mods);
+	filter{query}(pf.mods);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
 	BOOST_CHECK_EQUAL(pf.mods[0].content.size(),1);
 	BOOST_CHECK_EQUAL(pf.mods[0].name,"mod"sv);
 }
 BOOST_AUTO_TEST_CASE(pattern)
 {
-	auto pf = modegen::parse("module mod v1.0: enum e{} module mad1 v1.0: enum e{} module mod1 v1.0: enum e{}"sv);
+	auto pf = mi::parse("module mod v1.0: enum e{} module mad1 v1.0: enum e{} module mod1 v1.0: enum e{}"sv);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),3);
-	modegen::generation_request query;
+	filter::request query;
 	query.mod_name = "mo.*";
-	modegen::cvt::filter{query}(pf.mods);
+	filter{query}(pf.mods);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),2);
 	BOOST_CHECK_EQUAL(pf.mods[0].content.size(),1);
 	BOOST_CHECK_EQUAL(pf.mods[0].name,"mod"sv);
@@ -47,14 +48,14 @@ BOOST_AUTO_TEST_SUITE_END() // module_name
 BOOST_AUTO_TEST_SUITE(content_name)
 BOOST_AUTO_TEST_CASE(pattern)
 {
-	auto pf = modegen::parse("module mod v1.0: enum e1{} enum e2{} enum a3{}"sv);
+	auto pf = mi::parse("module mod v1.0: enum e1{} enum e2{} enum a3{}"sv);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
 	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),3);
-	modegen::generation_request query;
+	filter::request query;
 	query.cnt_name = "e[0-9]+";
-	modegen::cvt::filter{query}(pf.mods);
+	filter{query}(pf.mods);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(),1);
-	std::vector<modegen::module_content>& cnt = pf.mods[0].content;
+	std::vector<mi::module_content>& cnt = pf.mods[0].content;
 	BOOST_CHECK_EQUAL(cnt.size(),2);
 
 	namespace pl = std::placeholders;

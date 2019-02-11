@@ -1,15 +1,18 @@
-#include "filter.h"
+#include "filter.hpp"
 
 #include <regex>
 #include <algorithm>
-#include "parser/helpers.hpp"
+#include "parser/interface/helpers.hpp"
 
-modegen::cvt::filter::filter(const modegen::generation_request& q)
+namespace mg = modegen::generation::interface;
+namespace mi = modegen::parser::interface;
+
+mg::filter::filter(const request& q)
     : query(q)
 {
 }
 
-std::vector<modegen::module>& modegen::cvt::filter::operator()(std::vector<modegen::module>& mods) const
+std::vector<mi::module>& mg::filter::operator()(std::vector<mi::module>& mods) const
 {
 	cast_options(mods);
 	filter_by_name(mods);
@@ -18,7 +21,7 @@ std::vector<modegen::module>& modegen::cvt::filter::operator()(std::vector<modeg
 	return mods;
 }
 
-void modegen::cvt::filter::filter_by_name(std::vector<modegen::module>& mods) const
+void mg::filter::filter_by_name(std::vector<mi::module>& mods) const
 {
 	const bool need_check_module_name = !query.mod_name.empty();
 	const bool need_check_content_name = !query.cnt_name.empty();
@@ -42,14 +45,14 @@ void modegen::cvt::filter::filter_by_name(std::vector<modegen::module>& mods) co
 	}
 }
 
-void modegen::cvt::filter::remove_without_content(std::vector<modegen::module>& mods) const
+void mg::filter::remove_without_content(std::vector<mi::module>& mods) const
 {
-	auto rpos = std::remove_if(mods.begin(),mods.end(), [](const modegen::module& m){return m.content.empty();} );
+	auto rpos = std::remove_if(mods.begin(),mods.end(), [](const mi::module& m){return m.content.empty();} );
 	mods.erase( rpos, mods.end() );
 
 }
 
-void modegen::cvt::filter::cast_options(std::vector<modegen::module>& mods) const
+void mg::filter::cast_options(std::vector<mi::module>& mods) const
 {
 	TODO(uncomment and compile)
 	//modegen::gen_options opts = query.opts;
