@@ -61,7 +61,6 @@ std::string mg::naming::convert(const std::string& name, mg::name_conversion c)
 {
 	std::string ret = name;
 
-	TODO(it will return empty string)
 	if(c==name_conversion::as_is) return ret;
 
 	auto split = split_name(name);

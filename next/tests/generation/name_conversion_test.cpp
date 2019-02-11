@@ -83,4 +83,10 @@ BOOST_AUTO_TEST_CASE(title)
 	BOOST_CHECK_EQUAL("FooBar", naming::convert("FooBar", name_conversion::title_case));
 	BOOST_CHECK_EQUAL("FooBar", naming::convert("Foo_Bar", name_conversion::title_case));
 }
+BOOST_AUTO_TEST_CASE(as_is)
+{
+	BOOST_CHECK_EQUAL("FooBar", naming::convert("FooBar", name_conversion::as_is));
+	BOOST_CHECK_EQUAL("FooBar_", naming::convert("FooBar_", name_conversion::as_is));
+	BOOST_CHECK_EQUAL("Foo_Bar", naming::convert("Foo_Bar", name_conversion::as_is));
+}
 BOOST_AUTO_TEST_SUITE_END() // convert
