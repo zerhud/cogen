@@ -6,6 +6,7 @@
 
 #include "generation/common.hpp"
 #include "generation/provider.hpp"
+#include "generation/file_data.hpp"
 
 using namespace std::literals;
 namespace mg = modegen::generation;
@@ -87,11 +88,23 @@ BOOST_AUTO_TEST_CASE(common_generation)
 BOOST_AUTO_TEST_SUITE(options_view)
 BOOST_AUTO_TEST_CASE(part_data)
 {
-	BOOST_FAIL("no test");
+	boost::property_tree::ptree pt;
+	pt.put("gen.part.test", true);
+	pt.put("gen.other.test", true);
+	mg::options_view opts(pt, "part"sv);
+	BOOST_CHECK_EQUAL(opts.part_data().get<bool>("test"), true);
+	BOOST_CHECK_EQUAL(opts.part_data("other"sv).get<bool>("test"), true);
 }
 BOOST_AUTO_TEST_CASE(gen_data)
 {
-	TODO(checks for throws error with generator name: get it from gen settings)
-	BOOST_FAIL("no test");
+	boost::property_tree::ptree pt;
+	pt.put("gen.part.test", true);
+	pt.put("gen.other.test", true);
+	pt.put("gen.lala.test", "string");
+	mg::options_view opts(pt, "part"sv);
+
+	BOOST_CHECK_EQUAL(opts.gen_data().get<bool>("part.test"), true);
+	BOOST_CHECK_EQUAL(opts.gen_data().get<bool>("other.test"), true);
+	BOOST_CHECK_EQUAL(opts.gen_data().get<std::string>("lala.test"), "string");
 }
 BOOST_AUTO_TEST_SUITE_END() // options_view

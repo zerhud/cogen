@@ -32,6 +32,7 @@ struct fake_mi_loader : public mi::loader {
 BOOST_AUTO_TEST_CASE( no_data_no_work )
 {
 	pt::ptree opts_tree;
+	opts_tree.put("gen.def.input", "fake_tmpl");
 	mg::cpp_generator gen;
 	mg::options_view opts(opts_tree, "def"sv);
 
@@ -43,6 +44,7 @@ BOOST_AUTO_TEST_SUITE(includes)
 BOOST_AUTO_TEST_CASE( without_includes )
 {
 	pt::ptree opts_tree;
+	opts_tree.put("gen.def.input", "fake_tmpl");
 	mg::cpp_generator gen;
 	mg::options_view opts(opts_tree, "def"sv);
 
@@ -61,6 +63,7 @@ BOOST_AUTO_TEST_CASE( without_includes )
 BOOST_AUTO_TEST_CASE(with_lnag_includes)
 {
 	pt::ptree opts_tree;
+	opts_tree.put("gen.def.input", "fake_tmpl");
 	mg::cpp_generator gen;
 	mg::options_view opts(opts_tree, "def"sv);
 
@@ -90,8 +93,8 @@ BOOST_AUTO_TEST_CASE(with_setts_includes)
 	opts_tree.add("gen.hpp.inc_local", "local2.hpp");
 	opts_tree.add("gen.hpp.inc_sys", "sys.hpp");
 	opts_tree.add("gen.hpp.inc_sys", "sys2.hpp");
-	opts_tree.put("gen.def.ouput", "definitions.hpp");
-	opts_tree.put("gen.test.ouput", "t/test.hpp");
+	opts_tree.put("gen.def.output", "definitions.hpp");
+	opts_tree.put("gen.test.output", "t/test.hpp");
 
 	mg::cpp_generator gen;
 	mg::options_view opts(opts_tree, "hpp"sv);
@@ -101,27 +104,31 @@ BOOST_AUTO_TEST_CASE(with_setts_includes)
 	cppjson::value data = gen.jsoned_data(ldr, opts);
 
 	BOOST_REQUIRE( !data["incs"].is_undefined() );
-	BOOST_REQUIRE_EQUAL( data["incs"].array().size(), 11 );
+	BOOST_REQUIRE_EQUAL( data["incs"].array().size(), 10 );
 	BOOST_CHECK_EQUAL( data["incs"][0]["sys"], true );
 	BOOST_CHECK_EQUAL( data["incs"][1]["sys"], true );
 	BOOST_CHECK_EQUAL( data["incs"][2]["sys"], true );
 	BOOST_CHECK_EQUAL( data["incs"][3]["sys"], true );
+	BOOST_CHECK_EQUAL( data["incs"][0]["n"], "chrono" );
+	BOOST_CHECK_EQUAL( data["incs"][1]["n"], "cstdint" );
+	BOOST_CHECK_EQUAL( data["incs"][2]["n"], "string" );
+	BOOST_CHECK_EQUAL( data["incs"][3]["n"], "vector" );
 
-	BOOST_CHECK_EQUAL( data["incs"][5]["n"], "sys.hpp" );
+	BOOST_CHECK_EQUAL( data["incs"][4]["n"], "sys.hpp" );
+	BOOST_CHECK_EQUAL( data["incs"][4]["sys"], true );
+	BOOST_CHECK_EQUAL( data["incs"][5]["n"], "sys2.hpp" );
 	BOOST_CHECK_EQUAL( data["incs"][5]["sys"], true );
-	BOOST_CHECK_EQUAL( data["incs"][6]["n"], "sys2.hpp" );
-	BOOST_CHECK_EQUAL( data["incs"][6]["sys"], true );
 
-	BOOST_CHECK_EQUAL( data["incs"][7]["n"], "definitions.hpp" );
+	BOOST_CHECK_EQUAL( data["incs"][6]["n"], "definitions.hpp" );
+	BOOST_CHECK_EQUAL( data["incs"][6]["sys"], false );
+
+	BOOST_CHECK_EQUAL( data["incs"][7]["n"], "t/test.hpp" );
 	BOOST_CHECK_EQUAL( data["incs"][7]["sys"], false );
 
-	BOOST_CHECK_EQUAL( data["incs"][8]["n"], "t/test.hpp" );
+	BOOST_CHECK_EQUAL( data["incs"][8]["n"], "local.hpp" );
 	BOOST_CHECK_EQUAL( data["incs"][8]["sys"], false );
-
-	BOOST_CHECK_EQUAL( data["incs"][9]["n"], "local.hpp" );
+	BOOST_CHECK_EQUAL( data["incs"][9]["n"], "local2.hpp" );
 	BOOST_CHECK_EQUAL( data["incs"][9]["sys"], false );
-	BOOST_CHECK_EQUAL( data["incs"][10]["n"], "local2.hpp" );
-	BOOST_CHECK_EQUAL( data["incs"][10]["sys"], false );
 }
 BOOST_AUTO_TEST_SUITE_END() // includes
 
@@ -140,5 +147,14 @@ BOOST_AUTO_TEST_CASE(wrong_loader)
 
 	BOOST_CHECK_THROW( gen.jsoned_data(nullptr, opts), modegen::errors::gen_error );
 	BOOST_CHECK_THROW( gen.jsoned_data(std::make_shared<fake_wrong_loader>(), opts), modegen::errors::gen_error );
+}
+
+BOOST_AUTO_TEST_CASE( no_part_opts )
+{
+	pt::ptree opts_tree;
+	mg::cpp_generator gen;
+	mg::options_view opts(opts_tree, "def"sv);
+
+	BOOST_CHECK_THROW( gen.jsoned_data(std::make_shared<fake_mi_loader>(), opts), modegen::errors::error );
 }
 BOOST_AUTO_TEST_SUITE_END() // error_data

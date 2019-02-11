@@ -18,16 +18,45 @@ cppjson::value mg::cpp_generator::jsoned_data(parser::loader_ptr data_loader, op
 	cpp::type_converter tcvt;
 
 	auto data = ildr->result();
-	//data = data | tcvt ;
 
 	cppjson::value jsoned = data | tcvt | interface::to_json();
 
-	auto incs = tcvt.includes();
+	auto incs = includes(tcvt.includes(), opts);
 	for(std::size_t i=0;i<incs.size();++i) {
-		jsoned["incs"][i]["n"] = incs[i];
-		jsoned["incs"][i]["sys"] = true;
+		jsoned["incs"][i]["n"] = incs[i].name;
+		jsoned["incs"][i]["sys"] = incs[i].sys;
 	}
 
 	return jsoned;
+}
+
+std::vector<mg::cpp_generator::inc_info> mg::cpp_generator::includes(const std::vector<std::string> sys, mg::options_view& opts) const
+{
+	std::vector<inc_info> ret;
+	ret.reserve(sys.size());
+
+	for(auto& s:sys) ret.emplace_back(std::move(s), true);
+	for(auto& i:opts.part_data()) {
+		if(i.first == "inc_sys"sv) {
+			ret.emplace_back(i.second.get_value<std::string>(), true);
+		}
+	}
+	for(auto& i:opts.part_data()) {
+		if(i.first == "inc_part"sv) {
+			ret.emplace_back(solve_part_include(i.second.get_value<std::string>(), opts), false);
+		}
+	}
+	for(auto& i:opts.part_data()) {
+		if(i.first == "inc_local"sv) {
+			ret.emplace_back(i.second.get_value<std::string>(), false);
+		}
+	}
+
+	return ret;
+}
+
+std::string mg::cpp_generator::solve_part_include(const std::string& part, mg::options_view& opts) const
+{
+	return opts.part_data(part).get<std::string>("output");
 }
 
