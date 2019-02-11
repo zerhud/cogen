@@ -14,7 +14,6 @@ mg::filter::filter(const request& q)
 
 std::vector<mi::module>& mg::filter::operator()(std::vector<mi::module>& mods) const
 {
-	cast_options(mods);
 	filter_by_name(mods);
 	remove_without_content(mods);
 
@@ -51,14 +50,3 @@ void mg::filter::remove_without_content(std::vector<mi::module>& mods) const
 	mods.erase( rpos, mods.end() );
 
 }
-
-void mg::filter::cast_options(std::vector<mi::module>& mods) const
-{
-	TODO(uncomment and compile)
-	//modegen::gen_options opts = query.opts;
-	//if((opts & modegen::gen_options::split_version)==modegen::gen_options::split_version) {
-	    //modegen::converters::split_by_version splitter;
-	    //splitter(mods);
-	//}
-}
-

@@ -19,6 +19,8 @@ cmake --build .
 cat > make_cov.sh <<EOF
 #! /usr/bin/env bash
 
+ninja
+
 LLVM_PROFILE_FILE="\$1.profraw" ./\$1
 llvm-profdata merge -sparse \$1.profraw -o \$1.profdata
 llvm-cov show ./\$1 -show-line-counts-or-regions -instr-profile=\$1.profdata --format html > \$1.html

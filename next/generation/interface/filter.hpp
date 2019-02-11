@@ -19,7 +19,6 @@ public:
 private:
 	void filter_by_name(std::vector<parser::interface::module>& mods) const ;
 	void remove_without_content(std::vector<parser::interface::module>& mods) const ;
-	void cast_options(std::vector<parser::interface::module>& mods) const ;
 
 	const request& query;
 };
