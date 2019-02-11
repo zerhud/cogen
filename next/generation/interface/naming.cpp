@@ -1,9 +1,12 @@
-#include "case.h"
+#include "naming.hpp"
 
 #include <cassert>
 #include <algorithm>
 
-std::string_view modegen::cvt::to_string(modegen::cvt::name_conversion c)
+namespace mg = modegen::generation::interface;
+namespace mi = modegen::parser::interface;
+
+std::string_view mg::to_string(mg::name_conversion c)
 {
 	using namespace std::literals;
 	if(c==name_conversion::as_is) return "asis"sv;
@@ -14,7 +17,7 @@ std::string_view modegen::cvt::to_string(modegen::cvt::name_conversion c)
 	return "asis"sv;
 }
 
-modegen::cvt::name_conversion modegen::cvt::from_string(std::string_view n)
+mg::name_conversion mg::from_string(std::string_view n)
 {
 	using namespace std::literals;
 	if(n=="underscore"sv) return name_conversion::underscore;
@@ -23,7 +26,7 @@ modegen::cvt::name_conversion modegen::cvt::from_string(std::string_view n)
 	return name_conversion::as_is;
 }
 
-std::vector<std::string> modegen::cvt::naming::split_name(const std::string &name)
+std::vector<std::string> mg::naming::split_name(const std::string &name)
 {
 	std::vector<std::string> ret;
 
@@ -54,9 +57,9 @@ std::vector<std::string> modegen::cvt::naming::split_name(const std::string &nam
 	return ret;
 }
 
-std::string modegen::cvt::naming::convert(const std::string& name, modegen::cvt::name_conversion c)
+std::string mg::naming::convert(const std::string& name, mg::name_conversion c)
 {
-	std::string ret;
+	std::string ret = name;
 
 	TODO(it will return empty string)
 	if(c==name_conversion::as_is) return ret;
@@ -64,6 +67,7 @@ std::string modegen::cvt::naming::convert(const std::string& name, modegen::cvt:
 	auto split = split_name(name);
 	if(split.empty()) return ret;
 
+	ret.clear();
 	if(c == name_conversion::underscore) {
 		for(auto& s:split) ret += s + "_";
 		ret.erase(ret.size()-1,1);
@@ -88,12 +92,14 @@ std::string modegen::cvt::naming::convert(const std::string& name, modegen::cvt:
 	return ret;
 }
 
-modegen::cvt::naming::naming(modegen::cvt::name_conversion c) : conver(c)
+mg::naming::naming(mg::name_conversion c) : conver(c)
 {
 }
 
-std::vector<modegen::module>& modegen::cvt::naming::operator() (std::vector<modegen::module>& mods) const
+std::vector<mi::module>& mg::naming::operator() (std::vector<mi::module>& mods) const
 {
+	using namespace mi;
+
 	struct {
 		name_conversion naming = name_conversion::as_is;
 		void convert(std::vector<module>& mods) { for(auto& m:mods) convert(m); }
@@ -101,7 +107,7 @@ std::vector<modegen::module>& modegen::cvt::naming::operator() (std::vector<mode
 		void convert(function& obj) { obj.name = naming::convert(obj.name, naming); }
 		void convert(enumeration& obj) { obj.name = naming::convert(obj.name, naming); }
 		void convert(record& obj) { obj.name = naming::convert(obj.name, naming); }
-		void convert(interface& obj) {
+		void convert(mi::interface& obj) {
 			if(naming!=name_conversion::camel_case) obj.name = naming::convert(obj.name, naming);
 			else obj.name = naming::convert(obj.name, name_conversion::title_case);
 			for(auto& m:obj.mem_funcs) convert(m);

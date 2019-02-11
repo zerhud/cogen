@@ -62,6 +62,7 @@ target_sources(modegen_interfaces PRIVATE
 	)
 # generation part for interface
 target_sources_local(modegen_interfaces to_json.hpp to_json.cpp "generation/interface/")
+target_sources_local(modegen_interfaces naming.hpp naming.cpp "generation/interface/")
 # generation part for cpp
 target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "generation/cpp/")
 
@@ -80,7 +81,7 @@ endmacro()
 set(tests_gcommon
 	common to_json
 	cpp cpp_type_cvt
-	#name_conversion
+	name_conversion
 	#split_by_version
 	#filter
 	#common_generators
