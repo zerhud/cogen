@@ -37,6 +37,7 @@ configure_file("config.hpp.in" "${main_config_file}")
 include(cmake/target_sources_local.cmake)
 
 # interface library: parse interface definitions and generate code by templates
+set(pythongen_src "${CMAKE_CURRENT_LIST_DIR}/generation/pythongen")
 add_library(modegen_interfaces ${main_config_file})
 target_link_libraries(modegen_interfaces PRIVATE stdc++fs PUBLIC ${Boost_LIBRARIES} ${CPPJSON_LIBRARIES})
 target_include_directories(modegen_interfaces PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${config_files_dir}")
@@ -56,7 +57,7 @@ target_sources_local(modegen_interfaces common.hpp    common.cpp    "generation/
 target_sources_local(modegen_interfaces file_data.hpp file_data.cpp "generation/")
 target_sources_local(modegen_interfaces cpp.hpp       cpp.cpp       "generation/")
 target_sources(modegen_interfaces PRIVATE
-	generation/pythongen
+	"${pythongen_src}"
 	generation/cpp/declarations.info generation/cpp/declarations.jinja
 	generation/cpp/header.jinja generation/cpp/definitions.jinja
 	)
@@ -70,6 +71,11 @@ target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "g
 # main programm: run selected generator and sets options
 add_executable(modegen modegen/main.cpp)
 target_link_libraries(modegen modegen_interfaces ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
+add_custom_command(TARGET modegen POST_BUILD
+	COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+		"${pythongen_src}"
+		"${CMAKE_CURRENT_BINARY_DIR}/pythongen"
+	)
 
 # unit tests...
 enable_testing()
