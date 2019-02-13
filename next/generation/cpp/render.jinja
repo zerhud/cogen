@@ -28,7 +28,7 @@
 
 <%- macro includes(incs) -%>
 <%- for inc in incs %>
-#include <= '"' if inc.local else '<' =><= inc.n =><= '"' if inc.local else '>' =>
+#include <= '<' if inc.sys else '"' =><= inc.n =><= '>' if inc.sys else '"' =>
 <%- endfor -%>
 <%- endmacro -%>
 

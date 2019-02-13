@@ -57,7 +57,7 @@ public:
 
 	void json_jinja(const cppjson::value& data, const FS::path& tmpl, const std::optional<FS::path>& out) const override
 	{
-		std::cout << "gen " << tmpl << std::endl;
+		std::cout << "generate " << (out ? out->u8string() : u8"-"s) << " from " << tmpl << std::endl;
 		pygen(tmpl, out ? *out : u8"-", data);
 	}
 
