@@ -94,6 +94,7 @@ auto parse_command_line(int argc, char** argv, std::vector<std::string> glist)
 		("option,O", po::value<std::vector<std::string>>(), "override option from info file")
 		("aoption", po::value<std::vector<std::string>>(), "add option to info file parser result")
 		("include", po::value<std::vector<std::string>>(), "include directories for search files")
+		("outdir", po::value<std::vector<std::string>>(), "directory where to output (will not be overrdien with new generator)")
 		;
 
 	auto opts = po::command_line_parser(argc,argv).options(desc).run();
@@ -116,6 +117,7 @@ int main(int argc, char** argv)
 	auto [opts,vm] = parse_command_line(argc, argv, prov->list_target());
 
 	std::unique_ptr<mg::generator> gen;
+	FS::path out_dir = FS::current_path();
 	std::regex key_val_parser("([a-zA-Z_]+)(=(.+))?", std::regex::egrep);
 	for(auto& opt:opts.options) {
 		std::string& key = opt.string_key;
@@ -143,12 +145,16 @@ int main(int argc, char** argv)
 		else if(key=="include") {
 			TODO( add include directory );
 		}
+		else if(key=="outdir") {
+			out_dir = val;
+			if(!FS::exists(out_dir)) FS::create_directories(out_dir);
+		}
 		else {
 			std::cerr << u8"unknown option " << key << "=" << val << std::endl;
 		}
 	}
 
-	if(gen) gen->generate(FS::current_path());
+	if(gen) gen->generate(out_dir);
 
 	return 0;
 }
