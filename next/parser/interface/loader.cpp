@@ -44,6 +44,7 @@ void modegen::parser::interface::loader_impl::load(FS::path file)
 
 void modegen::parser::interface::loader_impl::finish_loads()
 {
+	if(cur_dir.empty()) return;
 	cur_dir.clear();
 	result_cache = ch.extract_result();
 }

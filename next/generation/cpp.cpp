@@ -3,6 +3,7 @@
 #include "errors.h"
 #include "interface/naming.hpp"
 #include "interface/to_json.hpp"
+#include "interface/filter.hpp"
 #include "cpp/type_converter.hpp"
 #include "parser/interface/loader.hpp"
 
@@ -20,10 +21,12 @@ cppjson::value mg::cpp_generator::jsoned_data(parser::loader_ptr data_loader, op
 	cpp::type_converter tcvt;
 
 	auto data = ildr->result();
+	if(data.empty()) throw errors::gen_error("cpp"s, "cannot work with empty interface");
 
 	cppjson::value jsoned =
 	          data
 	        | tcvt
+	        | filter(filter::request{})
 	        | naming(opts.part_data().get("naming",""s))
 	        | interface::to_json()
 	        ;

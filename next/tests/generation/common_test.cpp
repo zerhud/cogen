@@ -7,6 +7,7 @@
 #include "generation/common.hpp"
 #include "generation/provider.hpp"
 #include "generation/file_data.hpp"
+#include "errors.h"
 
 using namespace std::literals;
 namespace mg = modegen::generation;
@@ -16,8 +17,8 @@ namespace fs = FS;
 MOCK_BASE_CLASS( provider_mock, modegen::generation::provider )
 {
 	MOCK_METHOD( json_jinja, 3 )
-	MOCK_METHOD( target_data, 1 )
-	MOCK_METHOD( target_generator, 1 )
+	MOCK_METHOD( parser, 1 )
+	MOCK_METHOD( generator, 1 )
 };
 
 class fake_target : public modegen::parser::loader {
@@ -26,13 +27,15 @@ class fake_target : public modegen::parser::loader {
 	void finish_loads() override {}
 };
 
-class fake_data_gen : public modegen::generation::file_data {
-public:
+struct fake_data_gen : modegen::generation::file_data {
+	bool gen_data = true;
 	cppjson::value jsoned_data(mp::loader_ptr data_loader, mg::options_view opts) const override
 	{
 		cppjson::value ret;
-		ret["name"] = std::string(opts.part_name());
-		ret["test"] = opts.part_data().get<std::string>("test");
+		if(gen_data) {
+			ret["name"] = std::string(opts.part_name());
+			ret["test"] = opts.part_data().get<std::string>("test");
+		}
 		return ret;
 	}
 };
@@ -67,12 +70,13 @@ BOOST_AUTO_TEST_CASE(common_generation)
 
 	auto provider = std::make_shared<provider_mock>();
 	MOCK_EXPECT( provider->json_jinja ).exactly(2).with( result_data_checker ) ;
-	MOCK_EXPECT( provider->target_data ).exactly(2).with( "cpp"sv ).returns( std::make_shared<fake_target>() );
-	MOCK_EXPECT( provider->target_generator ).exactly(2).with( "cpp"sv ).returns( std::make_shared<fake_data_gen>() );
+	MOCK_EXPECT( provider->parser ).exactly(2).with( "interface"sv ).returns( std::make_shared<fake_target>() );
+	MOCK_EXPECT( provider->generator ).exactly(2).with( "cpp"sv ).returns( std::make_shared<fake_data_gen>() );
 
 	mg::generator gen(provider, u8"some/path");
 	auto& opts = gen.options();
 	opts.put("gen.def.target", "cpp") ;
+	opts.put("gen.def.parser", "interface") ;
 	opts.put("gen.def.output", "def.hpp") ;
 	opts.put("gen.def.input", "definitions.hpp.jinja") ;
 	opts.put("gen.def.test", "test_data") ;
@@ -108,3 +112,25 @@ BOOST_AUTO_TEST_CASE(gen_data)
 	BOOST_CHECK_EQUAL(opts.gen_data().get<std::string>("lala.test"), "string");
 }
 BOOST_AUTO_TEST_SUITE_END() // options_view
+
+BOOST_AUTO_TEST_SUITE(wrong_generation)
+BOOST_AUTO_TEST_CASE(no_data)
+{
+	auto data_gen = std::make_shared<fake_data_gen>();
+	data_gen->gen_data = false;
+
+	auto provider = std::make_shared<provider_mock>();
+	MOCK_EXPECT( provider->json_jinja ).exactly(0);
+	MOCK_EXPECT( provider->parser ).exactly(1).with( "interface"sv ).returns( std::make_shared<fake_target>() );
+	MOCK_EXPECT( provider->generator ).exactly(1).with( "cpp"sv ).returns( data_gen );
+
+	mg::generator gen(provider, u8"some/path");
+	auto& opts = gen.options();
+	opts.put("gen.def.target", "cpp") ;
+	opts.put("gen.def.parser", "interface") ;
+	opts.put("gen.def.output", "def.hpp") ;
+	opts.put("gen.def.input", "definitions.hpp.jinja") ;
+	opts.put("gen.def.test", "test_data") ;
+	BOOST_CHECK_THROW( gen.generate("some_dir"), modegen::errors::error );
+}
+BOOST_AUTO_TEST_SUITE_END() // wrong_generation

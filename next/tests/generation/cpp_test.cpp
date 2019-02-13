@@ -29,15 +29,14 @@ struct fake_mi_loader : public mi::loader {
 	}
 };
 
-BOOST_AUTO_TEST_CASE( no_data_no_work )
+BOOST_AUTO_TEST_CASE( no_data_is_error )
 {
 	pt::ptree opts_tree;
 	opts_tree.put("gen.def.input", "fake_tmpl");
 	mg::cpp_generator gen;
 	mg::options_view opts(opts_tree, "def"sv);
 
-	cppjson::value data = gen.jsoned_data(std::make_shared<fake_mi_loader>(), opts);
-	BOOST_CHECK(data.is_undefined());
+	BOOST_CHECK_THROW(gen.jsoned_data(std::make_shared<fake_mi_loader>(), opts), modegen::errors::gen_error);
 }
 
 BOOST_AUTO_TEST_SUITE(includes)

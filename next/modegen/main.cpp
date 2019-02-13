@@ -1,6 +1,7 @@
 #include <regex>
 #include <iostream>
 #include <boost/program_options.hpp>
+#include <boost/property_tree/info_parser.hpp>
 #include <boost/process.hpp>
 
 #include "generation/common.hpp"
@@ -40,19 +41,23 @@ public:
 		return ldr;
 	}
 
-	modegen::parser::loader_ptr target_data(std::string_view name) const override
+	modegen::parser::loader_ptr parser(std::string_view name) const override
 	{
-		return nullptr;
+		auto ldr = search_loader(name);
+		if(!ldr) throw std::runtime_error("no such target was loaded " + std::string(name));
+		ldr->finish_loads();
+		return ldr;
 	}
 
-	mg::file_data_ptr target_generator(std::string_view name) const override
+	mg::file_data_ptr generator(std::string_view name) const override
 	{
 		if(name == "cpp"sv) return std::make_shared<mg::cpp_generator>();
-		return nullptr;
+		throw std::runtime_error("no such target was loaded " + std::string(name));
 	}
 
 	void json_jinja(const cppjson::value& data, const FS::path& tmpl, const std::optional<FS::path>& out) const override
 	{
+		std::cout << "gen " << tmpl << std::endl;
 		pygen(tmpl, out ? *out : u8"-", data);
 	}
 
@@ -83,7 +88,7 @@ auto parse_command_line(int argc, char** argv, std::vector<std::string> glist)
 {
 	po::options_description desc("Allowed options");
 	desc.add_options()
-	        ("help,h", "produce this help message")
+		("help,h", "produce this help message")
 		("input,I", po::value<std::vector<std::string>>(), "input (foramt like -Iinterface=some_file). use - for read from std input")
 		("generator,g", po::value<std::vector<std::string>>(), "info file for generation (file contains options)")
 		("option,O", po::value<std::vector<std::string>>(), "override option from info file")
@@ -123,7 +128,9 @@ int main(int argc, char** argv)
 			prov->create_loader(m[1].str(), input_path);
 		}
 		else if(key=="generator") {
-			gen = std::make_unique<mg::generator>(prov, val);
+			FS::path info_path = val;
+			gen = std::make_unique<mg::generator>(prov, info_path.parent_path());
+			boost::property_tree::read_info(info_path.u8string(), gen->options());
 		}
 		else if(key=="option") {
 			if(!gen) throw std::runtime_error("cannot override option without generator");
@@ -140,6 +147,8 @@ int main(int argc, char** argv)
 			std::cerr << u8"unknown option " << key << "=" << val << std::endl;
 		}
 	}
+
+	if(gen) gen->generate(FS::current_path());
 
 	return 0;
 }

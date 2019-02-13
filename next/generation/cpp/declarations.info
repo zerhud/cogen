@@ -1,0 +1,24 @@
+gen
+{
+	dec {
+		parser interface
+		target cpp
+		input declarations.jinja
+		output declarations.hpp
+	}
+	header {
+		parser interface
+		target cpp
+		inc_part dec
+		input declarations.jinja
+		output module.hpp
+	}
+	definition {
+		parser interface
+		target cpp
+		inc_part dec
+		inc_part header
+		input definitions.jinja
+		output module.cpp
+	}
+}

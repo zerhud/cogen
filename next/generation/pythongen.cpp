@@ -18,6 +18,7 @@ const modegen::generation::json_jinja_generator& modegen::generation::jinja_pyth
 	opstream pdata;
 	child a(
 		  generator.u8string() // pythongen_path()
+		, "-d", "-"
 		, "-t", tmpl.u8string() // tmpl_path(t)
 		, "-o", out.u8string() // out_path.generic_u8string()
 		, std_out > stdout
