@@ -25,10 +25,11 @@ public:
 };
 
 class to_json {
+	typedef std::vector<std::unique_ptr<to_json_aspect>> aspect_ptr_vector;
 public:
 	to_json();
 	to_json(std::unique_ptr<to_json_aspect> gen_aspect);
-	to_json(boost::ptr_vector<to_json_aspect> gen_aspects);
+	to_json(aspect_ptr_vector gen_aspects);
 	to_json& operator () (std::vector<modegen::parser::interface::module>& m) ;
 	operator std::string () const ;
 	operator cppjson::value () const ;
@@ -51,7 +52,7 @@ private:
 	template<typename T>
 	void applay_asp(cppjson::value& val, const T& obj) const
 	{
-		for(auto a:gen_asps) a.as_object(val, obj);
+		for(const auto& a:gen_asps) a->as_object(val, obj);
 	}
 
 	template<typename P, typename O>
@@ -67,7 +68,7 @@ private:
 	std::vector<modegen::parser::interface::module> mods;
 	cppjson::value result;
 
-	boost::ptr_vector<to_json_aspect> gen_asps;
+	aspect_ptr_vector gen_asps;
 };
 
 } // namespace modegen::generation::interface

@@ -10,6 +10,13 @@ using namespace std::literals;
 namespace mi = modegen::parser::interface;
 namespace mg = modegen::generation::interface;
 
+struct test_json_asp : mg::to_json_aspect {
+	void as_object(cppjson::value& jval, const modegen::parser::interface::module& obj) override
+	{
+		jval["mn"] = obj.name;
+	}
+};
+
 void check_type(const cppjson::value& v, const std::string& name, const std::string& mod)
 {
 	BOOST_CHECK_EQUAL(v["type"], "type");
@@ -142,4 +149,17 @@ BOOST_AUTO_TEST_CASE(interface)
 	BOOST_REQUIRE_EQUAL(i["constructors"][1]["params"].array().size(), 1);
 	BOOST_CHECK_EQUAL(i["constructors"][1]["params"][0]["type"], "func_param");
 	BOOST_CHECK_EQUAL(i["constructors"][1]["params"][0]["name"], "name");
+}
+
+BOOST_AUTO_TEST_CASE(aspect)
+{
+	auto pf = mi::parse("module mod v1.0: interface i { type name() mutable ; constructor(); constructor(type name); }");
+	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(), 1);
+
+	cppjson::value result_ = mg::to_json(std::make_unique<test_json_asp>())(pf.mods);
+	cppjson::value result = result_["mods"];
+
+	BOOST_CHECK_EQUAL(result[0]["name"], "mod"s);
+	BOOST_CHECK_EQUAL(result[0]["mn"], "mod"s);
 }

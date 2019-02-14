@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(part_data)
 	BOOST_CHECK_EQUAL(opts.part_data().get<bool>("test"), true);
 	BOOST_CHECK_EQUAL(opts.part_data("other"sv).get<bool>("test"), true);
 }
-BOOST_AUTO_TEST_CASE(gen_data)
+BOOST_AUTO_TEST_CASE(all)
 {
 	boost::property_tree::ptree pt;
 	pt.put("gen.part.test", true);
@@ -107,9 +107,18 @@ BOOST_AUTO_TEST_CASE(gen_data)
 	pt.put("gen.lala.test", "string");
 	mg::options_view opts(pt, "part"sv);
 
-	BOOST_CHECK_EQUAL(opts.gen_data().get<bool>("part.test"), true);
-	BOOST_CHECK_EQUAL(opts.gen_data().get<bool>("other.test"), true);
-	BOOST_CHECK_EQUAL(opts.gen_data().get<std::string>("lala.test"), "string");
+	BOOST_CHECK_EQUAL(&opts.all(), &pt);
+}
+BOOST_AUTO_TEST_CASE(target_data)
+{
+	boost::property_tree::ptree pt;
+	pt.put("gen.part.test", true);
+	mg::options_view opts(pt, "part"sv);
+
+	BOOST_CHECK_NO_THROW( opts.target_data("cpp"sv) );
+
+	pt.put("target.cpp.some", true);
+	BOOST_CHECK_EQUAL( opts.target_data("cpp"sv).get<bool>("some"), true );
 }
 BOOST_AUTO_TEST_SUITE_END() // options_view
 

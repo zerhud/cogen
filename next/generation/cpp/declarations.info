@@ -1,3 +1,7 @@
+target {
+	cpp {
+	}
+}
 gen
 {
 	dec {
@@ -12,6 +16,9 @@ gen
 		inc_part dec
 		input declarations.jinja
 		output module.hpp
+		filter {
+			sel interface
+		}
 	}
 	definition {
 		parser interface

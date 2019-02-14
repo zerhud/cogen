@@ -6,9 +6,20 @@
 #include "interface/filter.hpp"
 #include "cpp/type_converter.hpp"
 #include "parser/interface/loader.hpp"
+#include "parser/interface/helpers.hpp"
 
 using namespace std::literals;
 namespace mg = modegen::generation;
+namespace mi = modegen::parser::interface;
+
+namespace modegen::generation {
+struct json_extra_info : interface::to_json_aspect {
+	void as_object(cppjson::value& jval, const mi::module& obj) override
+	{
+		jval["namespace"] = obj.name + "_v"s + get_version(obj).value("_"sv) ;
+	}
+};
+} // modegen::generation
 
 cppjson::value mg::cpp_generator::jsoned_data(parser::loader_ptr data_loader, options_view opts) const
 {
@@ -23,12 +34,17 @@ cppjson::value mg::cpp_generator::jsoned_data(parser::loader_ptr data_loader, op
 	auto data = ildr->result();
 	if(data.empty()) throw errors::gen_error("cpp"s, "cannot work with empty interface");
 
+	filter::request freq;
+	freq.mod_name = opts.part_data().get("filter.mod", ""s);
+	freq.cnt_name = opts.part_data().get("filter.cnt", ""s);
+	freq.sel = parser::interface::from_string(opts.part_data().get("filter.sel", ""s));
+
 	cppjson::value jsoned =
 	          data
 	        | tcvt
-	        | filter(filter::request{})
+	        | filter(freq)
 	        | naming(opts.part_data().get("naming",""s))
-	        | interface::to_json()
+	        | interface::to_json(std::make_unique<json_extra_info>())
 	        ;
 
 	auto incs = includes(tcvt.includes(), opts);

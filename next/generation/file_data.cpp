@@ -20,9 +20,9 @@ boost::property_tree::ptree mg::options_view::part_data() const
 	return part_data(part);
 }
 
-const boost::property_tree::ptree& mg::options_view::gen_data() const
+const boost::property_tree::ptree& mg::options_view::all() const
 {
-	return opts.get_child("gen"s);
+	return opts;
 }
 
 
@@ -31,4 +31,11 @@ boost::property_tree::ptree mg::options_view::part_data(std::string_view name) c
 	auto part = opts.get_child_optional("gen."s+std::string(name));
 	if(!part) throw errors::error("no options for part"s + std::string(name));
 	return *part;
+}
+
+boost::property_tree::ptree mg::options_view::target_data(std::string_view name) const
+{
+	auto part = opts.get_child_optional("target."s+std::string(name));
+	if(part) return *part;
+	return boost::property_tree::ptree{};
 }

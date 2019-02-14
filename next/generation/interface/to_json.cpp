@@ -16,10 +16,10 @@ mg::to_json::to_json()
 
 mg::to_json::to_json(std::unique_ptr<mg::to_json_aspect> gen_aspect)
 {
-	gen_asps.push_back(std::move(gen_aspect));
+	gen_asps.emplace_back(std::move(gen_aspect));
 }
 
-mg::to_json::to_json(boost::ptr_vector<mg::to_json_aspect> gen_aspects)
+mg::to_json::to_json(mg::to_json::aspect_ptr_vector gen_aspects)
 	: gen_asps(std::move(gen_aspects))
 {
 }
