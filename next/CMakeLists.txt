@@ -65,6 +65,7 @@ target_sources_copy(modegen_interfaces "${dbg_cpp_templates_dir}"
 target_sources_local(modegen_interfaces to_json.hpp to_json.cpp "generation/interface/")
 target_sources_local(modegen_interfaces naming.hpp naming.cpp "generation/interface/")
 target_sources_local(modegen_interfaces filter.hpp filter.cpp "generation/interface/")
+target_sources_local(modegen_interfaces split_by_version.hpp split_by_version.cpp "generation/interface/")
 # generation part for cpp
 target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "generation/cpp/")
 
@@ -90,7 +91,7 @@ set(tests_gcommon
 	cpp cpp_type_cvt
 	name_conversion
 	filter
-	#split_by_version
+	split_by_version
 	#common_generators
 	)
 set(tests_interface mdp checker )

@@ -4,6 +4,7 @@
 #include "interface/naming.hpp"
 #include "interface/to_json.hpp"
 #include "interface/filter.hpp"
+#include "interface/split_by_version.hpp"
 #include "cpp/type_converter.hpp"
 #include "parser/interface/loader.hpp"
 #include "parser/interface/helpers.hpp"
@@ -44,6 +45,7 @@ cppjson::value mg::cpp_generator::jsoned_data(parser::loader_ptr data_loader, op
 	        | tcvt
 	        | filter(freq)
 	        | naming(opts.naming())
+	        | split_by_version(!opts.target_data("cpp"sv).get("split_by_version", false))
 	        | interface::to_json(std::make_unique<json_extra_info>())
 	        ;
 
@@ -110,8 +112,8 @@ void mg::cpp_generator::set_constructors_prefix(mg::options_view& opts, cppjson:
 {
 	using namespace modegen::generation::interface;
 
-	auto ctor_pref = opts.all().get_optional<std::string>("target.cpp.ctor_prefix");
-	auto ptr_suf = opts.all().get_optional<std::string>("target.cpp.ptr_suffix");
+	auto ctor_pref = opts.target_data("cpp"sv).get_optional<std::string>("ctor_prefix");
+	auto ptr_suf = opts.target_data("cpp"sv).get_optional<std::string>("ptr_suffix");
 
 	name_conversion naming = from_string(opts.naming());
 	if(naming==name_conversion::title_case) {
