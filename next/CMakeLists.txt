@@ -56,10 +56,10 @@ target_sources_local(modegen_interfaces provider.hpp  provider.cpp  "generation/
 target_sources_local(modegen_interfaces common.hpp    common.cpp    "generation/")
 target_sources_local(modegen_interfaces file_data.hpp file_data.cpp "generation/")
 target_sources_local(modegen_interfaces cpp.hpp       cpp.cpp       "generation/")
-target_sources(modegen_interfaces PRIVATE
-	"${pythongen_src}"
-	generation/cpp/declarations.info generation/cpp/declarations.jinja
-	generation/cpp/header.jinja generation/cpp/definitions.jinja
+target_sources(modegen_interfaces PRIVATE "${pythongen_src}")
+target_sources_copy(modegen_interfaces "${dbg_cpp_templates_dir}"
+	generation/cpp/declarations.info generation/cpp/render.jinja
+	generation/cpp/declarations.jinja generation/cpp/header.jinja generation/cpp/definitions.jinja
 	)
 # generation part for interface
 target_sources_local(modegen_interfaces to_json.hpp to_json.cpp "generation/interface/")

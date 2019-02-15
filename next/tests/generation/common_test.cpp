@@ -19,6 +19,7 @@ MOCK_BASE_CLASS( provider_mock, modegen::generation::provider )
 	MOCK_METHOD( json_jinja, 3 )
 	MOCK_METHOD( parser, 1 )
 	MOCK_METHOD( generator, 1 )
+	MOCK_METHOD( resolve_file, 3 )
 };
 
 class fake_target : public modegen::parser::loader {
@@ -62,7 +63,7 @@ BOOST_AUTO_TEST_CASE(common_generation)
 				BOOST_CHECK_EQUAL( *out, fs::path("some_dir") / "def.hpp" );
 			}
 
-			BOOST_CHECK_EQUAL( tmpl, fs::path(u8"some/path") / "definitions.hpp.jinja" );
+			BOOST_CHECK_EQUAL( tmpl, fs::path(u8"resolved/path") / "definitions.hpp.jinja" );
 			BOOST_CHECK_EQUAL( data["name"], "def"s );
 			BOOST_CHECK_EQUAL( data["test"], "test_data"s );
 			return true;
@@ -72,6 +73,7 @@ BOOST_AUTO_TEST_CASE(common_generation)
 	MOCK_EXPECT( provider->json_jinja ).exactly(2).with( result_data_checker ) ;
 	MOCK_EXPECT( provider->parser ).exactly(2).with( "interface"sv ).returns( std::make_shared<fake_target>() );
 	MOCK_EXPECT( provider->generator ).exactly(2).with( "cpp"sv ).returns( std::make_shared<fake_data_gen>() );
+	MOCK_EXPECT( provider->resolve_file ).exactly(2).with( "definitions.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/definitions.hpp.jinja" );
 
 	mg::generator gen(provider, u8"some/path");
 	auto& opts = gen.options();

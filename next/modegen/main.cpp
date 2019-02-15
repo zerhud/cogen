@@ -61,11 +61,62 @@ public:
 		pygen(tmpl, out ? *out : u8"-", data);
 	}
 
+	void add_search_path(const FS::path& p)
+	{
+		search_pathes.push_back(p);
+	}
+
+	FS::path resolve_file(const FS::path& p, const FS::path& assumed, std::string_view gen_name) const override
+	{
+		if(p.is_absolute()) return p;
+
+		std::vector<FS::path> final_search;
+		final_search.reserve(search_pathes.size()*2 + 2);
+		if(!assumed.empty()) {
+			final_search.push_back(assumed);
+			if(!gen_name.empty()) final_search.push_back(assumed / gen_name);
+		}
+
+		final_search.push_back(FS::current_path());
+		for(const auto& sp:search_pathes) final_search.push_back(sp);
+
+		if(!gen_name.empty()) {
+			for(const auto& sp:search_pathes) final_search.push_back(sp / gen_name);
+		}
+
+		auto ret = resolve_file(p, final_search);
+		if(ret) return *ret;
+		ret = resolve_file(p.generic_u8string() + u8".info", final_search);
+		if(ret) return *ret;
+		ret = resolve_file(p.generic_u8string() + u8".jinja", final_search);
+		if(ret) return *ret;
+
+		std::string err_msg = u8"cannot find file "s + p.generic_u8string() + u8"\ntry to search in:\n"s;
+		for(const auto& sp:final_search) err_msg += u8"\t" + sp.generic_u8string() + u8"\n"s;
+		throw std::runtime_error(err_msg);
+	}
+
 	std::vector<std::string> list_target() const
 	{
-		return { u8"interface" };
+		return { u8"interface"s };
+	}
+
+	std::vector<std::string> list_generators() const
+	{
+		return { u8"cpp"s };
 	}
 private:
+	std::optional<FS::path> resolve_file(FS::path p, const std::vector<FS::path> final_search) const
+	{
+		FS::path ret;
+		for(auto& sp:final_search) {
+			ret = sp / p;
+			if(FS::exists(ret)) return ret;
+		}
+
+		return std::nullopt;
+	}
+
 	modegen::parser::loader_ptr search_loader(std::string_view name) const
 	{
 		auto pos = loaders.find(name);
@@ -82,6 +133,7 @@ private:
 
 	modegen::generation::jinja_python_generator pygen;
 	std::map<std::string,modegen::parser::loader_ptr, std::less<>> loaders;
+	std::vector<FS::path> search_pathes;
 };
 
 auto parse_command_line(int argc, char** argv, std::vector<std::string> glist)
@@ -107,13 +159,14 @@ auto parse_command_line(int argc, char** argv, std::vector<std::string> glist)
 		for(auto& g:glist) std::cout << "\t" << g << std::endl;
 		std::exit(1);
 	}
-
 	return std::make_tuple(opts, vm);
 }
 
 int main(int argc, char** argv)
 {
 	auto prov = std::make_shared<gen_prov>(argv[0]);
+	prov->add_search_path(modegen::settings::templates_dir);
+
 	auto [opts,vm] = parse_command_line(argc, argv, prov->list_target());
 
 	std::unique_ptr<mg::generator> gen;
@@ -122,35 +175,37 @@ int main(int argc, char** argv)
 	for(auto& opt:opts.options) {
 		std::string& key = opt.string_key;
 		std::string& val = opt.value[0];
-		if(key=="input") {
+		if(key=="input"sv) {
 			std::cmatch m;
 			std::regex_match(val.data(), m, key_val_parser);
 			FS::path input_path = m[3].str();
 			if(input_path.is_relative()) input_path = FS::current_path() / input_path;
 			prov->create_loader(m[1].str(), input_path);
 		}
-		else if(key=="generator") {
-			FS::path info_path = val;
+		else if(key=="generator"sv) {
+			if(gen) gen->generate(out_dir);
+
+			FS::path info_path = prov->resolve_file(val, "", "");
 			gen = std::make_unique<mg::generator>(prov, info_path.parent_path());
 			boost::property_tree::read_info(info_path.u8string(), gen->options());
 		}
-		else if(key=="option") {
+		else if(key=="option"sv) {
 			if(!gen) throw std::runtime_error("cannot override option without generator");
 			gen->options().put(key,val);
 		}
-		else if(key=="aoption") {
+		else if(key=="aoption"sv) {
 			if(!gen) throw std::runtime_error("cannot add option without generator");
 			gen->options().add(key,val);
 		}
-		else if(key=="include") {
-			TODO( add include directory );
+		else if(key=="include"sv) {
+			prov->add_search_path(val);
 		}
-		else if(key=="outdir") {
+		else if(key=="outdir"sv) {
 			out_dir = val;
 			if(!FS::exists(out_dir)) FS::create_directories(out_dir);
 		}
 		else {
-			std::cerr << u8"unknown option " << key << "=" << val << std::endl;
+			std::cerr << u8"unknown option "sv << key << "="sv << val << std::endl;
 		}
 	}
 

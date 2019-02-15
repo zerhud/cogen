@@ -59,14 +59,17 @@ FS::path mg::generator::output_path(std::string_view part) const
 {
 	std::string p(part);
 	std::string path = "gen." + p + ".output";
-	return opts.get(path, p + ".hpp");
+	return opts.get(path, p + u8".hpp");
 }
 
 FS::path mg::generator::tmpl_path(std::string_view part) const
 {
+	assert( prov );
+
 	std::string p(part);
 	std::string path = "gen." + p + ".input";
-	FS::path input_file = opts.get(path, p + ".jinja");
-	return info_directory / input_file;
+	FS::path input_file = opts.get(path, p + u8".jinja");
+
+	return prov->resolve_file(input_file, info_directory, opts.get("gen."s+p+".target"s,""s));
 }
 

@@ -30,8 +30,8 @@ template<class T> inline std::enable_if_t<std::is_enum_v<T>,T&> operator|= (T& a
 template<class T> inline std::enable_if_t<std::is_enum_v<T>,T&> operator&= (T& a, T b) { return (T&)((int&)a &= (int)b); }
 template<class T> inline std::enable_if_t<std::is_enum_v<T>,T&> operator^= (T& a, T b) { return (T&)((int&)a ^= (int)b); }
 
-namespace interface {
-constexpr std::string_view templetes_dir = "@templates_dir_path@";
-} // namespace interface
+namespace settings {
+constexpr std::string_view templates_dir = "@templates_dir_path@";
+} // namespace settings
 } // namespace modegen
 
