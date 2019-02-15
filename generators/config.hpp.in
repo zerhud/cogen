@@ -1,9 +1,0 @@
-#pragma once
-
-namespace modegen {
-constexpr const char* binary_dir = "@binary_dir@";
-namespace generation::cpp {
-constexpr const char* templates_dir = "@cpp_templates_dir@";
-} // namespace generators::cpp
-} // namespace modegen
-
