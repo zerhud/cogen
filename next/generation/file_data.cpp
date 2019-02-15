@@ -39,3 +39,8 @@ boost::property_tree::ptree mg::options_view::target_data(std::string_view name)
 	if(part) return *part;
 	return boost::property_tree::ptree{};
 }
+
+std::string mg::options_view::naming() const
+{
+	return part_data().get("naming",""s);
+}

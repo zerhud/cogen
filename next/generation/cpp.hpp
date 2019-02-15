@@ -16,6 +16,9 @@ private:
 
 	std::vector<inc_info> includes(const std::vector<std::string> sys, options_view& opts) const ;
 	std::string solve_part_include(const std::string& part, options_view& opts) const ;
+	void add_extra_info(options_view& opts, cppjson::value& cdata) const ;
+	void add_extra_namespaces(options_view& opts, cppjson::value& cdata) const ;
+	void set_constructors_prefix(options_view& opts, cppjson::value& cdata) const ;
 };
 
 } // namespace modegen::generation

@@ -39,6 +39,77 @@ BOOST_AUTO_TEST_CASE( no_data_is_error )
 	BOOST_CHECK_THROW(gen.jsoned_data(std::make_shared<fake_mi_loader>(), opts), modegen::errors::gen_error);
 }
 
+BOOST_AUTO_TEST_CASE( extra_namespaces )
+{
+	pt::ptree opts_tree;
+	opts_tree.put("gen.def.input", "fake_tmpl");
+	opts_tree.add("target.cpp.namespaces", "ns1");
+	opts_tree.add("target.cpp.namespaces", "ns2");
+	mg::cpp_generator gen;
+	mg::options_view opts(opts_tree, "def"sv);
+
+	auto ldr = std::make_shared<fake_mi_loader>();
+	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
+
+	cppjson::value data = gen.jsoned_data(ldr, opts);
+	BOOST_REQUIRE_EQUAL( data["namespaces"].array().size(), 2 );
+	BOOST_CHECK_EQUAL( data["namespaces"][0], "ns1" );
+	BOOST_CHECK_EQUAL( data["namespaces"][1], "ns2" );
+}
+
+BOOST_AUTO_TEST_SUITE(prefix_suffix)
+BOOST_AUTO_TEST_CASE( ctor_prefix_ptr_siffux )
+{
+	pt::ptree opts_tree;
+	opts_tree.put("gen.def.input", "fake_tmpl");
+	opts_tree.add("target.cpp.ctor_prefix", "ctor_");
+	opts_tree.add("target.cpp.ptr_suffix", "_ptR");
+	mg::cpp_generator gen;
+	mg::options_view opts(opts_tree, "def"sv);
+
+	auto ldr = std::make_shared<fake_mi_loader>();
+	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
+
+	cppjson::value data = gen.jsoned_data(ldr, opts);
+	BOOST_CHECK_EQUAL( data["ctor_prefix"], "ctor_" );
+	BOOST_CHECK_EQUAL( data["ptr_suffix"], "_ptR" );
+}
+BOOST_AUTO_TEST_CASE( defaults )
+{
+	pt::ptree opts_tree;
+	opts_tree.put("gen.def.input", "fake_tmpl");
+	mg::cpp_generator gen;
+	mg::options_view opts(opts_tree, "def"sv);
+
+	auto ldr = std::make_shared<fake_mi_loader>();
+	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
+
+	cppjson::value data = gen.jsoned_data(ldr, opts);
+	BOOST_CHECK_EQUAL( data["ctor_prefix"], "create_" );
+	BOOST_CHECK_EQUAL( data["ptr_suffix"], "_ptr" );
+
+	opts_tree.put("gen.def.naming", "title");
+	data = gen.jsoned_data(ldr, opts);
+	BOOST_CHECK_EQUAL( data["ctor_prefix"], "Create" );
+	BOOST_CHECK_EQUAL( data["ptr_suffix"], "Ptr" );
+
+	opts_tree.put("gen.def.naming", "camel");
+	data = gen.jsoned_data(ldr, opts);
+	BOOST_CHECK_EQUAL( data["ctor_prefix"], "create" );
+	BOOST_CHECK_EQUAL( data["ptr_suffix"], "Ptr" );
+
+	opts_tree.put("gen.def.naming", "underscore");
+	data = gen.jsoned_data(ldr, opts);
+	BOOST_CHECK_EQUAL( data["ctor_prefix"], "create_" );
+	BOOST_CHECK_EQUAL( data["ptr_suffix"], "_ptr" );
+
+	opts_tree.put("gen.def.naming", "asis");
+	data = gen.jsoned_data(ldr, opts);
+	BOOST_CHECK_EQUAL( data["ctor_prefix"], "create_" );
+	BOOST_CHECK_EQUAL( data["ptr_suffix"], "_ptr" );
+}
+BOOST_AUTO_TEST_SUITE_END() // prefix_suffix
+
 BOOST_AUTO_TEST_SUITE(includes)
 BOOST_AUTO_TEST_CASE( without_includes )
 {

@@ -43,7 +43,7 @@ cppjson::value mg::cpp_generator::jsoned_data(parser::loader_ptr data_loader, op
 	          data
 	        | tcvt
 	        | filter(freq)
-	        | naming(opts.part_data().get("naming",""s))
+	        | naming(opts.naming())
 	        | interface::to_json(std::make_unique<json_extra_info>())
 	        ;
 
@@ -52,6 +52,8 @@ cppjson::value mg::cpp_generator::jsoned_data(parser::loader_ptr data_loader, op
 		jsoned["incs"][i]["n"] = incs[i].name;
 		jsoned["incs"][i]["sys"] = incs[i].sys;
 	}
+
+	add_extra_info(opts, jsoned);
 
 	return jsoned;
 }
@@ -84,5 +86,43 @@ std::vector<mg::cpp_generator::inc_info> mg::cpp_generator::includes(const std::
 std::string mg::cpp_generator::solve_part_include(const std::string& part, mg::options_view& opts) const
 {
 	return opts.part_data(part).get<std::string>("output");
+}
+
+void mg::cpp_generator::add_extra_info(options_view& opts, cppjson::value& cdata) const
+{
+	add_extra_namespaces(opts, cdata);
+	set_constructors_prefix(opts, cdata);
+}
+
+void mg::cpp_generator::add_extra_namespaces(mg::options_view& opts, cppjson::value& cdata) const
+{
+	auto nsopts = opts.all().get_child_optional("target.cpp");
+	if(!nsopts) return;
+
+	std::size_t i=0;
+	for(auto& en:*nsopts) {
+		if(en.first!="namespaces"sv) continue;
+		cdata["namespaces"][i++] = en.second.get_value<std::string>();
+	}
+}
+
+void mg::cpp_generator::set_constructors_prefix(mg::options_view& opts, cppjson::value& cdata) const
+{
+	using namespace modegen::generation::interface;
+
+	auto ctor_pref = opts.all().get_optional<std::string>("target.cpp.ctor_prefix");
+	auto ptr_suf = opts.all().get_optional<std::string>("target.cpp.ptr_suffix");
+
+	name_conversion naming = from_string(opts.naming());
+	if(naming==name_conversion::title_case) {
+		cdata["ctor_prefix"] = ctor_pref ? *ctor_pref : "Create"s;
+		cdata["ptr_suffix"] = ptr_suf ? *ptr_suf : "Ptr"s;
+	} else if(naming==name_conversion::camel_case){
+		cdata["ctor_prefix"] = ctor_pref ? *ctor_pref : "create"s;
+		cdata["ptr_suffix"] = ptr_suf ? *ptr_suf : "Ptr"s;
+	} else  {
+		cdata["ctor_prefix"] = ctor_pref ? *ctor_pref : "create_"s;
+		cdata["ptr_suffix"] = ptr_suf ? *ptr_suf : "_ptr"s;
+	}
 }
 

@@ -1,5 +1,6 @@
 target {
 	cpp {
+		naming unserscore
 	}
 }
 gen

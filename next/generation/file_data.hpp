@@ -19,6 +19,8 @@ public:
 	boost::property_tree::ptree part_data(std::string_view name) const ;
 	boost::property_tree::ptree target_data(std::string_view name) const ;
 	const boost::property_tree::ptree& all() const ;
+
+	std::string naming() const ;
 };
 
 class file_data {
