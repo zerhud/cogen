@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+project(<= cdata.project => VERSION 0.0.0.0 LANGUAGES C CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+<% for lib in cdata.libraries %>
+add_library("<= lib =>" STATIC
+<% for file in lib.files %><= file =><% endfor %>
+)
+<% endfor %>
+
