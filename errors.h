@@ -17,6 +17,8 @@ struct gen_error : error {
 	gen_error(std::string gen_name, std::string w);
 };
 
+struct no_data : gen_error { no_data(std::string_view gen_name); };
+
 struct error_info : error {
 	std::string file;
 	std::string path;

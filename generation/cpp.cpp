@@ -33,7 +33,7 @@ cppjson::value mg::cpp_generator::jsoned_data(parser::loader_ptr data_loader, op
 	cpp::type_converter tcvt;
 
 	auto data = ildr->result();
-	if(data.empty()) throw errors::gen_error("cpp"s, "cannot work with empty interface");
+	if(data.empty()) throw errors::no_data("cpp"s);
 
 	filter::request freq;
 	freq.mod_name = opts.part_data().get("filter.mod", ""s);
