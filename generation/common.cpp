@@ -46,13 +46,12 @@ cppjson::value mg::generator::generate_data(std::string_view part) const
 
 	auto parser_name = opts.get<std::string>("gen."s+std::string(part)+".parser"s);
 	auto target_name = opts.get<std::string>("gen."s+std::string(part)+".target"s);
-	auto tl = prov->parser(parser_name);
+	auto tp = prov->parser(parser_name);
 	auto tg = prov->generator(target_name);
 
-	assert(tl);
 	assert(tg);
 	options_view props(opts, part);
-	return tg->jsoned_data(std::move(tl), std::move(props));
+	return tg->jsoned_data(std::move(tp), std::move(props));
 }
 
 FS::path mg::generator::output_path(std::string_view part) const

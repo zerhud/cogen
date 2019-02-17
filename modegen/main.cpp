@@ -9,6 +9,7 @@
 #include "generation/file_data.hpp"
 #include "generation/pythongen.hpp"
 #include "generation/cpp.hpp"
+#include "generation/cmake.hpp"
 
 #include "parser/interface/loader.hpp"
 
@@ -44,7 +45,8 @@ public:
 	modegen::parser::loader_ptr parser(std::string_view name) const override
 	{
 		auto ldr = search_loader(name);
-		if(!ldr) throw std::runtime_error("no such target was loaded " + std::string(name));
+		if(name=="meta"sv) return nullptr;
+		if(!ldr) throw std::runtime_error("no such parser was loaded: \""s + std::string(name) + "\""s);
 		ldr->finish_loads();
 		return ldr;
 	}
@@ -52,7 +54,8 @@ public:
 	mg::file_data_ptr generator(std::string_view name) const override
 	{
 		if(name == "cpp"sv) return std::make_shared<mg::cpp_generator>();
-		throw std::runtime_error("no such target was loaded " + std::string(name));
+		if(name == "cmake"sv) return std::make_shared<mg::cmake>();
+		throw std::runtime_error("no such generator was loaded \""s + std::string(name) + "\""s);
 	}
 
 	void json_jinja(const cppjson::value& data, const FS::path& tmpl, const std::optional<FS::path>& out) const override
@@ -103,7 +106,7 @@ public:
 
 	std::vector<std::string> list_generators() const
 	{
-		return { u8"cpp"s };
+		return { u8"cpp"s, u8"cmake"s };
 	}
 private:
 	std::optional<FS::path> resolve_file(FS::path p, const std::vector<FS::path> final_search) const

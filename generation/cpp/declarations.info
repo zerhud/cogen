@@ -29,4 +29,18 @@ gen
 		input definitions.jinja
 		output module.cpp
 	}
+	cmake {
+		parser meta
+		target cmake
+		input plain.jinja
+		output CMakeLists.txt
+		project interface
+		libraries {
+			interface {
+				part dec
+				part header
+				part definition
+			}
+		}
+	}
 }

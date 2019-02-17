@@ -23,6 +23,8 @@ set(rls_templates_dir "${CMAKE_INSTALL_PREFIX}/${templates_dir}")
 set(dbg_cpp_templates_dir "generation/cpp")
 set(dbg_cpp_templates_dir "${dbg_templates_dir}/cpp")
 set(rls_cpp_templates_dir "${rls_templates_dir}/cpp")
+set(dbg_cmake_templates_dir "${dbg_templates_dir}/cmake")
+set(rls_cmake_templates_dir "${rls_templates_dir}/cmake")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
 	set(templates_dir_path "${rls_templates_dir}")
@@ -56,10 +58,14 @@ target_sources_local(modegen_interfaces provider.hpp  provider.cpp  "generation/
 target_sources_local(modegen_interfaces common.hpp    common.cpp    "generation/")
 target_sources_local(modegen_interfaces file_data.hpp file_data.cpp "generation/")
 target_sources_local(modegen_interfaces cpp.hpp       cpp.cpp       "generation/")
+target_sources_local(modegen_interfaces cmake.hpp     cmake.cpp     "generation/")
 target_sources(modegen_interfaces PRIVATE "${pythongen_src}")
 target_sources_copy(modegen_interfaces "${dbg_cpp_templates_dir}"
 	generation/cpp/declarations.info generation/cpp/render.jinja
 	generation/cpp/declarations.jinja generation/cpp/header.jinja generation/cpp/definitions.jinja
+	)
+target_sources_copy(modegen_interfaces "${dbg_cmake_templates_dir}"
+	generation/cmake/plain.jinja
 	)
 # generation part for interface
 target_sources_local(modegen_interfaces to_json.hpp to_json.cpp "generation/interface/")
@@ -93,6 +99,7 @@ set(tests_gcommon
 	filter
 	split_by_version
 	#common_generators
+	cmake
 	)
 set(tests_interface mdp checker )
 foreach(tname ${tests_interface})
