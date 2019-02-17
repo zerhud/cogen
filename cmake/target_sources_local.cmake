@@ -24,8 +24,10 @@ function(target_sources_copy target dir)
 		add_custom_command(
 			OUTPUT "${target_src}"
 			COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_LIST_DIR}/${src}" "${target_src}"
+			DEPENDS "${CMAKE_CURRENT_LIST_DIR}/${src}"
 			)
 	endforeach()
+	target_sources(${target} PRIVATE ${src})
 	target_sources(${target} PRIVATE ${result_src})
 endfunction()
 
