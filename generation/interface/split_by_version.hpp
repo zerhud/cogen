@@ -7,7 +7,6 @@
 
 namespace modegen::generation::interface {
 
-TODO(move to converers and make converter from it)
 class split_by_version {
 	bool dry = false;
 public:

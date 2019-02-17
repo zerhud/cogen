@@ -15,7 +15,7 @@ gen
 		parser interface
 		target cpp
 		inc_part dec
-		input declarations.jinja
+		input header.jinja
 		output module.hpp
 		filter {
 			sel interface

@@ -1,0 +1,14 @@
+include "mod2"
+
+module mod v1.0:
+
+string foo();
+
+interface iinmod1 {
+	constructor(i8 p1, i8 p2);
+	i8 p1() const ;
+	i8 p2() const ;
+}
+
+enum +auto_io e {one two}
+

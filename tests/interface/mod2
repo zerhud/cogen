@@ -1,0 +1,10 @@
+module mod v1.0:
+
+string bar();
+
+interface iinfile2 {
+	constructor(list<string> bar);
+	list<string> get() const ;
+	void add(string param) mutable ;
+}
+
