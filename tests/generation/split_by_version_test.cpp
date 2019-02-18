@@ -47,6 +47,9 @@ BOOST_AUTO_TEST_CASE(functions)
 	mg::split_by_version sp;
 	sp(pr.mods);
 
+	auto presult = mi::parse("module mod v1.0: type name(); module mod v2.0: type name(); @v2.0 type name2();"sv);
+	BOOST_CHECK(presult.mods == pr.mods);
+
 	BOOST_REQUIRE_EQUAL(pr.mods.size(), 2);
 	BOOST_REQUIRE_EQUAL(pr.mods[0].content.size(), 1);
 	BOOST_REQUIRE_EQUAL(pr.mods[1].content.size(), 2);
@@ -156,7 +159,14 @@ BOOST_AUTO_TEST_CASE(interface)
 }
 BOOST_AUTO_TEST_CASE(record)
 {
-	BOOST_FAIL("empty test");
+	auto pr = mi::parse("module mod v1.0: record r1 {type f1; @v1.1 type f2;}"sv);
+	BOOST_REQUIRE_EQUAL(pr.mods.size(), 1);
+
+	mg::split_by_version sp;
+	sp(pr.mods);
+
+	auto presult = mi::parse("module mod v1.0: record r1 {type f1;} module mod v1.1: record r1{ type f1; @v1.1 type f2;}"sv);
+	BOOST_CHECK(presult.mods == pr.mods);
 }
 BOOST_AUTO_TEST_CASE(version_jump)
 {
