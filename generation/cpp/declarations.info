@@ -1,19 +1,15 @@
-target {
-	cpp {
-		naming unserscore
-	}
+defaults {
+	parser interface
+	target cpp
+	naming underscore
 }
 gen
 {
 	dec {
-		parser interface
-		target cpp
 		input declarations.jinja
 		output declarations.hpp
 	}
 	header {
-		parser interface
-		target cpp
 		inc_part dec
 		input header.jinja
 		output module.hpp
@@ -22,8 +18,6 @@ gen
 		}
 	}
 	definition {
-		parser interface
-		target cpp
 		inc_part dec
 		inc_part header
 		input definitions.jinja

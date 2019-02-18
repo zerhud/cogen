@@ -42,5 +42,5 @@ boost::property_tree::ptree mg::options_view::target_data(std::string_view name)
 
 std::string mg::options_view::naming() const
 {
-	return part_data().get("naming",""s);
+	return part_data().get("naming",opts.get("defaults.naming",""s));
 }
