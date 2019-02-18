@@ -22,6 +22,16 @@ bool mi::meta_parameters::operator ==(const mi::meta_parameters::version& left, 
 	return left.major_v == right.major_v && left.minor_v == right.minor_v;
 }
 
+bool mi::meta_parameters::operator == (const mi::meta_parameters::documentation& left, const mi::meta_parameters::documentation& right)
+{
+	return left.body == right.body;
+}
+
+bool mi::meta_parameters::operator == (const mi::meta_parameters::deprication& left, const mi::meta_parameters::deprication& right)
+{
+	return left.message == right.message && left.since == right.since;
+}
+
 bool mi::operator == (const mi::module& left, const mi::module& right)
 {
 	return left.name == right.name
@@ -120,6 +130,9 @@ bool mi::operator == (const mi::type& left, const mi::type& right)
 
 bool mi::operator == (const mi::meta_parameters::parameter_set& left, const mi::meta_parameters::parameter_set& right)
 {
+	return left.set.size() == right.set.size()
+		&& std::equal(left.set.begin(), left.set.end(), right.set.begin())
+		;
 }
 
 bool mi::meta_parameters::operator <=(const mi::meta_parameters::version& left, const mi::meta_parameters::version& right)

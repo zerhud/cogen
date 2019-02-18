@@ -54,6 +54,8 @@ namespace meta_parameters {
 bool operator < (const version& left, const version& right);
 bool operator <= (const version& left, const version& right);
 bool operator == (const version& left, const version& right);
+bool operator == (const documentation& left, const documentation& right);
+bool operator == (const deprication& left, const deprication& right);
 } // namespace modegen
 
 template<typename P>
