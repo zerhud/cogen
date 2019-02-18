@@ -135,6 +135,13 @@ bool mi::operator == (const mi::meta_parameters::parameter_set& left, const mi::
 		;
 }
 
+bool mi::operator == (const std::vector<mi::module>& left, const std::vector<mi::module>& right)
+{
+	return left.size() == right.size()
+		&& std::equal(left.begin(), left.end(), right.begin())
+		;
+}
+
 bool mi::meta_parameters::operator <=(const mi::meta_parameters::version& left, const mi::meta_parameters::version& right)
 {
 	return left.major_v <= right.major_v && left.minor_v <= right.minor_v;

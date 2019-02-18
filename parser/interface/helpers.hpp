@@ -49,6 +49,7 @@ bool operator == (const function& left, const function& right);
 bool operator == (const func_param& left, const func_param& right);
 bool operator == (const type& left, const type& right);
 bool operator == (const meta_parameters::parameter_set& left, const meta_parameters::parameter_set& right);
+bool operator == (const std::vector<module>& left, const std::vector<module>& right);
 
 namespace meta_parameters {
 bool operator < (const version& left, const version& right);
