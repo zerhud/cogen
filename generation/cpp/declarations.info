@@ -15,6 +15,7 @@ gen
 		output module.hpp
 		filter {
 			sel interface
+			sel record
 		}
 	}
 	definition {

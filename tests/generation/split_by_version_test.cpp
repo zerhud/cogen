@@ -130,3 +130,40 @@ BOOST_AUTO_TEST_CASE(interfaces)
 	BOOST_CHECK_EQUAL(i3.constructors[0].func_params.size(), 1);
 	BOOST_CHECK_EQUAL(i3.constructors[1].func_params.size(), 0);
 }
+
+BOOST_AUTO_TEST_SUITE(split_by_inner)
+BOOST_AUTO_TEST_CASE(interface)
+{
+	using mi::meta_parameters::version;
+
+	auto pr = mi::parse("module mod v1.0: interface r1 {type func1() const; @v1.1 type func2() const;}"sv);
+	BOOST_REQUIRE_EQUAL(pr.mods.size(), 1);
+
+	mg::split_by_version sp;
+	sp(pr.mods);
+	BOOST_REQUIRE_EQUAL(pr.mods.size(), 2);
+	BOOST_REQUIRE_EQUAL(pr.mods[0].content.size(), 1);
+	BOOST_REQUIRE_EQUAL(pr.mods[1].content.size(), 1);
+
+	auto& r1 = std::get<mi::interface>(pr.mods[0].content[0]);
+	BOOST_REQUIRE_EQUAL(r1.mem_funcs.size(), 1);
+	BOOST_CHECK_EQUAL(r1.mem_funcs[0].name, "func1");
+
+	auto& r2 = std::get<mi::interface>(pr.mods[1].content[0]);
+	BOOST_REQUIRE_EQUAL(r2.mem_funcs.size(), 2);
+	BOOST_CHECK_EQUAL(r2.mem_funcs[0].name, "func1");
+	BOOST_CHECK_EQUAL(r2.mem_funcs[1].name, "func2");
+}
+BOOST_AUTO_TEST_CASE(record)
+{
+	BOOST_FAIL("empty test");
+}
+BOOST_AUTO_TEST_CASE(version_jump)
+{
+	using mi::meta_parameters::version;
+
+	auto pr = mi::parse("module mod v1.0: interface r1 {type func1() const; @v1.3 type func2() const;}"sv);
+	BOOST_REQUIRE_EQUAL(pr.mods.size(), 1);
+	BOOST_FAIL("empty test");
+}
+BOOST_AUTO_TEST_SUITE_END() // split_by_inner

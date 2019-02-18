@@ -8,7 +8,14 @@ interface iinmod1 {
 	constructor(i8 p1, i8 p2);
 	i8 p1() const ;
 	i8 p2() const ;
+	@v1.1 i8 newer() const ;
 }
 
 enum +auto_io e {one two}
 
+@v1.2 string new_function();
+
+record rec_test {
+	i8 field_old;
+	@v1.1 i8 field_new;
+}
