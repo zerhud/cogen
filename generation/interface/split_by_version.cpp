@@ -3,6 +3,8 @@
 #include <cassert>
 #include <algorithm>
 
+#include "parser/interface/helpers.hpp"
+
 using modegen::parser::interface::meta_parameters::version;
 namespace mi = modegen::parser::interface;
 
@@ -34,10 +36,7 @@ void modegen::generation::interface::split_by_version::split_mod(const mi::modul
 
 void modegen::generation::interface::split_by_version::set_base(const mi::module& mod)
 {
-	TODO(copy it more effective)
-	//mi::module base_mod = mod;
-	//base_mod.content.clear();
-	result.emplace_back(mod).content.clear();
+	result.emplace_back(mi::copy(mod, mi::copy_method::meta)).content.clear();
 	base_index = result.size() - 1;
 }
 

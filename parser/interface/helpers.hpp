@@ -88,4 +88,7 @@ void set(meta_parameters::parameter_set& set, P p)
 
 	set.set.emplace_back(std::move(p));
 }
+
+enum class copy_method{ deep, meta };
+module copy(const module& mod, copy_method method=copy_method::meta);
 } // namespace modegen::parser::interface
