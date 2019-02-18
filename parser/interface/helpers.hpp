@@ -37,6 +37,18 @@ module_content_selector from_string(std::string_view v);
 bool operator == (const using_directive& left, const using_directive& right);
 bool operator == (const using_directive& left, std::string_view right);
 bool operator == (const export_info& left, std::string_view right);
+bool operator == (const module& left, const module& right);
+bool operator == (const export_info& left, const export_info& right);
+bool operator == (const interface& left, const interface& right);
+bool operator == (const record& left, const record& right);
+bool operator == (const record_item& left, const record_item& right);
+bool operator == (const enumeration& left, const enumeration& right);
+bool operator == (const enum_element& left, const enum_element& right);
+bool operator == (const constructor_fnc& left, const constructor_fnc& right);
+bool operator == (const function& left, const function& right);
+bool operator == (const func_param& left, const func_param& right);
+bool operator == (const type& left, const type& right);
+bool operator == (const meta_parameters::parameter_set& left, const meta_parameters::parameter_set& right);
 
 namespace meta_parameters {
 bool operator < (const version& left, const version& right);

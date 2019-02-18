@@ -22,6 +22,106 @@ bool mi::meta_parameters::operator ==(const mi::meta_parameters::version& left, 
 	return left.major_v == right.major_v && left.minor_v == right.minor_v;
 }
 
+bool mi::operator == (const mi::module& left, const mi::module& right)
+{
+	return left.name == right.name
+		&& left.content.size() == right.content.size()
+		&& std::equal(left.content.begin(), left.content.end(), right.content.begin())
+		&& left.meta_params == right.meta_params
+		;
+}
+
+bool mi::operator == (const mi::export_info& left, const mi::export_info& right)
+{
+	return left.name == right.name && left.type == right.type;
+}
+
+bool mi::operator == (const mi::interface& left, const mi::interface& right)
+{
+	return left.name == right.name
+		&& left.mem_funcs.size() == right.mem_funcs.size()
+		&& std::equal(left.mem_funcs.begin(), left.mem_funcs.end(), right.mem_funcs.begin())
+		&& left.constructors.size() == right.constructors.size()
+		&& std::equal(left.constructors.begin(), left.constructors.end(), right.constructors.begin())
+		&& left.meta_params == right.meta_params
+		&& left.realization_in_client  == right.realization_in_client 
+		;
+}
+
+bool mi::operator == (const mi::record& left, const mi::record& right)
+{
+	return left.name == right.name
+		&& left.members.size() == right.members.size()
+		&& std::equal(left.members.begin(), left.members.end(), right.members.begin())
+		&& left.meta_params == right.meta_params
+	;
+}
+
+bool mi::operator == (const mi::record_item& left, const mi::record_item& right)
+{
+	return left.name == right.name
+		&& left.param_type == right.param_type
+		&& left.meta_params == right.meta_params
+	;
+}
+
+bool mi::operator == (const mi::enumeration& left, const mi::enumeration& right)
+{
+	return left.name == right.name
+		&& left.elements.size() == right.elements.size()
+		&& std::equal(left.elements.begin(), left.elements.end(), right.elements.begin())
+		&& left.meta_params == right.meta_params
+		&& left.gen_io == right.gen_io
+		&& left.use_bitmask == right.use_bitmask
+	;
+}
+
+bool mi::operator == (const mi::enum_element& left, const mi::enum_element& right)
+{
+	return left.name == right.name
+		&& left.io == right.io
+	;
+}
+
+bool mi::operator == (const mi::constructor_fnc& left, const mi::constructor_fnc& right)
+{
+	return left.meta_params == right.meta_params
+		&& left.func_params.size() == right.func_params.size()
+		&& std::equal(left.func_params.begin(), left.func_params.end(), right.func_params.begin())
+		;
+}
+
+bool mi::operator == (const mi::function& left, const mi::function& right)
+{
+	return left.name == right.name
+		&& left.return_type == right.return_type
+		&& left.is_mutable == right.is_mutable
+		&& left.is_static == right.is_static
+		&& left.func_params.size() == right.func_params.size()
+		&& std::equal(left.func_params.begin(), left.func_params.end(), right.func_params.begin())
+		&& left.meta_params == right.meta_params
+	;
+}
+
+bool mi::operator == (const mi::func_param& left, const mi::func_param& right)
+{
+	return left.name == right.name
+		&& left.param_type == right.param_type
+		;
+}
+
+bool mi::operator == (const mi::type& left, const mi::type& right)
+{
+	return left.name == right.name
+		&& left.sub_types.size() == right.sub_types.size()
+		&& std::equal(left.sub_types.begin(), left.sub_types.end(), right.sub_types.begin())
+		;
+}
+
+bool mi::operator == (const mi::meta_parameters::parameter_set& left, const mi::meta_parameters::parameter_set& right)
+{
+}
+
 bool mi::meta_parameters::operator <=(const mi::meta_parameters::version& left, const mi::meta_parameters::version& right)
 {
 	return left.major_v <= right.major_v && left.minor_v <= right.minor_v;
