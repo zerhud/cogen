@@ -174,7 +174,7 @@ int main(int argc, char** argv)
 
 	std::unique_ptr<mg::generator> gen;
 	FS::path out_dir = FS::current_path();
-	std::regex key_val_parser("([a-zA-Z_]+)(=(.+))?", std::regex::egrep);
+	std::regex key_val_parser("([0-9a-zA-Z_.]+)(=(.+))?", std::regex::egrep);
 	for(auto& opt:opts.options) {
 		std::string& key = opt.string_key;
 		std::string& val = opt.value[0];
@@ -194,7 +194,10 @@ int main(int argc, char** argv)
 		}
 		else if(key=="option"sv) {
 			if(!gen) throw std::runtime_error("cannot override option without generator");
-			gen->options().put(key,val);
+
+			std::cmatch m;
+			std::regex_match(val.data(), m, key_val_parser);
+			gen->options().put(m[1].str(),m[3].str());
 		}
 		else if(key=="aoption"sv) {
 			if(!gen) throw std::runtime_error("cannot add option without generator");

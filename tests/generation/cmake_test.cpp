@@ -27,6 +27,6 @@ BOOST_AUTO_TEST_CASE(add_library)
 
 	BOOST_REQUIRE_EQUAL(data["libraries"]["interface"]["files"].type(), cppjson::is_array);
 	BOOST_REQUIRE_EQUAL(data["libraries"]["interface"]["files"].array().size(), 2);
-	BOOST_CHECK_EQUAL(data["libraries"]["interface"]["files"][1], "part_file.cpp");
-	BOOST_CHECK_EQUAL(data["libraries"]["interface"]["files"][0], "some_file.cpp");
+	BOOST_CHECK_EQUAL(data["libraries"]["interface"]["files"][0], "part_file.cpp");
+	BOOST_CHECK_EQUAL(data["libraries"]["interface"]["files"][1], "some_file.cpp");
 }
