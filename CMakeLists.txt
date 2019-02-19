@@ -72,6 +72,7 @@ target_sources_local(modegen_interfaces to_json.hpp to_json.cpp "generation/inte
 target_sources_local(modegen_interfaces naming.hpp naming.cpp "generation/interface/")
 target_sources_local(modegen_interfaces filter.hpp filter.cpp "generation/interface/")
 target_sources_local(modegen_interfaces split_by_version.hpp split_by_version.cpp "generation/interface/")
+target_sources_local(modegen_interfaces split_version.hpp split_version.cpp "generation/interface/")
 # generation part for cpp
 target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "generation/cpp/")
 
@@ -98,6 +99,7 @@ set(tests_gcommon
 	name_conversion
 	filter
 	split_by_version
+	split_version
 	#common_generators
 	cmake
 	)
