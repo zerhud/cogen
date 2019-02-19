@@ -23,6 +23,7 @@ private:
 	void split_mod(parser::interface::module mod);
 
 	bool dry = false;
+	std::size_t current_mod = 0;
 	std::vector<parser::interface::module> result;
 };
 

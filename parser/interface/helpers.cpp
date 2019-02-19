@@ -218,3 +218,11 @@ mi::module mi::copy(const mi::module& mod, mi::copy_method method)
 	return ret;
 }
 
+mi::module_content mi::copy(const mi::module_content& cnt, mi::copy_method method)
+{
+	module_content ret;
+	auto copier = [&method,&ret](auto& c){ ret = c.copy(method); };
+	std::visit(copier, cnt);
+	return ret;
+}
+

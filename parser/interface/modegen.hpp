@@ -19,6 +19,9 @@
 #include "config.hpp"
 
 namespace modegen::parser::interface {
+
+enum class copy_method{ deep, meta };
+
 struct type {
 	type() =default ;
 	type(const type& o) : name(o.name), sub_types(o.sub_types.begin(), o.sub_types.end()) {}
@@ -47,6 +50,13 @@ struct function {
 	std::optional<bool> is_static;
 	std::vector<func_param> func_params;
 	meta_parameters::parameter_set meta_params;
+
+	function copy(copy_method m) const
+	{
+		function ret(*this);
+		if(m!=copy_method::deep) ret.func_params.clear();
+		return ret;
+	}
 };
 
 struct constructor_fnc {
@@ -65,6 +75,13 @@ struct enumeration {
 
 	bool gen_io=false;
 	bool use_bitmask=false;
+
+	auto copy(copy_method m) const
+	{
+		enumeration ret(*this);
+		if(m!=copy_method::deep) ret.elements.clear();
+		return ret;
+	}
 };
 
 struct record_item {
@@ -77,6 +94,13 @@ struct record {
 	std::string name;
 	std::vector<record_item> members;
 	meta_parameters::parameter_set meta_params;
+
+	auto copy(copy_method m) const
+	{
+		record ret(*this);
+		if(m!=copy_method::deep) ret.members.clear();
+		return ret;
+	}
 };
 
 struct interface {
@@ -85,6 +109,16 @@ struct interface {
 	std::vector<constructor_fnc> constructors;
 	meta_parameters::parameter_set meta_params;
 	bool realization_in_client = false;
+
+	auto copy(copy_method m) const
+	{
+		interface ret(*this);
+		if(m!=copy_method::deep) {
+			ret.mem_funcs.clear();
+			ret.constructors.clear();
+		}
+		return ret;
+	}
 };
 
 typedef std::variant<function,enumeration,record,interface> module_content;

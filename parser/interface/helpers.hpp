@@ -73,6 +73,13 @@ std::optional<P> get(const MType& mobj)
 }
 
 template<typename P>
+std::optional<P> get(const module_content& cnt)
+{
+	auto getter = [&cnt](const auto& c){ return get<P>(c.meta_params); };
+	return std::visit(getter, cnt);
+}
+
+template<typename P>
 bool has(const meta_parameters::parameter_set& set)
 {
 	for(auto& p:set) if(std::holds_alternative<P>(p)) return true;
@@ -112,6 +119,9 @@ void set(meta_parameters::parameter_set& set, P p)
 	set.set.emplace_back(std::move(p));
 }
 
-enum class copy_method{ deep, meta };
 module copy(const module& mod, copy_method method=copy_method::meta);
+
+module_content copy(const module_content& cnt, copy_method method = copy_method::meta);
+
 } // namespace modegen::parser::interface
+
