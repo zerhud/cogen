@@ -10,6 +10,7 @@
 
 #include <boost/range/adaptors.hpp>
 #include <boost/range/algorithm.hpp>
+#include <boost/range/algorithm_ext/erase.hpp>
 
 #include "parser/interface/meta_parameters.hpp"
 
@@ -136,7 +137,7 @@ std::vector<version> mgi::split_version::all_versions(const mi::module& mod) con
 		}
 	}
 
-	boost::erase(ret, boost::unique(boost::sort(ret)));
+	boost::erase(ret, boost::unique<boost::return_found_end>(boost::sort(ret)));
 	return ret;
 }
 
