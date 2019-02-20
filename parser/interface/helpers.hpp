@@ -119,9 +119,17 @@ void set(meta_parameters::parameter_set& set, P p)
 	set.set.emplace_back(std::move(p));
 }
 
+template<typename MType, typename P>
+void set(MType& mobj, P p)
+{
+	set(mobj.meta_params, std::move(p));
+}
+
 module copy(const module& mod, copy_method method=copy_method::meta);
 
 module_content copy(const module_content& cnt, copy_method method = copy_method::meta);
+
+std::string name(const module_content& cnt);
 
 } // namespace modegen::parser::interface
 

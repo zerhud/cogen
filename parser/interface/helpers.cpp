@@ -226,3 +226,9 @@ mi::module_content mi::copy(const mi::module_content& cnt, mi::copy_method metho
 	return ret;
 }
 
+std::string mi::name(const mi::module_content& cnt)
+{
+	auto name_extracter = [](const auto& c) { return c.name; };
+	return std::visit(name_extracter, cnt);
+}
+

@@ -21,6 +21,11 @@ public:
 	std::vector<parser::interface::module>& operator () (std::vector<parser::interface::module>& mods) ;
 private:
 	void split_mod(parser::interface::module mod);
+	void prepare_modules(const parser::interface::module& mod);
+	std::vector<parser::interface::meta_parameters::version> all_versions(const parser::interface::module& mod) const ;
+	void insert_content(const parser::interface::module_content& cnt);
+	void deep_copy(const parser::interface::record& from, parser::interface::record& to);
+	void deep_copy(const parser::interface::interface& from, parser::interface::interface& to);
 
 	bool dry = false;
 	std::size_t current_mod = 0;
