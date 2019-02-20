@@ -97,4 +97,66 @@ BOOST_AUTO_TEST_CASE(multy)
 	                    );
 	mg::split_version{}(pi.mods);
 	BOOST_CHECK(pi.mods == po.mods);
+
+	pi = mi::parse(R"-(module mod v1.0:
+	               string foo();
+
+	               interface iinmod1 {
+	                   constructor(i8 p1, i8 p2);
+	                   i8 p1() const ;
+	                   i8 p2() const ;
+	                   @v1.1 i8 newer() const ;
+	               }
+
+	               enum +auto_io e {one two}
+
+	               @v1.2 string new_function();
+
+	               record rec_test {
+	                   i8 field_old;
+	                   @v1.1 i8 field_new;
+	               }
+	)-"sv);
+	po = mi::parse(R"-(module mod v1.0:
+	               string foo();
+	               interface iinmod1 {
+	                   constructor(i8 p1, i8 p2);
+	                   i8 p1() const ;
+	                   i8 p2() const ;
+	               }
+	               enum +auto_io e {one two}
+	               record rec_test {
+	                   i8 field_old;
+	               }
+	               module mod v1.1:
+	               string foo();
+	               interface iinmod1 {
+	                   constructor(i8 p1, i8 p2);
+	                   i8 p1() const ;
+	                   i8 p2() const ;
+	                   i8 newer() const ;
+	               }
+	               enum +auto_io e {one two}
+	               record rec_test {
+	                   i8 field_old;
+	                   i8 field_new;
+	               }
+	               module mod v1.2:
+	               string foo();
+	               interface iinmod1 {
+	                   constructor(i8 p1, i8 p2);
+	                   i8 p1() const ;
+	                   i8 p2() const ;
+	                   i8 newer() const ;
+	               }
+	               enum +auto_io e {one two}
+	               string new_function();
+	               record rec_test {
+	                   i8 field_old;
+	                   i8 field_new;
+	               }
+	)-"sv);
+	mg::split_version{}(pi.mods);
+	BOOST_CHECK(pi.mods == po.mods);
+	BOOST_CHECK_EQUAL(pi.mods.size(), 3);
 }

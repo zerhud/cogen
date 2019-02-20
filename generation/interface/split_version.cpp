@@ -136,7 +136,7 @@ std::vector<version> mgi::split_version::all_versions(const mi::module& mod) con
 		}
 	}
 
-	boost::unique(boost::sort(ret));
+	boost::erase(ret, boost::unique(boost::sort(ret)));
 	return ret;
 }
 
