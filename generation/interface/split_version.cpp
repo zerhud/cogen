@@ -59,7 +59,8 @@ void mgi::split_version::insert_content(const mi::module_content& cnt)
 			});
 
 	if(cnt_pos == std::end(cur_mod.content)) {
-		cur_mod.content.emplace_back(mi::copy(cnt, mi::copy_method::meta));
+		auto& copied = cur_mod.content.emplace_back(mi::copy(cnt, mi::copy_method::meta));
+		mi::erase<version>(copied);
 		cnt_pos = cur_mod.content.end()-1;
 	}
 
@@ -72,8 +73,10 @@ void mgi::split_version::deep_copy(const mi::record& from, mi::record& to)
 	version cur_ver = mi::get_version(result[current_mod]);
 	for(const mi::record_item& item:from.members) {
 		auto item_ver = mi::get<version>(item);
-		if(!item_ver || *item_ver <= cur_ver)
-			to.members.emplace_back(item);
+		if(!item_ver || *item_ver <= cur_ver) {
+			auto& ii = to.members.emplace_back(item);
+			mi::erase<version>(ii.meta_params);
+		}
 	}
 }
 
@@ -82,13 +85,17 @@ void mgi::split_version::deep_copy(const mi::interface& from, mi::interface& to)
 	version cur_ver = mi::get_version(result[current_mod]);
 	for(const auto& item:from.mem_funcs) {
 		auto item_ver = mi::get<version>(item);
-		if(!item_ver || *item_ver <= cur_ver)
-			to.mem_funcs.emplace_back(item);
+		if(!item_ver || *item_ver <= cur_ver) {
+			auto& ii = to.mem_funcs.emplace_back(item);
+			mi::erase<version>(ii.meta_params);
+		}
 	}
 	for(const auto& item:from.constructors) {
 		auto item_ver = mi::get<version>(item);
-		if(!item_ver || *item_ver <= cur_ver)
-			to.constructors.emplace_back(item);
+		if(!item_ver || *item_ver <= cur_ver) {
+			auto& ii = to.constructors.emplace_back(item);
+			mi::erase<version>(ii.meta_params);
+		}
 	}
 }
 

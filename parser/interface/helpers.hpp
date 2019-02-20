@@ -125,6 +125,24 @@ void set(MType& mobj, P p)
 	set(mobj.meta_params, std::move(p));
 }
 
+template<typename P>
+void erase(meta_parameters::parameter_set& set)
+{
+	for(auto par=set.begin();par!=set.end();++par) {
+		if(std::holds_alternative<P>(*par)) {
+			set.set.erase(par);
+			return;
+		}
+	}
+}
+
+template<typename P>
+void erase(module_content& cnt)
+{
+	auto eraser = [](auto& c){ erase<P>(c.meta_params); };
+	std::visit(eraser, cnt);
+}
+
 module copy(const module& mod, copy_method method=copy_method::meta);
 
 module_content copy(const module_content& cnt, copy_method method = copy_method::meta);
