@@ -71,7 +71,6 @@ target_sources_copy(modegen_interfaces "${dbg_cmake_templates_dir}"
 target_sources_local(modegen_interfaces to_json.hpp to_json.cpp "generation/interface/")
 target_sources_local(modegen_interfaces naming.hpp naming.cpp "generation/interface/")
 target_sources_local(modegen_interfaces filter.hpp filter.cpp "generation/interface/")
-target_sources_local(modegen_interfaces split_by_version.hpp split_by_version.cpp "generation/interface/")
 target_sources_local(modegen_interfaces split_version.hpp split_version.cpp "generation/interface/")
 # generation part for cpp
 target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "generation/cpp/")
@@ -94,13 +93,12 @@ macro(add_unit_test tname path lib)
 	add_test(NAME ${tname} COMMAND ${tname}_test)
 endmacro()
 set(tests_gcommon
-	common to_json
+	common
+	to_json
 	cpp cpp_type_cvt
 	name_conversion
 	filter
-	split_by_version
 	split_version
-	#common_generators
 	cmake
 	)
 set(tests_interface mdp checker )

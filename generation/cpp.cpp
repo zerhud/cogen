@@ -12,7 +12,7 @@
 #include "interface/naming.hpp"
 #include "interface/to_json.hpp"
 #include "interface/filter.hpp"
-#include "interface/split_by_version.hpp"
+#include "interface/split_version.hpp"
 #include "cpp/type_converter.hpp"
 #include "parser/interface/loader.hpp"
 #include "parser/interface/helpers.hpp"
@@ -53,7 +53,7 @@ cppjson::value mg::cpp_generator::jsoned_data(parser::loader_ptr data_loader, op
 	        | tcvt
 	        | filter(freq)
 	        | naming(opts.naming())
-	        | split_by_version(!opts.target_data("cpp"sv).get("split_by_version", false))
+	        | split_version(!opts.target_data("cpp"sv).get("split_by_version", false))
 	        | interface::to_json(std::make_unique<json_extra_info>())
 	        ;
 

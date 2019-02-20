@@ -65,7 +65,8 @@ void mgi::split_version::insert_content(const mi::module_content& cnt)
 	}
 
 	if(std::holds_alternative<mi::record>(cnt)) deep_copy(std::get<mi::record>(cnt), std::get<mi::record>(*cnt_pos));
-	if(std::holds_alternative<mi::interface>(cnt)) deep_copy(std::get<mi::interface>(cnt), std::get<mi::interface>(*cnt_pos));
+	else if(std::holds_alternative<mi::interface>(cnt)) deep_copy(std::get<mi::interface>(cnt), std::get<mi::interface>(*cnt_pos));
+	else if(std::holds_alternative<mi::enumeration>(cnt)) std::get<mi::enumeration>(*cnt_pos).elements = std::get<mi::enumeration>(cnt).elements;
 }
 
 void mgi::split_version::deep_copy(const mi::record& from, mi::record& to)

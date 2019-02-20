@@ -61,6 +61,13 @@ BOOST_AUTO_TEST_CASE(interface)
 	mg::split_version{}(pr.mods);
 	BOOST_CHECK(presult.mods == pr.mods);
 }
+BOOST_AUTO_TEST_CASE(enumeration)
+{
+	auto pr = mi::parse("module mod v1.0: enum e1{a b} @v1.1 enum e2{a b}"sv);
+	auto presult = mi::parse("module mod v1.0: enum e1{a b} module mod v1.1: enum e1{a b} enum e2{a b}"sv);
+	mg::split_version{}(pr.mods);
+	BOOST_CHECK(presult.mods == pr.mods);
+}
 BOOST_AUTO_TEST_SUITE_END() // simple
 
 BOOST_AUTO_TEST_CASE(with_empty)
@@ -70,4 +77,24 @@ BOOST_AUTO_TEST_CASE(with_empty)
 	mg::split_version{}(pr.mods);
 	BOOST_CHECK(presult.mods == pr.mods);
 	BOOST_CHECK_EQUAL(presult.mods.size(), 4);
+}
+
+BOOST_AUTO_TEST_CASE(dry_run)
+{
+	auto pr1 = mi::parse("module mod v1.0: @v1.1 record r1 {@v1.2 type f2; @v1.3 type f3;}"sv);
+	auto pr2 = mi::parse("module mod v1.0: @v1.1 record r1 {@v1.2 type f2; @v1.3 type f3;}"sv);
+	mg::split_version{true}(pr1.mods);
+	BOOST_CHECK(pr1.mods == pr2.mods);
+}
+
+BOOST_AUTO_TEST_CASE(multy)
+{
+	auto pi = mi::parse("module mod v1.0: type f(); @v1.1 type f2(); enum e{a b} @v1.2 enum +auto_io e2{a b}"sv);
+	auto po = mi::parse("module mod v1.0: type f(); enum e{a b}"
+	                    "module mod v1.1: type f(); type f2(); enum e{a b}"
+	                    "module mod v1.2: type f(); type f2(); enum e{a b} enum +auto_io e2{a b}"
+	                    ""sv
+	                    );
+	mg::split_version{}(pi.mods);
+	BOOST_CHECK(pi.mods == po.mods);
 }
