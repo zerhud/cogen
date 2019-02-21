@@ -18,14 +18,14 @@ namespace generation {
 class json_jinja_generator {
 public:
 	virtual ~json_jinja_generator() noexcept =default ;
-	virtual const json_jinja_generator& operator() (FS::path tmpl, FS::path out, const cppjson::value& data) const =0 ;
+	virtual const json_jinja_generator& operator() (FS::path tmpl, std::optional<FS::path> out, const cppjson::value& data) const =0 ;
 };
 
 
 class jinja_python_generator : public json_jinja_generator {
 public:
 	jinja_python_generator(FS::path gen);
-	const json_jinja_generator& operator () (FS::path tmpl, FS::path out, const cppjson::value& data) const override ;
+	const json_jinja_generator& operator () (FS::path tmpl, std::optional<FS::path> out, const cppjson::value& data) const override ;
 private:
 	FS::path generator;
 };
