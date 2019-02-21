@@ -3,8 +3,6 @@
 	, enable_clcov ? false
 	, python3
 	, py_jinja
-	, bison2
-	, flex
 	, boost
 	, cppjson
 	, cmake
@@ -12,6 +10,7 @@
         , turtle
         , clang
         , llvm_7
+        , pybind11
 }:
 
 let
@@ -23,14 +22,12 @@ stdenv.mkDerivation rec {
 	version = "0.0.0";
 	src = ./..;
 
-	nativeBuildInputs = [
-		# for generation
-		python3 py_jinja bison2 flex
-		# for build excutable file
-		cmake ninja
-		] ++ clcov_deps;
+	nativeBuildInputs = [ cmake ninja ] ++ clcov_deps;
 	buildInputs = [
-		boost turtle
+		# for generation
+		python3 py_jinja
+		# for build excutable file
+		boost turtle pybind11
 		cppjson
 	];
 }

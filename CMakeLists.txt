@@ -8,6 +8,7 @@ option(ENABLE_TODO "enable todo warnings in debug mode" ON)
 
 find_package(Boost COMPONENTS program_options unit_test_framework system REQUIRED)
 find_package(cppjson REQUIRED)
+find_package(pybind11 REQUIRED)
 find_package(Threads REQUIRED)
 find_file(turtle turtle/mock.hpp)
 include(CheckIncludeFile)
@@ -77,7 +78,12 @@ target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "g
 
 # main programm: run selected generator and sets options
 add_executable(modegen modegen/main.cpp)
-target_link_libraries(modegen modegen_interfaces ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
+target_link_libraries(modegen PRIVATE
+	modegen_interfaces
+	${Boost_LIBRARIES} pybind11::embed
+	${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
+	)
+
 add_custom_command(TARGET modegen POST_BUILD
 	COMMAND "${CMAKE_COMMAND}" -E copy_if_different
 		"${pythongen_src}"
