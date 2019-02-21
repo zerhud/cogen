@@ -66,9 +66,9 @@ public:
 		throw std::runtime_error("no such generator was loaded \""s + std::string(name) + "\""s);
 	}
 
-	void json_jinja(const cppjson::value& data, const FS::path& tmpl, const std::optional<FS::path>& out) const override
+	void json_jinja(const mg::tmpl_gen_data& data) const override
 	{
-		pygen(tmpl, out, data);
+		pygen(data.tmpl(), data.out_dir(), data.data());
 	}
 
 	void add_search_path(const FS::path& p)

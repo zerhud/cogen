@@ -24,7 +24,7 @@ namespace fs = FS;
 
 MOCK_BASE_CLASS( provider_mock, modegen::generation::provider )
 {
-	MOCK_METHOD( json_jinja, 3 )
+	MOCK_METHOD( json_jinja, 1 )
 	MOCK_METHOD( parser, 1 )
 	MOCK_METHOD( generator, 1 )
 	MOCK_METHOD( resolve_file, 3 )
@@ -64,16 +64,16 @@ BOOST_AUTO_TEST_CASE(common_generation)
 	//     4. cg generates resulting file for each item
 
 	bool cout = true;
-	auto result_data_checker = [&cout](const cppjson::value& data, const fs::path& tmpl, const std::optional<fs::path>& out) {
-			if(cout) BOOST_CHECK( !out );
+	auto result_data_checker = [&cout](const mg::tmpl_gen_data& gdata) {
+			if(cout) BOOST_CHECK( !gdata.out_dir() );
 			else {
-				BOOST_REQUIRE( out );
-				BOOST_CHECK_EQUAL( *out, fs::path("some_dir") / "def.hpp" );
+				BOOST_REQUIRE( gdata.out_dir() );
+				BOOST_CHECK_EQUAL( *gdata.out_dir(), fs::path("some_dir") / "def.hpp" );
 			}
 
-			BOOST_CHECK_EQUAL( tmpl, fs::path(u8"resolved/path") / "definitions.hpp.jinja" );
-			BOOST_CHECK_EQUAL( data["name"], "def"s );
-			BOOST_CHECK_EQUAL( data["test"], "test_data"s );
+			BOOST_CHECK_EQUAL( gdata.tmpl(), fs::path(u8"resolved/path") / "definitions.hpp.jinja" );
+			BOOST_CHECK_EQUAL( gdata.data()["name"], "def"s );
+			BOOST_CHECK_EQUAL( gdata.data()["test"], "test_data"s );
 			return true;
 		};
 
