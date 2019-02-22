@@ -60,7 +60,7 @@ target_sources_local(modegen_interfaces common.hpp    common.cpp    "generation/
 target_sources_local(modegen_interfaces file_data.hpp file_data.cpp "generation/")
 target_sources_local(modegen_interfaces cpp.hpp       cpp.cpp       "generation/")
 target_sources_local(modegen_interfaces cmake.hpp     cmake.cpp     "generation/")
-target_sources(modegen_interfaces PRIVATE "${pythongen_src}")
+target_sources(modegen_interfaces PRIVATE "${pythongen_src}" "${CMAKE_CURRENT_BINARY_DIR}/pythongen")
 target_sources_copy(modegen_interfaces "${dbg_cpp_templates_dir}"
 	generation/cpp/declarations.info generation/cpp/render.jinja
 	generation/cpp/declarations.jinja generation/cpp/header.jinja generation/cpp/definitions.jinja
@@ -84,10 +84,11 @@ target_link_libraries(modegen PRIVATE
 	${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
 	)
 
-add_custom_command(TARGET modegen POST_BUILD
+add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pythongen"
 	COMMAND "${CMAKE_COMMAND}" -E copy_if_different
 		"${pythongen_src}"
 		"${CMAKE_CURRENT_BINARY_DIR}/pythongen"
+	DEPENDS "${pythongen_src}"
 	)
 
 # unit tests...
