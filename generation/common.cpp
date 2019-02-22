@@ -40,6 +40,7 @@ void mg::generator::generate(const FS::path& output_dir) const
 
 		tmpl_gen_data gdata(std::move(data), tmpl_path(part.first));
 		gdata.out_dir(output_dir / output_path(part.first));
+		gdata.generator_data(extra_generator_data(part.first));
 		prov->json_jinja( gdata );
 	}
 }
@@ -48,7 +49,9 @@ void mg::generator::generate_stdout(std::string_view part) const
 {
 	assert( prov );
 	cppjson::value data = generate_data(part);
-	prov->json_jinja( tmpl_gen_data(std::move(data), tmpl_path(part) ) );
+	tmpl_gen_data gdata(std::move(data), tmpl_path(part));
+	gdata.generator_data(extra_generator_data(part));
+	prov->json_jinja( gdata );
 }
 
 cppjson::value mg::generator::generate_data(std::string_view part) const
@@ -84,5 +87,15 @@ FS::path mg::generator::tmpl_path(std::string_view part) const
 
 	auto target = opts.get("gen."s+p+".target"s,opts.get("defaults.target"s,""s));
 	return prov->resolve_file(input_file, info_directory, target);
+}
+
+boost::property_tree::ptree mg::generator::extra_generator_data(std::string_view part) const
+{
+	boost::property_tree::ptree ret;
+	std::string p(part);
+	auto forwards = opts.get_child_optional("gen."s+p+".forwards"s);
+	if(!forwards) forwards = opts.get_child_optional("defaults.forwards"s);
+	if(forwards) ret = std::move(*forwards);
+	return ret;
 }
 

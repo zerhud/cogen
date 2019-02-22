@@ -154,8 +154,8 @@ BOOST_AUTO_TEST_CASE(extra_generator_data)
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "def.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "other.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
 
-	gen.generate_stdout("def"sv);
-	gen.generate_stdout("other"sv);
+	BOOST_TEST_CONTEXT("def") gen.generate_stdout("def"sv);
+	BOOST_TEST_CONTEXT("other") gen.generate_stdout("other"sv);
 }
 
 BOOST_AUTO_TEST_SUITE(options_view)
