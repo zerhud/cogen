@@ -102,7 +102,8 @@ BOOST_AUTO_TEST_CASE(common_generation)
 BOOST_AUTO_TEST_CASE(defaults)
 {
 	auto provider = std::make_shared<provider_mock>();
-	MOCK_EXPECT( provider->json_jinja ).exactly(2) ;
+
+	MOCK_EXPECT( provider->json_jinja ).exactly(2);
 	MOCK_EXPECT( provider->parser ).exactly(1).with( "interface"sv ).returns( std::make_shared<fake_target>() );
 	MOCK_EXPECT( provider->parser ).exactly(1).with( "other_prs"sv ).returns( std::make_shared<fake_target>() );
 	MOCK_EXPECT( provider->generator ).exactly(1).with( "cpp"sv ).returns( std::make_shared<fake_data_gen>() );
@@ -122,7 +123,39 @@ BOOST_AUTO_TEST_CASE(defaults)
 	opts.put("gen.other.target", "other_trg");
 	opts.put("gen.other.parser", "other_prs");
 	opts.put("gen.other.test", "test_data") ;
+
 	gen.generate("dir");
+}
+
+BOOST_AUTO_TEST_CASE(extra_generator_data)
+{
+	auto provider = std::make_shared<provider_mock>();
+	mg::generator gen(provider, u8"some/path");
+	auto& opts = gen.options();
+	opts.put("defaults.target", "cpp");
+	opts.put("defaults.parser", "interface");
+	opts.put("defaults.forwards.some", "some");
+	opts.put("gen.def.output", "def.hpp") ;
+	opts.put("gen.def.input", "def.hpp.jinja") ;
+	opts.put("gen.def.test", "test_data") ;
+	opts.put("gen.other.output", "other.hpp") ;
+	opts.put("gen.other.input", "other.jinja") ;
+	opts.put("gen.other.test", "test_data") ;
+	opts.put("gen.other.forwards.other", "other");
+
+	auto result_data_checker = [](const mg::tmpl_gen_data& gdata) {
+		BOOST_CHECK( !gdata.generator_data().empty() );
+		return true;
+	};
+
+	MOCK_EXPECT( provider->json_jinja ).exactly(2).with( result_data_checker ) ;
+	MOCK_EXPECT( provider->parser ).exactly(2).with( "interface"sv ).returns( std::make_shared<fake_target>() );
+	MOCK_EXPECT( provider->generator ).exactly(2).with( "cpp"sv ).returns( std::make_shared<fake_data_gen>() );
+	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "def.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
+	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "other.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
+
+	gen.generate_stdout("def"sv);
+	gen.generate_stdout("other"sv);
 }
 
 BOOST_AUTO_TEST_SUITE(options_view)
