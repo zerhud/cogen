@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(common_generation)
 	//     4. cg generates resulting file for each item
 
 	bool cout = true;
-	auto result_data_checker = [&cout](const mg::tmpl_gen_data& gdata) {
+	auto result_data_checker = [&cout](const mg::tmpl_gen_env& gdata) {
 			if(cout) BOOST_CHECK( !gdata.out_dir() );
 			else {
 				BOOST_REQUIRE( gdata.out_dir() );
@@ -134,17 +134,36 @@ BOOST_AUTO_TEST_CASE(extra_generator_data)
 	auto& opts = gen.options();
 	opts.put("defaults.target", "cpp");
 	opts.put("defaults.parser", "interface");
-	opts.put("defaults.forwards.some", "some");
+	opts.put("defaults.forwards.ex.some.name", "some");
+	opts.put("defaults.forwards.ex.some.script", "some script");
 	opts.put("gen.def.output", "def.hpp") ;
 	opts.put("gen.def.input", "def.hpp.jinja") ;
 	opts.put("gen.def.test", "test_data") ;
 	opts.put("gen.other.output", "other.hpp") ;
 	opts.put("gen.other.input", "other.jinja") ;
 	opts.put("gen.other.test", "test_data") ;
-	opts.put("gen.other.forwards.other", "other");
+	opts.put("gen.other.forwards.ex.other.name", "other");
+	opts.put("gen.other.forwards.ex.other.file", "other_file");
+	opts.put("gen.other.forwards.before.file", "other_file");
+	opts.put("gen.other.forwards.after.script", "other script");
 
-	auto result_data_checker = [](const mg::tmpl_gen_data& gdata) {
-		BOOST_CHECK( !gdata.generator_data().empty() );
+	std::string ex_script_name;
+	mg::tmpl_gen_env::script_descriptor ex_script;
+	auto result_data_checker = [&ex_script,&ex_script_name](const mg::tmpl_gen_env& gdata) {
+		auto efnc = gdata.emb_fnc_list();
+		BOOST_CHECK_EQUAL(efnc.size(), 1);
+		for(auto& e:efnc) {
+			BOOST_CHECK(e.second == ex_script);
+			BOOST_CHECK_EQUAL(e.first, ex_script_name);
+		}
+
+		if(ex_script_name=="other"s) {
+			BOOST_REQUIRE(std::holds_alternative<FS::path>(gdata.exec_before()));
+			BOOST_REQUIRE(std::holds_alternative<std::string>(gdata.exec_after()));
+			BOOST_CHECK_EQUAL(std::get<FS::path>(gdata.exec_before()), "other_file"s);
+			BOOST_CHECK_EQUAL(std::get<std::string>(gdata.exec_after()), "other script"s);
+		}
+
 		return true;
 	};
 
@@ -153,8 +172,13 @@ BOOST_AUTO_TEST_CASE(extra_generator_data)
 	MOCK_EXPECT( provider->generator ).exactly(2).with( "cpp"sv ).returns( std::make_shared<fake_data_gen>() );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "def.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "other.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
+	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "other_file"sv, u8"some/path"sv, "cpp"sv ).returns( u8"other/path.jinja" );
 
+	ex_script_name = "some"s;
+	ex_script = "some script"s;
 	BOOST_TEST_CONTEXT("def") gen.generate_stdout("def"sv);
+	ex_script_name = "other"s;
+	ex_script = FS::path(u8"other/path.jinja"s);
 	BOOST_TEST_CONTEXT("other") gen.generate_stdout("other"sv);
 }
 

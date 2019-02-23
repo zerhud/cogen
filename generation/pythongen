@@ -3,6 +3,7 @@
 import os, sys, getopt
 import json
 import jinja2
+import importlib.util
 
 jinja_env = jinja2.Environment(
     block_start_string = '<%',
@@ -11,13 +12,25 @@ jinja_env = jinja2.Environment(
     variable_end_string = '=>',
     comment_start_string = '<*',
     comment_end_string = '*>',
-	loader = jinja2.FileSystemLoader(os.path.abspath('.'))
+    loader = jinja2.FileSystemLoader(os.path.abspath('.'))
 )
 
 def print_help():
 	print("usage ./jt.py -d data_file -t template_file -o output_file")
 	print("got ", sys.argv)
 	sys.exit()
+
+def parse_extra_data(ex):
+	print("got extra data ", ex)
+	for name, value in ex.items():
+		if 'script' in value:
+			exec(value['script'])
+			jinja_env.globals[value['name']] = locals()[value['name']]
+		elif 'file' in value:
+			spec = importlib.util.spec_from_file_location(value['name'], value['file'])
+			mod = importlib.util.module_from_spec(spec)
+			spec.loader.exec_module(mod)
+			jinja_env.globals[value['name']] = getattr(mod, value['name'])
 
 if __name__ == '__main__':
 
@@ -50,11 +63,14 @@ if __name__ == '__main__':
 	else:
 		data = json.loads(open(data_file).read())
 
+	if "extra_data" in data:
+		parse_extra_data(data["extra_data"])
+
 	jinja_env.loader = jinja2.FileSystemLoader(os.path.dirname(tmpl_file))
 	# jinja cannot load file if tmp_file contains path :(
 	#template = jinja_env.get_template(tmpl_file)
 	template = jinja_env.from_string(open(tmpl_file).read())
-	render_template = template.render(cdata=data) # pass in all jinja vars as a big dictionary
+	render_template = template.render(cdata=data["tmpl_data"]) # pass in all jinja vars as a big dictionary
 
 	if(output == '-'):
 		print(render_template)

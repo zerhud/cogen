@@ -21,6 +21,9 @@
 namespace modegen {
 namespace generation {
 
+/// generation environment
+class tmpl_gen_env ;
+
 class provider; ///< provides data for generation
 typedef std::shared_ptr<provider> provider_ptr;
 
@@ -51,6 +54,8 @@ private:
 	FS::path tmpl_path(std::string_view part) const ;
 	cppjson::value generate_data(std::string_view part) const ;
 	boost::property_tree::ptree extra_generator_data(std::string_view part) const ;
+	void build_extra_env(tmpl_gen_env& env, const boost::property_tree::ptree& ex_data, std::string_view part) const ;
+	std::string cur_target(std::string_view part) const ;
 
 	provider_ptr prov;
 	boost::property_tree::ptree opts;

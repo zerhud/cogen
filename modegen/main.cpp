@@ -7,10 +7,13 @@
  *************************************************************************/
 
 #include <regex>
+#include <sstream>
 #include <iostream>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/info_parser.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <boost/process.hpp>
+#include <pybind11/embed.h>
 
 #include "generation/common.hpp"
 #include "generation/provider.hpp"
@@ -66,9 +69,24 @@ public:
 		throw std::runtime_error("no such generator was loaded \""s + std::string(name) + "\""s);
 	}
 
-	void json_jinja(const mg::tmpl_gen_data& data) const override
+	void json_jinja(const mg::tmpl_gen_env& data) const override
 	{
-		pygen(data.tmpl(), data.out_dir(), data.data());
+		cppjson::value json_data;
+
+		auto fnc_list = data.emb_fnc_list();
+		for(auto& ef:fnc_list) {
+			if(std::holds_alternative<std::string>(ef.second)) {
+				json_data["extra_data"][ef.first]["name"] = ef.first;
+				json_data["extra_data"][ef.first]["script"] = std::get<std::string>(ef.second);
+			}
+			else if(std::holds_alternative<FS::path>(ef.second)) {
+				json_data["extra_data"][ef.first]["name"] = ef.first;
+				json_data["extra_data"][ef.first]["file"] = std::get<FS::path>(ef.second).u8string();
+			}
+		}
+
+		json_data["tmpl_data"] = data.data();
+		pygen(data.tmpl(), data.out_dir(), json_data);
 	}
 
 	void add_search_path(const FS::path& p)
@@ -174,6 +192,8 @@ auto parse_command_line(int argc, char** argv, std::vector<std::string> glist)
 
 int main(int argc, char** argv)
 {
+	pybind11::scoped_interpreter python_guard{};
+
 	auto prov = std::make_shared<gen_prov>(argv[0]);
 	prov->add_search_path(modegen::settings::templates_dir);
 

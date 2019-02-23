@@ -38,9 +38,9 @@ void mg::generator::generate(const FS::path& output_dir) const
 		cppjson::value data = generate_data(part.first);
 		if(data.is_undefined()) throw errors::gen_error("common", "no data for output");
 
-		tmpl_gen_data gdata(std::move(data), tmpl_path(part.first));
+		tmpl_gen_env gdata(std::move(data), tmpl_path(part.first));
 		gdata.out_dir(output_dir / output_path(part.first));
-		gdata.generator_data(extra_generator_data(part.first));
+		build_extra_env(gdata, extra_generator_data(part.first), part.first);
 		prov->json_jinja( gdata );
 	}
 }
@@ -49,8 +49,8 @@ void mg::generator::generate_stdout(std::string_view part) const
 {
 	assert( prov );
 	cppjson::value data = generate_data(part);
-	tmpl_gen_data gdata(std::move(data), tmpl_path(part));
-	gdata.generator_data(extra_generator_data(part));
+	tmpl_gen_env gdata(std::move(data), tmpl_path(part));
+	build_extra_env(gdata, extra_generator_data(part), part);
 	prov->json_jinja( gdata );
 }
 
@@ -59,11 +59,9 @@ cppjson::value mg::generator::generate_data(std::string_view part) const
 	assert( prov );
 
 	auto parser_name = opts.get_optional<std::string>("gen."s+std::string(part)+".parser"s);
-	auto target_name = opts.get_optional<std::string>("gen."s+std::string(part)+".target"s);
 	if(!parser_name) parser_name = opts.get<std::string>("defaults.parser"s);
-	if(!target_name) target_name = opts.get<std::string>("defaults.target"s);
 	auto tp = prov->parser(*parser_name);
-	auto tg = prov->generator(*target_name);
+	auto tg = prov->generator(cur_target(part));
 
 	assert(tg);
 	options_view props(opts, part);
@@ -85,8 +83,7 @@ FS::path mg::generator::tmpl_path(std::string_view part) const
 	std::string path = "gen." + p + ".input";
 	FS::path input_file = opts.get(path, p + u8".jinja");
 
-	auto target = opts.get("gen."s+p+".target"s,opts.get("defaults.target"s,""s));
-	return prov->resolve_file(input_file, info_directory, target);
+	return prov->resolve_file(input_file, info_directory, cur_target(part));
 }
 
 boost::property_tree::ptree mg::generator::extra_generator_data(std::string_view part) const
@@ -99,3 +96,32 @@ boost::property_tree::ptree mg::generator::extra_generator_data(std::string_view
 	return ret;
 }
 
+void mg::generator::build_extra_env(tmpl_gen_env& env, const boost::property_tree::ptree& ex_data, std::string_view part) const
+{
+	auto ex_child = ex_data.get_child_optional("ex"s);
+	if(ex_child) for(auto& ex:*ex_child) {
+		auto name = ex.second.get<std::string>("name"s);
+		auto file = ex.second.get_optional<std::string>("file"s);
+		auto script = ex.second.get_optional<std::string>("script"s);
+		if(script) env.emb_fnc(name, *script);
+		else if(file) env.emb_fnc(name, prov->resolve_file(*file, info_directory, cur_target(part)));
+		else throw errors::gen_error("common"s, "for embade function you must specify the name and script or file options"s);
+	}
+
+	auto before_script = ex_data.get_optional<std::string>("before.script"s);
+	auto before_file = ex_data.get_optional<std::string>("before.file"s);
+	auto after_script = ex_data.get_optional<std::string>("after.script"s);
+	auto after_file = ex_data.get_optional<std::string>("after.file"s);
+
+	if(before_script) env.exec_before(*before_script);
+	else if(before_file) env.exec_before(FS::path(*before_file));
+
+	if(after_script) env.exec_after(*after_script);
+	else if(after_file) env.exec_after(*after_file);
+}
+
+std::string mg::generator::cur_target(std::string_view part) const
+{
+	std::string p(part);
+	return opts.get("gen."s+p+".target"s,opts.get("defaults.target"s,""s));
+}

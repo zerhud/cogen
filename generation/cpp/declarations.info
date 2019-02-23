@@ -23,6 +23,18 @@ gen
 		inc_part header
 		input definitions.jinja
 		output module.cpp
+		forwards {
+			ex {
+				gen_str {
+					name gen_str
+					script "def gen_str(a,b):\n\tprint(\"hello\")\n\treturn \"hello \"+a"
+				}
+				gen_mod {
+					name gen_mod
+					file "/tmp/mod.py"
+				}
+			}
+		}
 	}
 	cmake {
 		parser meta
