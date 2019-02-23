@@ -18,11 +18,12 @@
 #include "generation/common.hpp"
 #include "generation/provider.hpp"
 #include "generation/file_data.hpp"
-#include "generation/pythongen.hpp"
 #include "generation/cpp.hpp"
 #include "generation/cmake.hpp"
 
 #include "parser/interface/loader.hpp"
+
+#include "pythongen.hpp"
 
 namespace mg = modegen::generation;
 namespace mi = modegen::parser::interface;
@@ -86,7 +87,10 @@ public:
 		}
 
 		json_data["tmpl_data"] = data.data();
-		pygen(data.tmpl(), data.out_dir(), json_data);
+		//pygen(data.tmpl(), data.out_dir(), json_data);
+		mg::python_evaluator ev(std::move(json_data));
+		ev.sys_path("some/path");
+		ev.script("print(sys.path)"s);
 	}
 
 	void add_search_path(const FS::path& p)
@@ -192,8 +196,6 @@ auto parse_command_line(int argc, char** argv, std::vector<std::string> glist)
 
 int main(int argc, char** argv)
 {
-	pybind11::scoped_interpreter python_guard{};
-
 	auto prov = std::make_shared<gen_prov>(argv[0]);
 	prov->add_search_path(modegen::settings::templates_dir);
 

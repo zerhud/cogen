@@ -40,7 +40,7 @@ configure_file("config.hpp.in" "${main_config_file}")
 include(cmake/target_sources_local.cmake)
 
 # interface library: parse interface definitions and generate code by templates
-set(pythongen_src "${CMAKE_CURRENT_LIST_DIR}/generation/pythongen")
+set(pythongen_src "${CMAKE_CURRENT_LIST_DIR}/modegen/pythongen")
 add_library(modegen_interfaces ${main_config_file})
 target_link_libraries(modegen_interfaces PRIVATE stdc++fs PUBLIC ${Boost_LIBRARIES} ${CPPJSON_LIBRARIES})
 target_include_directories(modegen_interfaces PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${config_files_dir}")
@@ -54,13 +54,11 @@ target_sources_local(modegen_interfaces helpers.hpp         helpers.cpp         
 target_sources_local(modegen_interfaces loader.hpp          loader.cpp          "parser/interface/")
 target_sources_local(modegen_interfaces check.hpp           check.cpp           "parser/interface/")
 # generations
-target_sources_local(modegen_interfaces pythongen.hpp pythongen.cpp "generation/")
 target_sources_local(modegen_interfaces provider.hpp  provider.cpp  "generation/")
 target_sources_local(modegen_interfaces common.hpp    common.cpp    "generation/")
 target_sources_local(modegen_interfaces file_data.hpp file_data.cpp "generation/")
 target_sources_local(modegen_interfaces cpp.hpp       cpp.cpp       "generation/")
 target_sources_local(modegen_interfaces cmake.hpp     cmake.cpp     "generation/")
-target_sources(modegen_interfaces PRIVATE "${pythongen_src}" "${CMAKE_CURRENT_BINARY_DIR}/pythongen")
 target_sources_copy(modegen_interfaces "${dbg_cpp_templates_dir}"
 	generation/cpp/declarations.info generation/cpp/render.jinja
 	generation/cpp/declarations.jinja generation/cpp/header.jinja generation/cpp/definitions.jinja
@@ -77,7 +75,8 @@ target_sources_local(modegen_interfaces split_version.hpp split_version.cpp "gen
 target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "generation/cpp/")
 
 # main programm: run selected generator and sets options
-add_executable(modegen modegen/main.cpp)
+add_executable(modegen modegen/main.cpp modegen/pythongen.cpp modegen/pythongen.hpp)
+target_sources(modegen PRIVATE "${pythongen_src}" "${CMAKE_CURRENT_BINARY_DIR}/pythongen")
 target_link_libraries(modegen PRIVATE
 	modegen_interfaces
 	${Boost_LIBRARIES} pybind11::embed
