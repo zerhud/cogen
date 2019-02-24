@@ -24,6 +24,7 @@ gen
 		input definitions.jinja
 		output module.cpp
 		forwards {
+			before { script "print('before')" }
 			ex {
 				gen_str {
 					name gen_str
