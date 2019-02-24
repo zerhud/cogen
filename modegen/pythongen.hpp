@@ -42,30 +42,5 @@ private:
 };
 #pragma GCC visibility pop
 
-class json_jinja_generator {
-public:
-	typedef std::variant<std::string, FS::path> python_def_t;
-
-	virtual ~json_jinja_generator() noexcept =default ;
-
-	virtual const json_jinja_generator& execute_script(const python_def_t& def) const =0 ;
-	virtual json_jinja_generator& emb_fnc(const std::string& name, const python_def_t& def) =0 ;
-	virtual json_jinja_generator& emb_mod(const std::string& name, const python_def_t& def) =0 ;
-
-	virtual const json_jinja_generator& operator() (FS::path tmpl, std::optional<FS::path> out, const cppjson::value& data) const =0 ;
-};
-
-
-class jinja_python_generator : public json_jinja_generator {
-public:
-	jinja_python_generator(FS::path gen);
-	const json_jinja_generator& execute_script(const python_def_t& def) const override ;
-	json_jinja_generator& emb_fnc(const std::string& name, const python_def_t& def) override;
-	json_jinja_generator& emb_mod(const std::string& name, const python_def_t& def) override;
-	const json_jinja_generator& operator () (FS::path tmpl, std::optional<FS::path> out, const cppjson::value& data) const override ;
-private:
-	FS::path generator;
-};
-
 } // namespace generators
 } // namespace modegen

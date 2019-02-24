@@ -34,8 +34,9 @@ using namespace std::literals;
 class gen_prov : public mg::provider
 {
 public:
-	gen_prov(FS::path self_path) : pygen(self_path.parent_path() / u8"pythongen")
+	gen_prov(FS::path self_path)
 	{
+		(void)self_path;
 	}
 
 	modegen::parser::loader_ptr create_loader(std::string_view target, FS::path input)
@@ -173,7 +174,6 @@ private:
 		throw std::runtime_error("no such parser "s + std::string(name));
 	}
 
-	modegen::generation::jinja_python_generator pygen;
 	std::map<std::string,modegen::parser::loader_ptr, std::less<>> loaders;
 	std::vector<FS::path> search_pathes;
 };
