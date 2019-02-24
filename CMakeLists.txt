@@ -77,6 +77,7 @@ target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "g
 # main programm: run selected generator and sets options
 add_executable(modegen modegen/main.cpp modegen/pythongen.cpp modegen/pythongen.hpp)
 target_sources(modegen PRIVATE "${pythongen_src}" "${CMAKE_CURRENT_BINARY_DIR}/pythongen")
+target_sources(modegen PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/pythongen_data.cpp")
 target_link_libraries(modegen PRIVATE
 	modegen_interfaces
 	${Boost_LIBRARIES} pybind11::embed
@@ -88,6 +89,20 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pythongen"
 		"${pythongen_src}"
 		"${CMAKE_CURRENT_BINARY_DIR}/pythongen"
 	DEPENDS "${pythongen_src}"
+	)
+add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pythongen_data.cpp"
+	COMMAND "${CMAKE_COMMAND}"
+		-Dcnt_list="tscript;jinja_env"
+		-Dtscript_file="${CMAKE_CURRENT_LIST_DIR}/modegen/scripts/tmpl_script.py"
+		-Djinja_env_file="${CMAKE_CURRENT_LIST_DIR}/modegen/scripts/jinja_env.py"
+		-Dinput="${CMAKE_CURRENT_LIST_DIR}/modegen/pythongen_data.cpp.in"
+		-Doutput="${CMAKE_CURRENT_BINARY_DIR}/pythongen_data.cpp"
+		-P "${CMAKE_CURRENT_LIST_DIR}/cmake/configure_file.cmake"
+	DEPENDS
+		"${CMAKE_CURRENT_LIST_DIR}/modegen/pythongen_data.cpp.in"
+		"${CMAKE_CURRENT_LIST_DIR}/cmake/configure_file.cmake"
+		"${CMAKE_CURRENT_LIST_DIR}/modegen/scripts/tmpl_script.py"
+		"${CMAKE_CURRENT_LIST_DIR}/modegen/scripts/jinja_env.py"
 	)
 
 # unit tests...

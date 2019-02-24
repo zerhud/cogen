@@ -70,6 +70,7 @@ modegen::generation::python_evaluator::python_evaluator(cppjson::value data)
     : gen_data(std::move(data))
     , globals(py::globals())
 {
+	script(set_jinja_script);
 }
 
 const mg::python_evaluator& mg::python_evaluator::sys_path(const FS::path& dir)
@@ -84,6 +85,9 @@ const mg::python_evaluator& mg::python_evaluator::sys_path(const FS::path& dir)
 
 const mg::python_evaluator& mg::python_evaluator::tmpl(const FS::path& tfile) const
 {
+	using namespace py::literals;
+	TODO(pass tempalte file to locals)
+	script(template_script);
 	return *this;
 }
 
@@ -91,9 +95,11 @@ const mg::python_evaluator& mg::python_evaluator::script(const mg::python_evalua
 {
 	const auto* str = std::get_if<std::string>(&def);
 	const auto* file = std::get_if<FS::path>(&def);
-	if(str) py::exec(*str, globals, py::dict());
+	if(str) py::exec(*str, py::globals(), globals);
 	else if(file) {
-		py::exec(u8"import "s + file->filename().u8string());
+		std::stringstream code;
+		code << u8"exec(open(" << std::quoted(file->u8string()) << ").read())" ;
+		py::exec(code.str(), py::globals(), globals);
 	}
 	else {
 		assert(false);

@@ -87,10 +87,9 @@ public:
 		}
 
 		json_data["tmpl_data"] = data.data();
-		//pygen(data.tmpl(), data.out_dir(), json_data);
 		mg::python_evaluator ev(std::move(json_data));
 		ev.sys_path("some/path");
-		ev.script("print(sys.path)"s);
+		ev.tmpl("some/tmpl.jinja"s);
 	}
 
 	void add_search_path(const FS::path& p)

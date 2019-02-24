@@ -34,6 +34,9 @@ public:
 private:
 	pybind11::dict globals;
 	cppjson::value gen_data;
+
+	static std::string template_script;
+	static std::string set_jinja_script;
 };
 #pragma GCC visibility pop
 
