@@ -27,11 +27,13 @@ public:
 	python_evaluator(cppjson::value data);
 
 	const python_evaluator& sys_path(const FS::path& dir) ;
-	const python_evaluator& tmpl(const FS::path& tfile) const ;
+	const python_evaluator& tmpl(const FS::path& tfile, const std::optional<FS::path>& out) const ;
 	const python_evaluator& script(const python_def_t& def) const ;
 
 	python_evaluator& add_emb_fnc(const std::string& name, const python_def_t& def) ;
 private:
+	std::string str_gen_data() const ;
+
 	pybind11::dict globals;
 	cppjson::value gen_data;
 

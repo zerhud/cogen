@@ -86,10 +86,21 @@ public:
 			}
 		}
 
-		json_data["tmpl_data"] = data.data();
-		mg::python_evaluator ev(std::move(json_data));
-		ev.sys_path("some/path");
-		ev.tmpl("some/tmpl.jinja"s);
+		mg::python_evaluator ev(data.data());
+		ev
+		        .sys_path("some/path"s)
+		        .script(data.exec_before())
+		        ;
+
+		auto emb_fnc_list = data.emb_fnc_list();
+		for(const auto& ef:emb_fnc_list) {
+			ev.add_emb_fnc(ef.first, ef.second);
+		}
+
+		ev
+		        .tmpl(data.tmpl(), data.out_dir())
+		        .script(data.exec_after())
+		        ;
 	}
 
 	void add_search_path(const FS::path& p)

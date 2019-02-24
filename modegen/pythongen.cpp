@@ -83,10 +83,13 @@ const mg::python_evaluator& mg::python_evaluator::sys_path(const FS::path& dir)
 	return *this;
 }
 
-const mg::python_evaluator& mg::python_evaluator::tmpl(const FS::path& tfile) const
+const mg::python_evaluator& mg::python_evaluator::tmpl(const FS::path& tfile, const std::optional<FS::path>& out) const
 {
 	using namespace py::literals;
-	TODO(pass tempalte file to locals)
+	globals["template_file"] = tfile.u8string();
+	if(out) globals["output_file"] = out->u8string();
+	else globals["output_file"] = "-"s;
+	globals["template_str_data"] = str_gen_data();
 	script(template_script);
 	return *this;
 }
@@ -106,4 +109,21 @@ const mg::python_evaluator& mg::python_evaluator::script(const mg::python_evalua
 	}
 
 	return *this;
+}
+
+mg::python_evaluator& mg::python_evaluator::add_emb_fnc(const std::string& name, const mg::python_evaluator::python_def_t& def)
+{
+	script(def);
+	std::stringstream code;
+	code << "jinja_env.globals["s << std::quoted(name) << "]=locals()[" << std::quoted(name) << "]"s ;
+	script(code.str());
+
+	return *this;
+}
+
+std::string modegen::generation::python_evaluator::str_gen_data() const
+{
+	std::stringstream out;
+	out << gen_data;
+	return out.str();
 }
