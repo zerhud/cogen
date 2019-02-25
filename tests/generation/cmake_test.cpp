@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(add_library)
 	mg::options_view opts_view(opts, "cmake"sv);
 
 	mg::cmake cm;
-	auto data = cm.jsoned_data(nullptr, opts_view);
+	auto data = cm.jsoned_data({}, opts_view);
 	std::vector<std::string> lib_names;
 	for(auto& l:data["libraries"].object()) lib_names.emplace_back(l.first);
 	BOOST_REQUIRE_EQUAL(lib_names.size(), 1);

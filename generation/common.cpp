@@ -58,14 +58,28 @@ cppjson::value mg::generator::generate_data(std::string_view part) const
 {
 	assert( prov );
 
-	auto parser_name = opts.get_optional<std::string>("gen."s+std::string(part)+".parser"s);
-	if(!parser_name) parser_name = opts.get<std::string>("defaults.parser"s);
-	auto tp = prov->parser(*parser_name);
+	std::vector<std::string> parsers_names = parser_name_list(part);
+	std::vector<parser::loader_ptr> parsers;
+	for(auto& pn:parsers_names) parsers.emplace_back(prov->parser(pn));
+
 	auto tg = prov->generator(cur_target(part));
 
 	assert(tg);
 	options_view props(opts, part);
-	return tg->jsoned_data(std::move(tp), std::move(props));
+	return tg->jsoned_data(std::move(parsers), std::move(props));
+}
+
+std::vector<std::string> mg::generator::parser_name_list(std::string_view part) const
+{
+	std::vector<std::string> ret;
+	auto part_nl = opts.get_child_optional("gen."s+std::string(part));
+	if(part_nl) for(auto& [kn,kv]:*part_nl) if(kn=="parser"s) ret.emplace_back(kv.get_value<std::string>());
+	if(ret.empty()) {
+		auto def_nl = opts.get_child_optional("defaults"s);
+		if(def_nl) for(auto& [kn,kv]:*def_nl) if(kn=="parser"s) ret.emplace_back(kv.get_value<std::string>());
+	}
+
+	return ret;
 }
 
 FS::path mg::generator::output_path(std::string_view part) const

@@ -56,6 +56,7 @@ private:
 	boost::property_tree::ptree extra_generator_data(std::string_view part) const ;
 	void build_extra_env(tmpl_gen_env& env, const boost::property_tree::ptree& ex_data, std::string_view part) const ;
 	std::string cur_target(std::string_view part) const ;
+	std::vector<std::string> parser_name_list(std::string_view part) const ;
 
 	provider_ptr prov;
 	boost::property_tree::ptree opts;

@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE( no_data_is_error )
 	mg::cpp_generator gen;
 	mg::options_view opts(opts_tree, "def"sv);
 
-	BOOST_CHECK_THROW(gen.jsoned_data(std::make_shared<fake_mi_loader>(), opts), modegen::errors::gen_error);
+	BOOST_CHECK_THROW(gen.jsoned_data({std::make_shared<fake_mi_loader>()}, opts), modegen::errors::gen_error);
 }
 
 BOOST_AUTO_TEST_CASE( extra_namespaces )
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE( extra_namespaces )
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
 
-	cppjson::value data = gen.jsoned_data(ldr, opts);
+	cppjson::value data = gen.jsoned_data({ldr}, opts);
 	BOOST_REQUIRE_EQUAL( data["namespaces"].array().size(), 2 );
 	BOOST_CHECK_EQUAL( data["namespaces"][0], "ns1" );
 	BOOST_CHECK_EQUAL( data["namespaces"][1], "ns2" );
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE( ctor_prefix_ptr_siffux )
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
 
-	cppjson::value data = gen.jsoned_data(ldr, opts);
+	cppjson::value data = gen.jsoned_data({ldr}, opts);
 	BOOST_CHECK_EQUAL( data["ctor_prefix"], "ctor_" );
 	BOOST_CHECK_EQUAL( data["ptr_suffix"], "_ptR" );
 }
@@ -92,27 +92,27 @@ BOOST_AUTO_TEST_CASE( defaults )
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
 
-	cppjson::value data = gen.jsoned_data(ldr, opts);
+	cppjson::value data = gen.jsoned_data({ldr}, opts);
 	BOOST_CHECK_EQUAL( data["ctor_prefix"], "create_" );
 	BOOST_CHECK_EQUAL( data["ptr_suffix"], "_ptr" );
 
 	opts_tree.put("gen.def.naming", "title");
-	data = gen.jsoned_data(ldr, opts);
+	data = gen.jsoned_data({ldr}, opts);
 	BOOST_CHECK_EQUAL( data["ctor_prefix"], "Create" );
 	BOOST_CHECK_EQUAL( data["ptr_suffix"], "Ptr" );
 
 	opts_tree.put("gen.def.naming", "camel");
-	data = gen.jsoned_data(ldr, opts);
+	data = gen.jsoned_data({ldr}, opts);
 	BOOST_CHECK_EQUAL( data["ctor_prefix"], "create" );
 	BOOST_CHECK_EQUAL( data["ptr_suffix"], "Ptr" );
 
 	opts_tree.put("gen.def.naming", "underscore");
-	data = gen.jsoned_data(ldr, opts);
+	data = gen.jsoned_data({ldr}, opts);
 	BOOST_CHECK_EQUAL( data["ctor_prefix"], "create_" );
 	BOOST_CHECK_EQUAL( data["ptr_suffix"], "_ptr" );
 
 	opts_tree.put("gen.def.naming", "asis");
-	data = gen.jsoned_data(ldr, opts);
+	data = gen.jsoned_data({ldr}, opts);
 	BOOST_CHECK_EQUAL( data["ctor_prefix"], "create_" );
 	BOOST_CHECK_EQUAL( data["ptr_suffix"], "_ptr" );
 }
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE( without_includes )
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
 
-	cppjson::value data = gen.jsoned_data(ldr, opts);
+	cppjson::value data = gen.jsoned_data({ldr}, opts);
 	BOOST_REQUIRE(!data.is_undefined());
 	BOOST_REQUIRE_EQUAL( data["mods"].array().size(), 1 );
 	BOOST_REQUIRE_EQUAL( data["mods"][0]["content"].array().size(), 1 );
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(with_lnag_includes)
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: string foo(date d, list<i8> l);"sv).mods;
 
-	cppjson::value data = gen.jsoned_data(ldr, opts);
+	cppjson::value data = gen.jsoned_data({ldr}, opts);
 	BOOST_REQUIRE( !data["incs"].is_undefined() );
 	BOOST_REQUIRE_EQUAL( data["incs"].array().size(), 4 );
 	// order sorted by alphabet
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(with_setts_includes)
 
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: string foo(date d, list<i8> l);"sv).mods;
-	cppjson::value data = gen.jsoned_data(ldr, opts);
+	cppjson::value data = gen.jsoned_data({ldr}, opts);
 
 	BOOST_REQUIRE( !data["incs"].is_undefined() );
 	BOOST_REQUIRE_EQUAL( data["incs"].array().size(), 10 );
@@ -223,8 +223,8 @@ BOOST_AUTO_TEST_CASE(wrong_loader)
 	mg::cpp_generator gen;
 	mg::options_view opts(opts_tree, "def"sv);
 
-	BOOST_CHECK_THROW( gen.jsoned_data(nullptr, opts), modegen::errors::gen_error );
-	BOOST_CHECK_THROW( gen.jsoned_data(std::make_shared<fake_wrong_loader>(), opts), modegen::errors::gen_error );
+	BOOST_CHECK_THROW( gen.jsoned_data({nullptr}, opts), modegen::errors::gen_error );
+	BOOST_CHECK_THROW( gen.jsoned_data({std::make_shared<fake_wrong_loader>()}, opts), modegen::errors::gen_error );
 }
 
 BOOST_AUTO_TEST_CASE( no_part_opts )
@@ -233,6 +233,6 @@ BOOST_AUTO_TEST_CASE( no_part_opts )
 	mg::cpp_generator gen;
 	mg::options_view opts(opts_tree, "def"sv);
 
-	BOOST_CHECK_THROW( gen.jsoned_data(std::make_shared<fake_mi_loader>(), opts), modegen::errors::error );
+	BOOST_CHECK_THROW( gen.jsoned_data({std::make_shared<fake_mi_loader>()}, opts), modegen::errors::error );
 }
 BOOST_AUTO_TEST_SUITE_END() // error_data

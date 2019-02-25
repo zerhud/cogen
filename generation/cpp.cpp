@@ -30,12 +30,16 @@ struct json_extra_info : interface::to_json_aspect {
 };
 } // modegen::generation
 
-cppjson::value mg::cpp_generator::jsoned_data(parser::loader_ptr data_loader, options_view opts) const
+cppjson::value mg::cpp_generator::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options_view opts) const
 {
 	using namespace modegen::generation::interface;
 	using modegen::generation::interface::operator |;
 
-	auto* ildr = dynamic_cast<parser::interface::loader*>(data_loader.get());
+	parser::interface::loader* ildr = nullptr;
+	for(auto& dl:data_loaders) {
+		ildr = dynamic_cast<parser::interface::loader*>(dl.get());
+		if(ildr) break;
+	}
 	if(!ildr) throw errors::gen_error("cpp"s, "cannot generate cpp not from interface declaration or with wrong loader"s);
 
 	cpp::type_converter tcvt;

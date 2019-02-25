@@ -34,7 +34,7 @@ public:
 class file_data {
 public:
 	virtual ~file_data() noexcept =default ;
-	virtual cppjson::value jsoned_data(parser::loader_ptr data_loader, options_view opts) const =0 ;
+	virtual cppjson::value jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options_view opts) const =0 ;
 };
 
 } // namespace modegen::generation

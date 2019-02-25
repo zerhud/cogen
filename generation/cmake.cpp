@@ -13,8 +13,10 @@ using namespace std::literals;
 namespace mg = modegen::generation;
 using boost::property_tree::ptree;
 
-cppjson::value mg::cmake::jsoned_data(parser::loader_ptr data_loader, options_view opts) const
+cppjson::value mg::cmake::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options_view opts) const
 {
+	(void) data_loaders;
+
 	cppjson::value data;
 	data["project"] = opts.part_data().get<std::string>("project");
 	data["version"] = opts.part_data().get("version", u8"0.0.0.0"s);
