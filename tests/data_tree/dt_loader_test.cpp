@@ -14,9 +14,12 @@
 
 #include "errors.h"
 #include "parser/data_tree/loader.hpp"
+#include "parser/data_tree/ptree_merge.hpp"
 
 using namespace std::literals;
 namespace md = modegen::parser::data_tree;
+namespace pt = boost::property_tree;
+using ostr = boost::optional<std::string>;
 
 BOOST_AUTO_TEST_CASE(merge)
 {
@@ -34,3 +37,29 @@ BOOST_AUTO_TEST_CASE(merge)
 	BOOST_CHECK_EQUAL(ldr.boost_ptree().get<std::string>("two"s), "two_v"s);
 }
 
+BOOST_AUTO_TEST_SUITE(merger)
+BOOST_AUTO_TEST_CASE(add)
+{
+	pt::ptree basic, adding;
+	basic.put("leaf"s, "lv"s);
+	basic.put("sub.leaf"s, "slv"s);
+	basic.put("sub2.leaf"s, "s2lv"s);
+	basic.put("sub.sub.leaf", "sslv"s);
+	basic.put("tadd.add"s, "1");
+	adding.put("add"s, "alv"s);
+	adding.put("sub.add"s, "aslv");
+	adding.put("addsub.add"s, "as2lv");
+	adding.put("tadd.add"s, "2");
+
+	pt::merger mr(std::move(basic));
+	pt::ptree result = mr.add(adding);
+	BOOST_CHECK(!result.empty());
+	BOOST_CHECK_EQUAL(result.get_optional<std::string>("leaf"s), ostr("lv"s));
+	BOOST_CHECK_EQUAL(result.get_optional<std::string>("add"s), ostr("alv"s));
+	BOOST_CHECK_EQUAL(result.get_optional<std::string>("sub.leaf"s), ostr("slv"s));
+	BOOST_CHECK_EQUAL(result.get_optional<std::string>("sub.sub.leaf"s), ostr("sslv"s));
+	BOOST_CHECK_EQUAL(result.get_optional<std::string>("sub2.leaf"s), ostr("s2lv"s));
+	BOOST_CHECK_EQUAL(result.get_optional<std::string>("sub.add"s), ostr("aslv"s));
+	BOOST_CHECK_EQUAL(result.get_optional<std::string>("addsub.add"s), ostr("as2lv"s));
+}
+BOOST_AUTO_TEST_SUITE_END() // merger
