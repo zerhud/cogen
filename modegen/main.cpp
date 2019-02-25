@@ -141,7 +141,7 @@ public:
 
 	std::vector<std::string> list_target() const
 	{
-		return { u8"interface"s };
+		return { u8"interface"s, u8"info"s, u8"json"s };
 	}
 
 	std::vector<std::string> list_generators() const
@@ -169,8 +169,8 @@ private:
 
 	modegen::parser::loader_ptr create_loader(std::string_view name) const
 	{
-		const bool is_interface = name == "cpp"sv || name == "interface"sv;
-		if(is_interface) return std::make_shared<mi::loader_impl>();
+		auto ldr = modegen::parser::create_loader(name, search_pathes);
+		if(ldr) return ldr;
 		throw std::runtime_error("no such parser "s + std::string(name));
 	}
 

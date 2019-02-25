@@ -15,6 +15,7 @@
 #include "errors.h"
 #include "generation/cpp.hpp"
 #include "parser/interface/loader.hpp"
+#include "parser/data_tree/loader.hpp"
 
 // tests cpp generation (don't test correctly working of filters)
 
@@ -32,6 +33,19 @@ struct fake_mi_loader : public mi::loader {
 	void finish_loads() override {}
 
 	std::vector<mi::module> result() const override
+	{
+		return data;
+	}
+};
+
+struct fake_data_tree_loader : public modegen::parser::data_tree::loader {
+	pt::ptree data;
+
+	void load(std::istream& input, std::string fn) override {}
+	void load(FS::path file) override {}
+	void finish_loads() override {}
+
+	pt::ptree boost_ptree() const override
 	{
 		return data;
 	}
@@ -63,6 +77,32 @@ BOOST_AUTO_TEST_CASE( extra_namespaces )
 	BOOST_REQUIRE_EQUAL( data["namespaces"].array().size(), 2 );
 	BOOST_CHECK_EQUAL( data["namespaces"][0], "ns1" );
 	BOOST_CHECK_EQUAL( data["namespaces"][1], "ns2" );
+
+	std::stringstream out;
+	BOOST_CHECK_NO_THROW(out << data);
+}
+
+BOOST_AUTO_TEST_CASE(extra_data)
+{
+	pt::ptree opts_tree;
+	opts_tree.put("gen.def.input", "fake_tmpl");
+	mg::cpp_generator gen;
+	mg::options_view opts(opts_tree, "def"sv);
+
+	auto ldr = std::make_shared<fake_mi_loader>();
+	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
+
+	auto dldr = std::make_shared<fake_data_tree_loader>();
+	dldr->data.put("some", "data");
+
+	cppjson::value data = gen.jsoned_data({ldr,dldr}, opts);
+	BOOST_CHECK_EQUAL(data["extra_data"s]["some"s], "data"s);
+
+	data = gen.jsoned_data({ldr,nullptr,dldr}, opts);
+	BOOST_CHECK_EQUAL(data["extra_data"s]["some"s], "data"s);
+
+	std::stringstream out;
+	BOOST_CHECK_NO_THROW(out << data);
 }
 
 BOOST_AUTO_TEST_SUITE(prefix_suffix)
@@ -137,7 +177,6 @@ BOOST_AUTO_TEST_CASE( without_includes )
 
 	BOOST_REQUIRE( data["incs"].is_undefined() );
 }
-
 BOOST_AUTO_TEST_CASE(with_lnag_includes)
 {
 	pt::ptree opts_tree;
@@ -161,7 +200,6 @@ BOOST_AUTO_TEST_CASE(with_lnag_includes)
 	BOOST_CHECK_EQUAL( data["incs"][2]["sys"], true );
 	BOOST_CHECK_EQUAL( data["incs"][3]["sys"], true );
 }
-
 BOOST_AUTO_TEST_CASE(with_setts_includes)
 {
 	pt::ptree opts_tree;
@@ -226,7 +264,6 @@ BOOST_AUTO_TEST_CASE(wrong_loader)
 	BOOST_CHECK_THROW( gen.jsoned_data({nullptr}, opts), modegen::errors::gen_error );
 	BOOST_CHECK_THROW( gen.jsoned_data({std::make_shared<fake_wrong_loader>()}, opts), modegen::errors::gen_error );
 }
-
 BOOST_AUTO_TEST_CASE( no_part_opts )
 {
 	pt::ptree opts_tree;

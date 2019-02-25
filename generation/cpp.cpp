@@ -8,14 +8,17 @@
 
 #include "cpp.hpp"
 
+#include <boost/property_tree/json_parser.hpp>
+
 #include "errors.h"
 #include "interface/naming.hpp"
 #include "interface/to_json.hpp"
 #include "interface/filter.hpp"
 #include "interface/split_version.hpp"
 #include "cpp/type_converter.hpp"
-#include "parser/interface/loader.hpp"
 #include "parser/interface/helpers.hpp"
+#include "parser/interface/loader.hpp"
+#include "parser/data_tree/loader.hpp"
 
 using namespace std::literals;
 namespace mg = modegen::generation;
@@ -28,6 +31,36 @@ struct json_extra_info : interface::to_json_aspect {
 		jval["namespace"] = obj.name + "_v"s + get_version(obj).value("_"sv) ;
 	}
 };
+
+static auto get_loaders(const std::vector<parser::loader_ptr>& data_loaders)
+{
+	parser::interface::loader* ildr = nullptr;
+	parser::data_tree::loader* dldr = nullptr;
+
+	for(auto& dl:data_loaders) {
+		auto* i_ildr = dynamic_cast<parser::interface::loader*>(dl.get());
+		if(i_ildr) ildr = i_ildr;
+
+		auto* i_dldr = dynamic_cast<parser::data_tree::loader*>(dl.get());
+		if(i_dldr) dldr = i_dldr;
+	}
+
+	if(!ildr) throw errors::gen_error("cpp"s, "cannot generate cpp not from interface declaration or with wrong loader"s);
+
+	return std::make_tuple(ildr, dldr);
+}
+
+static cppjson::value convert(parser::data_tree::loader* dldr)
+{
+	cppjson::value ret = cppjson::array{};
+	if(dldr) {
+		const boost::property_tree::ptree data = dldr->boost_ptree();
+		std::stringstream cvt;
+		boost::property_tree::write_json(cvt, data);
+		cvt >> ret;
+	}
+	return ret;
+}
 } // modegen::generation
 
 cppjson::value mg::cpp_generator::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options_view opts) const
@@ -35,12 +68,8 @@ cppjson::value mg::cpp_generator::jsoned_data(const std::vector<parser::loader_p
 	using namespace modegen::generation::interface;
 	using modegen::generation::interface::operator |;
 
-	parser::interface::loader* ildr = nullptr;
-	for(auto& dl:data_loaders) {
-		ildr = dynamic_cast<parser::interface::loader*>(dl.get());
-		if(ildr) break;
-	}
-	if(!ildr) throw errors::gen_error("cpp"s, "cannot generate cpp not from interface declaration or with wrong loader"s);
+	auto [ildr, dldr] = get_loaders(data_loaders);
+	assert(ildr);
 
 	cpp::type_converter tcvt;
 
@@ -68,6 +97,7 @@ cppjson::value mg::cpp_generator::jsoned_data(const std::vector<parser::loader_p
 	}
 
 	add_extra_info(opts, jsoned);
+	jsoned["extra_data"] = convert(dldr);
 
 	return jsoned;
 }
