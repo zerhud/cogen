@@ -31,6 +31,7 @@ public:
 private:
 	data_format cur_format;
 	boost::property_tree::ptree result;
+	std::map<std::string, boost::property_tree::ptree> files;
 };
 
 } // namespace modegen::parser::data_tree

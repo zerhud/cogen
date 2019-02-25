@@ -11,6 +11,8 @@
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
+#include "ptree_merge.hpp"
+
 using namespace std::literals;
 namespace md = modegen::parser::data_tree;
 
@@ -23,20 +25,25 @@ md::loader_impl::loader_impl(data_format df)
 
 void md::loader_impl::load(std::istream& input, std::string fn)
 {
-	if(cur_format==data_format::info) boost::property_tree::read_info(input, result);
-	else if(cur_format==data_format::json) boost::property_tree::read_json(input, result);
+	boost::property_tree::ptree file;
+	if(cur_format==data_format::info) boost::property_tree::read_info(input, file);
+	else if(cur_format==data_format::json) boost::property_tree::read_json(input, file);
+	files[fn] = std::move(file);
 }
 
 void md::loader_impl::load(FS::path file)
 {
-	TODO("merge result, this operation will clear it")
-	if(cur_format==data_format::info) boost::property_tree::read_info(file.u8string(), result);
-	else if(cur_format==data_format::json) boost::property_tree::read_json(file.u8string(), result);
+	boost::property_tree::ptree file_data;
+	if(cur_format==data_format::info) boost::property_tree::read_info(file.u8string(), file_data);
+	else if(cur_format==data_format::json) boost::property_tree::read_json(file.u8string(), file_data);
+	files[file.generic_string()] = std::move(file_data);
 }
 
 void md::loader_impl::finish_loads()
 {
-	TODO("merge results here or from load functions?")
+	boost::property_tree::merger m;
+	for(auto& [fn, data]:files) m.add(data);
+	result = m;
 }
 
 boost::property_tree::ptree md::loader_impl::boost_ptree() const

@@ -13,12 +13,12 @@
 
 namespace boost { namespace property_tree {
 
-template<class Key, class Data, class KeyCompare>
+template<class Key=ptree::key_type, class Data=ptree::data_type, class KeyCompare=ptree::key_compare>
 class merger {
 	typedef merger<Key, Data, KeyCompare> self_type;
 	typedef basic_ptree<Key, Data, KeyCompare> ptree_type;
 public:
-	merger(ptree_type basic)
+	merger(ptree_type basic=ptree{})
 	    : result(std::move(basic))
 	{
 	}
@@ -62,6 +62,18 @@ public:
 
 	self_type& error(ptree_type data)
 	{
+		begin_merge(std::move(data));
+		while(!values.empty()) {
+			auto [key, cur_data] = begin_iteration();
+			for(auto& child:cur_data) {
+				auto [leaf_key, is_leaf] = iterate_child(child, key);
+				if(is_leaf) {
+					const bool exists = result.get_child_optional(leaf_key);
+					if(exists) throw ptree_bad_path("already exists", leaf_key);
+					result.put( leaf_key, child.second.data());
+				}
+			}
+		}
 		assert(keys.empty());
 		assert(values.empty());
 		return *this;
