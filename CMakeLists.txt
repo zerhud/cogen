@@ -46,13 +46,15 @@ target_link_libraries(modegen_interfaces PRIVATE stdc++fs PUBLIC ${Boost_LIBRARI
 target_include_directories(modegen_interfaces PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${config_files_dir}")
 target_sources_local(modegen_interfaces errors.h errors.cpp "")
 # interface declaration
-target_sources_local(modegen_interfaces parser/loader.hpp parser/loader.cpp "")
+target_sources_local(modegen_interfaces loader.hpp          loader.cpp          "parser/")
 target_sources_local(modegen_interfaces grammar.hpp         grammar.cpp         "parser/interface/")
 target_sources_local(modegen_interfaces modegen.hpp         modegen.cpp         "parser/interface/")
 target_sources_local(modegen_interfaces meta_parameters.hpp meta_parameters.cpp "parser/interface/")
 target_sources_local(modegen_interfaces helpers.hpp         helpers.cpp         "parser/interface/")
 target_sources_local(modegen_interfaces loader.hpp          loader.cpp          "parser/interface/")
 target_sources_local(modegen_interfaces check.hpp           check.cpp           "parser/interface/")
+# data_tree
+target_sources_local(modegen_interfaces loader.hpp          loader.cpp          "parser/data_tree/")
 # generations
 target_sources_local(modegen_interfaces provider.hpp  provider.cpp  "generation/")
 target_sources_local(modegen_interfaces common.hpp    common.cpp    "generation/")
@@ -129,4 +131,5 @@ endforeach()
 foreach(tname ${tests_gcommon})
 	add_unit_test(${tname} "tests/generation/" "modegen_interfaces")
 endforeach()
+add_unit_test("dt_loader" "tests/data_tree/" "modegen_interfaces")
 
