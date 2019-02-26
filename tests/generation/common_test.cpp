@@ -38,10 +38,10 @@ class fake_target : public modegen::parser::loader {
 
 struct fake_data_gen : modegen::generation::file_data {
 	bool gen_data = true;
-	cppjson::value jsoned_data(const std::vector<mp::loader_ptr>& data_loaders, mg::options_view opts) const override
+	nlohmann::json jsoned_data(const std::vector<mp::loader_ptr>& data_loaders, mg::options_view opts) const override
 	{
 		(void) data_loaders;
-		cppjson::value ret;
+		nlohmann::json ret;
 		if(gen_data) {
 			ret["name"] = std::string(opts.part_name());
 			ret["test"] = opts.part_data().get<std::string>("test");

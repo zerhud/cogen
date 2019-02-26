@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE( extra_namespaces )
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
 
-	cppjson::value data = gen.jsoned_data({ldr}, opts);
+	nlohmann::json data = gen.jsoned_data({ldr}, opts);
 	BOOST_REQUIRE_EQUAL( data["namespaces"].array().size(), 2 );
 	BOOST_CHECK_EQUAL( data["namespaces"][0], "ns1" );
 	BOOST_CHECK_EQUAL( data["namespaces"][1], "ns2" );
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(extra_data)
 	auto dldr = std::make_shared<fake_data_tree_loader>();
 	dldr->data.put("some", "data");
 
-	cppjson::value data = gen.jsoned_data({ldr,dldr}, opts);
+	nlohmann::json data = gen.jsoned_data({ldr,dldr}, opts);
 	BOOST_CHECK_EQUAL(data["extra_data"s]["some"s], "data"s);
 
 	data = gen.jsoned_data({ldr,nullptr,dldr}, opts);
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE( ctor_prefix_ptr_siffux )
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
 
-	cppjson::value data = gen.jsoned_data({ldr}, opts);
+	nlohmann::json data = gen.jsoned_data({ldr}, opts);
 	BOOST_CHECK_EQUAL( data["ctor_prefix"], "ctor_" );
 	BOOST_CHECK_EQUAL( data["ptr_suffix"], "_ptR" );
 }
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE( defaults )
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
 
-	cppjson::value data = gen.jsoned_data({ldr}, opts);
+	nlohmann::json data = gen.jsoned_data({ldr}, opts);
 	BOOST_CHECK_EQUAL( data["ctor_prefix"], "create_" );
 	BOOST_CHECK_EQUAL( data["ptr_suffix"], "_ptr" );
 
@@ -169,13 +169,12 @@ BOOST_AUTO_TEST_CASE( without_includes )
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
 
-	cppjson::value data = gen.jsoned_data({ldr}, opts);
-	BOOST_REQUIRE(!data.is_undefined());
+	nlohmann::json data = gen.jsoned_data({ldr}, opts);
 	BOOST_REQUIRE_EQUAL( data["mods"].array().size(), 1 );
 	BOOST_REQUIRE_EQUAL( data["mods"][0]["content"].array().size(), 1 );
 	BOOST_CHECK_EQUAL( data["mods"][0]["content"][0]["type"], "function" );
 
-	BOOST_REQUIRE( data["incs"].is_undefined() );
+	BOOST_REQUIRE( !data.contains("incs") );
 }
 BOOST_AUTO_TEST_CASE(with_lnag_includes)
 {
@@ -187,8 +186,8 @@ BOOST_AUTO_TEST_CASE(with_lnag_includes)
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: string foo(date d, list<i8> l);"sv).mods;
 
-	cppjson::value data = gen.jsoned_data({ldr}, opts);
-	BOOST_REQUIRE( !data["incs"].is_undefined() );
+	nlohmann::json data = gen.jsoned_data({ldr}, opts);
+	BOOST_REQUIRE( data.contains("incs") );
 	BOOST_REQUIRE_EQUAL( data["incs"].array().size(), 4 );
 	// order sorted by alphabet
 	BOOST_CHECK_EQUAL( data["incs"][0]["n"], "chrono" );
@@ -217,9 +216,9 @@ BOOST_AUTO_TEST_CASE(with_setts_includes)
 
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: string foo(date d, list<i8> l);"sv).mods;
-	cppjson::value data = gen.jsoned_data({ldr}, opts);
+	nlohmann::json data = gen.jsoned_data({ldr}, opts);
 
-	BOOST_REQUIRE( !data["incs"].is_undefined() );
+	BOOST_REQUIRE( data.contains("incs") );
 	BOOST_REQUIRE_EQUAL( data["incs"].array().size(), 10 );
 	BOOST_CHECK_EQUAL( data["incs"][0]["sys"], true );
 	BOOST_CHECK_EQUAL( data["incs"][1]["sys"], true );

@@ -28,13 +28,11 @@ BOOST_AUTO_TEST_CASE(add_library)
 
 	mg::cmake cm;
 	auto data = cm.jsoned_data({}, opts_view);
-	std::vector<std::string> lib_names;
-	for(auto& l:data["libraries"].object()) lib_names.emplace_back(l.first);
-	BOOST_REQUIRE_EQUAL(lib_names.size(), 1);
-	BOOST_CHECK_EQUAL(lib_names[0], "interface"sv);
+	BOOST_CHECK_EQUAL(data["libraries"].size(), 1);
+	for(auto& l:data["libraries"].items()) BOOST_CHECK_EQUAL(l.value(), L"interface"s);
 
-	BOOST_REQUIRE_EQUAL(data["libraries"]["interface"]["files"].type(), cppjson::is_array);
-	BOOST_REQUIRE_EQUAL(data["libraries"]["interface"]["files"].array().size(), 2);
+	BOOST_REQUIRE(data["libraries"]["interface"]["files"].is_array());
+	BOOST_REQUIRE_EQUAL(data["libraries"]["interface"]["files"].size(), 2);
 	BOOST_CHECK_EQUAL(data["libraries"]["interface"]["files"][0], "part_file.cpp");
 	BOOST_CHECK_EQUAL(data["libraries"]["interface"]["files"][1], "some_file.cpp");
 }

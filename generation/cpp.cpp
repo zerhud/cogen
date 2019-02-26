@@ -26,7 +26,7 @@ namespace mi = modegen::parser::interface;
 
 namespace modegen::generation {
 struct json_extra_info : interface::to_json_aspect {
-	void as_object(cppjson::value& jval, const mi::module& obj) override
+	void as_object(nlohmann::json& jval, const mi::module& obj) override
 	{
 		jval["namespace"] = obj.name + "_v"s + get_version(obj).value("_"sv) ;
 	}
@@ -50,9 +50,9 @@ static auto get_loaders(const std::vector<parser::loader_ptr>& data_loaders)
 	return std::make_tuple(ildr, dldr);
 }
 
-static cppjson::value convert(parser::data_tree::loader* dldr)
+static nlohmann::json convert(parser::data_tree::loader* dldr)
 {
-	cppjson::value ret = cppjson::array{};
+	nlohmann::json ret = cppjson::array{};
 	if(dldr) {
 		const boost::property_tree::ptree data = dldr->boost_ptree();
 		std::stringstream cvt;
@@ -63,7 +63,7 @@ static cppjson::value convert(parser::data_tree::loader* dldr)
 }
 } // modegen::generation
 
-cppjson::value mg::cpp_generator::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options_view opts) const
+nlohmann::json mg::cpp_generator::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options_view opts) const
 {
 	using namespace modegen::generation::interface;
 	using modegen::generation::interface::operator |;
@@ -81,7 +81,7 @@ cppjson::value mg::cpp_generator::jsoned_data(const std::vector<parser::loader_p
 	freq.cnt_name = opts.part_data().get("filter.cnt", ""s);
 	freq.sel = parser::interface::from_string(opts.part_data().get("filter.sel", ""s));
 
-	cppjson::value jsoned =
+	nlohmann::json jsoned =
 	          data
 	        | tcvt
 	        | filter(freq)
@@ -132,13 +132,13 @@ std::string mg::cpp_generator::solve_part_include(const std::string& part, mg::o
 	return opts.part_data(part).get<std::string>("output");
 }
 
-void mg::cpp_generator::add_extra_info(options_view& opts, cppjson::value& cdata) const
+void mg::cpp_generator::add_extra_info(options_view& opts, nlohmann::json& cdata) const
 {
 	add_extra_namespaces(opts, cdata);
 	set_constructors_prefix(opts, cdata);
 }
 
-void mg::cpp_generator::add_extra_namespaces(mg::options_view& opts, cppjson::value& cdata) const
+void mg::cpp_generator::add_extra_namespaces(mg::options_view& opts, nlohmann::json& cdata) const
 {
 	auto nsopts = opts.all().get_child_optional("target.cpp");
 	if(!nsopts) return;
@@ -150,7 +150,7 @@ void mg::cpp_generator::add_extra_namespaces(mg::options_view& opts, cppjson::va
 	}
 }
 
-void mg::cpp_generator::set_constructors_prefix(mg::options_view& opts, cppjson::value& cdata) const
+void mg::cpp_generator::set_constructors_prefix(mg::options_view& opts, nlohmann::json& cdata) const
 {
 	using namespace modegen::generation::interface;
 

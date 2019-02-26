@@ -13,7 +13,7 @@
 #include <memory>
 #include FILESYSTEM
 #include <string_view>
-#include <cppjson/json.h>
+#include <nlohman/json.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include "parser/interface/modegen.hpp"
@@ -52,7 +52,7 @@ public:
 private:
 	FS::path output_path(std::string_view part) const ;
 	FS::path tmpl_path(std::string_view part) const ;
-	cppjson::value generate_data(std::string_view part) const ;
+	nlohmann::json generate_data(std::string_view part) const ;
 	boost::property_tree::ptree extra_generator_data(std::string_view part) const ;
 	void build_extra_env(tmpl_gen_env& env, const boost::property_tree::ptree& ex_data, std::string_view part) const ;
 	std::string cur_target(std::string_view part) const ;

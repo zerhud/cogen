@@ -19,13 +19,13 @@ namespace mi = modegen::parser::interface;
 namespace mg = modegen::generation::interface;
 
 struct test_json_asp : mg::to_json_aspect {
-	void as_object(cppjson::value& jval, const modegen::parser::interface::module& obj) override
+	void as_object(nlohmann::json& jval, const modegen::parser::interface::module& obj) override
 	{
 		jval["mn"] = obj.name;
 	}
 };
 
-void check_type(const cppjson::value& v, const std::string& name, const std::string& mod)
+void check_type(const nlohmann::json& v, const std::string& name, const std::string& mod)
 {
 	BOOST_CHECK_EQUAL(v["type"], "type");
 
@@ -54,13 +54,13 @@ BOOST_AUTO_TEST_CASE(fnc)
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
 	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(), 2);
 
-	cppjson::value result_ = mg::to_json()(pf.mods);
-	cppjson::value result = result_["mods"];
+	nlohmann::json result_ = mg::to_json()(pf.mods);
+	nlohmann::json result = result_["mods"];
 	BOOST_CHECK_EQUAL(result[0]["name"], "mod");
 	BOOST_CHECK_EQUAL(result[0]["v"]["major"], 1);
 	BOOST_CHECK_EQUAL(result[0]["v"]["minor"], 0);
 
-	cppjson::value& fnc = result[0]["content"][0];
+	nlohmann::json& fnc = result[0]["content"][0];
 	BOOST_CHECK_EQUAL(fnc["name"], "some");
 	BOOST_CHECK_EQUAL(fnc["type"], "function");
 	BOOST_CHECK_EQUAL(fnc["v"]["major"], 2);
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(fnc)
 	check_type(fnc["params"][0]["par_type"], "type", "");
 	check_type(fnc["params"][1]["par_type"], "type", "");
 
-	cppjson::value& fnc2 = result[0]["content"][1];
+	nlohmann::json& fnc2 = result[0]["content"][1];
 	BOOST_REQUIRE_EQUAL(fnc2["params"].type(), cppjson::is_array);
 	BOOST_REQUIRE_EQUAL(fnc2["params"].array().size(), 0);
 }
@@ -82,10 +82,10 @@ BOOST_AUTO_TEST_CASE(enums)
 {
 	auto pf = mi::parse("module mod v1.0: enum some{one two};");
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
-	cppjson::value result_ = mg::to_json()(pf.mods);
-	cppjson::value result = result_["mods"];
+	nlohmann::json result_ = mg::to_json()(pf.mods);
+	nlohmann::json result = result_["mods"];
 
-	cppjson::value& enum_rec = result[0]["content"][0];
+	nlohmann::json& enum_rec = result[0]["content"][0];
 	BOOST_CHECK_EQUAL(enum_rec["name"], "some");
 	BOOST_CHECK_EQUAL(enum_rec["type"], "enumeration");
 	BOOST_CHECK_EQUAL(enum_rec["gen_io"], false);
@@ -101,14 +101,14 @@ BOOST_AUTO_TEST_CASE(record)
 {
 	auto pf = mi::parse("module mod v1.2: record rec { type m1; list<other_type> m2;}");
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
-	cppjson::value result_ = mg::to_json()(pf.mods);
-	cppjson::value result = result_["mods"];
+	nlohmann::json result_ = mg::to_json()(pf.mods);
+	nlohmann::json result = result_["mods"];
 
 	BOOST_CHECK_EQUAL(result[0]["name"], "mod");
 	BOOST_CHECK_EQUAL(result[0]["v"]["major"], 1);
 	BOOST_CHECK_EQUAL(result[0]["v"]["minor"], 2);
 
-	cppjson::value& rec = result[0]["content"][0];
+	nlohmann::json& rec = result[0]["content"][0];
 	BOOST_CHECK(rec["v"].is_null());
 	BOOST_CHECK_EQUAL(rec["name"], "rec");
 	BOOST_CHECK_EQUAL(rec["type"], "record");
@@ -130,14 +130,14 @@ BOOST_AUTO_TEST_CASE(interface)
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
 	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(), 1);
 
-	cppjson::value result_ = mg::to_json()(pf.mods);
-	cppjson::value result = result_["mods"];
+	nlohmann::json result_ = mg::to_json()(pf.mods);
+	nlohmann::json result = result_["mods"];
 
 	BOOST_CHECK_EQUAL(result[0]["name"], "mod");
 	BOOST_CHECK_EQUAL(result[0]["v"]["major"], 1);
 	BOOST_CHECK_EQUAL(result[0]["v"]["minor"], 0);
 
-	cppjson::value& i = result[0]["content"][0];
+	nlohmann::json& i = result[0]["content"][0];
 	BOOST_CHECK_EQUAL(i["name"], "i");
 	BOOST_CHECK_EQUAL(i["type"], "interface");
 	BOOST_CHECK_EQUAL(i["invert"], false);
@@ -165,8 +165,8 @@ BOOST_AUTO_TEST_CASE(aspect)
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
 	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(), 1);
 
-	cppjson::value result_ = mg::to_json(std::make_unique<test_json_asp>())(pf.mods);
-	cppjson::value result = result_["mods"];
+	nlohmann::json result_ = mg::to_json(std::make_unique<test_json_asp>())(pf.mods);
+	nlohmann::json result = result_["mods"];
 
 	BOOST_CHECK_EQUAL(result[0]["name"], "mod"s);
 	BOOST_CHECK_EQUAL(result[0]["mn"], "mod"s);

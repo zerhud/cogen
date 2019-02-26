@@ -11,18 +11,18 @@
 namespace mg = modegen::generation;
 using namespace std::literals;
 
-mg::tmpl_gen_env::tmpl_gen_env(cppjson::value data, const FS::path& tmpl)
+mg::tmpl_gen_env::tmpl_gen_env(nlohmann::json data, const FS::path& tmpl)
 	: gen_data_(std::move(data))
 	, tmpl_path_(tmpl)
 {
 }
 
-cppjson::value& mg::tmpl_gen_env::data()
+nlohmann::json& mg::tmpl_gen_env::data()
 {
 	return gen_data_;
 }
 
-const cppjson::value& mg::tmpl_gen_env::data() const
+const nlohmann::json& mg::tmpl_gen_env::data() const
 {
 	return gen_data_;
 }

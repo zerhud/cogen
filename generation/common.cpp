@@ -35,7 +35,7 @@ void mg::generator::generate(const FS::path& output_dir) const
 {
 	assert( prov );
 	for(auto& part:opts.get_child("gen")) {
-		cppjson::value data = generate_data(part.first);
+		nlohmann::json data = generate_data(part.first);
 		if(data.is_undefined()) throw errors::gen_error("common", "no data for output");
 
 		tmpl_gen_env gdata(std::move(data), tmpl_path(part.first));
@@ -48,13 +48,13 @@ void mg::generator::generate(const FS::path& output_dir) const
 void mg::generator::generate_stdout(std::string_view part) const
 {
 	assert( prov );
-	cppjson::value data = generate_data(part);
+	nlohmann::json data = generate_data(part);
 	tmpl_gen_env gdata(std::move(data), tmpl_path(part));
 	build_extra_env(gdata, extra_generator_data(part), part);
 	prov->json_jinja( gdata );
 }
 
-cppjson::value mg::generator::generate_data(std::string_view part) const
+nlohmann::json mg::generator::generate_data(std::string_view part) const
 {
 	assert( prov );
 

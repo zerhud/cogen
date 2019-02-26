@@ -14,7 +14,7 @@ namespace modegen::generation {
 
 class cpp_generator : public file_data {
 public:
-	cppjson::value jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options_view opts) const override ;
+	nlohmann::json jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options_view opts) const override ;
 private:
 	struct inc_info {
 		inc_info(std::string n, bool s) : name(std::move(n)), sys(s) {}
@@ -24,9 +24,9 @@ private:
 
 	std::vector<inc_info> includes(const std::vector<std::string> sys, options_view& opts) const ;
 	std::string solve_part_include(const std::string& part, options_view& opts) const ;
-	void add_extra_info(options_view& opts, cppjson::value& cdata) const ;
-	void add_extra_namespaces(options_view& opts, cppjson::value& cdata) const ;
-	void set_constructors_prefix(options_view& opts, cppjson::value& cdata) const ;
+	void add_extra_info(options_view& opts, nlohmann::json& cdata) const ;
+	void add_extra_namespaces(options_view& opts, nlohmann::json& cdata) const ;
+	void set_constructors_prefix(options_view& opts, nlohmann::json& cdata) const ;
 };
 
 } // namespace modegen::generation

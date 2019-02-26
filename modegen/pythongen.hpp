@@ -11,7 +11,7 @@
 #include <variant>
 #include "config.hpp"
 #include FILESYSTEM
-#include <cppjson/json.h>
+#include <nlohman/json.hpp>
 #include <pybind11/embed.h>
 
 namespace modegen {
@@ -24,7 +24,7 @@ class python_evaluator {
 public:
 	typedef std::variant<std::string, FS::path> python_def_t;
 
-	python_evaluator(cppjson::value data);
+	python_evaluator(nlohmann::json data);
 
 	const python_evaluator& sys_path(const FS::path& dir) ;
 	const python_evaluator& tmpl(const FS::path& tfile, const std::optional<FS::path>& out) const ;
@@ -35,7 +35,7 @@ private:
 	std::string str_gen_data() const ;
 
 	pybind11::dict globals;
-	cppjson::value gen_data;
+	nlohmann::json gen_data;
 
 	static std::string template_script;
 	static std::string set_jinja_script;

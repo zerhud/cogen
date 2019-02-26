@@ -17,7 +17,7 @@ using namespace std::literals;
 namespace mg=modegen::generation;
 namespace py=pybind11;
 
-modegen::generation::python_evaluator::python_evaluator(cppjson::value data)
+modegen::generation::python_evaluator::python_evaluator(nlohmann::json data)
     : gen_data(std::move(data))
     , globals(py::globals())
 {

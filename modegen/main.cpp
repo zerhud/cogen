@@ -73,7 +73,7 @@ public:
 
 	void json_jinja(const mg::tmpl_gen_env& data) const override
 	{
-		cppjson::value json_data;
+		nlohmann::json json_data;
 
 		auto fnc_list = data.emb_fnc_list();
 		for(auto& ef:fnc_list) {

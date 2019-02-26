@@ -10,7 +10,7 @@
 
 #include "config.hpp"
 #include FILESYSTEM
-#include <cppjson/json.h>
+#include <nlohman/json.hpp>
 
 #include "common.hpp"
 #include "file_data.hpp"
@@ -22,10 +22,10 @@ class tmpl_gen_env {
 public:
 	typedef std::variant<std::string, FS::path> script_descriptor;
 
-	tmpl_gen_env(cppjson::value data, const FS::path& tmpl);
+	tmpl_gen_env(nlohmann::json data, const FS::path& tmpl);
 
-	cppjson::value& data() ;
-	const cppjson::value& data() const ;
+	nlohmann::json& data() ;
+	const nlohmann::json& data() const ;
 
 	FS::path& tmpl() ;
 	const FS::path& tmpl() const ;
@@ -41,7 +41,7 @@ public:
 	script_descriptor exec_after() const ;
 	script_descriptor exec_before() const ;
 private:
-	cppjson::value gen_data_;
+	nlohmann::json gen_data_;
 	FS::path tmpl_path_;
 	std::optional<FS::path> out_dir_;
 	std::map<std::string, script_descriptor> extra_scripts_;
