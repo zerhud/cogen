@@ -77,6 +77,20 @@ target_sources_local(modegen_interfaces split_version.hpp split_version.cpp "gen
 # generation part for cpp
 target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "generation/cpp/")
 
+# lohman json
+set(lohman_json_file "${CMAKE_CURRENT_BINARY_DIR}/json.hpp")
+set(lohman_json_url "https://github.com/nlohmann/json/raw/develop/single_include/nlohmann/json.hpp")
+add_custom_command(OUTPUT "${lohman_json_file}"
+	COMMAND "${CMAKE_COMMAND}"
+		-Durl="${lohman_json_url}" -Dout="${lohman_json_file}"
+		-Denv_var="nlohman_json_header"
+		-P "${CMAKE_CURRENT_LIST_DIR}/cmake/download_or_get.cmake"
+	DEPENDS
+		"${CMAKE_CURRENT_LIST_DIR}/cmake/download_or_get.cmake"
+)
+
+target_sources(modegen_interfaces PRIVATE json.hpp )
+
 # main programm: run selected generator and sets options
 add_executable(modegen modegen/main.cpp modegen/pythongen.cpp modegen/pythongen.hpp)
 target_sources(modegen PRIVATE "${pythongen_src}" "${CMAKE_CURRENT_BINARY_DIR}/pythongen")
