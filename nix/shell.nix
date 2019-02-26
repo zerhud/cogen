@@ -6,12 +6,11 @@
 }:
 
 let
-	cppjson = import ./cppjson.nix {};
-        turtle = import ./turtle.nix { inherit pkgs stdenv; } ;
+	turtle = import ./turtle.nix { inherit pkgs stdenv; } ;
 	stdenv = pkgs.overrideCC pkgs.stdenv pkgs.${compiler_name};
 
 in pkgs.callPackage ./default.nix {
-	inherit cppjson stdenv turtle enable_clcov;
+	inherit stdenv turtle enable_clcov;
 	py_jinja = pkgs.python3Packages.jinja2;
         clang = pkgs.clang_7;
 }
