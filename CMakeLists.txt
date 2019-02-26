@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(ENABLE_TODO "enable todo warnings in debug mode" ON)
 
 find_package(Boost COMPONENTS program_options unit_test_framework system REQUIRED)
-find_package(cppjson REQUIRED)
 find_package(pybind11 REQUIRED)
 find_package(Threads REQUIRED)
 find_file(turtle turtle/mock.hpp)
@@ -42,8 +41,8 @@ include(cmake/target_sources_local.cmake)
 # interface library: parse interface definitions and generate code by templates
 set(pythongen_src "${CMAKE_CURRENT_LIST_DIR}/modegen/pythongen")
 add_library(modegen_interfaces ${main_config_file})
-target_link_libraries(modegen_interfaces PRIVATE stdc++fs PUBLIC ${Boost_LIBRARIES} ${CPPJSON_LIBRARIES})
-target_include_directories(modegen_interfaces PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${config_files_dir}")
+target_link_libraries(modegen_interfaces PRIVATE stdc++fs PUBLIC ${Boost_LIBRARIES})
+target_include_directories(modegen_interfaces PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
 target_sources_local(modegen_interfaces errors.h errors.cpp "")
 # interface declaration
 target_sources_local(modegen_interfaces loader.hpp          loader.cpp          "parser/")
@@ -78,7 +77,7 @@ target_sources_local(modegen_interfaces split_version.hpp split_version.cpp "gen
 target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "generation/cpp/")
 
 # lohman json
-set(lohman_json_file "${CMAKE_CURRENT_BINARY_DIR}/json.hpp")
+set(lohman_json_file "${CMAKE_CURRENT_BINARY_DIR}/nlohman/json.hpp")
 set(lohman_json_url "https://github.com/nlohmann/json/raw/develop/single_include/nlohmann/json.hpp")
 add_custom_command(OUTPUT "${lohman_json_file}"
 	COMMAND "${CMAKE_COMMAND}"
@@ -89,7 +88,7 @@ add_custom_command(OUTPUT "${lohman_json_file}"
 		"${CMAKE_CURRENT_LIST_DIR}/cmake/download_or_get.cmake"
 )
 
-target_sources(modegen_interfaces PRIVATE json.hpp )
+target_sources(modegen_interfaces PRIVATE "${lohman_json_file}" )
 
 # main programm: run selected generator and sets options
 add_executable(modegen modegen/main.cpp modegen/pythongen.cpp modegen/pythongen.hpp)
