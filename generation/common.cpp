@@ -36,7 +36,7 @@ void mg::generator::generate(const FS::path& output_dir) const
 	assert( prov );
 	for(auto& part:opts.get_child("gen")) {
 		nlohmann::json data = generate_data(part.first);
-		if(data.is_undefined()) throw errors::gen_error("common", "no data for output");
+		if(data.empty()) throw errors::gen_error("common", "no data for output");
 
 		tmpl_gen_env gdata(std::move(data), tmpl_path(part.first));
 		gdata.out_dir(output_dir / output_path(part.first));

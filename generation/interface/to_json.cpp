@@ -32,24 +32,19 @@ mg::to_json::to_json(mg::to_json::aspect_ptr_vector gen_aspects)
 {
 }
 
-mg::to_json& mg::to_json::operator () (std::vector<modegen::parser::interface::module>& m)
+nlohmann::json mg::to_json::operator () (std::vector<modegen::parser::interface::module>& m)
 {
 	mods = std::move(m);
 	generate();
 	m = std::move(mods);
-	return *this;
+	return result;
 }
 
-mg::to_json::operator std::string () const
+std::string mg::to_json::str() const
 {
 	std::stringstream out;
 	out << result;
 	return out.str();
-}
-
-mg::to_json::operator nlohmann::json () const
-{
-	return result;
 }
 
 void mg::to_json::generate()
@@ -86,13 +81,12 @@ nlohmann::json mg::to_json::as_object(const modegen::parser::interface::function
 	ret["ret_type"] = as_object(obj.return_type);
 
 	if(obj.is_mutable) ret["mutable"] = *obj.is_mutable;
-	else ret["mutable"] = cppjson::null{};
+	else ret["mutable"] = nullptr;
 
 	if(obj.is_static) ret["static"] = *obj.is_static;
-	else ret["static"] = cppjson::null{};
+	else ret["static"] = nullptr;
 
-	ret["params"] = cppjson::array();
-	for(std::size_t i=0;i<obj.func_params.size();++i) ret["params"][i]=as_object(obj.func_params[i]);
+	for(auto& fp:obj.func_params) ret["params"].push_back(as_object(fp));
 
 	add_meta(ret, obj.meta_params);
 
@@ -179,9 +173,8 @@ nlohmann::json mg::to_json::as_object(const modegen::parser::interface::type& ob
 	ret["type"] = "type";
 
 	ret["name"] = obj.name;
-	if(obj.sub_types.empty()) ret["sub"] = cppjson::null{};
-	for(std::size_t i=0;i<obj.sub_types.size();++i)
-		ret["sub"][i] = as_object(obj.sub_types[i]);
+	if(obj.sub_types.empty()) ret["sub"] = nullptr;
+	for(auto& st:obj.sub_types) ret["sub"].push_back(as_object(st));
 
 	applay_asp(ret, obj);
 
@@ -203,8 +196,7 @@ nlohmann::json mg::to_json::as_object(const modegen::parser::interface::construc
 {
 	nlohmann::json ret;
 	ret["type"] = "constructor";
-	ret["params"] = cppjson::array();
-	for(std::size_t i=0;i<obj.func_params.size();++i) ret["params"][i]=as_object(obj.func_params[i]);
+	for(auto& fp:obj.func_params) ret["params"].push_back(as_object(fp));
 
 	applay_asp(ret, obj);
 	return ret;
@@ -225,7 +217,7 @@ void mg::to_json::add_meta(nlohmann::json& val, const modegen::parser::interface
 	using namespace modegen::parser::interface::meta_parameters;
 
 	auto ver = extract<version>(params);
-	if(!ver) val["v"] = cppjson::null{};
+	if(!ver) val["v"] = nullptr;
 	else val["v"] = as_object(*ver);
 
 	auto docs = extract<documentation>(params);

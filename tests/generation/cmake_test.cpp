@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(add_library)
 	mg::cmake cm;
 	auto data = cm.jsoned_data({}, opts_view);
 	BOOST_CHECK_EQUAL(data["libraries"].size(), 1);
-	for(auto& l:data["libraries"].items()) BOOST_CHECK_EQUAL(l.value(), L"interface"s);
+	for(auto& [k,v]:data["libraries"].items()) BOOST_CHECK_EQUAL(k, "interface"s);
 
 	BOOST_REQUIRE(data["libraries"]["interface"]["files"].is_array());
 	BOOST_REQUIRE_EQUAL(data["libraries"]["interface"]["files"].size(), 2);

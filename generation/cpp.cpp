@@ -52,7 +52,7 @@ static auto get_loaders(const std::vector<parser::loader_ptr>& data_loaders)
 
 static nlohmann::json convert(parser::data_tree::loader* dldr)
 {
-	nlohmann::json ret = cppjson::array{};
+	nlohmann::json ret;
 	if(dldr) {
 		const boost::property_tree::ptree data = dldr->boost_ptree();
 		std::stringstream cvt;

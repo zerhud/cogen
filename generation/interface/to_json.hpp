@@ -38,9 +38,8 @@ public:
 	to_json();
 	to_json(std::unique_ptr<to_json_aspect> gen_aspect);
 	to_json(aspect_ptr_vector gen_aspects);
-	to_json& operator () (std::vector<modegen::parser::interface::module>& m) ;
-	operator std::string () const ;
-	operator nlohmann::json () const ;
+	nlohmann::json operator () (std::vector<modegen::parser::interface::module>& m) ;
+	std::string str() const ;
 private:
 	void generate() ;
 

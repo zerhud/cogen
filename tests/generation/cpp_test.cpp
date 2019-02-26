@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE( extra_namespaces )
 	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
 
 	nlohmann::json data = gen.jsoned_data({ldr}, opts);
-	BOOST_REQUIRE_EQUAL( data["namespaces"].array().size(), 2 );
+	BOOST_REQUIRE_EQUAL( data["namespaces"].size(), 2 );
 	BOOST_CHECK_EQUAL( data["namespaces"][0], "ns1" );
 	BOOST_CHECK_EQUAL( data["namespaces"][1], "ns2" );
 
@@ -170,8 +170,8 @@ BOOST_AUTO_TEST_CASE( without_includes )
 	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
 
 	nlohmann::json data = gen.jsoned_data({ldr}, opts);
-	BOOST_REQUIRE_EQUAL( data["mods"].array().size(), 1 );
-	BOOST_REQUIRE_EQUAL( data["mods"][0]["content"].array().size(), 1 );
+	BOOST_REQUIRE_EQUAL( data["mods"].size(), 1 );
+	BOOST_REQUIRE_EQUAL( data["mods"][0]["content"].size(), 1 );
 	BOOST_CHECK_EQUAL( data["mods"][0]["content"][0]["type"], "function" );
 
 	BOOST_REQUIRE( !data.contains("incs") );
@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_CASE(with_lnag_includes)
 
 	nlohmann::json data = gen.jsoned_data({ldr}, opts);
 	BOOST_REQUIRE( data.contains("incs") );
-	BOOST_REQUIRE_EQUAL( data["incs"].array().size(), 4 );
+	BOOST_REQUIRE_EQUAL( data["incs"].size(), 4 );
 	// order sorted by alphabet
 	BOOST_CHECK_EQUAL( data["incs"][0]["n"], "chrono" );
 	BOOST_CHECK_EQUAL( data["incs"][1]["n"], "cstdint" );
@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE(with_setts_includes)
 	nlohmann::json data = gen.jsoned_data({ldr}, opts);
 
 	BOOST_REQUIRE( data.contains("incs") );
-	BOOST_REQUIRE_EQUAL( data["incs"].array().size(), 10 );
+	BOOST_REQUIRE_EQUAL( data["incs"].size(), 10 );
 	BOOST_CHECK_EQUAL( data["incs"][0]["sys"], true );
 	BOOST_CHECK_EQUAL( data["incs"][1]["sys"], true );
 	BOOST_CHECK_EQUAL( data["incs"][2]["sys"], true );

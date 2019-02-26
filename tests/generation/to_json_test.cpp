@@ -30,11 +30,11 @@ void check_type(const nlohmann::json& v, const std::string& name, const std::str
 	BOOST_CHECK_EQUAL(v["type"], "type");
 
 	if(mod.empty()) {
-		BOOST_CHECK_EQUAL(v["sub"].type(), cppjson::is_null);
+		BOOST_CHECK(v["sub"].is_null());
 		BOOST_CHECK_EQUAL(v["name"], name);
 	}
 	else {
-		BOOST_CHECK_EQUAL(v["sub"].type(), cppjson::is_array);
+		BOOST_CHECK_EQUAL(static_cast<int>(v["sub"].type()), static_cast<int>(nlohmann::json::value_t::array));
 		BOOST_CHECK_EQUAL(v["name"], mod);
 		BOOST_CHECK_EQUAL(v["sub"][0]["name"], name);
 	}
@@ -44,7 +44,9 @@ BOOST_AUTO_TEST_CASE(empty)
 {
 	auto pf = mi::parse("module mod v1.0: #help mes\nmodule mod2 v1.0:");
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 2);
-	std::string result = mg::to_json()(pf.mods);
+	mg::to_json jer;
+	jer(pf.mods);
+	std::string result = jer.str();
 	BOOST_CHECK_EQUAL(result, R"-({"mods":[{"name":"mod","type":"module","v":{"major":1,"minor":0}},{"docs":"help mes","name":"mod2","type":"module","v":{"major":1,"minor":0}}]})-");
 }
 
@@ -55,7 +57,8 @@ BOOST_AUTO_TEST_CASE(fnc)
 	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(), 2);
 
 	nlohmann::json result_ = mg::to_json()(pf.mods);
-	nlohmann::json result = result_["mods"];
+	BOOST_CHECK_EQUAL(result_["mods"].size(), 1);
+	nlohmann::json& result = result_["mods"];
 	BOOST_CHECK_EQUAL(result[0]["name"], "mod");
 	BOOST_CHECK_EQUAL(result[0]["v"]["major"], 1);
 	BOOST_CHECK_EQUAL(result[0]["v"]["minor"], 0);
@@ -67,15 +70,15 @@ BOOST_AUTO_TEST_CASE(fnc)
 	BOOST_CHECK_EQUAL(fnc["v"]["minor"], 10);
 	BOOST_CHECK(fnc["static"].is_null());
 	BOOST_CHECK(fnc["mutable"].is_null());
-	BOOST_REQUIRE_EQUAL(fnc["params"].array().size(), 2);
+	BOOST_REQUIRE_EQUAL(fnc["params"].size(), 2);
 	BOOST_CHECK_EQUAL(fnc["params"][0]["name"], "one");
 	BOOST_CHECK_EQUAL(fnc["params"][1]["name"], "two");
 	check_type(fnc["params"][0]["par_type"], "type", "");
 	check_type(fnc["params"][1]["par_type"], "type", "");
 
 	nlohmann::json& fnc2 = result[0]["content"][1];
-	BOOST_REQUIRE_EQUAL(fnc2["params"].type(), cppjson::is_array);
-	BOOST_REQUIRE_EQUAL(fnc2["params"].array().size(), 0);
+	BOOST_REQUIRE_EQUAL(static_cast<int>(fnc2["params"].type()), static_cast<int>(nlohmann::json::value_t::null));
+	BOOST_REQUIRE_EQUAL(fnc2["params"].size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(enums)
@@ -90,7 +93,7 @@ BOOST_AUTO_TEST_CASE(enums)
 	BOOST_CHECK_EQUAL(enum_rec["type"], "enumeration");
 	BOOST_CHECK_EQUAL(enum_rec["gen_io"], false);
 	BOOST_CHECK_EQUAL(enum_rec["use_bitmask"], false);
-	BOOST_REQUIRE_EQUAL(enum_rec["members"].array().size(), 2);
+	BOOST_REQUIRE_EQUAL(enum_rec["members"].size(), 2);
 	BOOST_CHECK_EQUAL(enum_rec["members"][0]["name"], "one");
 	BOOST_CHECK_EQUAL(enum_rec["members"][0]["output"], "");
 	BOOST_CHECK_EQUAL(enum_rec["members"][1]["name"], "two");
@@ -116,8 +119,8 @@ BOOST_AUTO_TEST_CASE(record)
 	mi::type& m2type = std::get<mi::record>(pf.mods[0].content[0]).members[1].param_type;
 	BOOST_CHECK_EQUAL(m2type.name, "list");
 
-	BOOST_REQUIRE_EQUAL(rec["members"].type(), cppjson::is_array);
-	BOOST_REQUIRE_EQUAL(rec["members"].array().size(), 2);
+	BOOST_REQUIRE(rec["members"].is_array());
+	BOOST_REQUIRE_EQUAL(rec["members"].size(), 2);
 	BOOST_CHECK_EQUAL(rec["members"][0]["name"], "m1");
 	BOOST_CHECK_EQUAL(rec["members"][1]["name"], "m2");
 	check_type(rec["members"][0]["par_type"], "type", "");
@@ -142,19 +145,19 @@ BOOST_AUTO_TEST_CASE(interface)
 	BOOST_CHECK_EQUAL(i["type"], "interface");
 	BOOST_CHECK_EQUAL(i["invert"], false);
 
-	BOOST_REQUIRE_EQUAL(i["members"].type(), cppjson::is_array);
-	BOOST_REQUIRE_EQUAL(i["members"].array().size(), 1);
+	BOOST_REQUIRE(i["members"].is_array());
+	BOOST_REQUIRE_EQUAL(i["members"].size(), 1);
 	BOOST_CHECK_EQUAL(i["members"][0]["name"], "name");
 
-	BOOST_REQUIRE_EQUAL(i["constructors"].type(), cppjson::is_array);
-	BOOST_REQUIRE_EQUAL(i["constructors"].array().size(), 2);
+	BOOST_REQUIRE(i["constructors"].is_array());
+	BOOST_REQUIRE_EQUAL(i["constructors"].size(), 2);
 	BOOST_CHECK_EQUAL(i["constructors"][0]["type"], "constructor");
 
-	BOOST_CHECK_EQUAL(i["constructors"][0]["params"].type(), cppjson::is_array);
-	BOOST_REQUIRE_EQUAL(i["constructors"][0]["params"].array().size(), 0);
+	BOOST_CHECK(i["constructors"][0]["params"].is_null());
+	BOOST_REQUIRE_EQUAL(i["constructors"][0]["params"].size(), 0);
 
-	BOOST_REQUIRE_EQUAL(i["constructors"][1]["params"].type(), cppjson::is_array);
-	BOOST_REQUIRE_EQUAL(i["constructors"][1]["params"].array().size(), 1);
+	BOOST_REQUIRE(i["constructors"][1]["params"].is_array());
+	BOOST_REQUIRE_EQUAL(i["constructors"][1]["params"].size(), 1);
 	BOOST_CHECK_EQUAL(i["constructors"][1]["params"][0]["type"], "func_param");
 	BOOST_CHECK_EQUAL(i["constructors"][1]["params"][0]["name"], "name");
 }
