@@ -37,6 +37,7 @@ const boost::property_tree::ptree& mg::options_view::all() const
 boost::property_tree::ptree mg::options_view::part_data(std::string_view name) const
 {
 	auto part = opts.get_child_optional("gen."s+std::string(name));
+	if(!part) part = opts.get_child_optional("defaults");
 	if(!part) throw errors::error("no options for part"s + std::string(name));
 	return *part;
 }

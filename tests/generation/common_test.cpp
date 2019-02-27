@@ -236,4 +236,20 @@ BOOST_AUTO_TEST_CASE(no_data)
 	opts.put("gen.def.test", "test_data") ;
 	BOOST_CHECK_THROW( gen.generate("some_dir"), modegen::errors::error );
 }
+BOOST_AUTO_TEST_CASE(no_output)
+{
+	auto data_gen = std::make_shared<fake_data_gen>();
+	auto provider = std::make_shared<provider_mock>();
+	MOCK_EXPECT( provider->parser ).with( "interface"sv ).returns( std::make_shared<fake_target>() );
+	MOCK_EXPECT( provider->generator ).with( "cpp"sv ).returns( data_gen );
+	MOCK_EXPECT( provider->resolve_file ).with( "def.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
+
+	mg::generator gen(provider, u8"some/path"s);
+	auto& opts = gen.options();
+	opts.put("gen.def.target", "cpp") ;
+	opts.put("gen.def.parser", "interface") ;
+	opts.put("gen.def.input", "def.hpp.jinja") ;
+	opts.put("gen.def.test", "test_data") ;
+	BOOST_CHECK_THROW( gen.generate("some_dir"), modegen::errors::error );
+}
 BOOST_AUTO_TEST_SUITE_END() // wrong_generation

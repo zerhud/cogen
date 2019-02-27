@@ -77,9 +77,10 @@ std::vector<std::string> mg::generator::parser_name_list(std::string_view part) 
 
 FS::path mg::generator::output_path(std::string_view part) const
 {
-	std::string p(part);
-	std::string path = "gen." + p + ".output";
-	return opts.get(path, p + u8".hpp");
+	options_view view(opts, part);
+	auto val = view.part_str("output");
+	if(!val) throw errors::gen_error("common"s, "no output file provided for "s + std::string(part));
+	return *val;
 }
 
 FS::path mg::generator::tmpl_path(std::string_view part) const
