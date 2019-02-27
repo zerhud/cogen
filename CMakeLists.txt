@@ -5,15 +5,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(ENABLE_TODO "enable todo warnings in debug mode" ON)
+option(ENABLE_TESTS "enable tests.. it depends on turtle library" ON)
 
 find_package(Boost COMPONENTS program_options unit_test_framework system REQUIRED)
 find_package(pybind11 REQUIRED)
 find_package(Threads REQUIRED)
-message(WARNING "TODO: make turtle an optional dependencie")
-find_file(turtle turtle/mock.hpp)
 include(CheckCXXSourceCompiles)
-get_filename_component(turtle "${turtle}" DIRECTORY)
-get_filename_component(turtle "${turtle}" DIRECTORY)
 
 CHECK_CXX_SOURCE_COMPILES("#include <filesystem>\nint main(int,char**){return 0;}" HAVE_FILESYSTEM)
 if(NOT HAVE_FILESYSTEM)
@@ -48,10 +45,11 @@ set(pythongen_src "${CMAKE_CURRENT_LIST_DIR}/modegen/pythongen")
 add_library(modegen_interfaces ${main_config_file})
 target_link_libraries(modegen_interfaces PRIVATE stdc++fs PUBLIC ${Boost_LIBRARIES})
 target_include_directories(modegen_interfaces PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
+# grammar need to start compiling first
+target_sources_local(modegen_interfaces grammar.hpp         grammar.cpp         "parser/interface/")
 target_sources_local(modegen_interfaces errors.h errors.cpp "")
 # interface declaration
 target_sources_local(modegen_interfaces loader.hpp          loader.cpp          "parser/")
-target_sources_local(modegen_interfaces grammar.hpp         grammar.cpp         "parser/interface/")
 target_sources_local(modegen_interfaces modegen.hpp         modegen.cpp         "parser/interface/")
 target_sources_local(modegen_interfaces meta_parameters.hpp meta_parameters.cpp "parser/interface/")
 target_sources_local(modegen_interfaces helpers.hpp         helpers.cpp         "parser/interface/")
@@ -126,29 +124,7 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pythongen_data.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/modegen/scripts/jinja_env.py"
 	)
 
-# unit tests...
-enable_testing()
-macro(add_unit_test tname path lib)
-	add_executable(${tname}_test "${path}${tname}_test.cpp")
-	target_link_libraries(${tname}_test PRIVATE ${lib} ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
-	target_include_directories(${tname}_test SYSTEM PRIVATE "${turtle}")
-	add_test(NAME ${tname} COMMAND ${tname}_test)
-endmacro()
-set(tests_gcommon
-	common
-	to_json
-	cpp cpp_type_cvt
-	name_conversion
-	filter
-	split_version
-	cmake
-	)
-set(tests_interface mdp checker )
-foreach(tname ${tests_interface})
-	add_unit_test(${tname} "tests/interface/" "modegen_interfaces")
-endforeach()
-foreach(tname ${tests_gcommon})
-	add_unit_test(${tname} "tests/generation/" "modegen_interfaces")
-endforeach()
-add_unit_test("dt_loader" "tests/data_tree/" "modegen_interfaces")
+if(ENABLE_TESTS)
+	include(cmake/tests.inc.cmake)
+endif()
 
