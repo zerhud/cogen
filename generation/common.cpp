@@ -71,11 +71,8 @@ nlohmann::json mg::generator::generate_data(std::string_view part) const
 
 std::vector<std::string> mg::generator::parser_name_list(std::string_view part) const
 {
-	std::vector<std::string> ret;
 	options_view opts_view(opts, part);
 	return opts_view.part_str_list(""s, "parser"s);
-
-	return ret;
 }
 
 FS::path mg::generator::output_path(std::string_view part) const
@@ -89,10 +86,8 @@ FS::path mg::generator::tmpl_path(std::string_view part) const
 {
 	assert( prov );
 
-	std::string p(part);
-	std::string path = "gen." + p + ".input";
-	FS::path input_file = opts.get(path, p + u8".jinja");
-
+	options_view view(opts, part);
+	FS::path input_file = view.part_str("input"s).value_or(std::string(part) + u8".jinja"s);
 	return prov->resolve_file(input_file, info_directory, cur_target(part));
 }
 

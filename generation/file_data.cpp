@@ -50,14 +50,19 @@ boost::property_tree::ptree mg::options_view::target_data(std::string_view name)
 
 std::vector<std::string> mg::options_view::part_str_list(const std::string& path, std::string_view key, std::string_view name) const
 {
+	std::vector<std::string> ret;
+
 	std::string pn(name.empty() ? part : name);
 	std::string suffix = path.empty() ? path : "."s + path;
+
 	auto child_list = opts.get_child_optional("gen."s+pn+suffix);
-	if(!child_list) child_list = opts.get_child_optional("defaults"s + suffix);
-	if(!child_list) return {};
-	
-	std::vector<std::string> ret;
 	for(auto& [k,v]:*child_list) if(k==key) ret.emplace_back(v.get_value<std::string>());
+
+	if(ret.empty()) {
+		child_list = opts.get_child_optional("defaults"s + suffix);
+		for(auto& [k,v]:*child_list) if(k==key) ret.emplace_back(v.get_value<std::string>());
+	}
+
 	return ret;
 }
 
