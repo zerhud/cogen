@@ -81,12 +81,13 @@ nlohmann::json mg::cpp_generator::jsoned_data(const std::vector<parser::loader_p
 	freq.cnt_name = opts.part_data().get("filter.cnt", ""s);
 	freq.sel = parser::interface::from_string(opts.part_data().get("filter.sel", ""s));
 
+	std::string versioning = opts.target_str("versioning"s, "cpp"sv).value_or(""s);
 	nlohmann::json jsoned =
 	          data
 	        | tcvt
 	        | filter(freq)
 	        | naming(opts.naming())
-	        | split_version(!opts.target_data("cpp"sv).get("split_by_version", false))
+	        | split_version(versioning == "split"sv)
 	        | interface::to_json(std::make_unique<json_extra_info>())
 	        ;
 

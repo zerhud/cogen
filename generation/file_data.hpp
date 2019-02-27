@@ -28,6 +28,10 @@ public:
 	boost::property_tree::ptree target_data(std::string_view name) const ;
 	const boost::property_tree::ptree& all() const ;
 
+	std::optional<std::string> part_str(const std::string& path, std::string_view name="") const ;
+	std::optional<std::string> target_str(const std::string& path, std::string_view name) const ;
+	std::vector<std::string> part_str_list(const std::string& path, std::string_view key, std::string_view name="") const ;
+
 	std::string naming() const ;
 };
 

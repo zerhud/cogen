@@ -72,12 +72,8 @@ nlohmann::json mg::generator::generate_data(std::string_view part) const
 std::vector<std::string> mg::generator::parser_name_list(std::string_view part) const
 {
 	std::vector<std::string> ret;
-	auto part_nl = opts.get_child_optional("gen."s+std::string(part));
-	if(part_nl) for(auto& [kn,kv]:*part_nl) if(kn=="parser"s) ret.emplace_back(kv.get_value<std::string>());
-	if(ret.empty()) {
-		auto def_nl = opts.get_child_optional("defaults"s);
-		if(def_nl) for(auto& [kn,kv]:*def_nl) if(kn=="parser"s) ret.emplace_back(kv.get_value<std::string>());
-	}
+	options_view opts_view(opts, part);
+	return opts_view.part_str_list(""s, "parser"s);
 
 	return ret;
 }
