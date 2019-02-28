@@ -16,16 +16,16 @@ namespace modegen::generation::options {
 class container;
 typedef std::shared_ptr<container> container_ptr;
 
+enum class part_option {input, output, file_generator, naming};
+enum class part_idl_filter {part_selection, mod_name, content_name, modificator};
+enum class part_forwards {before, after, extends};
+enum class template_option {versioning};
+
+typedef std::variant<part_option, part_idl_filter, part_forwards, template_option> any_option;
+
 class container {
 	boost::property_tree::ptree opts;
 public:
-	enum class part_option {input, output, file_generator, naming};
-	enum class part_idl_filter {part_selection, mod_name, content_name, modificator};
-	enum class part_forwards {before, after, extends};
-	enum class template_option {versioning};
-
-	typedef std::variant<part_option, part_idl_filter, part_forwards, template_option> any_option;
-
 	/// returns option's help message
 	static std::string description_message(any_option opt) ;
 
@@ -51,6 +51,16 @@ private:
 	static std::string descr_message(part_idl_filter opt) ;
 	static std::string descr_message(part_option opt) ;
 	static std::string descr_message(template_option opt) ;
+
+	static std::string solve_key(any_option key) ;
+	static std::string solve_key(part_forwards opt) ;
+	static std::string solve_key(part_idl_filter opt) ;
+	static std::string solve_key(part_option opt) ;
+	static std::string solve_key(template_option opt) ;
+
+	static std::string make_part_key(any_option key, const std::string& p) ;
+	static std::string make_filegen_key(any_option key, const std::string& p) ;
+	static std::string make_part_default_key(any_option key, const std::string& p) ;
 
 	void throw_no_option(any_option key);
 };
