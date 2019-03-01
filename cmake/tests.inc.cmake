@@ -11,6 +11,7 @@ macro(add_unit_test tname path lib)
 	add_test(NAME ${tname} COMMAND ${tname}_test)
 endmacro()
 set(tests_gcommon
+	options
 	common
 	to_json
 	cpp cpp_type_cvt

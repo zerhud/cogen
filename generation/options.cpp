@@ -34,6 +34,25 @@ std::string mo::container::description_message(mo::any_option opt)
 	return "unknown option chapter"s;
 }
 
+boost::property_tree::ptree& mo::container::raw()
+{
+	return opts;
+}
+
+const boost::property_tree::ptree& mo::container::raw() const
+{
+	return opts;
+}
+
+boost::property_tree::ptree mo::container::get_subset(subsetts s, const std::string& part, const std::string& param) const
+{
+	boost::property_tree::ptree ret;
+	auto t = opts.get_child_optional(make_subset_key(s, part, param));
+	if(!t) t = opts.get_child_optional(make_subset_default_key(s, param));
+	if(t) ret = *t;
+	return ret;
+}
+
 std::string mo::container::descr_message(mo::part_forwards opt)
 {
 	if(opt==part_forwards::before) return "run script before the generation has began"s;
@@ -110,19 +129,72 @@ std::string mo::container::solve_key(template_option opt)
 	return ""s;
 }
 
-
-std::string mo::container::make_part_key(mo::any_option key, const std::string& p)
+std::string mo::container::solve_key(subsetts opt)
 {
-	return "gen."s + p + solve_key(key);
+	if(opt==subsetts::file_generator) return "file_gen"s;
+	assert(false);
+	return ""s;
 }
 
-std::string mo::container::make_filegen_key(any_option key, const std::string& p)
+mo::container::path_t mo::container::make_part_key(mo::any_option key, const std::string& p)
 {
-	return "filegen."s + p + solve_key(key);
+	return path_t("gen"s) / path_t(p) / path_t(solve_key(key));
 }
 
-std::string mo::container::make_part_default_key(any_option key, const std::string& p)
+mo::container::path_t mo::container::make_part_default_key(any_option key, const std::string& p)
 {
-	return "defults."s + p + solve_key(key);
+	return path_t("defaults"s) / path_t(solve_key(key));
 }
 
+mo::container::path_t mo::container::make_subset_key(mo::subsetts key, const std::string& part, const std::string& param)
+{
+	(void)part; // reserved for future use
+	return make_subset_default_key(key, param);
+}
+
+mo::container::path_t mo::container::make_subset_default_key(mo::subsetts key, const std::string& param)
+{
+	return path_t(solve_key(key)) / path_t(param);
+}
+
+std::tuple<mo::container::path_t,mo::container::path_t> mo::container::up_path(path_t p)
+{
+	path_t ret;
+	while(!p.single()) ret /= p.reduce();
+	return std::make_tuple(ret, p.reduce());
+}
+
+mo::view::view(container_ptr c, std::string_view p)
+    : opts(std::move(c))
+    , def_part(p)
+{
+}
+
+void mo::view::part(std::string_view p)
+{
+	def_part = p;
+}
+
+void mo::view::file_generator(std::string_view fg)
+{
+	def_fgen = fg;
+}
+
+std::string_view mo::view::part() const
+{
+	return def_part;
+}
+
+std::string_view mo::view::file_generator() const
+{
+	return def_fgen;
+}
+
+boost::property_tree::ptree mo::view::get_subset(subsetts s, const std::string& param, const std::string& part) const
+{
+	return opts->get_subset(
+	            s,
+	            std::string(part.empty() ? def_part : part),
+	            std::string(param.empty() ? def_fgen : param)
+	            );
+}
