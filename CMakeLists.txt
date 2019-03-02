@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(ENABLE_TODO "enable todo warnings in debug mode" ON)
 option(ENABLE_TESTS "enable tests.. it depends on turtle library" ON)
+option(LOW_MEMORY "assume we don't have efough memroty for complie grammars (gcc optimizations)" ON)
 
 find_package(Boost COMPONENTS program_options unit_test_framework system REQUIRED)
 find_package(pybind11 REQUIRED)
@@ -124,6 +125,11 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pythongen_data.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/modegen/scripts/tmpl_script.py"
 		"${CMAKE_CURRENT_LIST_DIR}/modegen/scripts/jinja_env.py"
 	)
+
+# some files may slow down system when compiling..
+if(LOW_MEMORY AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	set_source_files_properties("parser/interface/grammar.cpp" PROPERTIES COMPILE_FLAGS "--param ggc-min-expand=1024 --param ggc-min-heapsize=4096")
+endif()
 
 if(ENABLE_TESTS)
 	include(cmake/tests.inc.cmake)
