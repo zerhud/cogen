@@ -17,25 +17,6 @@
 
 namespace modegen::generation {
 
-class options_view final {
-	const boost::property_tree::ptree& opts;
-	std::string_view part;
-public:
-	options_view(const boost::property_tree::ptree& o, std::string_view p);
-
-	std::string_view part_name() const ;
-	boost::property_tree::ptree part_data() const ;
-	boost::property_tree::ptree part_data(std::string_view name) const ;
-	boost::property_tree::ptree target_data(std::string_view name) const ;
-	const boost::property_tree::ptree& all() const ;
-
-	std::optional<std::string> part_str(const std::string& path, std::string_view name="") const ;
-	std::optional<std::string> target_str(const std::string& path, std::string_view name) const ;
-	std::vector<std::string> part_str_list(const std::string& path, std::string_view key, std::string_view name="") const ;
-
-	std::string naming() const ;
-};
-
 class file_data {
 public:
 	virtual ~file_data() noexcept =default ;

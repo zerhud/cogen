@@ -185,39 +185,6 @@ BOOST_AUTO_TEST_CASE(extra_generator_data)
 	BOOST_TEST_CONTEXT("other") gen.generate_stdout("other"sv);
 }
 
-BOOST_AUTO_TEST_SUITE(options_view)
-BOOST_AUTO_TEST_CASE(part_data)
-{
-	boost::property_tree::ptree pt;
-	pt.put("gen.part.test", true);
-	pt.put("gen.other.test", true);
-	mg::options_view opts(pt, "part"sv);
-	BOOST_CHECK_EQUAL(opts.part_data().get<bool>("test"), true);
-	BOOST_CHECK_EQUAL(opts.part_data("other"sv).get<bool>("test"), true);
-}
-BOOST_AUTO_TEST_CASE(all)
-{
-	boost::property_tree::ptree pt;
-	pt.put("gen.part.test", true);
-	pt.put("gen.other.test", true);
-	pt.put("gen.lala.test", "string");
-	mg::options_view opts(pt, "part"sv);
-
-	BOOST_CHECK_EQUAL(&opts.all(), &pt);
-}
-BOOST_AUTO_TEST_CASE(target_data)
-{
-	boost::property_tree::ptree pt;
-	pt.put("gen.part.test", true);
-	mg::options_view opts(pt, "part"sv);
-
-	BOOST_CHECK_NO_THROW( opts.target_data("cpp"sv) );
-
-	pt.put("target.cpp.some", true);
-	BOOST_CHECK_EQUAL( opts.target_data("cpp"sv).get<bool>("some"), true );
-}
-BOOST_AUTO_TEST_SUITE_END() // options_view
-
 BOOST_AUTO_TEST_SUITE(wrong_generation)
 BOOST_AUTO_TEST_CASE(no_data)
 {
