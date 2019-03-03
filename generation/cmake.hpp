@@ -14,7 +14,7 @@ namespace modegen::generation {
 
 class cmake : public file_data {
 public:
-	nlohmann::json jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options_view opts) const override ;
+	nlohmann::json jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const override ;
 };
 
 } // namespace modegen::generation

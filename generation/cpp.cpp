@@ -63,7 +63,7 @@ static nlohmann::json convert(parser::data_tree::loader* dldr)
 }
 } // modegen::generation
 
-nlohmann::json mg::cpp_generator::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options_view opts) const
+nlohmann::json mg::cpp_generator::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const
 {
 	using namespace modegen::generation::interface;
 	using modegen::generation::interface::operator |;
@@ -77,16 +77,21 @@ nlohmann::json mg::cpp_generator::jsoned_data(const std::vector<parser::loader_p
 	if(data.empty()) throw errors::no_data("cpp"s);
 
 	filter::request freq;
-	freq.mod_name = opts.part_data().get("filter.mod", ""s);
-	freq.cnt_name = opts.part_data().get("filter.cnt", ""s);
-	freq.sel = parser::interface::from_string(opts.part_data().get("filter.sel", ""s));
+	//options::filter_view fw(opts.container());
+	//std::vector<filter::request> freq_list;
+	//for(auto f:fw.in_part()) {
+	//}
 
-	std::string versioning = opts.target_str("versioning"s, "cpp"sv).value_or(""s);
+	//freq.mod_name = opts.part_data().get("filter.mod", ""s);
+	//freq.cnt_name = opts.part_data().get("filter.cnt", ""s);
+	//freq.sel = parser::interface::from_string(opts.part_data().get("filter.sel", ""s));
+
+	std::string versioning = opts.get_opt<std::string>(options::template_option::versioning, ""s, "cpp"s).value_or(""s);
 	nlohmann::json jsoned =
 	          data
 	        | tcvt
 	        | filter(freq)
-	        | naming(opts.naming())
+	        | naming(opts.get_opt<std::string>(options::part_option::naming).value_or(""s))
 	        | split_version(versioning == "split"sv)
 	        | interface::to_json(std::make_unique<json_extra_info>())
 	        ;
@@ -103,23 +108,25 @@ nlohmann::json mg::cpp_generator::jsoned_data(const std::vector<parser::loader_p
 	return jsoned;
 }
 
-std::vector<mg::cpp_generator::inc_info> mg::cpp_generator::includes(const std::vector<std::string> sys, mg::options_view& opts) const
+std::vector<mg::cpp_generator::inc_info> mg::cpp_generator::includes(const std::vector<std::string> sys, mg::options::view& opts) const
 {
 	std::vector<inc_info> ret;
 	ret.reserve(sys.size());
 
+	auto part_data = opts.get_subset(options::subsetts::part_data);
+
 	for(auto& s:sys) ret.emplace_back(std::move(s), true);
-	for(auto& i:opts.part_data()) {
+	for(auto& i:part_data) {
 		if(i.first == "inc_sys"sv) {
 			ret.emplace_back(i.second.get_value<std::string>(), true);
 		}
 	}
-	for(auto& i:opts.part_data()) {
+	for(auto& i:part_data) {
 		if(i.first == "inc_part"sv) {
 			ret.emplace_back(solve_part_include(i.second.get_value<std::string>(), opts), false);
 		}
 	}
-	for(auto& i:opts.part_data()) {
+	for(auto& i:part_data) {
 		if(i.first == "inc_local"sv) {
 			ret.emplace_back(i.second.get_value<std::string>(), false);
 		}
@@ -128,37 +135,37 @@ std::vector<mg::cpp_generator::inc_info> mg::cpp_generator::includes(const std::
 	return ret;
 }
 
-std::string mg::cpp_generator::solve_part_include(const std::string& part, mg::options_view& opts) const
+std::string mg::cpp_generator::solve_part_include(const std::string& part, mg::options::view& opts) const
 {
-	return opts.part_data(part).get<std::string>("output");
+	return opts.get<std::string>(options::part_option::output, part);
 }
 
-void mg::cpp_generator::add_extra_info(options_view& opts, nlohmann::json& cdata) const
+void mg::cpp_generator::add_extra_info(options::view& opts, nlohmann::json& cdata) const
 {
 	add_extra_namespaces(opts, cdata);
 	set_constructors_prefix(opts, cdata);
 }
 
-void mg::cpp_generator::add_extra_namespaces(mg::options_view& opts, nlohmann::json& cdata) const
+void mg::cpp_generator::add_extra_namespaces(mg::options::view& opts, nlohmann::json& cdata) const
 {
-	auto nsopts = opts.all().get_child_optional("target.cpp");
-	if(!nsopts) return;
+	auto nsopts = opts.get_subset(options::subsetts::file_generator, "cpp"s, ""s);
 
 	std::size_t i=0;
-	for(auto& en:*nsopts) {
+	for(auto& en:nsopts) {
 		if(en.first!="namespaces"sv) continue;
 		cdata["namespaces"][i++] = en.second.get_value<std::string>();
 	}
 }
 
-void mg::cpp_generator::set_constructors_prefix(mg::options_view& opts, nlohmann::json& cdata) const
+void mg::cpp_generator::set_constructors_prefix(mg::options::view& opts, nlohmann::json& cdata) const
 {
 	using namespace modegen::generation::interface;
 
-	auto ctor_pref = opts.target_data("cpp"sv).get_optional<std::string>("ctor_prefix");
-	auto ptr_suf = opts.target_data("cpp"sv).get_optional<std::string>("ptr_suffix");
+	auto nsopts = opts.get_subset(options::subsetts::file_generator, "cpp"s, ""s);
+	auto ctor_pref = nsopts.get_optional<std::string>("ctor_prefix");
+	auto ptr_suf = nsopts.get_optional<std::string>("ptr_suffix");
 
-	name_conversion naming = from_string(opts.naming());
+	name_conversion naming = from_string(opts.get_opt<std::string>(options::part_option::naming).value_or(""s));
 	if(naming==name_conversion::title_case) {
 		cdata["ctor_prefix"] = ctor_pref ? *ctor_pref : "Create"s;
 		cdata["ptr_suffix"] = ptr_suf ? *ptr_suf : "Ptr"s;

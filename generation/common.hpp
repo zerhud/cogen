@@ -17,6 +17,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "parser/interface/modegen.hpp"
+#include "options.hpp"
 
 namespace modegen {
 namespace generation {
@@ -53,13 +54,11 @@ private:
 	FS::path output_path(std::string_view part) const ;
 	FS::path tmpl_path(std::string_view part) const ;
 	nlohmann::json generate_data(std::string_view part) const ;
-	boost::property_tree::ptree extra_generator_data(std::string_view part) const ;
-	void build_extra_env(tmpl_gen_env& env, const boost::property_tree::ptree& ex_data, std::string_view part) const ;
+	void build_extra_env(tmpl_gen_env& env, std::string_view part) const ;
 	std::string cur_target(std::string_view part) const ;
-	std::vector<std::string> parser_name_list(std::string_view part) const ;
 
 	provider_ptr prov;
-	boost::property_tree::ptree opts;
+	options::container_ptr opts;
 	FS::path info_directory;
 };
 

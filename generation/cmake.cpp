@@ -13,22 +13,22 @@ using namespace std::literals;
 namespace mg = modegen::generation;
 using boost::property_tree::ptree;
 
-nlohmann::json mg::cmake::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options_view opts) const
+nlohmann::json mg::cmake::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const
 {
 	(void) data_loaders;
 
 	nlohmann::json data;
-	data["project"] = opts.part_data().get<std::string>("project");
-	data["version"] = opts.part_data().get("version", u8"0.0.0.0"s);
+	auto part = opts.get_subset(options::subsetts::part_data);
+	data["project"] = part.get<std::string>("project");
+	data["version"] = part.get("version", u8"0.0.0.0"s);
 
-	ptree part_data = opts.part_data();
-	auto libs = part_data.get_child_optional("libraries");
+	auto libs = part.get_child_optional("libraries");
 	for(auto l:*libs) {
 		std::vector<std::string> files;
 		for(auto& f:l.second) {
 			auto val = f.second.get_value<std::string>();
 			if(f.first=="file"sv) files.emplace_back(val);
-			if(f.first=="part"sv) files.emplace_back(opts.part_data(val).get<std::string>("output"));
+			if(f.first=="part"sv) files.emplace_back(opts.get<std::string>(options::part_option::output));
 		}
 
 

@@ -64,6 +64,12 @@ public:
 		return ldr;
 	}
 
+	std::vector<modegen::parser::loader_ptr> parsers() const override
+	{
+		std::vector<modegen::parser::loader_ptr> ret;
+		return ret;
+	}
+
 	mg::file_data_ptr generator(std::string_view name) const override
 	{
 		if(name == "cpp"sv) return std::make_shared<mg::cpp_generator>();

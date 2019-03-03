@@ -44,6 +44,12 @@ const boost::property_tree::ptree& mo::container::raw() const
 	return opts;
 }
 
+std::vector<std::string> mo::container::part_list() const
+{
+	std::vector<std::string> ret;
+	return ret;
+}
+
 boost::property_tree::ptree mo::container::get_subset(subsetts s, const std::string& part, const std::string& param) const
 {
 	boost::property_tree::ptree ret;
@@ -131,6 +137,7 @@ std::string mo::container::solve_key(template_option opt)
 
 std::string mo::container::solve_key(subsetts opt)
 {
+	if(opt==subsetts::part_data) return "";
 	if(opt==subsetts::file_generator) return "file_gen"s;
 	assert(false);
 	return ""s;
@@ -148,7 +155,8 @@ mo::container::path_t mo::container::make_part_default_key(any_option key, const
 
 mo::container::path_t mo::container::make_subset_key(mo::subsetts key, const std::string& part, const std::string& param)
 {
-	(void)part; // reserved for future use
+	path_t rpath = path_t("gen"s) / path_t(part) / path_t(solve_key(key), '.') ;
+	if(!param.empty()) rpath /= path_t(param);
 	return make_subset_default_key(key, param);
 }
 
@@ -198,3 +206,40 @@ boost::property_tree::ptree mo::view::get_subset(subsetts s, const std::string& 
 	            std::string(param.empty() ? def_fgen : param)
 	            );
 }
+
+mo::forwards_view::forwards_view(mo::container_ptr o, std::string_view part)
+    : opts(std::move(o))
+    , def_part(part)
+{
+}
+
+std::optional<mo::descriptor_t> mo::forwards_view::before() const
+{
+	std::optional<descriptor_t> ret;
+	return ret;
+}
+
+std::optional<mo::descriptor_t> mo::forwards_view::after() const
+{
+	std::optional<descriptor_t> ret;
+	return ret;
+}
+
+std::vector<mo::forwards_view::ex_descriptor> mo::forwards_view::ex_list() const
+{
+	std::vector<ex_descriptor> ret;
+	return ret;
+}
+
+mo::filter_view::filter_view(mo::container_ptr o, std::string_view p)
+    : opts(std::move(o))
+	, def_part(p)
+{
+}
+
+std::vector<mo::filter_view::info> mo::filter_view::in_part() const
+{
+	std::vector<info> ret;
+	return ret;
+}
+

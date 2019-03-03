@@ -8,19 +8,24 @@
 
 #pragma once
 
+#include "config.hpp"
+
 #include <memory>
+#include FILESYSTEM
+
 #include <boost/property_tree/ptree.hpp>
 
 namespace modegen::generation::options {
 
 class container;
 typedef std::shared_ptr<container> container_ptr;
+typedef std::variant<std::string, FS::path> descriptor_t;
 
 enum class part_option {input, output, file_generator, naming};
 enum class part_idl_filter {part_selection, mod_name, content_name, modificator};
 enum class part_forwards {before, after, extends};
 enum class template_option {versioning};
-enum class subsetts { file_generator };
+enum class subsetts { file_generator, part_data };
 
 typedef std::variant<part_option, part_idl_filter, part_forwards, template_option> any_option;
 
@@ -34,6 +39,7 @@ public:
 	boost::property_tree::ptree& raw() ;
 	const boost::property_tree::ptree& raw() const ;
 
+	std::vector<std::string> part_list() const ;
 	boost::property_tree::ptree get_subset(subsetts s, const std::string& part, const std::string& param) const ;
 
 	template<typename T>
@@ -103,6 +109,8 @@ class view {
 public:
 	view(container_ptr c, std::string_view p);
 
+	container_ptr container() const {return opts;}
+
 	void part(std::string_view p);
 	void file_generator(std::string_view fg);
 	std::string_view part() const ;
@@ -139,6 +147,39 @@ public:
 				(fgen.empty() ? std::string(def_fgen) : fgen)
 				);
 	}
+};
+
+class forwards_view {
+	container_ptr opts;
+	std::string def_part;
+public:
+	struct ex_descriptor {
+		std::string name;
+		descriptor_t source;
+	};
+
+	forwards_view(container_ptr o, std::string_view p);
+
+	container_ptr container() const {return opts;}
+
+	std::optional<descriptor_t> after() const ;
+	std::optional<descriptor_t> before() const ;
+	std::vector<ex_descriptor> ex_list() const ;
+};
+
+class filter_view {
+	container_ptr opts;
+	std::string def_part;
+public:
+	struct info {
+		std::vector<std::string> selected;
+		std::string mod_name;
+		std::string cnt_name;
+		descriptor_t modificator;
+	};
+
+	filter_view(container_ptr o, std::string_view p);
+	std::vector<info> in_part() const ;
 };
 
 } // namespace modegen::generation

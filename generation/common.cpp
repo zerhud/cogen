@@ -16,6 +16,7 @@ namespace mg = modegen::generation;
 
 mg::generator::generator(mg::provider_ptr p, const FS::path& i)
 	: prov(std::move(p))
+	, opts(std::make_shared<options::container>())
 	, info_directory(i)
 {
 	if(!prov) throw errors::gen_error("common"s, "cannot create generator without provider"s);
@@ -23,24 +24,28 @@ mg::generator::generator(mg::provider_ptr p, const FS::path& i)
 
 boost::property_tree::ptree& mg::generator::options()
 {
-	return opts;
+	assert(opts);
+	return opts->raw();
 }
 
 const boost::property_tree::ptree& mg::generator::options() const
 {
-	return opts;
+	assert(opts);
+	return opts->raw();
 }
 
 void mg::generator::generate(const FS::path& output_dir) const
 {
 	assert( prov );
-	for(auto& part:opts.get_child("gen")) {
-		nlohmann::json data = generate_data(part.first);
-		if(data.empty()) throw errors::gen_error("common", "no data for output");
+	assert( opts );
+	auto plist = opts->part_list();
+	for(auto& p:plist) {
+		nlohmann::json data = generate_data(p);
+		if(data.empty()) throw errors::gen_error("common", "no data for output in "s + p);
 
-		tmpl_gen_env gdata(std::move(data), tmpl_path(part.first));
-		gdata.out_dir(output_dir / output_path(part.first));
-		build_extra_env(gdata, extra_generator_data(part.first), part.first);
+		tmpl_gen_env gdata(std::move(data), tmpl_path(p));
+		gdata.out_dir(output_dir / output_path(p));
+		build_extra_env(gdata, p);
 		prov->json_jinja( gdata );
 	}
 }
@@ -50,7 +55,7 @@ void mg::generator::generate_stdout(std::string_view part) const
 	assert( prov );
 	nlohmann::json data = generate_data(part);
 	tmpl_gen_env gdata(std::move(data), tmpl_path(part));
-	build_extra_env(gdata, extra_generator_data(part), part);
+	build_extra_env(gdata, part);
 	prov->json_jinja( gdata );
 }
 
@@ -58,27 +63,17 @@ nlohmann::json mg::generator::generate_data(std::string_view part) const
 {
 	assert( prov );
 
-	std::vector<std::string> parsers_names = parser_name_list(part);
-	std::vector<parser::loader_ptr> parsers;
-	for(auto& pn:parsers_names) parsers.emplace_back(prov->parser(pn));
-
 	auto tg = prov->generator(cur_target(part));
 
 	assert(tg);
-	options_view props(opts, part);
-	return tg->jsoned_data(std::move(parsers), std::move(props));
-}
-
-std::vector<std::string> mg::generator::parser_name_list(std::string_view part) const
-{
-	options_view opts_view(opts, part);
-	return opts_view.part_str_list(""s, "parser"s);
+	options::view props(opts, part);
+	return tg->jsoned_data(prov->parsers(), std::move(props));
 }
 
 FS::path mg::generator::output_path(std::string_view part) const
 {
-	options_view view(opts, part);
-	auto val = view.part_str("output");
+	assert( opts );
+	auto val = opts->get_opt<std::string>(options::part_option::output, std::string(part), ""s);
 	if(!val) throw errors::gen_error("common"s, "no output file provided for "s + std::string(part));
 	return *val;
 }
@@ -86,48 +81,30 @@ FS::path mg::generator::output_path(std::string_view part) const
 FS::path mg::generator::tmpl_path(std::string_view part) const
 {
 	assert( prov );
+	assert( opts );
 
-	options_view view(opts, part);
-	FS::path input_file = view.part_str("input"s).value_or(std::string(part) + u8".jinja"s);
+	FS::path input_file = opts->get_opt<std::string>(options::part_option::input, std::string(part), ""s).value_or(std::string(part) + u8".jinja"s);
 	return prov->resolve_file(input_file, info_directory, cur_target(part));
 }
 
-boost::property_tree::ptree mg::generator::extra_generator_data(std::string_view part) const
+void mg::generator::build_extra_env(tmpl_gen_env& env, std::string_view part) const
 {
-	boost::property_tree::ptree ret;
-	std::string p(part);
-	auto forwards = opts.get_child_optional("gen."s+p+".forwards"s);
-	if(!forwards) forwards = opts.get_child_optional("defaults.forwards"s);
-	if(forwards) ret = std::move(*forwards);
-	return ret;
-}
+	assert( opts );
 
-void mg::generator::build_extra_env(tmpl_gen_env& env, const boost::property_tree::ptree& ex_data, std::string_view part) const
-{
-	auto ex_child = ex_data.get_child_optional("ex"s);
-	if(ex_child) for(auto& ex:*ex_child) {
-		auto name = ex.second.get<std::string>("name"s);
-		auto file = ex.second.get_optional<std::string>("file"s);
-		auto script = ex.second.get_optional<std::string>("script"s);
-		if(script) env.emb_fnc(name, *script);
-		else if(file) env.emb_fnc(name, prov->resolve_file(*file, info_directory, cur_target(part)));
-		else throw errors::gen_error("common"s, "for embade function you must specify the name and script or file options"s);
-	}
+	options::forwards_view fw(opts, part);
+	auto before = fw.before();
+	if(before) env.exec_before(*before);
 
-	auto before_script = ex_data.get_optional<std::string>("before.script"s);
-	auto before_file = ex_data.get_optional<std::string>("before.file"s);
-	auto after_script = ex_data.get_optional<std::string>("after.script"s);
-	auto after_file = ex_data.get_optional<std::string>("after.file"s);
+	auto after = fw.after();
+	if(after) env.exec_after(*after);
 
-	if(before_script) env.exec_before(*before_script);
-	else if(before_file) env.exec_before(FS::path(*before_file));
-
-	if(after_script) env.exec_after(*after_script);
-	else if(after_file) env.exec_after(*after_file);
+	auto ex_list = fw.ex_list();
+	for(auto& ex:ex_list) env.emb_fnc(ex.name, ex.source);
 }
 
 std::string mg::generator::cur_target(std::string_view part) const
 {
+	assert( opts );
 	std::string p(part);
-	return opts.get("gen."s+p+".target"s,opts.get("defaults.target"s,""s));
+	return opts->get<std::string>(options::part_option::file_generator, p, ""s);
 }

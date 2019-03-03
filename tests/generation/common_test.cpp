@@ -20,12 +20,14 @@
 using namespace std::literals;
 namespace mg = modegen::generation;
 namespace mp = modegen::parser;
+namespace mo = modegen::generation::options;
 namespace fs = FS;
 
 MOCK_BASE_CLASS( provider_mock, modegen::generation::provider )
 {
 	MOCK_METHOD( json_jinja, 1 )
 	MOCK_METHOD( parser, 1 )
+	MOCK_METHOD( parsers, 0 )
 	MOCK_METHOD( generator, 1 )
 	MOCK_METHOD( resolve_file, 3 )
 };
@@ -38,13 +40,13 @@ class fake_target : public modegen::parser::loader {
 
 struct fake_data_gen : modegen::generation::file_data {
 	bool gen_data = true;
-	nlohmann::json jsoned_data(const std::vector<mp::loader_ptr>& data_loaders, mg::options_view opts) const override
+	nlohmann::json jsoned_data(const std::vector<mp::loader_ptr>& data_loaders, mg::options::view opts) const override
 	{
 		(void) data_loaders;
 		nlohmann::json ret;
 		if(gen_data) {
-			ret["name"] = std::string(opts.part_name());
-			ret["test"] = opts.part_data().get<std::string>("test");
+			ret["name"] = std::string(opts.part());
+			ret["test"] = opts.get_subset(mo::subsetts::part_data).get<std::string>("test");
 		}
 		return ret;
 	}

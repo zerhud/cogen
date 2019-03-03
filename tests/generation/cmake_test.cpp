@@ -19,12 +19,12 @@ namespace mg = modegen::generation;
 
 BOOST_AUTO_TEST_CASE(add_library)
 {
-	boost::property_tree::ptree opts;
-	opts.put("gen.cmake.project", "proj");
-	opts.put("gen.cmake.libraries.interface.part", "part");
-	opts.put("gen.cmake.libraries.interface.file", "some_file.cpp");
-	opts.put("gen.part.output", "part_file.cpp");
-	mg::options_view opts_view(opts, "cmake"sv);
+	auto opts = std::make_shared<mg::options::container>();
+	opts->raw().put("gen.cmake.project", "proj");
+	opts->raw().put("gen.cmake.libraries.interface.part", "part");
+	opts->raw().put("gen.cmake.libraries.interface.file", "some_file.cpp");
+	opts->raw().put("gen.part.output", "part_file.cpp");
+	mg::options::view opts_view(opts, "cmake"s);
 
 	mg::cmake cm;
 	auto data = cm.jsoned_data({}, opts_view);
