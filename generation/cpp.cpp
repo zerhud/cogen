@@ -92,7 +92,7 @@ nlohmann::json mg::cpp_generator::jsoned_data(const std::vector<parser::loader_p
 	        | tcvt
 	        | filter(freq)
 	        | naming(opts.get_opt<std::string>(options::part_option::naming).value_or(""s))
-	        | split_version(versioning == "split"sv)
+	        | split_version(versioning != "split"sv)
 	        | interface::to_json(std::make_unique<json_extra_info>())
 	        ;
 
