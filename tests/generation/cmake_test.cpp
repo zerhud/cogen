@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(add_library)
 {
 	auto opts = std::make_shared<mg::options::container>();
 	opts->raw().put("gen.cmake.project", "proj");
-	opts->raw().put("gen.cmake.libraries.interface.part", "part");
+	opts->raw().put("gen.cmake.libraries.interface.part", "some_part");
 	opts->raw().put("gen.cmake.libraries.interface.file", "some_file.cpp");
 	opts->raw().put("gen.some_part.output", "part_file.cpp");
 	mg::options::view opts_view(opts, "cmake"s);
