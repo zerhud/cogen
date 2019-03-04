@@ -26,7 +26,6 @@ namespace fs = FS;
 MOCK_BASE_CLASS( provider_mock, modegen::generation::provider )
 {
 	MOCK_METHOD( json_jinja, 1 )
-	MOCK_METHOD( parser, 1 )
 	MOCK_METHOD( parsers, 0 )
 	MOCK_METHOD( generator, 1 )
 	MOCK_METHOD( resolve_file, 3 )

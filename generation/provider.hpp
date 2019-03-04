@@ -50,8 +50,6 @@ private:
 class provider {
 public:
 	virtual ~provider() noexcept =default ;
-	[[deprecated("use parsers insteed")]]
-	virtual parser::loader_ptr parser(std::string_view name) const =0 ;
 	virtual std::vector<parser::loader_ptr> parsers() const =0 ;
 	virtual file_data_ptr generator(std::string_view name) const =0 ;
 	virtual void json_jinja(const tmpl_gen_env& data) const =0 ;

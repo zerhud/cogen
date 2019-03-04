@@ -55,15 +55,6 @@ public:
 		return ldr;
 	}
 
-	modegen::parser::loader_ptr parser(std::string_view name) const override
-	{
-		auto ldr = search_loader(name);
-		if(name=="meta"sv) return nullptr;
-		if(!ldr) throw std::runtime_error("no such parser was loaded: \""s + std::string(name) + "\""s);
-		ldr->finish_loads();
-		return ldr;
-	}
-
 	std::vector<modegen::parser::loader_ptr> parsers() const override
 	{
 		std::vector<modegen::parser::loader_ptr> ret;
