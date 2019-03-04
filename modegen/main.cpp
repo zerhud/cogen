@@ -67,6 +67,7 @@ public:
 	std::vector<modegen::parser::loader_ptr> parsers() const override
 	{
 		std::vector<modegen::parser::loader_ptr> ret;
+		for(auto& l:loaders) ret.emplace_back(l.second)->finish_loads();
 		return ret;
 	}
 
