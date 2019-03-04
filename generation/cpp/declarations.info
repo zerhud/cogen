@@ -1,6 +1,5 @@
 defaults {
-	parser interface
-	target cpp
+	filegen cpp
 	naming underscore
 }
 gen
@@ -34,8 +33,7 @@ gen
 		}
 	}
 	cmake {
-		parser meta
-		target cmake
+		filegen cmake
 		input plain.jinja
 		output CMakeLists.txt
 		project interface

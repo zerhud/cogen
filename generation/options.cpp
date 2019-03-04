@@ -105,7 +105,7 @@ std::string mo::container::solve_key(part_option opt)
 	if(opt==part_option::input) return "input"s;
 	if(opt==part_option::output) return "output"s;
 	TODO("change name to filegen");
-	if(opt==part_option::file_generator) return "target"s;
+	if(opt==part_option::file_generator) return "filegen"s;
 	if(opt==part_option::naming) return "naming"s;
 	assert(false);
 	return ""s;

@@ -52,7 +52,7 @@ private:
 	FS::path tmpl_path(std::string_view part) const ;
 	nlohmann::json generate_data(std::string_view part) const ;
 	void build_extra_env(tmpl_gen_env& env, std::string_view part) const ;
-	std::string cur_target(std::string_view part) const ;
+	std::string cur_filegen(std::string_view part) const ;
 
 	provider_ptr prov;
 	options::container_ptr opts;

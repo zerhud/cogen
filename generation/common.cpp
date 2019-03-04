@@ -63,7 +63,7 @@ nlohmann::json mg::generator::generate_data(std::string_view part) const
 {
 	assert( prov );
 
-	auto tg = prov->generator(cur_target(part));
+	auto tg = prov->generator(cur_filegen(part));
 
 	assert(tg);
 	options::view props(opts, part);
@@ -84,7 +84,7 @@ FS::path mg::generator::tmpl_path(std::string_view part) const
 	assert( opts );
 
 	FS::path input_file = opts->get_opt<std::string>(options::part_option::input, std::string(part), ""s).value_or(std::string(part) + u8".jinja"s);
-	return prov->resolve_file(input_file, info_directory, cur_target(part));
+	return prov->resolve_file(input_file, info_directory, cur_filegen(part));
 }
 
 void mg::generator::build_extra_env(tmpl_gen_env& env, std::string_view part) const
@@ -101,12 +101,12 @@ void mg::generator::build_extra_env(tmpl_gen_env& env, std::string_view part) co
 	auto ex_list = fw.ex_list();
 	for(auto ex:ex_list) {
 		if(std::holds_alternative<FS::path>(ex.source))
-			ex.source = prov->resolve_file(std::get<FS::path>(ex.source), info_directory, cur_target(part) );
+			ex.source = prov->resolve_file(std::get<FS::path>(ex.source), info_directory, cur_filegen(part) );
 		env.emb_fnc(ex.name, ex.source);
 	}
 }
 
-std::string mg::generator::cur_target(std::string_view part) const
+std::string mg::generator::cur_filegen(std::string_view part) const
 {
 	assert( opts );
 	std::string p(part);

@@ -7,7 +7,7 @@
  *************************************************************************/
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE modegen_parser
+#define BOOST_TEST_MODULE common_generator
 
 #include <boost/test/unit_test.hpp>
 #include <turtle/mock.hpp>
@@ -93,12 +93,12 @@ BOOST_AUTO_TEST_CASE(common_generation)
 	BOOST_TEST_CHECKPOINT("get settings pointer");
 	auto& opts = gen.options();
 	BOOST_TEST_CHECKPOINT("fill settings");
-	opts.put("gen.def.target", "cpp") ;
-	opts.put("gen.def.parser", "interface") ;
+	opts.put("gen.def.filegen", "cpp") ;
 	opts.put("gen.def.output", "def.hpp") ;
 	opts.put("gen.def.input", "definitions.hpp.jinja") ;
 	opts.put("gen.def.test", "test_data") ;
-	BOOST_TEST_CHECKPOINT("fill settings: end");
+
+	BOOST_TEST_CHECKPOINT("generation");
 
 	// first calls
 	BOOST_TEST_CONTEXT("cout out") gen.generate_stdout("def");
@@ -121,15 +121,13 @@ BOOST_AUTO_TEST_CASE(defaults)
 
 	mg::generator gen(provider, u8"some/path");
 	auto& opts = gen.options();
-	opts.put("defaults.target", "cpp");
-	opts.put("defaults.parser", "interface");
+	opts.put("defaults.filegen", "cpp");
 	opts.put("gen.def.output", "def.hpp") ;
 	opts.put("gen.def.input", "def.hpp.jinja") ;
 	opts.put("gen.def.test", "test_data") ;
 	opts.put("gen.other.output", "other.hpp") ;
 	opts.put("gen.other.input", "other.jinja") ;
-	opts.put("gen.other.target", "other_trg");
-	opts.put("gen.other.parser", "other_prs");
+	opts.put("gen.other.filegen", "other_trg");
 	opts.put("gen.other.test", "test_data") ;
 
 	gen.generate("dir");
@@ -140,7 +138,7 @@ BOOST_AUTO_TEST_CASE(extra_generator_data)
 	auto provider = std::make_shared<provider_mock>();
 	mg::generator gen(provider, u8"some/path");
 	auto& opts = gen.options();
-	opts.put("defaults.target", "cpp");
+	opts.put("defaults.filegen", "cpp");
 	opts.put("defaults.forwards.ex.some.name", "some");
 	opts.put("defaults.forwards.ex.some.script", "some script");
 	opts.put("gen.def.output", "def.hpp") ;
@@ -203,8 +201,7 @@ BOOST_AUTO_TEST_CASE(no_data)
 
 	mg::generator gen(provider, u8"some/path");
 	auto& opts = gen.options();
-	opts.put("gen.def.target", "cpp") ;
-	opts.put("gen.def.parser", "interface") ;
+	opts.put("gen.def.filegen", "cpp") ;
 	opts.put("gen.def.output", "def.hpp") ;
 	opts.put("gen.def.input", "definitions.hpp.jinja") ;
 	opts.put("gen.def.test", "test_data") ;
@@ -221,8 +218,7 @@ BOOST_AUTO_TEST_CASE(no_output)
 
 	mg::generator gen(provider, u8"some/path"s);
 	auto& opts = gen.options();
-	opts.put("gen.def.target", "cpp") ;
-	opts.put("gen.def.parser", "interface") ;
+	opts.put("gen.def.filegen", "cpp") ;
 	opts.put("gen.def.input", "def.hpp.jinja") ;
 	opts.put("gen.def.test", "test_data") ;
 	BOOST_CHECK_THROW( gen.generate("some_dir"), modegen::errors::error );
