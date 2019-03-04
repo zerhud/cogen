@@ -6,6 +6,8 @@
  * or <http://www.gnu.org/licenses/> for details
  *************************************************************************/
 
+#include <iostream>
+#include <boost/property_tree/json_parser.hpp>
 #include "options.hpp"
 
 namespace mo = modegen::generation::options;
@@ -16,10 +18,6 @@ std::string mo::container::description_message(mo::any_option opt)
 {
 	if(std::holds_alternative<template_option>(opt)) {
 		return descr_message(std::get<template_option>(opt));
-	}
-
-	if(std::holds_alternative<part_forwards>(opt)) {
-		return descr_message(std::get<part_forwards>(opt));
 	}
 
 	if(std::holds_alternative<part_idl_filter>(opt)) {
@@ -47,6 +45,8 @@ const boost::property_tree::ptree& mo::container::raw() const
 std::vector<std::string> mo::container::part_list() const
 {
 	std::vector<std::string> ret;
+	auto gchild = opts.get_child_optional("gen");
+	if(gchild) for(auto& ps:*gchild) ret.emplace_back(ps.first);
 	return ret;
 }
 
@@ -54,18 +54,9 @@ boost::property_tree::ptree mo::container::get_subset(subsetts s, const std::str
 {
 	boost::property_tree::ptree ret;
 	auto t = opts.get_child_optional(make_subset_key(s, part, param));
-	if(!t) t = opts.get_child_optional(make_subset_default_key(s, param));
+	if(!t && !is_toplevel_subset(s)) t = opts.get_child_optional(make_subset_default_key(s, param));
 	if(t) ret = *t;
 	return ret;
-}
-
-std::string mo::container::descr_message(mo::part_forwards opt)
-{
-	if(opt==part_forwards::before) return "run script before the generation has began"s;
-	if(opt==part_forwards::after) return "run script after the generation"s;
-	if(opt==part_forwards::extends) return "extend generator by functions..."s;
-	assert(false);
-	return "unknown part forwards option"s;
 }
 
 std::string mo::container::descr_message(mo::part_idl_filter opt)
@@ -99,15 +90,6 @@ std::string mo::container::solve_key(mo::any_option key)
 	return std::visit(solver, key);
 }
 
-std::string mo::container::solve_key(part_forwards opt)
-{
-	if(opt==part_forwards::before) return "forwards.before"s;
-	if(opt==part_forwards::after) return "forwards.after"s;
-	if(opt==part_forwards::extends) return "forwards.ex"s;
-	assert(false);
-	return ""s;
-}
-
 std::string mo::container::solve_key(part_idl_filter opt)
 {
 	if(opt==part_idl_filter::part_selection) return "filter.sel"s;
@@ -122,6 +104,7 @@ std::string mo::container::solve_key(part_option opt)
 {
 	if(opt==part_option::input) return "input"s;
 	if(opt==part_option::output) return "output"s;
+	TODO("change name to filegen");
 	if(opt==part_option::file_generator) return "target"s;
 	if(opt==part_option::naming) return "naming"s;
 	assert(false);
@@ -137,8 +120,9 @@ std::string mo::container::solve_key(template_option opt)
 
 std::string mo::container::solve_key(subsetts opt)
 {
-	if(opt==subsetts::part_data) return "";
-	if(opt==subsetts::file_generator) return "file_gen"s;
+	if(opt==subsetts::part_data) return ""s;
+	if(opt==subsetts::file_generator) return "filegen"s;
+	if(opt==subsetts::part_forwards) return "forwards"s;
 	assert(false);
 	return ""s;
 }
@@ -155,14 +139,22 @@ mo::container::path_t mo::container::make_part_default_key(any_option key, const
 
 mo::container::path_t mo::container::make_subset_key(mo::subsetts key, const std::string& part, const std::string& param)
 {
+	if(is_toplevel_subset(key)) return path_t(solve_key(key)) / path_t(param);
+
 	path_t rpath = path_t("gen"s) / path_t(part) / path_t(solve_key(key), '.') ;
 	if(!param.empty()) rpath /= path_t(param);
-	return make_subset_default_key(key, param);
+	return rpath;
 }
 
 mo::container::path_t mo::container::make_subset_default_key(mo::subsetts key, const std::string& param)
 {
-	return path_t(solve_key(key)) / path_t(param);
+	assert( !is_toplevel_subset(key) );
+	return path_t("defaults"s) / path_t(solve_key(key)) / path_t(param);
+}
+
+bool mo::container::is_toplevel_subset(mo::subsetts key)
+{
+	return key == subsetts::file_generator;
 }
 
 std::tuple<mo::container::path_t,mo::container::path_t> mo::container::up_path(path_t p)
@@ -216,19 +208,45 @@ mo::forwards_view::forwards_view(mo::container_ptr o, std::string_view part)
 std::optional<mo::descriptor_t> mo::forwards_view::before() const
 {
 	std::optional<descriptor_t> ret;
+	view v(opts, def_part);
+	auto fwd_data = v.get_subset(subsetts::part_forwards);
+	auto bdata = fwd_data.get_child_optional("before"s);
+	if(bdata) ret = extract_desc(*bdata);
+	//for(auto fwd:fwd_data) if(fwd.frist == "before"s) ret.emplace_back(extract_desc(fwd.second));
 	return ret;
 }
 
 std::optional<mo::descriptor_t> mo::forwards_view::after() const
 {
 	std::optional<descriptor_t> ret;
+	view v(opts, def_part);
+	auto fwd_data = v.get_subset(subsetts::part_forwards);
+	auto bdata = fwd_data.get_child_optional("after"s);
+	if(bdata) ret = extract_desc(*bdata);
+	//for(auto fwd:fwd_data) if(fwd.frist == "after"s) ret.emplace_back(extract_desc(fwd.second));
 	return ret;
 }
 
 std::vector<mo::forwards_view::ex_descriptor> mo::forwards_view::ex_list() const
 {
 	std::vector<ex_descriptor> ret;
+	view v(opts, def_part);
+	auto fwd_data = v.get_subset(subsetts::part_forwards);
+	auto ex_child = fwd_data.get_child_optional("ex"s);
+	if(ex_child) for(auto ex:*ex_child) {
+		ex_descriptor& item = ret.emplace_back();
+		item.name = ex.second.get<std::string>("name"s);
+		item.source = extract_desc(ex.second);
+	}
 	return ret;
+}
+
+mo::descriptor_t mo::forwards_view::extract_desc(const boost::property_tree::ptree& pt) const
+{
+	auto file = pt.get_optional<std::string>("file"s);
+	auto script = pt.get_optional<std::string>("script"s);
+	if(file) return FS::path(*file);
+	return *script;
 }
 
 mo::filter_view::filter_view(mo::container_ptr o, std::string_view p)

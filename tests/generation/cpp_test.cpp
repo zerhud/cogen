@@ -66,8 +66,8 @@ BOOST_AUTO_TEST_CASE( extra_namespaces )
 {
 	auto opts_tree = std::make_shared<mo::container>();
 	opts_tree->raw().put("gen.def.input", "fake_tmpl");
-	opts_tree->raw().add("target.cpp.namespaces", "ns1");
-	opts_tree->raw().add("target.cpp.namespaces", "ns2");
+	opts_tree->raw().add("filegen.cpp.namespaces", "ns1");
+	opts_tree->raw().add("filegen.cpp.namespaces", "ns2");
 	mg::cpp_generator gen;
 	mo::view opts(opts_tree, "def"sv);
 
@@ -111,8 +111,8 @@ BOOST_AUTO_TEST_CASE( ctor_prefix_ptr_siffux )
 {
 	auto opts_tree = std::make_shared<mo::container>();
 	opts_tree->raw().put("gen.def.input", "fake_tmpl");
-	opts_tree->raw().add("target.cpp.ctor_prefix", "ctor_");
-	opts_tree->raw().add("target.cpp.ptr_suffix", "_ptR");
+	opts_tree->raw().add("filegen.cpp.ctor_prefix", "ctor_");
+	opts_tree->raw().add("filegen.cpp.ptr_suffix", "_ptR");
 	mg::cpp_generator gen;
 	mg::options::view opts(opts_tree, "def"sv);
 

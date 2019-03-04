@@ -28,7 +28,7 @@ nlohmann::json mg::cmake::jsoned_data(const std::vector<parser::loader_ptr>& dat
 		for(auto& f:l.second) {
 			auto val = f.second.get_value<std::string>();
 			if(f.first=="file"sv) files.emplace_back(val);
-			if(f.first=="part"sv) files.emplace_back(opts.get<std::string>(options::part_option::output));
+			if(f.first=="part"sv) files.emplace_back(opts.get<std::string>(options::part_option::output, f.first));
 		}
 
 

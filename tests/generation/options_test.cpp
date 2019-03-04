@@ -18,13 +18,25 @@
 using namespace std::literals;
 namespace mo = modegen::generation::options;
 
+BOOST_AUTO_TEST_CASE(part_list)
+{
+	mo::container cnt;
+	cnt.raw().put("gen.part.input", "pin");
+	cnt.raw().put("gen.other.input", "pin");
+	auto list = cnt.part_list();
+	BOOST_REQUIRE_EQUAL(list.size(), 2);
+	BOOST_CHECK_EQUAL(list[0], "part");
+	BOOST_CHECK_EQUAL(list[1], "other");
+
+}
+
 BOOST_AUTO_TEST_SUITE(part)
 BOOST_AUTO_TEST_CASE(defaults)
 {
 	mo::container cnt;
 	cnt.raw().put("gen.part.input", "pin");
 	cnt.raw().put("defaults.output", "pout");
-	cnt.raw().put("file_gen.cpp.naming", "n");
+	cnt.raw().put("filegen.cpp.naming", "n");
 	BOOST_CHECK_EQUAL(cnt.get<std::string>(mo::part_option::input, "part", ""), "pin");
 	BOOST_CHECK_EQUAL(cnt.get<std::string>(mo::part_option::output, "part", ""), "pout");
 
@@ -38,7 +50,7 @@ BOOST_AUTO_TEST_CASE(defaults)
 
 	v.file_generator("cpp"sv);
 	auto pt = v.get_subset(mo::subsetts::file_generator);
-	BOOST_CHECK_EQUAL(v.get_subset(mo::subsetts::file_generator).get<std::string>("naming"), "n");
+	BOOST_CHECK_EQUAL( pt.get<std::string>("naming"), "n" );
 }
 BOOST_AUTO_TEST_CASE(opt)
 {
@@ -87,7 +99,7 @@ BOOST_AUTO_TEST_SUITE_END() // part
 BOOST_AUTO_TEST_CASE(subset)
 {
 	mo::container cnt;
-	cnt.raw().put("file_gen.cpp.opt", "cppopt");
+	cnt.raw().put("filegen.cpp.opt", "cppopt");
 	BOOST_CHECK( cnt.get_subset(mo::subsetts::file_generator, "", "ee"s).empty() );
 	BOOST_CHECK_EQUAL(cnt.get_subset(mo::subsetts::file_generator, "", "cpp"s).get<std::string>("opt"s), "cppopt"s);
 

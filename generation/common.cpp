@@ -99,7 +99,11 @@ void mg::generator::build_extra_env(tmpl_gen_env& env, std::string_view part) co
 	if(after) env.exec_after(*after);
 
 	auto ex_list = fw.ex_list();
-	for(auto& ex:ex_list) env.emb_fnc(ex.name, ex.source);
+	for(auto ex:ex_list) {
+		if(std::holds_alternative<FS::path>(ex.source))
+			ex.source = prov->resolve_file(std::get<FS::path>(ex.source), info_directory, cur_target(part) );
+		env.emb_fnc(ex.name, ex.source);
+	}
 }
 
 std::string mg::generator::cur_target(std::string_view part) const

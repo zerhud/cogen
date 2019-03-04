@@ -23,11 +23,10 @@ typedef std::variant<std::string, FS::path> descriptor_t;
 
 enum class part_option {input, output, file_generator, naming};
 enum class part_idl_filter {part_selection, mod_name, content_name, modificator};
-enum class part_forwards {before, after, extends};
 enum class template_option {versioning};
-enum class subsetts { file_generator, part_data };
+enum class subsetts { file_generator, part_data, part_forwards };
 
-typedef std::variant<part_option, part_idl_filter, part_forwards, template_option> any_option;
+typedef std::variant<part_option, part_idl_filter, template_option> any_option;
 
 class container {
 	boost::property_tree::ptree opts;
@@ -80,13 +79,11 @@ public:
 		return ret;
 	}
 private:
-	static std::string descr_message(part_forwards opt) ;
 	static std::string descr_message(part_idl_filter opt) ;
 	static std::string descr_message(part_option opt) ;
 	static std::string descr_message(template_option opt) ;
 
 	static std::string solve_key(any_option key) ;
-	static std::string solve_key(part_forwards opt) ;
 	static std::string solve_key(part_idl_filter opt) ;
 	static std::string solve_key(part_option opt) ;
 	static std::string solve_key(template_option opt) ;
@@ -96,6 +93,8 @@ private:
 	static path_t make_part_default_key(any_option key, const std::string& p) ;
 	static path_t make_subset_key(subsetts key, const std::string& part, const std::string& param) ;
 	static path_t make_subset_default_key(subsetts key, const std::string& p) ;
+
+	static bool is_toplevel_subset(subsetts key) ;
 
 	static std::tuple<path_t,path_t> up_path(path_t p);
 
@@ -151,7 +150,7 @@ public:
 
 class forwards_view {
 	container_ptr opts;
-	std::string def_part;
+	std::string_view def_part;
 public:
 	struct ex_descriptor {
 		std::string name;
@@ -165,6 +164,8 @@ public:
 	std::optional<descriptor_t> after() const ;
 	std::optional<descriptor_t> before() const ;
 	std::vector<ex_descriptor> ex_list() const ;
+private:
+	descriptor_t extract_desc(const boost::property_tree::ptree& pt) const ;
 };
 
 class filter_view {
