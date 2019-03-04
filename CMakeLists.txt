@@ -42,7 +42,6 @@ configure_file("config.hpp.in" "${main_config_file}")
 include(cmake/target_sources_local.cmake)
 
 # interface library: parse interface definitions and generate code by templates
-set(pythongen_src "${CMAKE_CURRENT_LIST_DIR}/modegen/pythongen")
 add_library(modegen_interfaces ${main_config_file})
 target_link_libraries(modegen_interfaces PRIVATE stdc++fs PUBLIC ${Boost_LIBRARIES})
 target_include_directories(modegen_interfaces PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
@@ -96,8 +95,8 @@ add_custom_command(OUTPUT "${lohman_json_file}"
 target_sources(modegen_interfaces PRIVATE "${lohman_json_file}" )
 
 # main programm: run selected generator and sets options
-add_executable(modegen modegen/main.cpp modegen/pythongen.cpp modegen/pythongen.hpp)
-target_sources(modegen PRIVATE "${pythongen_src}" "${CMAKE_CURRENT_BINARY_DIR}/pythongen")
+add_executable(modegen modegen/main.cpp)
+target_sources(modegen PRIVATE modegen/pythongen.cpp modegen/pythongen.hpp)
 target_sources(modegen PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/pythongen_data.cpp")
 target_link_libraries(modegen PRIVATE
 	modegen_interfaces
@@ -105,12 +104,6 @@ target_link_libraries(modegen PRIVATE
 	${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
 	)
 
-add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pythongen"
-	COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-		"${pythongen_src}"
-		"${CMAKE_CURRENT_BINARY_DIR}/pythongen"
-	DEPENDS "${pythongen_src}"
-	)
 add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pythongen_data.cpp"
 	COMMAND "${CMAKE_COMMAND}"
 		-Dcnt_list="tscript;jinja_env"
