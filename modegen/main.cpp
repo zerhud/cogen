@@ -92,7 +92,7 @@ public:
 		}
 
 		ev
-		        .tmpl(data.tmpl(), data.out_dir())
+		        .tmpl(data.tmpl(), data.out_file())
 		        .script(data.exec_after())
 		        ;
 	}

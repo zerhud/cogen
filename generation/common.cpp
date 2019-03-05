@@ -44,7 +44,7 @@ void mg::generator::generate(const FS::path& output_dir) const
 		if(data.empty()) throw errors::gen_error("common", "no data for output in "s + p);
 
 		tmpl_gen_env gdata(std::move(data), tmpl_path(p));
-		gdata.out_dir(output_dir / output_path(p));
+		gdata.out_file(output_dir / output_path(p));
 		build_extra_env(gdata, p);
 		prov->json_jinja( gdata );
 	}

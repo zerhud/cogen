@@ -30,8 +30,8 @@ public:
 	FS::path& tmpl() ;
 	const FS::path& tmpl() const ;
 
-	std::optional<FS::path> out_dir() const ;
-	tmpl_gen_env& out_dir(const std::optional<FS::path>& p);
+	std::optional<FS::path> out_file() const ;
+	tmpl_gen_env& out_file(const std::optional<FS::path>& p);
 
 	tmpl_gen_env& emb_fnc(const std::string& name, const script_descriptor& fnc);
 	std::map<std::string, script_descriptor> emb_fnc_list() const ;
@@ -43,7 +43,7 @@ public:
 private:
 	nlohmann::json gen_data_;
 	FS::path tmpl_path_;
-	std::optional<FS::path> out_dir_;
+	std::optional<FS::path> out_file_;
 	std::map<std::string, script_descriptor> extra_scripts_;
 };
 

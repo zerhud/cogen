@@ -39,14 +39,14 @@ const FS::path& mg::tmpl_gen_env::tmpl() const
 }
 
 
-std::optional<FS::path> mg::tmpl_gen_env::out_dir() const
+std::optional<FS::path> mg::tmpl_gen_env::out_file() const
 {
-	return out_dir_;
+	return out_file_;
 }
 
-mg::tmpl_gen_env& mg::tmpl_gen_env::out_dir(const std::optional<FS::path>& p)
+mg::tmpl_gen_env& mg::tmpl_gen_env::out_file(const std::optional<FS::path>& p)
 {
-	out_dir_ = p;
+	out_file_ = p;
 	return *this;
 }
 

@@ -69,10 +69,10 @@ BOOST_AUTO_TEST_CASE(common_generation)
 	bool cout = true;
 	auto result_data_checker = [&cout](const mg::tmpl_gen_env& gdata) {
 			BOOST_TEST_CHECKPOINT("begin result check");
-			if(cout) BOOST_CHECK( !gdata.out_dir() );
+			if(cout) BOOST_CHECK( !gdata.out_file() );
 			else {
-				BOOST_REQUIRE( gdata.out_dir() );
-				BOOST_CHECK_EQUAL( *gdata.out_dir(), fs::path("some_dir") / "def.hpp" );
+				BOOST_REQUIRE( gdata.out_file() );
+				BOOST_CHECK_EQUAL( *gdata.out_file(), fs::path("some_dir") / "def.hpp" );
 			}
 
 			BOOST_CHECK_EQUAL( gdata.tmpl(), fs::path(u8"resolved/path") / "definitions.hpp.jinja" );
