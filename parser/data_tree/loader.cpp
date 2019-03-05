@@ -19,6 +19,12 @@ namespace md = modegen::parser::data_tree;
 md::loader_impl::loader_impl(data_format df)
 	: cur_format(df)
 {
+	next_input_format(df);
+}
+
+void md::loader_impl::next_input_format(data_format df)
+{
+	cur_format = df;
 	// check if all enum entries are used
 	assert( cur_format == data_format::info || cur_format == data_format::json );
 }

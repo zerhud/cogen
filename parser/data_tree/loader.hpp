@@ -24,6 +24,7 @@ public:
 	enum class data_format { info, json };
 	explicit loader_impl(data_format df);
 
+	void next_input_format(data_format df);
 	void load(std::istream& input, std::string fn) override ;
 	void load(FS::path file) override ;
 	void finish_loads() override ;

@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <map>
 #include "config.hpp"
 #include FILESYSTEM
 
@@ -15,6 +16,19 @@ namespace modegen::parser {
 
 class loader;
 typedef std::shared_ptr<loader> loader_ptr;
+
+/// allow to create and use loaders
+class loaders_manager {
+public:
+	static std::vector<std::string> name_list() ;
+
+	loaders_manager();
+
+	loader_ptr require(std::string_view name);
+	std::vector<loader_ptr> finish_loads() ;
+private:
+	std::map<std::string, loader_ptr> loaders;
+};
 
 class loader {
 public:
@@ -25,8 +39,4 @@ public:
 	virtual void finish_loads() =0 ;
 };
 
-loader_ptr create_loader(std::string_view name, std::vector<FS::path> includes);
-
 } // namespace modegen::parser
-
-

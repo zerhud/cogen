@@ -41,11 +41,7 @@ public:
 
 	modegen::parser::loader_ptr create_loader(std::string_view target, FS::path input)
 	{
-		auto ldr = search_loader(target);
-		if(!ldr) {
-			ldr = create_loader(target);
-			loaders[std::string(target)] = ldr;
-		}
+		auto ldr = lman.require(target);
 
 		assert(ldr);
 
@@ -57,9 +53,8 @@ public:
 
 	std::vector<modegen::parser::loader_ptr> parsers() const override
 	{
-		std::vector<modegen::parser::loader_ptr> ret;
-		for(auto& l:loaders) ret.emplace_back(l.second)->finish_loads();
-		return ret;
+		// nonconst only first time called
+		return const_cast<decltype(lman)&>(lman).finish_loads();
 	}
 
 	mg::file_data_ptr generator(std::string_view name) const override
@@ -158,21 +153,7 @@ private:
 		return std::nullopt;
 	}
 
-	modegen::parser::loader_ptr search_loader(std::string_view name) const
-	{
-		auto pos = loaders.find(name);
-		if(pos==loaders.end()) return nullptr;
-		return pos->second;
-	}
-
-	modegen::parser::loader_ptr create_loader(std::string_view name) const
-	{
-		auto ldr = modegen::parser::create_loader(name, search_pathes);
-		if(ldr) return ldr;
-		throw std::runtime_error("no such parser "s + std::string(name));
-	}
-
-	std::map<std::string,modegen::parser::loader_ptr, std::less<>> loaders;
+	modegen::parser::loaders_manager lman;
 	std::vector<FS::path> search_pathes;
 };
 

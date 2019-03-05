@@ -9,13 +9,43 @@
 #include "loader.hpp"
 #include "interface/loader.hpp"
 #include "data_tree/loader.hpp"
+#include "errors.h"
 
 using namespace std::literals;
 
-modegen::parser::loader_ptr modegen::parser::create_loader(std::string_view name, std::vector<FS::path> includes)
+namespace mp = modegen::parser;
+
+std::vector<std::string> mp::loaders_manager::name_list()
 {
-	if(name == "interface"sv) return std::make_shared<interface::loader_impl>(std::move(includes));
-	if(name == "info"sv) return std::make_shared<data_tree::loader_impl>(data_tree::loader_impl::data_format::info);
-	if(name == "json"sv) return std::make_shared<data_tree::loader_impl>(data_tree::loader_impl::data_format::json);
-	return nullptr;
+	return {u8"interface"s, u8"info"s, u8"json"s};
+}
+
+mp::loaders_manager::loaders_manager()
+{
+	loaders["idl"] = std::make_shared<interface::loader_impl>();
+	loaders["extra"] = std::make_shared<data_tree::loader_impl>(data_tree::loader_impl::data_format::info);
+}
+
+mp::loader_ptr mp::loaders_manager::require(std::string_view name)
+{
+	if(name=="interface"sv) return loaders["idl"];
+	if(name=="info"sv) {
+		auto ret = loaders["extra"];
+		static_cast<data_tree::loader_impl*>(ret.get())->next_input_format(data_tree::loader_impl::data_format::info);
+		return ret;
+	}
+	if(name=="json"sv) {
+		auto ret = loaders["extra"];
+		static_cast<data_tree::loader_impl*>(ret.get())->next_input_format(data_tree::loader_impl::data_format::json);
+		return ret;
+	}
+
+	throw errors::error(u8"no loader with name "s + std::string(name));
+}
+
+std::vector<mp::loader_ptr> mp::loaders_manager::finish_loads()
+{
+	std::vector<loader_ptr> ret;
+	for(auto& l:loaders) ret.emplace_back(l.second)->finish_loads();
+	return ret;
 }
