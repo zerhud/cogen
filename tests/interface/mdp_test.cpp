@@ -67,7 +67,8 @@ BOOST_AUTO_TEST_CASE(using_rule)
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
 }
 
-BOOST_AUTO_TEST_CASE(record_rule)
+BOOST_AUTO_TEST_SUITE(record_rule)
+BOOST_AUTO_TEST_CASE(normal)
 {
 	auto pf = modegen::parser::interface::parse("module mod v1.0: record some{type some; @v4.0 type other;}"sv);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
@@ -75,11 +76,24 @@ BOOST_AUTO_TEST_CASE(record_rule)
 	BOOST_REQUIRE_EQUAL(pf.mods[0].content[0].index(),2);
 
 	modegen::parser::interface::record& rec = std::get<modegen::parser::interface::record>(pf.mods[0].content[0]);
-	BOOST_REQUIRE_EQUAL(rec.name, "some");
+	BOOST_CHECK_EQUAL(rec.use_as_exception, false);
+	BOOST_CHECK_EQUAL(rec.name, "some");
 	BOOST_REQUIRE_EQUAL(rec.members.size(), 2);
 }
+BOOST_AUTO_TEST_CASE(flags)
+{
+	auto pf = modegen::parser::interface::parse("module mod v1.0: record +ex some{}"sv);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content[0].index(),2);
 
-BOOST_AUTO_TEST_CASE(interfaceq_rule)
+	modegen::parser::interface::record& rec = std::get<modegen::parser::interface::record>(pf.mods[0].content[0]);
+	BOOST_CHECK_EQUAL(rec.use_as_exception, true);
+}
+BOOST_AUTO_TEST_SUITE_END() // record_rule
+
+BOOST_AUTO_TEST_SUITE(interface_rule)
+BOOST_AUTO_TEST_CASE(normal)
 {
 	auto pf = modegen::parser::interface::parse("module mod v1.0: interface inter{ constructor(); static type some() const; type other() mutable;}"sv);
 	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
@@ -89,6 +103,7 @@ BOOST_AUTO_TEST_CASE(interfaceq_rule)
 	modegen::parser::interface::interface& i = std::get<modegen::parser::interface::interface>(pf.mods[0].content[0]);
 	BOOST_CHECK_EQUAL(i.name, "inter");
 	BOOST_CHECK_EQUAL(i.realization_in_client, false);
+	BOOST_CHECK_EQUAL(i.use_as_exception, false);
 
 	BOOST_REQUIRE_EQUAL(i.mem_funcs.size(), 2);
 	BOOST_CHECK_EQUAL(i.mem_funcs[1].is_static.has_value(),false);
@@ -98,6 +113,18 @@ BOOST_AUTO_TEST_CASE(interfaceq_rule)
 	BOOST_REQUIRE_EQUAL(i.constructors.size(), 1);
 	BOOST_REQUIRE_EQUAL(i.constructors[0].func_params.size(), 0);
 }
+BOOST_AUTO_TEST_CASE(flags)
+{
+	auto pf = modegen::parser::interface::parse("module mod v1.0: interface +i +ex inter {}"sv);
+	BOOST_REQUIRE_EQUAL(pf.mods.size(), 1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content.size(),1);
+	BOOST_REQUIRE_EQUAL(pf.mods[0].content[0].index(),3);
+
+	modegen::parser::interface::interface& i = std::get<modegen::parser::interface::interface>(pf.mods[0].content[0]);
+	BOOST_CHECK_EQUAL(i.realization_in_client, true);
+	BOOST_CHECK_EQUAL(i.use_as_exception, true);
+}
+BOOST_AUTO_TEST_SUITE_END() // interface_rule
 
 BOOST_AUTO_TEST_SUITE(functions)
 BOOST_AUTO_TEST_CASE(simple)

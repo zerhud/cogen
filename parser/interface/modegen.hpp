@@ -94,6 +94,7 @@ struct record {
 	std::string name;
 	std::vector<record_item> members;
 	meta_parameters::parameter_set meta_params;
+	bool use_as_exception = false;
 
 	auto copy(copy_method m) const
 	{
@@ -109,6 +110,7 @@ struct interface {
 	std::vector<constructor_fnc> constructors;
 	meta_parameters::parameter_set meta_params;
 	bool realization_in_client = false;
+	bool use_as_exception = false;
 
 	auto copy(copy_method m) const
 	{
@@ -177,8 +179,8 @@ BOOST_FUSION_ADAPT_STRUCT( modegen::parser::interface::function
 BOOST_FUSION_ADAPT_STRUCT( modegen::parser::interface::enum_element, name, io )
 BOOST_FUSION_ADAPT_STRUCT( modegen::parser::interface::enumeration, name, elements, meta_params, gen_io, use_bitmask )
 BOOST_FUSION_ADAPT_STRUCT( modegen::parser::interface::record_item, meta_params, param_type, name )
-BOOST_FUSION_ADAPT_STRUCT( modegen::parser::interface::record, name, members, meta_params )
-BOOST_FUSION_ADAPT_STRUCT( modegen::parser::interface::interface, name, mem_funcs, constructors, meta_params, realization_in_client )
+BOOST_FUSION_ADAPT_STRUCT( modegen::parser::interface::record, name, members, meta_params, use_as_exception )
+BOOST_FUSION_ADAPT_STRUCT( modegen::parser::interface::interface, name, mem_funcs, constructors, meta_params, realization_in_client, use_as_exception )
 BOOST_FUSION_ADAPT_STRUCT( modegen::parser::interface::using_directive, mod_name )
 BOOST_FUSION_ADAPT_STRUCT( modegen::parser::interface::parsed_file, mods, includes )
 BOOST_FUSION_ADAPT_STRUCT( modegen::parser::interface::module

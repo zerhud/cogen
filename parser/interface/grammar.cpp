@@ -137,7 +137,9 @@ struct grammar : boost::spirit::qi::grammar<Iterator, parsed_file(), boost::spir
 
 		record_rule.name("record_rule");
 		record_rule = meta_params_rule[at_c<2>(_val)=_1]
-		            >> qi::lexeme[lit("record") >> +space >> var_name[at_c<0>(_val)=_1]]
+		            >> qi::lexeme[lit("record") >> +space]
+		            >> -qi::lexeme[lit("+ex")[at_c<3>(_val)=true] >> +space]
+		            >> var_name[at_c<0>(_val)=_1]
 		            >> lit('{')
 		            >> *(record_item_rule[push_back(at_c<1>(_val),_1)] >> lit(';'))
 		            >> lit('}')
@@ -145,7 +147,10 @@ struct grammar : boost::spirit::qi::grammar<Iterator, parsed_file(), boost::spir
 
 		interface_rule.name("interface_rule");
 		interface_rule = meta_params_rule[at_c<3>(_val)=_1]
-		                         >> qi::lexeme[lit("interface") >> +space >> -lit("+i")[at_c<4>(_val)=true] >> var_name[at_c<0>(_val)=_1]]
+		                         >> qi::lexeme[lit("interface") >> +space]
+		                         >> -qi::lexeme[lit("+i")[at_c<4>(_val)=true] >> +space]
+		                         >> -qi::lexeme[lit("+ex")[at_c<5>(_val)=true] >> +space]
+		                         >> var_name[at_c<0>(_val)=_1]
 		                         >> lit('{')
 		                         >> *((function_rule[push_back(at_c<1>(_val),_1)] | constructor_rule[push_back(at_c<2>(_val),_1)]) >> lit(';'))
 		                         >> lit('}')
