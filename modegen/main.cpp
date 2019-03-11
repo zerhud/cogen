@@ -20,6 +20,7 @@
 #include "generation/file_data.hpp"
 #include "generation/cpp.hpp"
 #include "generation/cmake.hpp"
+#include "generation/python.hpp"
 
 #include "parser/interface/loader.hpp"
 
@@ -61,6 +62,7 @@ public:
 	{
 		if(name == "cpp"sv) return std::make_shared<mg::cpp_generator>();
 		if(name == "cmake"sv) return std::make_shared<mg::cmake>();
+		if(name == "python"sv) return std::make_shared<mg::python>();
 		throw std::runtime_error("no such generator was loaded \""s + std::string(name) + "\""s);
 	}
 
@@ -134,12 +136,12 @@ public:
 
 	std::vector<std::string> list_target() const
 	{
-		return { u8"interface"s, u8"info"s, u8"json"s };
+		return lman.name_list();
 	}
 
 	std::vector<std::string> list_generators() const
 	{
-		return { u8"cpp"s, u8"cmake"s };
+		return { u8"cpp"s, u8"cmake"s, u8"py"s };
 	}
 private:
 	std::optional<FS::path> resolve_file(FS::path p, const std::vector<FS::path> final_search) const
@@ -157,7 +159,7 @@ private:
 	std::vector<FS::path> search_pathes;
 };
 
-auto parse_command_line(int argc, char** argv, std::vector<std::string> glist)
+auto parse_command_line(int argc, char** argv, std::vector<std::string> fglist, std::vector<std::string> gen_list)
 {
 	po::options_description desc("Allowed options");
 	desc.add_options()
@@ -176,10 +178,15 @@ auto parse_command_line(int argc, char** argv, std::vector<std::string> glist)
 
 	if(vm.count("help")) {
 		std::cout << "use this program to prepare module data." << std::endl << desc << std::endl
-			<< std::endl << "as target you may use:" << std::endl;
-		for(auto& g:glist) std::cout << "\t" << g << std::endl;
+		    << std::endl << "as parser you may use:" << std::endl;
+		for(auto& g:fglist) std::cout << "\t" << g << std::endl;
+
+		std::cout << std::endl << "as generator you may use:" << std::endl;
+		for(auto& g:gen_list) std::cout << "\t" << g << std::endl;
+
 		std::exit(1);
 	}
+
 	return std::make_tuple(opts, vm);
 }
 
@@ -188,7 +195,7 @@ int main(int argc, char** argv)
 	auto prov = std::make_shared<gen_prov>(argv[0]);
 	prov->add_search_path(modegen::settings::templates_dir);
 
-	auto [opts,vm] = parse_command_line(argc, argv, prov->list_target());
+	auto [opts,vm] = parse_command_line(argc, argv, prov->list_target(), prov->list_generators());
 
 	std::unique_ptr<mg::generator> gen;
 	FS::path out_dir = FS::current_path();

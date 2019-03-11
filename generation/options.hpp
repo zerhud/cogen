@@ -23,7 +23,7 @@ typedef std::variant<std::string, FS::path> descriptor_t;
 
 enum class part_option {input, output, file_generator, naming};
 enum class part_idl_filter {part_selection, mod_name, content_name, modificator};
-enum class template_option {versioning};
+enum class template_option {versioning, modularization};
 enum class subsetts { file_generator, part_data, part_forwards };
 
 typedef std::variant<part_option, part_idl_filter, template_option> any_option;

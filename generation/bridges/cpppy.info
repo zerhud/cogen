@@ -1,0 +1,45 @@
+defaults {
+	filegen cpp
+	naming underscore
+}
+gen
+{
+	cpp_dec {
+		input declarations.jinja
+		output declarations.hpp
+	}
+	header {
+		inc_part cpp_dec
+		input header.jinja
+		output modules.hpp
+		filter {
+			sel interface
+			sel record
+		}
+	}
+	definition {
+		inc_part cpp_dec
+		inc_part header
+		input definitions.jinja
+		output modules.cpp
+	}
+	cmake {
+		filegen cmake
+		input plain.jinja
+		output CMakeLists.txt
+		project interface
+		libraries {
+			interface {
+				part cpp_dec
+				part header
+				part definition
+			}
+		}
+	}
+	pymod {
+		filegen python
+		input python/cpppy.jinja
+		output %mod%.py
+		modularization "split"
+	}
+}

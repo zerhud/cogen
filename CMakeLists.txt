@@ -23,11 +23,12 @@ set(main_config_file "${config_files_dir}/config.hpp")
 set(templates_dir "share/modegen")
 set(dbg_templates_dir "${config_files_dir}/${templates_dir}")
 set(rls_templates_dir "${CMAKE_INSTALL_PREFIX}/${templates_dir}")
-set(dbg_cpp_templates_dir "generation/cpp")
 set(dbg_cpp_templates_dir "${dbg_templates_dir}/cpp")
 set(rls_cpp_templates_dir "${rls_templates_dir}/cpp")
 set(dbg_cmake_templates_dir "${dbg_templates_dir}/cmake")
 set(rls_cmake_templates_dir "${rls_templates_dir}/cmake")
+set(dbg_python_templates_dir "${dbg_templates_dir}/python")
+set(rls_python_templates_dir "${rls_templates_dir}/python")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
 	set(templates_dir_path "${rls_templates_dir}")
@@ -64,6 +65,7 @@ target_sources_local(modegen_interfaces provider.hpp  provider.cpp  "generation/
 target_sources_local(modegen_interfaces common.hpp    common.cpp    "generation/")
 target_sources_local(modegen_interfaces file_data.hpp file_data.cpp "generation/")
 target_sources_local(modegen_interfaces cpp.hpp       cpp.cpp       "generation/")
+target_sources_local(modegen_interfaces python.hpp    python.cpp    "generation/")
 target_sources_local(modegen_interfaces cmake.hpp     cmake.cpp     "generation/")
 target_sources_copy(modegen_interfaces "${dbg_cpp_templates_dir}"
 	generation/cpp/declarations.info generation/cpp/render.jinja
@@ -71,6 +73,11 @@ target_sources_copy(modegen_interfaces "${dbg_cpp_templates_dir}"
 	)
 target_sources_copy(modegen_interfaces "${dbg_cmake_templates_dir}"
 	generation/cmake/plain.jinja
+	)
+target_sources_copy(modegen_interfaces "${dbg_python_templates_dir}"
+	generation/bridges/cpppy.info
+	generation/bridges/pycpp.info
+	generation/bridges/cpppy.jinja
 	)
 # generation part for interface
 target_sources_local(modegen_interfaces to_json.hpp to_json.cpp "generation/interface/")

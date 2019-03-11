@@ -81,7 +81,12 @@ std::string mo::container::descr_message(mo::part_option opt)
 
 std::string mo::container::descr_message(mo::template_option opt)
 {
-	return "split by versions: append version to module name; no: ignore version; enitity: append version to entity name"s;
+	if(opt==template_option::versioning)
+		return "split by versions: append version to module name; no: ignore version; enitity: append version to entity name"s;
+	if(opt==template_option::modularization)
+		return "split: module per file; combine: all modules in one file"s;
+	assert(false);
+	return "unknown tempalte options"s;
 }
 
 std::string mo::container::solve_key(mo::any_option key)
@@ -104,7 +109,6 @@ std::string mo::container::solve_key(part_option opt)
 {
 	if(opt==part_option::input) return "input"s;
 	if(opt==part_option::output) return "output"s;
-	TODO("change name to filegen");
 	if(opt==part_option::file_generator) return "filegen"s;
 	if(opt==part_option::naming) return "naming"s;
 	assert(false);
@@ -114,6 +118,7 @@ std::string mo::container::solve_key(part_option opt)
 std::string mo::container::solve_key(template_option opt)
 {
 	if(opt==template_option::versioning) return "versioning"s;
+	if(opt==template_option::modularization) return "modularization"s;
 	assert(false);
 	return ""s;
 }

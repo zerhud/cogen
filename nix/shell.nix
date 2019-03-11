@@ -2,7 +2,7 @@
 	  system ? builtins.currentSystem
 	, pkgs ? import<nixos-unstable> { inherit system; }
 	, compiler_name ? "gcc8"
-        , enable_clcov ? false
+	, enable_clcov ? false
 }:
 
 let

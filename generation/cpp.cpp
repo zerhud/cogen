@@ -7,7 +7,6 @@
  *************************************************************************/
 
 #include "cpp.hpp"
-
 #include <boost/property_tree/json_parser.hpp>
 
 #include "errors.h"
