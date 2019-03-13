@@ -12,6 +12,8 @@
 #include <string_view>
 #include <nlohman/json.hpp>
 #include <boost/property_tree/ptree.hpp>
+
+#include "declaration.hpp"
 #include "parser/loader.hpp"
 #include "options.hpp"
 

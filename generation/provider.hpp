@@ -8,10 +8,9 @@
 
 #pragma once
 
-#include "config.hpp"
-#include FILESYSTEM
 #include <nlohman/json.hpp>
 
+#include "declaration.hpp"
 #include "common.hpp"
 #include "file_data.hpp"
 #include "parser/loader.hpp"

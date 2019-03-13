@@ -8,18 +8,12 @@
 
 #pragma once
 
-#include "config.hpp"
-
-#include <memory>
-#include FILESYSTEM
-
 #include <boost/property_tree/ptree.hpp>
+
+#include "declaration.hpp"
 
 namespace modegen::generation::options {
 
-class container;
-typedef std::shared_ptr<container> container_ptr;
-typedef std::variant<std::string, FS::path> descriptor_t;
 
 enum class part_option {input, output, file_generator, naming};
 enum class part_idl_filter {part_selection, mod_name, content_name, modificator};

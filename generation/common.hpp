@@ -8,28 +8,17 @@
 
 #pragma once
 
-#include "config.hpp"
-
 #include <memory>
-#include FILESYSTEM
 #include <string_view>
 #include <nlohman/json.hpp>
 #include <boost/property_tree/ptree.hpp>
 
+#include "declaration.hpp"
 #include "parser/interface/modegen.hpp"
 #include "options.hpp"
 
 namespace modegen {
 namespace generation {
-
-/// generation environment
-class tmpl_gen_env ;
-
-class provider; ///< provides data for generation
-typedef std::shared_ptr<provider> provider_ptr;
-
-class file_data ; ///< provides data for concreate file generation
-typedef std::shared_ptr<file_data> file_data_ptr;
 
 class part_descriptor {
 public:

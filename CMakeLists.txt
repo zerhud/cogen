@@ -60,6 +60,7 @@ target_sources_local(modegen_interfaces check.hpp           check.cpp           
 target_sources_local(modegen_interfaces loader.hpp          loader.cpp          "parser/data_tree/")
 target_sources_local(modegen_interfaces ptree_merge.hpp     ""                  "parser/data_tree/")
 # generations
+target_sources_local(modegen_interfaces "generation/declaration.hpp" "" "")
 target_sources_local(modegen_interfaces options.hpp   options.cpp   "generation/")
 target_sources_local(modegen_interfaces provider.hpp  provider.cpp  "generation/")
 target_sources_local(modegen_interfaces common.hpp    common.cpp    "generation/")
