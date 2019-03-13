@@ -14,6 +14,29 @@
 using namespace std::literals;
 namespace mg = modegen::generation;
 
+mg::single_part_descriptor::single_part_descriptor(std::string pname)
+    : name_(std::move(pname))
+{
+}
+
+mg::single_part_descriptor::~single_part_descriptor() noexcept
+{
+}
+std::string mg::single_part_descriptor::origin_name() const
+{
+	return name_;
+}
+
+std::string mg::single_part_descriptor::name() const
+{
+	return name_;
+}
+
+bool mg::single_part_descriptor::next() const
+{
+	return false;
+}
+
 mg::generator::generator(mg::provider_ptr p, const FS::path& i)
 	: prov(std::move(p))
 	, opts(std::make_shared<options::container>())
@@ -40,7 +63,9 @@ void mg::generator::generate(const FS::path& output_dir) const
 	assert( opts );
 	auto plist = opts->part_list();
 	for(auto& p:plist) {
-		nlohmann::json data = generate_data(p);
+		file_data_ptr tg = prov->generator(cur_filegen(p));
+		auto pdest = part_info(p, *tg);
+		nlohmann::json data = generate_data(*pdest, *tg);
 		if(data.empty()) throw errors::gen_error("common", "no data for output in "s + p);
 
 		tmpl_gen_env gdata(std::move(data), tmpl_path(p));
@@ -53,21 +78,22 @@ void mg::generator::generate(const FS::path& output_dir) const
 void mg::generator::generate_stdout(std::string_view part) const
 {
 	assert( prov );
-	nlohmann::json data = generate_data(part);
+
+	file_data_ptr tg = prov->generator(cur_filegen(part));
+	auto pdest = part_info(part, *tg);
+	nlohmann::json data = generate_data(*pdest, *tg);
+
 	tmpl_gen_env gdata(std::move(data), tmpl_path(part));
 	build_extra_env(gdata, part);
 	prov->json_jinja( gdata );
 }
 
-nlohmann::json mg::generator::generate_data(std::string_view part) const
+nlohmann::json mg::generator::generate_data(const part_descriptor& part, const file_data& fdg) const
 {
 	assert( prov );
 
-	auto tg = prov->generator(cur_filegen(part));
-
-	assert(tg);
-	options::view props(opts, part);
-	return tg->jsoned_data(prov->parsers(), std::move(props));
+	options::view props(opts, part.origin_name());
+	return fdg.jsoned_data(prov->parsers(), std::move(props));
 }
 
 FS::path mg::generator::output_path(std::string_view part) const
@@ -111,4 +137,12 @@ std::string mg::generator::cur_filegen(std::string_view part) const
 	assert( opts );
 	std::string p(part);
 	return opts->get<std::string>(options::part_option::file_generator, p, ""s);
+}
+
+std::unique_ptr<mg::part_descriptor> mg::generator::part_info(std::string_view p, const file_data& fdg) const
+{
+	//auto ret = fdg.part_info(p);
+	//if(!ret) ret = std::make_unique<single_part_descriptor>(std::string(p));
+	//return ret;
+	return std::make_unique<single_part_descriptor>(std::string(p));
 }
