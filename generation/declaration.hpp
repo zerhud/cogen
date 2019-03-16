@@ -36,7 +36,7 @@ typedef std::shared_ptr<file_data> file_data_ptr;
 
 /// describes generation part, contains extra info, provied by file generator
 /// or contains just part info from settings if no special part generation are used
-class part_descrioptor;
+class part_descriptor;
 
 /// common generator: reads input settings (from info file for example), and
 /// create output with file_data generators, creates generation environment

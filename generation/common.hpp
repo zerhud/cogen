@@ -20,24 +20,6 @@
 namespace modegen {
 namespace generation {
 
-class part_descriptor {
-public:
-	virtual ~part_descriptor() noexcept =default ;
-	virtual std::string origin_name() const =0 ;
-	virtual std::string name() const =0 ;
-	virtual bool next() const =0 ;
-};
-
-class single_part_descriptor : public part_descriptor {
-	std::string name_;
-public:
-	single_part_descriptor(std::string pname);
-	~single_part_descriptor() noexcept override ;
-	std::string origin_name() const override ;
-	std::string name() const override ;
-	bool next() const override ;
-};
-
 /// generates files from info file and parameters
 class generator {
 public:
@@ -55,12 +37,11 @@ public:
 	/// generate only one part into std::cout
 	void generate_stdout(std::string_view part) const ;
 private:
-	FS::path output_path(std::string_view part) const ;
-	FS::path tmpl_path(std::string_view part) const ;
+	FS::path tmpl_path(part_descriptor& part) const ;
 	nlohmann::json generate_data(const part_descriptor& part, const file_data& fdg) const ;
-	void build_extra_env(tmpl_gen_env& env, std::string_view part) const ;
-	std::string cur_filegen(std::string_view part) const ;
-	std::unique_ptr<part_descriptor> part_info(std::string_view p, const file_data& fdg) const ;
+	void build_extra_env(tmpl_gen_env& env, const part_descriptor& part) const ;
+	std::string cur_filegen(const part_descriptor& part) const ;
+	std::unique_ptr<part_descriptor> part_info(std::string_view p) const ;
 
 	provider_ptr prov;
 	options::container_ptr opts;

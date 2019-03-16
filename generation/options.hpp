@@ -36,7 +36,7 @@ public:
 	boost::property_tree::ptree get_subset(subsetts s, const std::string& part, const std::string& param) const ;
 
 	template<typename T>
-	T get(any_option key, const std::string& part, const std::string& fgen)
+	T get(any_option key, const std::string& part, const std::string& fgen) const
 	{
 		auto test_ret = opts.get_optional<T>(make_part_key(key, part));
 		if(!test_ret) return opts.get<T>(make_part_default_key(key,part));
@@ -44,7 +44,7 @@ public:
 	}
 
 	template<typename T>
-	std::optional<T> get_opt(any_option key, const std::string& part, const std::string& fgen)
+	std::optional<T> get_opt(any_option key, const std::string& part, const std::string& fgen) const
 	{
 		auto test_ret = opts.get_optional<T>(make_part_key(key,part));
 		if(!test_ret) test_ret = opts.get_optional<T>(make_part_default_key(key, part));
@@ -52,7 +52,7 @@ public:
 	}
 
 	template<typename T>
-	std::vector<T> get_vec(any_option key, const std::string& part, const std::string& fgen)
+	std::vector<T> get_vec(any_option key, const std::string& part, const std::string& fgen) const
 	{
 		std::vector<T> ret;
 
@@ -112,7 +112,7 @@ public:
 	boost::property_tree::ptree get_subset(subsetts s, const std::string& param="", const std::string& part="") const ;
 
 	template<typename T>
-	T get(any_option key, const std::string& part="", const std::string& fgen="")
+	T get(any_option key, const std::string& part="", const std::string& fgen="") const
 	{
 		return opts->get<T>(
 				key,
@@ -122,7 +122,7 @@ public:
 	}
 
 	template<typename T>
-	std::optional<T> get_opt(any_option key, const std::string& part="", const std::string& fgen="")
+	std::optional<T> get_opt(any_option key, const std::string& part="", const std::string& fgen="") const
 	{
 		return opts->get_opt<T>(
 				key,
@@ -132,7 +132,7 @@ public:
 	}
 
 	template<typename T>
-	std::vector<T> get_vec(any_option key, const std::string& part="", const std::string& fgen="")
+	std::vector<T> get_vec(any_option key, const std::string& part="", const std::string& fgen="") const
 	{
 		return opts->get_vec<T>(
 				key,

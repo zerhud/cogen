@@ -11,3 +11,5 @@
 
 using namespace std::literals;
 namespace mg = modegen::generation;
+
+TODO("remo this file and header, move file_data interface into declarations.hpp (if no code here)")

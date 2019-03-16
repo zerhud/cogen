@@ -23,7 +23,6 @@ class file_data {
 public:
 	virtual ~file_data() noexcept =default ;
 	virtual nlohmann::json jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const =0 ;
-	//virtual std::unique_ptr<part_description> part_info(std::string_view name, options::view opts) const =0 ;
 };
 
 } // namespace modegen::generation
