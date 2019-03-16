@@ -37,7 +37,5 @@ public:
 	bool next() const override ;
 };
 
-std::unique_ptr<part_descriptor> create_part_descriptor(options::view v, std::vector<parser::loader_ptr> prs);
-
 } // namespace generation
 } //  namespace modegen

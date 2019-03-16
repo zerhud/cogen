@@ -73,6 +73,7 @@ std::string mo::container::descr_message(mo::part_option opt)
 {
 	if(opt==part_option::input) return "tempalte file"s;
 	if(opt==part_option::output) return "the generated file in result dir"s;
+	if(opt==part_option::output_name_gen) return "output file name generator"s;
 	if(opt==part_option::file_generator) return "which generator use to provide data tree"s;
 	if(opt==part_option::naming) return "the name convension to use"s;
 	assert(false);
@@ -109,6 +110,7 @@ std::string mo::container::solve_key(part_option opt)
 {
 	if(opt==part_option::input) return "input"s;
 	if(opt==part_option::output) return "output"s;
+	if(opt==part_option::output_name_gen) return "output_ng"s;
 	if(opt==part_option::file_generator) return "filegen"s;
 	if(opt==part_option::naming) return "naming"s;
 	assert(false);

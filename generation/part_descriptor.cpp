@@ -14,12 +14,6 @@ using namespace std::literals;
 namespace mg = modegen::generation;
 namespace mp = modegen::parser;
 
-std::unique_ptr<mg::part_descriptor> mg::create_part_descriptor(mg::options::view v, std::vector<mp::loader_ptr> prs)
-{
-	(void) prs;
-	return std::make_unique<single_part_descriptor>(std::move(v));
-}
-
 mg::single_part_descriptor::single_part_descriptor(mg::options::view o)
     : opts_(std::move(o))
 {

@@ -15,7 +15,7 @@
 namespace modegen::generation::options {
 
 
-enum class part_option {input, output, file_generator, naming};
+enum class part_option {input, output, output_name_gen, file_generator, naming};
 enum class part_idl_filter {part_selection, mod_name, content_name, modificator};
 enum class template_option {versioning, modularization};
 enum class subsetts { file_generator, part_data, part_forwards };

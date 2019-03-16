@@ -21,6 +21,7 @@
 #include "generation/cpp.hpp"
 #include "generation/cmake.hpp"
 #include "generation/python.hpp"
+#include "generation/part_descriptor.hpp"
 
 #include "parser/interface/loader.hpp"
 
@@ -132,6 +133,12 @@ public:
 		std::string err_msg = u8"cannot find file "s + p.generic_u8string() + u8"\ntry to search in:\n"s;
 		for(const auto& sp:final_search) err_msg += u8"\t" + sp.generic_u8string() + u8"\n"s;
 		throw std::runtime_error(err_msg);
+	}
+
+	std::unique_ptr<mg::part_descriptor> create_part_descriptor(mg::options::view v) const override
+	{
+		TODO("create here using options diff gens")
+		return std::make_unique<mg::single_part_descriptor>(std::move(v));
 	}
 
 	std::vector<std::string> list_target() const

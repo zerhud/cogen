@@ -53,6 +53,7 @@ public:
 	virtual file_data_ptr generator(std::string_view name) const =0 ;
 	virtual void json_jinja(const tmpl_gen_env& data) const =0 ;
 	virtual FS::path resolve_file(const FS::path& p, const FS::path& assumed, std::string_view gen_name) const =0 ;
+	virtual std::unique_ptr<part_descriptor> create_part_descriptor(options::view v) const =0 ;
 };
 
 } // namespace modegen::generation {

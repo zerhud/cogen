@@ -114,5 +114,5 @@ std::unique_ptr<mg::part_descriptor> mg::generator::part_info(std::string_view p
 	assert( opts );
 	assert( prov );
 	options::view v(opts, p);
-	return create_part_descriptor(std::move(v), prov->parsers());
+	return prov->create_part_descriptor(std::move(v));
 }
