@@ -34,7 +34,7 @@ std::string mg::single_part_descriptor::file_name() const
 	return *val;
 }
 
-bool mg::single_part_descriptor::next() const
+bool mg::single_part_descriptor::next()
 {
 	return false;
 }

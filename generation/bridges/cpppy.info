@@ -40,7 +40,7 @@ gen
 		filegen python
 		input python/cpppy.jinja
 		output %mod%.py
-		output_name_generator interface
+		output_ng interface
 		modularization "split"
 	}
 }

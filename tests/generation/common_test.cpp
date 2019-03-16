@@ -62,7 +62,7 @@ struct ab_part_desc : modegen::generation::part_descriptor {
 	std::string part_name() const override {return std::string(opts_.part()); }
 	const mo::view& opts() const override {return opts_;}
 	bool need_output() const override {return cur_iter < 2;}
-	bool next() const override {return cur_iter < 2;}
+	bool next() override {return cur_iter < 2;}
 	std::string file_name() const override
 	{
 		++cur_iter;

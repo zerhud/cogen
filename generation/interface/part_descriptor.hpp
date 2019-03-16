@@ -8,28 +8,19 @@
 
 #pragma once
 
-#include "options.hpp"
-#include "declaration.hpp"
 #include "parser/loader.hpp"
+#include "generation/part_descriptor.hpp"
 
-namespace modegen {
-namespace generation {
+namespace modegen::generation::interface {
 
-class part_descriptor {
-public:
-	virtual ~part_descriptor() noexcept =default ;
-	virtual std::string part_name() const =0 ;
-	virtual std::string file_name() const =0 ;
-	virtual const options::view& opts() const =0 ;
-	virtual bool need_output() const =0 ;
-	virtual bool next() =0 ;
-};
 
-class single_part_descriptor : public part_descriptor {
+class part_descriptor : public generation::part_descriptor {
 	options::view opts_;
+	std::vector<std::string> mods_;
+	std::size_t cur_pos = 0;
 public:
-	single_part_descriptor(options::view o);
-	~single_part_descriptor() noexcept override ;
+	part_descriptor(options::view o, std::vector<parser::loader_ptr> ldrs);
+
 	std::string part_name() const override ;
 	std::string file_name() const override ;
 	const options::view& opts() const override ;
@@ -37,5 +28,4 @@ public:
 	bool next() override ;
 };
 
-} // namespace generation
-} //  namespace modegen
+} // namespace modegen::generation::interface
