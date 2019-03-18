@@ -7,7 +7,7 @@
  *************************************************************************/
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE modegen_parser
+#define BOOST_TEST_MODULE cpp file generator
 
 #include <boost/test/unit_test.hpp>
 #include <turtle/mock.hpp>
@@ -66,6 +66,7 @@ BOOST_AUTO_TEST_CASE( extra_namespaces )
 {
 	auto opts_tree = std::make_shared<mo::container>();
 	opts_tree->raw().put("gen.def.input", "fake_tmpl");
+	opts_tree->raw().put("gen.def.output", "o");
 	opts_tree->raw().add("filegen.cpp.namespaces", "ns1");
 	opts_tree->raw().add("filegen.cpp.namespaces", "ns2");
 	mg::cpp_generator gen;
@@ -74,7 +75,11 @@ BOOST_AUTO_TEST_CASE( extra_namespaces )
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
 
-	nlohmann::json data = gen.jsoned_data({ldr}, opts);
+	auto _data = gen.jsoned_data({ldr}, opts);
+	BOOST_REQUIRE_EQUAL(_data.size(), 1);
+	BOOST_CHECK_EQUAL(_data[0].out_file, "o");
+
+	nlohmann::json& data = _data[0].data;
 	BOOST_REQUIRE_EQUAL( data["namespaces"].size(), 2 );
 	BOOST_CHECK_EQUAL( data["namespaces"][0], "ns1" );
 	BOOST_CHECK_EQUAL( data["namespaces"][1], "ns2" );
@@ -87,6 +92,7 @@ BOOST_AUTO_TEST_CASE(extra_data)
 {
 	auto opts_tree = std::make_shared<mo::container>();
 	opts_tree->raw().put("gen.def.input", "fake_tmpl");
+	opts_tree->raw().put("gen.def.output", "o");
 	mg::cpp_generator gen;
 	mg::options::view opts(opts_tree, "def"sv);
 
@@ -96,14 +102,21 @@ BOOST_AUTO_TEST_CASE(extra_data)
 	auto dldr = std::make_shared<fake_data_tree_loader>();
 	dldr->data.put("some", "data");
 
-	nlohmann::json data = gen.jsoned_data({ldr,dldr}, opts);
+	auto _data = gen.jsoned_data({ldr,dldr}, opts);
+	BOOST_REQUIRE_EQUAL(_data.size(), 1);
+	BOOST_CHECK_EQUAL(_data[0].out_file, "o");
+
+	nlohmann::json& data = _data[0].data;
 	BOOST_CHECK_EQUAL(data["extra_data"s]["some"s], "data"s);
 
-	data = gen.jsoned_data({ldr,nullptr,dldr}, opts);
-	BOOST_CHECK_EQUAL(data["extra_data"s]["some"s], "data"s);
+	auto _data2 = gen.jsoned_data({ldr,nullptr,dldr}, opts);
+	BOOST_REQUIRE_EQUAL(_data2.size(), 1);
+
+	nlohmann::json& data2 = _data2[0].data;
+	BOOST_CHECK_EQUAL(data2["extra_data"s]["some"s], "data"s);
 
 	std::stringstream out;
-	BOOST_CHECK_NO_THROW(out << data);
+	BOOST_CHECK_NO_THROW(out << data2);
 }
 
 BOOST_AUTO_TEST_SUITE(prefix_suffix)
@@ -111,6 +124,7 @@ BOOST_AUTO_TEST_CASE( ctor_prefix_ptr_siffux )
 {
 	auto opts_tree = std::make_shared<mo::container>();
 	opts_tree->raw().put("gen.def.input", "fake_tmpl");
+	opts_tree->raw().put("gen.def.output", "o");
 	opts_tree->raw().add("filegen.cpp.ctor_prefix", "ctor_");
 	opts_tree->raw().add("filegen.cpp.ptr_suffix", "_ptR");
 	mg::cpp_generator gen;
@@ -119,7 +133,11 @@ BOOST_AUTO_TEST_CASE( ctor_prefix_ptr_siffux )
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
 
-	nlohmann::json data = gen.jsoned_data({ldr}, opts);
+	auto _data = gen.jsoned_data({ldr}, opts);
+	BOOST_REQUIRE_EQUAL(_data.size(), 1);
+	BOOST_CHECK_EQUAL(_data[0].out_file, "o");
+
+	nlohmann::json& data = _data[0].data;
 	BOOST_CHECK_EQUAL( data["ctor_prefix"], "ctor_" );
 	BOOST_CHECK_EQUAL( data["ptr_suffix"], "_ptR" );
 }
@@ -127,33 +145,41 @@ BOOST_AUTO_TEST_CASE( defaults )
 {
 	auto opts_tree = std::make_shared<mo::container>();
 	opts_tree->raw().put("gen.def.input", "fake_tmpl");
+	opts_tree->raw().put("gen.def.output", "out");
 	mg::cpp_generator gen;
 	mg::options::view opts(opts_tree, "def"sv);
 
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
 
-	nlohmann::json data = gen.jsoned_data({ldr}, opts);
+	auto _data = gen.jsoned_data({ldr}, opts);
+	BOOST_REQUIRE_EQUAL(_data.size(), 1);
+	BOOST_CHECK_EQUAL(_data[0].out_file, "out");
+
+	nlohmann::json data = std::move(_data[0].data);
 	BOOST_CHECK_EQUAL( data["ctor_prefix"], "create_" );
 	BOOST_CHECK_EQUAL( data["ptr_suffix"], "_ptr" );
 
 	opts_tree->raw().put("gen.def.naming", "title");
-	data = gen.jsoned_data({ldr}, opts);
+	data = gen.jsoned_data({ldr}, opts)[0].data;
 	BOOST_CHECK_EQUAL( data["ctor_prefix"], "Create" );
 	BOOST_CHECK_EQUAL( data["ptr_suffix"], "Ptr" );
 
 	opts_tree->raw().put("gen.def.naming", "camel");
-	data = gen.jsoned_data({ldr}, opts);
+	data = gen.jsoned_data({ldr}, opts)[0].data;
+	BOOST_REQUIRE_EQUAL(_data.size(), 1);
 	BOOST_CHECK_EQUAL( data["ctor_prefix"], "create" );
 	BOOST_CHECK_EQUAL( data["ptr_suffix"], "Ptr" );
 
 	opts_tree->raw().put("gen.def.naming", "underscore");
-	data = gen.jsoned_data({ldr}, opts);
+	data = gen.jsoned_data({ldr}, opts)[0].data;
+	BOOST_REQUIRE_EQUAL(_data.size(), 1);
 	BOOST_CHECK_EQUAL( data["ctor_prefix"], "create_" );
 	BOOST_CHECK_EQUAL( data["ptr_suffix"], "_ptr" );
 
 	opts_tree->raw().put("gen.def.naming", "asis");
-	data = gen.jsoned_data({ldr}, opts);
+	data = gen.jsoned_data({ldr}, opts)[0].data;
+	BOOST_REQUIRE_EQUAL(_data.size(), 1);
 	BOOST_CHECK_EQUAL( data["ctor_prefix"], "create_" );
 	BOOST_CHECK_EQUAL( data["ptr_suffix"], "_ptr" );
 }
@@ -164,13 +190,18 @@ BOOST_AUTO_TEST_CASE( without_includes )
 {
 	auto opts_tree = std::make_shared<mo::container>();
 	opts_tree->raw().put("gen.def.input", "fake_tmpl");
+	opts_tree->raw().put("gen.def.output", "o");
 	mg::cpp_generator gen;
 	mg::options::view opts(opts_tree, "def"sv);
 
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: int foo();"sv).mods;
 
-	nlohmann::json data = gen.jsoned_data({ldr}, opts);
+	auto _data = gen.jsoned_data({ldr}, opts);
+	BOOST_REQUIRE_EQUAL(_data.size(), 1);
+	BOOST_CHECK_EQUAL(_data[0].out_file, "o");
+
+	nlohmann::json& data = _data[0].data;
 	BOOST_REQUIRE_EQUAL( data["mods"].size(), 1 );
 	BOOST_REQUIRE_EQUAL( data["mods"][0]["content"].size(), 1 );
 	BOOST_CHECK_EQUAL( data["mods"][0]["content"][0]["type"], "function" );
@@ -181,13 +212,18 @@ BOOST_AUTO_TEST_CASE(with_lnag_includes)
 {
 	auto opts_tree = std::make_shared<mo::container>();
 	opts_tree->raw().put("gen.def.input", "fake_tmpl");
+	opts_tree->raw().put("gen.def.output", "o");
 	mg::cpp_generator gen;
 	mg::options::view opts(opts_tree, "def"sv);
 
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: string foo(date d, list<i8> l);"sv).mods;
 
-	nlohmann::json data = gen.jsoned_data({ldr}, opts);
+	auto _data = gen.jsoned_data({ldr}, opts);
+	BOOST_REQUIRE_EQUAL(_data.size(), 1);
+	BOOST_CHECK_EQUAL(_data[0].out_file, "o");
+
+	nlohmann::json& data = _data[0].data;
 	BOOST_REQUIRE( data.contains("incs") );
 	BOOST_REQUIRE_EQUAL( data["incs"].size(), 4 );
 	// order sorted by alphabet
@@ -203,6 +239,7 @@ BOOST_AUTO_TEST_CASE(with_lnag_includes)
 BOOST_AUTO_TEST_CASE(with_setts_includes)
 {
 	auto opts_tree = std::make_shared<mo::container>();
+	opts_tree->raw().add("gen.hpp.output", "output");
 	opts_tree->raw().add("gen.hpp.inc_part", "def");
 	opts_tree->raw().add("gen.hpp.inc_part", "test");
 	opts_tree->raw().add("gen.hpp.inc_local", "local.hpp");
@@ -217,7 +254,7 @@ BOOST_AUTO_TEST_CASE(with_setts_includes)
 
 	auto ldr = std::make_shared<fake_mi_loader>();
 	ldr->data = mi::parse("module mod v1.0: string foo(date d, list<i8> l);"sv).mods;
-	nlohmann::json data = gen.jsoned_data({ldr}, opts);
+	nlohmann::json data = gen.jsoned_data({ldr}, opts)[0].data;
 
 	BOOST_REQUIRE( data.contains("incs") );
 	BOOST_REQUIRE_EQUAL( data["incs"].size(), 10 );
@@ -264,12 +301,36 @@ BOOST_AUTO_TEST_CASE(wrong_loader)
 	BOOST_CHECK_THROW( gen.jsoned_data({nullptr}, opts), modegen::errors::gen_error );
 	BOOST_CHECK_THROW( gen.jsoned_data({std::make_shared<fake_wrong_loader>()}, opts), modegen::errors::gen_error );
 }
-BOOST_AUTO_TEST_CASE( no_part_opts )
+BOOST_AUTO_TEST_CASE(no_part_opts)
 {
 	auto opts_tree = std::make_shared<mo::container>();
 	mg::cpp_generator gen;
 	mg::options::view opts(opts_tree, "def"sv);
 
 	BOOST_CHECK_THROW( gen.jsoned_data({std::make_shared<fake_mi_loader>()}, opts), modegen::errors::error );
+}
+BOOST_AUTO_TEST_CASE(no_output)
+{
+	auto opts_tree = std::make_shared<mo::container>();
+	opts_tree->raw().put("gen.def.filegen", "cpp") ;
+	opts_tree->raw().put("gen.def.input", "def.hpp.jinja") ;
+	opts_tree->raw().put("gen.def.test", "test_data") ;
+
+	mg::cpp_generator gen;
+	mg::options::view opts(opts_tree, "def"sv);
+
+	auto ldr = std::make_shared<fake_mi_loader>();
+	ldr->data = mi::parse("module mod v1.0: string foo(date d, list<i8> l);"sv).mods;
+	BOOST_CHECK_THROW( gen.jsoned_data({ldr}, opts), modegen::errors::error );
+}
+BOOST_AUTO_TEST_CASE(no_data)
+{
+	auto opts_tree = std::make_shared<mo::container>();
+
+	mg::cpp_generator gen;
+	mg::options::view opts(opts_tree, "def"sv);
+
+	auto ldr = std::make_shared<fake_mi_loader>();
+	BOOST_CHECK_THROW( gen.jsoned_data({ldr}, opts), modegen::errors::no_data );
 }
 BOOST_AUTO_TEST_SUITE_END() // error_data

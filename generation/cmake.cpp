@@ -13,7 +13,7 @@ using namespace std::literals;
 namespace mg = modegen::generation;
 using boost::property_tree::ptree;
 
-nlohmann::json mg::cmake::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const
+std::vector<mg::file_data::output_info> mg::cmake::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const
 {
 	(void) data_loaders;
 
@@ -35,5 +35,8 @@ nlohmann::json mg::cmake::jsoned_data(const std::vector<parser::loader_ptr>& dat
 		data["libraries"][l.first]["files"] = files;
 	}
 
-	return data;
+	output_info ret;
+	ret.data = std::move(data);
+	ret.out_file = opts.get<std::string>(options::part_option::output);
+	return {ret};
 }

@@ -41,55 +41,50 @@ void mg::generator::generate(const FS::path& output_dir) const
 	assert( opts );
 	auto plist = opts->part_list();
 	for(auto& p:plist) {
-		std::unique_ptr<part_descriptor> pdest = part_info(p);
-		if(!pdest->need_output()) continue;
-
-		do {
-			file_data_ptr tg = prov->generator(cur_filegen(*pdest));
-			nlohmann::json data = generate_data(*pdest, *tg);
-			if(data.empty()) throw errors::gen_error("common", "no data for output in "s + p);
-
-			tmpl_gen_env gdata(std::move(data), tmpl_path(*pdest));
-			gdata.out_file(output_dir / pdest->file_name());
-			build_extra_env(gdata, *pdest);
+		mg::options::view part_opts(opts, p);
+		file_data_ptr tg = prov->generator(cur_filegen(part_opts));
+		std::vector<file_data::output_info> info = tg->jsoned_data(prov->parsers(), part_opts);
+		for(auto& oi:info) {
+			tmpl_gen_env gdata(std::move(oi.data), tmpl_path(part_opts));
+			gdata.out_file(output_dir / oi.out_file);
+			build_extra_env(gdata, part_opts);
 			prov->json_jinja( gdata );
-		} while(pdest->next());
+		}
 	}
 }
 
 void mg::generator::generate_stdout(std::string_view part) const
 {
 	assert( prov );
+	assert( opts );
 
-	std::unique_ptr<part_descriptor> pdest = part_info(part);
-	file_data_ptr tg = prov->generator(cur_filegen(*pdest));
-	nlohmann::json data = generate_data(*pdest, *tg);
-
-	tmpl_gen_env gdata(std::move(data), tmpl_path(*pdest));
-	build_extra_env(gdata, *pdest);
-	prov->json_jinja( gdata );
+	mg::options::view part_opts(opts, part);
+	file_data_ptr tg = prov->generator(cur_filegen(part_opts));
+	std::vector<file_data::output_info> infos = tg->jsoned_data(prov->parsers(), part_opts);
+	for(auto& p:infos) {
+		tmpl_gen_env gdata(std::move(p.data), tmpl_path(part_opts));
+		build_extra_env(gdata, part_opts);
+		prov->json_jinja( gdata );
+	}
 }
 
-nlohmann::json mg::generator::generate_data(const part_descriptor& part, const file_data& fdg) const
+FS::path mg::generator::tmpl_path(options::view& opts) const
 {
 	assert( prov );
-
-	options::view props(opts, part.part_name());
-	return fdg.jsoned_data(prov->parsers(), std::move(props));
+	FS::path input = opts.get_opt<std::string>(options::part_option::input).value_or(std::string(opts.part()) + u8".jinja"s);
+	return prov->resolve_file(input, info_directory, cur_filegen(opts));
 }
 
 FS::path mg::generator::tmpl_path(part_descriptor& part) const
 {
-	assert( prov );
-	FS::path input = part.opts().get_opt<std::string>(options::part_option::input).value_or(part.part_name() + u8".jinja"s);
-	return prov->resolve_file(input, info_directory, cur_filegen(part));
+	return tmpl_path(part.opts());
 }
 
-void mg::generator::build_extra_env(tmpl_gen_env& env, const part_descriptor& part) const
+void mg::generator::build_extra_env(tmpl_gen_env& env, options::view& part_opts) const
 {
 	assert( opts );
 
-	options::forwards_view fw(opts, part.part_name());
+	options::forwards_view fw(opts, part_opts.part());
 	auto before = fw.before();
 	if(before) env.exec_before(*before);
 
@@ -99,14 +94,14 @@ void mg::generator::build_extra_env(tmpl_gen_env& env, const part_descriptor& pa
 	auto ex_list = fw.ex_list();
 	for(auto ex:ex_list) {
 		if(std::holds_alternative<FS::path>(ex.source))
-			ex.source = prov->resolve_file(std::get<FS::path>(ex.source), info_directory, cur_filegen(part) );
+			ex.source = prov->resolve_file(std::get<FS::path>(ex.source), info_directory, cur_filegen(part_opts) );
 		env.emb_fnc(ex.name, ex.source);
 	}
 }
 
-std::string mg::generator::cur_filegen(const part_descriptor& part) const
+std::string mg::generator::cur_filegen(options::view& opts) const
 {
-	return part.opts().get<std::string>(options::part_option::file_generator);
+	return opts.get<std::string>(options::part_option::file_generator);
 }
 
 std::unique_ptr<mg::part_descriptor> mg::generator::part_info(std::string_view p) const

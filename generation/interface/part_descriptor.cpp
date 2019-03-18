@@ -44,7 +44,7 @@ std::string mi::part_descriptor::file_name() const
 	return output_name;
 }
 
-const mg::options::view& mi::part_descriptor::opts() const
+mg::options::view& mi::part_descriptor::opts()
 {
 	return opts_;
 }

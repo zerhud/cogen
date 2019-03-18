@@ -22,7 +22,9 @@ using namespace std::literals;
 namespace mg = modegen::generation;
 namespace mp = modegen::parser;
 namespace mo = modegen::generation::options;
+
 namespace fs = FS;
+namespace utests = boost::unit_test_framework;
 
 MOCK_BASE_CLASS( provider_mock, modegen::generation::provider )
 {
@@ -41,16 +43,20 @@ class fake_target : public modegen::parser::loader {
 
 struct fake_data_gen : modegen::generation::file_data {
 	bool gen_data = true;
-	nlohmann::json jsoned_data(const std::vector<mp::loader_ptr>& data_loaders, mg::options::view opts) const override
+	std::vector<mg::file_data::output_info> jsoned_data(const std::vector<mp::loader_ptr>& data_loaders, mg::options::view opts) const override
 	{
 		(void) data_loaders;
 		BOOST_TEST_CHECKPOINT("begin create resulting data");
-		nlohmann::json ret;
+
+		mg::file_data::output_info ret;
+		ret.out_file = opts.get<std::string>(mg::options::part_option::output);
+
 		if(gen_data) {
-			ret["name"] = std::string(opts.part());
-			ret["test"] = opts.get_subset(mo::subsetts::part_data).get<std::string>("test");
+			ret.data["name"] = std::string(opts.part());
+			ret.data["test"] = opts.get_subset(mo::subsetts::part_data).get<std::string>("test");
 		}
-		return ret;
+
+		return {ret};
 	}
 };
 
@@ -60,7 +66,7 @@ struct ab_part_desc : modegen::generation::part_descriptor {
 	ab_part_desc(mo::view o) : opts_(std::move(o)) {}
 
 	std::string part_name() const override {return std::string(opts_.part()); }
-	const mo::view& opts() const override {return opts_;}
+	mo::view& opts() override {return opts_;}
 	bool need_output() const override {return cur_iter < 2;}
 	bool next() override {return cur_iter < 2;}
 	std::string file_name() const override
@@ -107,7 +113,6 @@ BOOST_AUTO_TEST_CASE(common_generation)
 	MOCK_EXPECT( provider->parsers ).exactly(2).returns( std::vector<mp::loader_ptr>{std::make_shared<fake_target>()} );
 	MOCK_EXPECT( provider->generator ).exactly(2).with( "cpp"sv ).returns( std::make_shared<fake_data_gen>() );
 	MOCK_EXPECT( provider->resolve_file ).exactly(2).with( "definitions.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/definitions.hpp.jinja" );
-	MOCK_EXPECT( provider->create_part_descriptor ).exactly(2).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );
 
 	BOOST_TEST_CHECKPOINT("create generator");
 	mg::generator gen(provider, u8"some/path");
@@ -139,7 +144,6 @@ BOOST_AUTO_TEST_CASE(defaults)
 	MOCK_EXPECT( provider->generator ).exactly(1).with( "other_trg"sv ).returns( std::make_shared<fake_data_gen>() );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "def.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "other.jinja"sv, u8"some/path"sv, "other_trg"sv ).returns( u8"resolved/path/def.jinja" );
-	MOCK_EXPECT( provider->create_part_descriptor ).exactly(2).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );
 
 	mg::generator gen(provider, u8"some/path");
 	auto& opts = gen.options();
@@ -200,7 +204,6 @@ BOOST_AUTO_TEST_CASE(extra_generator_data)
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "def.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "other.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "other_file"sv, u8"some/path"sv, "cpp"sv ).returns( u8"other/path.jinja" );
-	MOCK_EXPECT( provider->create_part_descriptor ).exactly(2).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );
 
 	ex_script_name = "some"s;
 	ex_script = "some script"s;
@@ -211,8 +214,9 @@ BOOST_AUTO_TEST_CASE(extra_generator_data)
 	BOOST_TEST_CONTEXT("other") gen.generate_stdout("other"sv);
 }
 
-BOOST_AUTO_TEST_CASE(output_name_generator)
+BOOST_AUTO_TEST_CASE(output_name_generator, * utests::disabled())
 {
+	TODO("this test is wrong: filegenerator will produce output name");
 	BOOST_TEST_CHECKPOINT("fill mock");
 	mo::view cur_opts(nullptr, ""sv);
 	auto opt_saver = [&cur_opts](mo::view no){ cur_opts = std::move(no); };
@@ -249,40 +253,4 @@ BOOST_AUTO_TEST_CASE(output_name_generator)
 }
 
 BOOST_AUTO_TEST_SUITE(wrong_generation)
-BOOST_AUTO_TEST_CASE(no_data)
-{
-	auto data_gen = std::make_shared<fake_data_gen>();
-	data_gen->gen_data = false;
-
-	auto provider = std::make_shared<provider_mock>();
-	MOCK_EXPECT( provider->json_jinja ).exactly(0);
-	MOCK_EXPECT( provider->parsers ).exactly(1).returns( std::vector<mp::loader_ptr>{std::make_shared<fake_target>()} );
-	MOCK_EXPECT( provider->generator ).exactly(1).with( "cpp"sv ).returns( data_gen );
-	MOCK_EXPECT( provider->create_part_descriptor ).exactly(1).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );
-
-	mg::generator gen(provider, u8"some/path");
-	auto& opts = gen.options();
-	opts.put("gen.def.filegen", "cpp") ;
-	opts.put("gen.def.output", "def.hpp") ;
-	opts.put("gen.def.input", "definitions.hpp.jinja") ;
-	opts.put("gen.def.test", "test_data") ;
-	BOOST_CHECK_THROW( gen.generate("some_dir"), modegen::errors::error );
-}
-BOOST_AUTO_TEST_CASE(no_output)
-{
-	TODO("no putput will be normal in future: some part may be used only for executing scripts .. ?");
-	auto data_gen = std::make_shared<fake_data_gen>();
-	auto provider = std::make_shared<provider_mock>();
-	MOCK_EXPECT( provider->parsers ).returns( std::vector<mp::loader_ptr>{std::make_shared<fake_target>()} );
-	MOCK_EXPECT( provider->generator ).with( "cpp"sv ).returns( data_gen );
-	MOCK_EXPECT( provider->resolve_file ).with( "def.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
-	MOCK_EXPECT( provider->create_part_descriptor ).exactly(1).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );
-
-	mg::generator gen(provider, u8"some/path"s);
-	auto& opts = gen.options();
-	opts.put("gen.def.filegen", "cpp") ;
-	opts.put("gen.def.input", "def.hpp.jinja") ;
-	opts.put("gen.def.test", "test_data") ;
-	BOOST_CHECK_THROW( gen.generate("some_dir"), modegen::errors::error );
-}
 BOOST_AUTO_TEST_SUITE_END() // wrong_generation

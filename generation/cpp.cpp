@@ -62,7 +62,7 @@ static nlohmann::json convert(parser::data_tree::loader* dldr)
 }
 } // modegen::generation
 
-nlohmann::json mg::cpp_generator::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const
+std::vector<mg::file_data::output_info> mg::cpp_generator::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const
 {
 	using namespace modegen::generation::interface;
 	using modegen::generation::interface::operator |;
@@ -104,7 +104,12 @@ nlohmann::json mg::cpp_generator::jsoned_data(const std::vector<parser::loader_p
 	add_extra_info(opts, jsoned);
 	jsoned["extra_data"] = convert(dldr);
 
-	return jsoned;
+	auto out_file = opts.get_opt<std::string>(options::part_option::output);
+	if(!out_file) throw errors::gen_error("cpp"s, "no output for "s + std::string(opts.part()));
+	output_info ret{.out_file = *out_file, .data = std::move(jsoned)};
+	return {ret};
+	//std::vector<output_info> ret;
+	//return ret;
 }
 
 std::vector<mg::cpp_generator::inc_info> mg::cpp_generator::includes(const std::vector<std::string> sys, mg::options::view& opts) const

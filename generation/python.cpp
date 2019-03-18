@@ -10,10 +10,9 @@
 
 namespace mg = modegen::generation;
 
-nlohmann::json mg::python::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const
+std::vector<mg::file_data::output_info> mg::python::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const
 {
-	nlohmann::json ret;
-	ret["generator"] = "python";
+	std::vector<output_info> ret;
 	return ret;
 }
 

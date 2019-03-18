@@ -23,7 +23,7 @@ public:
 
 	std::string part_name() const override ;
 	std::string file_name() const override ;
-	const options::view& opts() const override ;
+	options::view& opts() override ;
 	bool need_output() const override ;
 	bool next() override ;
 };

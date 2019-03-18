@@ -14,7 +14,7 @@ namespace modegen::generation {
 
 class cpp_generator : public file_data {
 public:
-	nlohmann::json jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const override ;
+	std::vector<output_info> jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const override ;
 private:
 	struct inc_info {
 		inc_info(std::string n, bool s) : name(std::move(n)), sys(s) {}

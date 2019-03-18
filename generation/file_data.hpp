@@ -21,8 +21,13 @@ namespace modegen::generation {
 
 class file_data {
 public:
+	struct output_info {
+		FS::path out_file;
+		nlohmann::json data;
+	};
+
 	virtual ~file_data() noexcept =default ;
-	virtual nlohmann::json jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const =0 ;
+	virtual std::vector<output_info> jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const =0 ;
 };
 
 } // namespace modegen::generation
