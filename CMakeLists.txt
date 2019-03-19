@@ -68,6 +68,7 @@ target_sources_local(modegen_interfaces file_data.hpp file_data.cpp "generation/
 target_sources_local(modegen_interfaces cpp.hpp       cpp.cpp       "generation/")
 target_sources_local(modegen_interfaces python.hpp    python.cpp    "generation/")
 target_sources_local(modegen_interfaces cmake.hpp     cmake.cpp     "generation/")
+target_sources_local(modegen_interfaces output_info.hpp        output_info.cpp        "generation/")
 target_sources_local(modegen_interfaces part_descriptor.hpp    part_descriptor.cpp    "generation/")
 target_sources_copy(modegen_interfaces "${dbg_cpp_templates_dir}"
 	generation/cpp/declarations.info generation/cpp/render.jinja

@@ -9,6 +9,7 @@
 #include "common.hpp"
 
 #include "provider.hpp"
+#include "output_info.hpp"
 #include "part_descriptor.hpp"
 #include "errors.h"
 
@@ -40,6 +41,17 @@ void mg::generator::generate(const FS::path& output_dir) const
 	assert( prov );
 	assert( opts );
 	auto plist = opts->part_list();
+
+	//output_info outputs;
+	//for(auto& p:plist) outputs.add_part(prov->create_part_descriptor(options::view(opts, p)));
+
+	//while(outputs.next()) {
+	    //part_descriptor* cur_part = outputs.current_part();
+	    //assert(cur_part);
+
+	    //file_data_ptr fg = prov->generator(cur_filegen(*cur_part));
+	//}
+
 	for(auto& p:plist) {
 		std::unique_ptr<part_descriptor> pdest = part_info(p);
 		if(!pdest->need_output()) continue;
