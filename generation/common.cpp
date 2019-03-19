@@ -10,6 +10,7 @@
 
 #include "provider.hpp"
 #include "part_descriptor.hpp"
+#include "output_info.hpp"
 #include "errors.h"
 
 using namespace std::literals;
@@ -40,6 +41,15 @@ void mg::generator::generate(const FS::path& output_dir) const
 	assert( prov );
 	assert( opts );
 	auto plist = opts->part_list();
+
+	output_info outputs;
+	for(auto& p:plist) outputs.add_part(prov->create_part_descriptor(options::view(opts, p)));
+
+	while(outputs.next()) {
+		options::view& popts = outputs.current_part()->opts();
+		file_data_ptr fg = prov->generator(cur_filegen(popts));
+	}
+
 	for(auto& p:plist) {
 		mg::options::view part_opts(opts, p);
 		file_data_ptr tg = prov->generator(cur_filegen(part_opts));

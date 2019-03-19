@@ -19,6 +19,7 @@ public:
 
 	/// all contained parts
 	std::vector<part_descriptor*> parts() const ;
+	void add_part(std::unique_ptr<part_descriptor> part);
 
 	/// part selected by \ref next call
 	part_descriptor* current_part() const ;
@@ -32,7 +33,7 @@ public:
 	/// interate by parts for get part info from \ref current_part
 	/// setts the first part (0 index) on the first call
 	/// @returns true if there is more part, false if no part
-	bool next() const ;
+	bool next() ;
 private:
 	std::vector<std::unique_ptr<part_descriptor>> parts_;
 	std::optional<std::size_t> cur_part_ = 0;
