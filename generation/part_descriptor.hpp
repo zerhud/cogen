@@ -20,7 +20,7 @@ public:
 	virtual ~part_descriptor() noexcept =default ;
 	virtual std::string part_name() const =0 ;
 	virtual std::string file_name() const =0 ;
-	virtual options::view& opts() =0 ;
+	virtual const options::view& opts() const =0 ;
 	virtual bool need_output() const =0 ;
 	virtual bool next() =0 ;
 };
@@ -32,7 +32,7 @@ public:
 	~single_part_descriptor() noexcept override ;
 	std::string part_name() const override ;
 	std::string file_name() const override ;
-	options::view& opts() override ;
+	const options::view& opts() const override ;
 	bool need_output() const override ;
 	bool next() override ;
 };

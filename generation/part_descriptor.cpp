@@ -39,7 +39,7 @@ bool mg::single_part_descriptor::next()
 	return false;
 }
 
-mg::options::view& mg::single_part_descriptor::opts()
+const modegen::generation::options::view& mg::single_part_descriptor::opts() const
 {
 	return opts_;
 }

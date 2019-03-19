@@ -68,19 +68,19 @@ void mg::generator::generate_stdout(std::string_view part) const
 	}
 }
 
-FS::path mg::generator::tmpl_path(options::view& opts) const
+FS::path mg::generator::tmpl_path(const options::view& opts) const
 {
 	assert( prov );
 	FS::path input = opts.get_opt<std::string>(options::part_option::input).value_or(std::string(opts.part()) + u8".jinja"s);
 	return prov->resolve_file(input, info_directory, cur_filegen(opts));
 }
 
-FS::path mg::generator::tmpl_path(part_descriptor& part) const
+FS::path mg::generator::tmpl_path(const part_descriptor& part) const
 {
 	return tmpl_path(part.opts());
 }
 
-void mg::generator::build_extra_env(tmpl_gen_env& env, options::view& part_opts) const
+void mg::generator::build_extra_env(tmpl_gen_env& env, const options::view& part_opts) const
 {
 	assert( opts );
 
@@ -99,7 +99,7 @@ void mg::generator::build_extra_env(tmpl_gen_env& env, options::view& part_opts)
 	}
 }
 
-std::string mg::generator::cur_filegen(options::view& opts) const
+std::string mg::generator::cur_filegen(const options::view& opts) const
 {
 	return opts.get<std::string>(options::part_option::file_generator);
 }
