@@ -24,7 +24,7 @@ std::vector<mg::part_descriptor*> mg::output_info::parts() const
 {
 	std::vector<part_descriptor*> ret;
 	ret.reserve(parts_.size());
-	for(auto& p:parts_) ret.emplace_back(const_cast<part_descriptor*>(&p));
+	for(auto& p:parts_) ret.emplace_back(p.get());
 	return ret;
 }
 
@@ -38,12 +38,12 @@ mg::part_descriptor* mg::output_info::current_part() const
 {
 	if(!cur_part_) throw errors::error("call next first");
 	assert( *cur_part_ < parts_.size() );
-	return const_cast<part_descriptor*>(&parts_.at(*cur_part_));
+	return parts_.at(*cur_part_).get();
 }
 
 mg::part_descriptor* mg::output_info::require(std::string_view name) const
 {
-	for(auto& p:parts_) if(p.part_name() == name) return const_cast<part_descriptor*>(&p);
+	for(auto& p:parts_) if(p->part_name() == name) return p.get();
 	throw errors::error("no such part found"s + std::string(name));
 }
 
@@ -65,7 +65,7 @@ bool mg::output_info::next()
 void modegen::generation::output_info::select(std::string_view name)
 {
 	for(std::size_t i=0;i<parts_.size();++i) {
-		if(parts_[i].part_name() == name) {
+		if(parts_[i]->part_name() == name) {
 			cur_part_ = i;
 			return;
 		}

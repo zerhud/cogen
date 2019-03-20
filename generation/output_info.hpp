@@ -9,7 +9,6 @@
 #pragma once
 
 #include <optional>
-#include <boost/ptr_container/ptr_vector.hpp>
 #include "declaration.hpp"
 
 namespace modegen{ namespace generation {
@@ -38,7 +37,7 @@ public:
 	/// select a part by name (equal few next call for select part with such name)
 	void select(std::string_view name) ;
 private:
-	boost::ptr_vector<part_descriptor> parts_;
+	std::vector<std::unique_ptr<part_descriptor>> parts_;
 	std::optional<std::size_t> cur_part_ = std::nullopt;
 };
 
