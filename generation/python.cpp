@@ -17,3 +17,10 @@ nlohmann::json mg::python::jsoned_data(const std::vector<parser::loader_ptr>& da
 	return ret;
 }
 
+
+nlohmann::json mg::python::jsoned_data(const mg::output_info& outputs) const
+{
+	TODO("place code here");
+	nlohmann::json ret;
+	return ret;
+}

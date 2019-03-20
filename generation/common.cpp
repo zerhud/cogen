@@ -42,44 +42,65 @@ void mg::generator::generate(const FS::path& output_dir) const
 	assert( opts );
 	auto plist = opts->part_list();
 
-	//output_info outputs;
-	//for(auto& p:plist) outputs.add_part(prov->create_part_descriptor(options::view(opts, p)));
+	output_info outputs;
+	for(auto& p:plist) outputs.add_part(part_info(p));
 
-	//while(outputs.next()) {
-	    //part_descriptor* cur_part = outputs.current_part();
-	    //assert(cur_part);
-
-	    //file_data_ptr fg = prov->generator(cur_filegen(*cur_part));
-	//}
-
-	for(auto& p:plist) {
-		std::unique_ptr<part_descriptor> pdest = part_info(p);
-		if(!pdest->need_output()) continue;
+	while(outputs.next()) {
+		part_descriptor* cur_part = outputs.current_part();
+		assert(cur_part);
 
 		do {
-			file_data_ptr tg = prov->generator(cur_filegen(*pdest));
-			nlohmann::json data = generate_data(*pdest, *tg);
-			if(data.empty()) throw errors::gen_error("common", "no data for output in "s + p);
+			file_data_ptr fg = prov->generator(cur_filegen(*cur_part));
+			nlohmann::json data = fg->jsoned_data(outputs);
+			//if(data.empty()) continue;
+			if(data.empty()) throw errors::gen_error("common", "no data for output in "s + cur_part->part_name());
 
-			tmpl_gen_env gdata(std::move(data), tmpl_path(*pdest));
-			gdata.out_file(output_dir / pdest->file_name());
-			build_extra_env(gdata, *pdest);
+			tmpl_gen_env gdata(std::move(data), tmpl_path(*cur_part));
+			gdata.out_file(output_dir / cur_part->file_name());
+			build_extra_env(gdata, *cur_part);
 			prov->json_jinja( gdata );
-		} while(pdest->next());
+		} while(cur_part->next());
 	}
+
+	//for(auto& p:plist) {
+	    //std::unique_ptr<part_descriptor> pdest = part_info(p);
+	    //if(!pdest->need_output()) continue;
+
+	    //do {
+	        //file_data_ptr tg = prov->generator(cur_filegen(*pdest));
+	        //nlohmann::json data = generate_data(*pdest, *tg);
+	        //if(data.empty()) throw errors::gen_error("common", "no data for output in "s + p);
+
+	        //tmpl_gen_env gdata(std::move(data), tmpl_path(*pdest));
+	        //gdata.out_file(output_dir / pdest->file_name());
+	        //build_extra_env(gdata, *pdest);
+	        //prov->json_jinja( gdata );
+	    //} while(pdest->next());
+	//}
 }
 
 void mg::generator::generate_stdout(std::string_view part) const
 {
 	assert( prov );
+	assert( opts );
 
-	std::unique_ptr<part_descriptor> pdest = part_info(part);
-	file_data_ptr tg = prov->generator(cur_filegen(*pdest));
-	nlohmann::json data = generate_data(*pdest, *tg);
+	output_info outputs;
+	for(auto& p:opts->part_list()) outputs.add_part(part_info(p));
 
-	tmpl_gen_env gdata(std::move(data), tmpl_path(*pdest));
-	build_extra_env(gdata, *pdest);
-	prov->json_jinja( gdata );
+	outputs.select(part);
+	part_descriptor* cur_part = outputs.current_part();
+	assert(cur_part);
+
+	do {
+		file_data_ptr fg = prov->generator(cur_filegen(*cur_part));
+		nlohmann::json data = fg->jsoned_data(outputs);
+		//if(data.empty()) continue;
+		if(data.empty()) throw errors::gen_error("common", "no data for output in "s + cur_part->part_name());
+
+		tmpl_gen_env gdata(std::move(data), tmpl_path(*cur_part));
+		build_extra_env(gdata, *cur_part);
+		prov->json_jinja(gdata);
+	} while(cur_part->next());
 }
 
 nlohmann::json mg::generator::generate_data(const part_descriptor& part, const file_data& fdg) const

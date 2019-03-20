@@ -62,6 +62,13 @@ static nlohmann::json convert(parser::data_tree::loader* dldr)
 }
 } // modegen::generation
 
+nlohmann::json mg::cpp_generator::jsoned_data(const output_info& outputs) const
+{
+	TODO("place code here");
+	nlohmann::json ret;
+	return ret;
+}
+
 nlohmann::json mg::cpp_generator::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const
 {
 	using namespace modegen::generation::interface;

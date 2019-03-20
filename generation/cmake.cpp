@@ -13,6 +13,13 @@ using namespace std::literals;
 namespace mg = modegen::generation;
 using boost::property_tree::ptree;
 
+nlohmann::json mg::cmake::jsoned_data(const output_info& outputs) const
+{
+	TODO("place code herer");
+	nlohmann::json ret;
+	return ret;
+}
+
 nlohmann::json mg::cmake::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const
 {
 	(void) data_loaders;

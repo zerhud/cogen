@@ -97,8 +97,8 @@ private:
 
 class view {
 	container_ptr opts;
-	std::string_view def_part;
-	std::string_view def_fgen;
+	std::string def_part;
+	std::string def_fgen;
 public:
 	view(container_ptr c, std::string_view p);
 

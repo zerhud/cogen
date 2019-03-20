@@ -16,6 +16,7 @@
 #include "generation/provider.hpp"
 #include "generation/file_data.hpp"
 #include "generation/part_descriptor.hpp"
+#include "generation/output_info.hpp"
 #include "errors.h"
 
 using namespace std::literals;
@@ -41,15 +42,27 @@ class fake_target : public modegen::parser::loader {
 
 struct fake_data_gen : modegen::generation::file_data {
 	bool gen_data = true;
-	nlohmann::json jsoned_data(const std::vector<mp::loader_ptr>& data_loaders, mg::options::view opts) const override
+	nlohmann::json jsoned_data(const mg::output_info& outputs) const override
 	{
-		(void) data_loaders;
-		BOOST_TEST_CHECKPOINT("begin create resulting data");
+		BOOST_REQUIRE( outputs.current_part() );
+		BOOST_TEST_CHECKPOINT("begin create resulting data for " << outputs.current_part()->part_name());
+
+		const mg::options::view& opts = outputs.current_part()->opts();
+
 		nlohmann::json ret;
 		if(gen_data) {
 			ret["name"] = std::string(opts.part());
 			ret["test"] = opts.get_subset(mo::subsetts::part_data).get<std::string>("test");
 		}
+		return ret;
+	}
+
+	nlohmann::json jsoned_data(const std::vector<mp::loader_ptr>& data_loaders, mg::options::view opts) const override
+	{
+		TODO("remove this method");
+		(void) data_loaders;
+		(void) opts;
+		nlohmann::json ret;
 		return ret;
 	}
 };
@@ -104,7 +117,6 @@ BOOST_AUTO_TEST_CASE(common_generation)
 	BOOST_TEST_CHECKPOINT("fill mock settings");
 	auto provider = std::make_shared<provider_mock>();
 	MOCK_EXPECT( provider->json_jinja ).exactly(2).with( result_data_checker ) ;
-	MOCK_EXPECT( provider->parsers ).exactly(2).returns( std::vector<mp::loader_ptr>{std::make_shared<fake_target>()} );
 	MOCK_EXPECT( provider->generator ).exactly(2).with( "cpp"sv ).returns( std::make_shared<fake_data_gen>() );
 	MOCK_EXPECT( provider->resolve_file ).exactly(2).with( "definitions.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/definitions.hpp.jinja" );
 	MOCK_EXPECT( provider->create_part_descriptor ).exactly(2).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );
@@ -134,7 +146,6 @@ BOOST_AUTO_TEST_CASE(defaults)
 	auto provider = std::make_shared<provider_mock>();
 
 	MOCK_EXPECT( provider->json_jinja ).exactly(2);
-	MOCK_EXPECT( provider->parsers ).exactly(2).returns( std::vector<mp::loader_ptr>{std::make_shared<fake_target>()} );
 	MOCK_EXPECT( provider->generator ).exactly(1).with( "cpp"sv ).returns( std::make_shared<fake_data_gen>() );
 	MOCK_EXPECT( provider->generator ).exactly(1).with( "other_trg"sv ).returns( std::make_shared<fake_data_gen>() );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "def.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
@@ -195,12 +206,11 @@ BOOST_AUTO_TEST_CASE(extra_generator_data)
 	};
 
 	MOCK_EXPECT( provider->json_jinja ).exactly(2).with( result_data_checker ) ;
-	MOCK_EXPECT( provider->parsers ).exactly(2).returns( std::vector<mp::loader_ptr>{std::make_shared<fake_target>()} );
 	MOCK_EXPECT( provider->generator ).exactly(2).with( "cpp"sv ).returns( std::make_shared<fake_data_gen>() );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "def.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "other.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "other_file"sv, u8"some/path"sv, "cpp"sv ).returns( u8"other/path.jinja" );
-	MOCK_EXPECT( provider->create_part_descriptor ).exactly(2).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );
+	MOCK_EXPECT( provider->create_part_descriptor ).exactly(4).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );
 
 	ex_script_name = "some"s;
 	ex_script = "some script"s;
@@ -229,7 +239,6 @@ BOOST_AUTO_TEST_CASE(output_name_generator)
 
 	auto provider = std::make_shared<provider_mock>();
 	MOCK_EXPECT( provider->json_jinja ).exactly(2).with(result_checker) ;
-	MOCK_EXPECT( provider->parsers ).exactly(2).returns( std::vector<mp::loader_ptr>{std::make_shared<fake_target>()} );
 	MOCK_EXPECT( provider->generator ).exactly(2).with( "cpp"sv ).returns( std::make_shared<fake_data_gen>() );
 	MOCK_EXPECT( provider->resolve_file ).exactly(2).with( "definitions.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/definitions.hpp.jinja" );
 	MOCK_EXPECT( provider->create_part_descriptor ).exactly(1).calls(pdesc_maker);
@@ -256,7 +265,6 @@ BOOST_AUTO_TEST_CASE(no_data)
 
 	auto provider = std::make_shared<provider_mock>();
 	MOCK_EXPECT( provider->json_jinja ).exactly(0);
-	MOCK_EXPECT( provider->parsers ).exactly(1).returns( std::vector<mp::loader_ptr>{std::make_shared<fake_target>()} );
 	MOCK_EXPECT( provider->generator ).exactly(1).with( "cpp"sv ).returns( data_gen );
 	MOCK_EXPECT( provider->create_part_descriptor ).exactly(1).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );
 
@@ -273,7 +281,6 @@ BOOST_AUTO_TEST_CASE(no_output)
 	TODO("no putput will be normal in future: some part may be used only for executing scripts .. ?");
 	auto data_gen = std::make_shared<fake_data_gen>();
 	auto provider = std::make_shared<provider_mock>();
-	MOCK_EXPECT( provider->parsers ).returns( std::vector<mp::loader_ptr>{std::make_shared<fake_target>()} );
 	MOCK_EXPECT( provider->generator ).with( "cpp"sv ).returns( data_gen );
 	MOCK_EXPECT( provider->resolve_file ).with( "def.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
 	MOCK_EXPECT( provider->create_part_descriptor ).exactly(1).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );

@@ -13,6 +13,7 @@ endmacro()
 set(tests_gcommon
 	options
 	common
+	outputs
 	part_descriptors
 	to_json
 	cpp cpp_type_cvt

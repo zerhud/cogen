@@ -41,6 +41,7 @@ bool mg::single_part_descriptor::next()
 
 const mg::options::view& mg::single_part_descriptor::opts() const
 {
+	assert(opts_.part() == part_name());
 	return opts_;
 }
 
