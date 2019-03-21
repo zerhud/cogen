@@ -10,12 +10,26 @@
 #define BOOST_TEST_MODULE cmake
 
 #include <boost/test/unit_test.hpp>
+#include <turtle/mock.hpp>
 
 #include "errors.h"
 #include "generation/cmake.hpp"
+#include "generation/output_info.hpp"
+#include "generation/part_descriptor.hpp"
 
 using namespace std::literals;
 namespace mg = modegen::generation;
+
+MOCK_BASE_CLASS( part_desc_mock, modegen::generation::part_descriptor )
+{
+	MOCK_METHOD( part_name, 0 )
+	MOCK_METHOD( file_name, 0 )
+	MOCK_METHOD( opts, 0 )
+	MOCK_METHOD( need_output, 0 )
+	MOCK_METHOD( next, 0 )
+	MOCK_METHOD( idl_input, 0 )
+	MOCK_METHOD( data_input, 0 )
+};
 
 BOOST_AUTO_TEST_CASE(add_library)
 {
@@ -26,8 +40,15 @@ BOOST_AUTO_TEST_CASE(add_library)
 	opts->raw().put("gen.some_part.output", "part_file.cpp");
 	mg::options::view opts_view(opts, "cmake"s);
 
+	auto pg = std::make_unique<part_desc_mock>();
+	MOCK_EXPECT( pg->opts ).once().returns( opts_view );
+
+	mg::output_info oi;
+	oi.add_part(std::move(pg)).next();
+
+
 	mg::cmake cm;
-	auto data = cm.jsoned_data({}, opts_view);
+	auto data = cm.jsoned_data(oi);
 	BOOST_CHECK_EQUAL(data["libraries"].size(), 1);
 	for(auto& [k,v]:data["libraries"].items()) BOOST_CHECK_EQUAL(k, "interface"s);
 

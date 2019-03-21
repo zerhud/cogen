@@ -38,7 +38,6 @@ public:
 	void generate_stdout(std::string_view part) const ;
 private:
 	FS::path tmpl_path(part_descriptor& part) const ;
-	nlohmann::json generate_data(const part_descriptor& part, const file_data& fdg) const ;
 	void build_extra_env(tmpl_gen_env& env, const part_descriptor& part) const ;
 	std::string cur_filegen(const part_descriptor& part) const ;
 	std::unique_ptr<part_descriptor> part_info(std::string_view p) const ;

@@ -56,15 +56,6 @@ struct fake_data_gen : modegen::generation::file_data {
 		}
 		return ret;
 	}
-
-	nlohmann::json jsoned_data(const std::vector<mp::loader_ptr>& data_loaders, mg::options::view opts) const override
-	{
-		TODO("remove this method");
-		(void) data_loaders;
-		(void) opts;
-		nlohmann::json ret;
-		return ret;
-	}
 };
 
 struct ab_part_desc : modegen::generation::part_descriptor {
@@ -83,7 +74,20 @@ struct ab_part_desc : modegen::generation::part_descriptor {
 		if(cur_iter==2) return "b.hpp"s;
 		return ""s;
 	}
+
+	std::vector<mp::interface::module> idl_input() const override { return {}; }
+	boost::property_tree::ptree data_input() const override
+	{
+		boost::property_tree::ptree ret;
+		return ret;
+	}
 };
+
+std::unique_ptr<mg::part_descriptor> make_single_part(mo::view o)
+{
+	std::unique_ptr<mg::part_descriptor> ret( new mg::single_part_descriptor(std::move(o), {}) );
+	return ret;
+}
 
 BOOST_AUTO_TEST_CASE(common_generation)
 {
@@ -119,7 +123,7 @@ BOOST_AUTO_TEST_CASE(common_generation)
 	MOCK_EXPECT( provider->json_jinja ).exactly(2).with( result_data_checker ) ;
 	MOCK_EXPECT( provider->generator ).exactly(2).with( "cpp"sv ).returns( std::make_shared<fake_data_gen>() );
 	MOCK_EXPECT( provider->resolve_file ).exactly(2).with( "definitions.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/definitions.hpp.jinja" );
-	MOCK_EXPECT( provider->create_part_descriptor ).exactly(2).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );
+	MOCK_EXPECT( provider->create_part_descriptor ).exactly(2).calls( make_single_part );
 
 	BOOST_TEST_CHECKPOINT("create generator");
 	mg::generator gen(provider, u8"some/path");
@@ -150,7 +154,7 @@ BOOST_AUTO_TEST_CASE(defaults)
 	MOCK_EXPECT( provider->generator ).exactly(1).with( "other_trg"sv ).returns( std::make_shared<fake_data_gen>() );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "def.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "other.jinja"sv, u8"some/path"sv, "other_trg"sv ).returns( u8"resolved/path/def.jinja" );
-	MOCK_EXPECT( provider->create_part_descriptor ).exactly(2).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );
+	MOCK_EXPECT( provider->create_part_descriptor ).exactly(2).calls( make_single_part );
 
 	mg::generator gen(provider, u8"some/path");
 	auto& opts = gen.options();
@@ -210,7 +214,7 @@ BOOST_AUTO_TEST_CASE(extra_generator_data)
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "def.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "other.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
 	MOCK_EXPECT( provider->resolve_file ).exactly(1).with( "other_file"sv, u8"some/path"sv, "cpp"sv ).returns( u8"other/path.jinja" );
-	MOCK_EXPECT( provider->create_part_descriptor ).exactly(4).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );
+	MOCK_EXPECT( provider->create_part_descriptor ).exactly(4).calls( make_single_part );
 
 	ex_script_name = "some"s;
 	ex_script = "some script"s;
@@ -266,7 +270,7 @@ BOOST_AUTO_TEST_CASE(no_data)
 	auto provider = std::make_shared<provider_mock>();
 	MOCK_EXPECT( provider->json_jinja ).exactly(0);
 	MOCK_EXPECT( provider->generator ).exactly(1).with( "cpp"sv ).returns( data_gen );
-	MOCK_EXPECT( provider->create_part_descriptor ).exactly(1).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );
+	MOCK_EXPECT( provider->create_part_descriptor ).exactly(1).calls( make_single_part );
 
 	mg::generator gen(provider, u8"some/path");
 	auto& opts = gen.options();
@@ -283,7 +287,7 @@ BOOST_AUTO_TEST_CASE(no_output)
 	auto provider = std::make_shared<provider_mock>();
 	MOCK_EXPECT( provider->generator ).with( "cpp"sv ).returns( data_gen );
 	MOCK_EXPECT( provider->resolve_file ).with( "def.hpp.jinja"sv, u8"some/path"sv, "cpp"sv ).returns( u8"resolved/path/def.jinja" );
-	MOCK_EXPECT( provider->create_part_descriptor ).exactly(1).calls( [](mo::view o){return std::make_unique<mg::single_part_descriptor>(std::move(o));} );
+	MOCK_EXPECT( provider->create_part_descriptor ).exactly(1).calls( make_single_part );
 
 	mg::generator gen(provider, u8"some/path"s);
 	auto& opts = gen.options();

@@ -10,17 +10,10 @@
 
 namespace mg = modegen::generation;
 
-nlohmann::json mg::python::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const
-{
-	nlohmann::json ret;
-	ret["generator"] = "python";
-	return ret;
-}
-
-
 nlohmann::json mg::python::jsoned_data(const mg::output_info& outputs) const
 {
 	TODO("place code here");
 	nlohmann::json ret;
+	ret["generator"] = "python";
 	return ret;
 }

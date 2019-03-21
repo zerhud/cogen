@@ -11,6 +11,7 @@
 #include <boost/algorithm/string/replace.hpp>
 
 #include "parser/interface/loader.hpp"
+#include "errors.h"
 
 using namespace std::literals;
 namespace mp = modegen::parser;
@@ -23,7 +24,9 @@ mi::part_descriptor::part_descriptor(mg::options::view o, std::vector<mp::loader
 	for(auto& _ldr:ldrs) {
 		mp::interface::loader* ldr = dynamic_cast<mp::interface::loader*>(_ldr.get());
 		if(!ldr) continue;
-		for(auto& mod:ldr->result()) mods_.emplace_back(mod.name);
+		if(!input_idl_.empty()) throw errors::error("idl loader dublicat");
+		input_idl_ = ldr->result();
+		for(auto& mod:input_idl_) mods_.emplace_back(mod.name);
 	}
 }
 
@@ -57,4 +60,14 @@ bool mi::part_descriptor::need_output() const
 bool mi::part_descriptor::next()
 {
 	return ++cur_pos < mods_.size();
+}
+
+std::vector<mp::interface::module> mi::part_descriptor::idl_input() const
+{
+	return input_idl_;
+}
+
+boost::property_tree::ptree mi::part_descriptor::data_input() const
+{
+	return input_data_;
 }

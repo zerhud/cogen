@@ -15,6 +15,10 @@
 using namespace std::literals;
 namespace mg = modegen::generation;
 
+mg::output_info::~output_info() noexcept
+{
+}
+
 bool mg::output_info::empty() const
 {
 	return parts_.empty();
@@ -28,10 +32,11 @@ std::vector<mg::part_descriptor*> mg::output_info::parts() const
 	return ret;
 }
 
-void mg::output_info::add_part(std::unique_ptr<part_descriptor> part)
+mg::output_info& mg::output_info::add_part(std::unique_ptr<part_descriptor> part)
 {
 	if(cur_part_) throw errors::error("cannot add part after iterate starts");
 	parts_.push_back(std::move(part));
+	return *this;
 }
 
 mg::part_descriptor* mg::output_info::current_part() const

@@ -67,4 +67,12 @@ BOOST_AUTO_TEST_CASE(splited_by_ver_modules)
 {
 	BOOST_FAIL("no test");
 }
+BOOST_AUTO_TEST_SUITE(wrong)
+BOOST_AUTO_TEST_CASE(wrong_loader)
+{
+	// test may be only idl or data for now
+	// tests: cannot dynamic cast
+	BOOST_FAIL("no test");
+}
+BOOST_AUTO_TEST_SUITE_END() // wrong
 BOOST_AUTO_TEST_SUITE_END() // interface

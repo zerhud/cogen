@@ -10,6 +10,8 @@
 #include <boost/property_tree/json_parser.hpp>
 
 #include "errors.h"
+#include "output_info.hpp"
+#include "part_descriptor.hpp"
 #include "interface/naming.hpp"
 #include "interface/to_json.hpp"
 #include "interface/filter.hpp"
@@ -60,27 +62,31 @@ static nlohmann::json convert(parser::data_tree::loader* dldr)
 	}
 	return ret;
 }
+
+static nlohmann::json convert(const boost::property_tree::ptree& pt)
+{
+	nlohmann::json ret;
+	if(!pt.empty()) {
+		std::stringstream cvt;
+		boost::property_tree::write_json(cvt, pt);
+		cvt >> ret;
+	}
+	return ret;
+}
 } // modegen::generation
 
 nlohmann::json mg::cpp_generator::jsoned_data(const output_info& outputs) const
 {
-	TODO("place code here");
-	nlohmann::json ret;
-	return ret;
-}
-
-nlohmann::json mg::cpp_generator::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const
-{
 	using namespace modegen::generation::interface;
 	using modegen::generation::interface::operator |;
 
-	auto [ildr, dldr] = get_loaders(data_loaders);
-	assert(ildr);
+	part_descriptor* cur_part = outputs.current_part();
+	if(!cur_part) throw errors::no_data("cpp"s);
 
-	cpp::type_converter tcvt;
-
-	auto data = ildr->result();
+	auto data = cur_part->idl_input();
 	if(data.empty()) throw errors::no_data("cpp"s);
+
+	auto& opts = cur_part->opts();
 
 	filter::request freq;
 	//options::filter_view fw(opts.container());
@@ -92,6 +98,7 @@ nlohmann::json mg::cpp_generator::jsoned_data(const std::vector<parser::loader_p
 	//freq.cnt_name = opts.part_data().get("filter.cnt", ""s);
 	//freq.sel = parser::interface::from_string(opts.part_data().get("filter.sel", ""s));
 
+	cpp::type_converter tcvt;
 	std::string versioning = opts.get_opt<std::string>(options::template_option::versioning, ""s, "cpp"s).value_or(""s);
 	nlohmann::json jsoned =
 	          data
@@ -109,12 +116,11 @@ nlohmann::json mg::cpp_generator::jsoned_data(const std::vector<parser::loader_p
 	}
 
 	add_extra_info(opts, jsoned);
-	jsoned["extra_data"] = convert(dldr);
-
+	jsoned["extra_data"] = convert(cur_part->data_input());
 	return jsoned;
 }
 
-std::vector<mg::cpp_generator::inc_info> mg::cpp_generator::includes(const std::vector<std::string> sys, mg::options::view& opts) const
+std::vector<mg::cpp_generator::inc_info> mg::cpp_generator::includes(const std::vector<std::string> sys, const mg::options::view& opts) const
 {
 	std::vector<inc_info> ret;
 	ret.reserve(sys.size());
@@ -141,18 +147,18 @@ std::vector<mg::cpp_generator::inc_info> mg::cpp_generator::includes(const std::
 	return ret;
 }
 
-std::string mg::cpp_generator::solve_part_include(const std::string& part, mg::options::view& opts) const
+std::string mg::cpp_generator::solve_part_include(const std::string& part, const mg::options::view& opts) const
 {
 	return opts.get<std::string>(options::part_option::output, part);
 }
 
-void mg::cpp_generator::add_extra_info(options::view& opts, nlohmann::json& cdata) const
+void mg::cpp_generator::add_extra_info(const options::view& opts, nlohmann::json& cdata) const
 {
 	add_extra_namespaces(opts, cdata);
 	set_constructors_prefix(opts, cdata);
 }
 
-void mg::cpp_generator::add_extra_namespaces(mg::options::view& opts, nlohmann::json& cdata) const
+void mg::cpp_generator::add_extra_namespaces(const mg::options::view& opts, nlohmann::json& cdata) const
 {
 	auto nsopts = opts.get_subset(options::subsetts::file_generator, "cpp"s, ""s);
 
@@ -163,7 +169,7 @@ void mg::cpp_generator::add_extra_namespaces(mg::options::view& opts, nlohmann::
 	}
 }
 
-void mg::cpp_generator::set_constructors_prefix(mg::options::view& opts, nlohmann::json& cdata) const
+void mg::cpp_generator::set_constructors_prefix(const mg::options::view& opts, nlohmann::json& cdata) const
 {
 	using namespace modegen::generation::interface;
 

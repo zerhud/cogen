@@ -7,6 +7,7 @@
  *************************************************************************/
 
 #include "part_descriptor.hpp"
+#include "parser/interface/loader.hpp"
 
 #include "errors.h"
 
@@ -14,9 +15,15 @@ using namespace std::literals;
 namespace mg = modegen::generation;
 namespace mp = modegen::parser;
 
-mg::single_part_descriptor::single_part_descriptor(mg::options::view o)
+mg::single_part_descriptor::single_part_descriptor(mg::options::view o, std::vector<mp::loader_ptr> plist)
     : opts_(std::move(o))
 {
+	for(auto& _ldr:plist) {
+		mp::interface::loader* ldr = dynamic_cast<mp::interface::loader*>(_ldr.get());
+		if(!ldr) continue;
+		if(!input_idl_.empty()) throw errors::error("idl loader dublicat");
+		input_idl_ = ldr->result();
+	}
 }
 
 mg::single_part_descriptor::~single_part_descriptor() noexcept
@@ -48,4 +55,14 @@ const mg::options::view& mg::single_part_descriptor::opts() const
 bool mg::single_part_descriptor::need_output() const
 {
 	return true;
+}
+
+std::vector<mp::interface::module> mg::single_part_descriptor::idl_input() const
+{
+	return input_idl_;
+}
+
+boost::property_tree::ptree mg::single_part_descriptor::data_input() const
+{
+	return input_data_;
 }

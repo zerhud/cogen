@@ -22,7 +22,6 @@ namespace modegen::generation {
 class file_data {
 public:
 	virtual ~file_data() noexcept =default ;
-	virtual nlohmann::json jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const =0 ;
 	virtual nlohmann::json jsoned_data(const output_info& outputs) const =0 ;
 };
 

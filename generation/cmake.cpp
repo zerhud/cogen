@@ -9,23 +9,19 @@
 #include "cmake.hpp"
 #include <boost/property_tree/json_parser.hpp>
 
+#include "output_info.hpp"
+#include "part_descriptor.hpp"
+
 using namespace std::literals;
 namespace mg = modegen::generation;
 using boost::property_tree::ptree;
 
 nlohmann::json mg::cmake::jsoned_data(const output_info& outputs) const
 {
-	TODO("place code herer");
-	nlohmann::json ret;
-	return ret;
-}
-
-nlohmann::json mg::cmake::jsoned_data(const std::vector<parser::loader_ptr>& data_loaders, options::view opts) const
-{
-	(void) data_loaders;
+	const mg::options::view& opts = outputs.current_part()->opts();
 
 	nlohmann::json data;
-	auto part = opts.get_subset(options::subsetts::part_data);
+	ptree part = opts.get_subset(options::subsetts::part_data);
 	data["project"] = part.get<std::string>("project");
 	data["version"] = part.get("version", u8"0.0.0.0"s);
 

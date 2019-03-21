@@ -30,6 +30,9 @@ struct simple_part_desc : mg::part_descriptor {
 	const mg::options::view& opts() const override {throw 1;}
 	bool need_output() const override {return false;}
 	bool next() override {return false;}
+
+	std::vector<modegen::parser::interface::module> idl_input() const override { return {}; }
+	boost::property_tree::ptree data_input() const override { return boost::property_tree::ptree{}; }
 };
 
 BOOST_AUTO_TEST_CASE(acceess)

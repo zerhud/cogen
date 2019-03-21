@@ -10,16 +10,19 @@
 
 #include <optional>
 #include "declaration.hpp"
+#include "part_descriptor.hpp" //TODO: "part_descriptor needs to be included because unique_ptr requires dtor");
 
 namespace modegen{ namespace generation {
 
 class output_info final {
 public:
+	~output_info() noexcept ;
+
 	bool empty() const ;
 
 	/// all contained parts
 	std::vector<part_descriptor*> parts() const ;
-	void add_part(std::unique_ptr<part_descriptor> part);
+	output_info& add_part(std::unique_ptr<part_descriptor> part);
 
 	/// part selected by \ref next call
 	part_descriptor* current_part() const ;

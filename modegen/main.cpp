@@ -138,7 +138,7 @@ public:
 	std::unique_ptr<mg::part_descriptor> create_part_descriptor(mg::options::view v) const override
 	{
 		TODO("create here using options diff gens")
-		return std::make_unique<mg::single_part_descriptor>(std::move(v));
+		return std::make_unique<mg::single_part_descriptor>(std::move(v), parsers());
 	}
 
 	std::vector<std::string> list_target() const
