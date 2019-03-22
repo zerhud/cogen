@@ -14,6 +14,7 @@
 
 #include "parser/interface/loader.hpp"
 #include "parser/data_tree/loader.hpp"
+#include "parser/interface/helpers.hpp"
 
 #include "generation/provider.hpp"
 #include "generation/file_data.hpp"
@@ -107,7 +108,7 @@ BOOST_AUTO_TEST_CASE(splited_by_ver_modules)
 	ldr->data = pi::parse("module mod v1.0: int foo(); @v2.0 int bar(); module other v1.0: int bar();"sv).mods;
 
 	mo::container_ptr opt_cnt = std::make_shared<mo::container>();
-	opt_cnt->raw().put("gen.def.output", "%mod%.ext");
+	opt_cnt->raw().put("gen.def.output", "%mod%%vm%_%vi%.ext");
 	opt_cnt->raw().put("gen.def.versioning", "split");
 	mi::part_descriptor pd(mo::view(opt_cnt, "def"sv), {ldr});
 
@@ -115,14 +116,16 @@ BOOST_AUTO_TEST_CASE(splited_by_ver_modules)
 	BOOST_CHECK_EQUAL(pd.need_output(), true);
 	BOOST_CHECK_EQUAL(pd.file_name(), "mod1_0.ext");
 	BOOST_REQUIRE_EQUAL(pd.idl_input().size(), 1);
-	BOOST_CHECK_EQUAL(pd.idl_input()[0].name, "mod1_0");
+	BOOST_CHECK_EQUAL(pd.idl_input()[0].name, "mod");
+	BOOST_CHECK_EQUAL(pi::get_version(pd.idl_input()[0]), pi::meta_parameters::version(1,0));
 
 	BOOST_CHECK_EQUAL(pd.next(), true);
 	BOOST_CHECK_EQUAL(pd.part_name(), "def");
 	BOOST_CHECK_EQUAL(pd.need_output(), true);
 	BOOST_CHECK_EQUAL(pd.file_name(), "mod2_0.ext");
 	BOOST_REQUIRE_EQUAL(pd.idl_input().size(), 1);
-	BOOST_CHECK_EQUAL(pd.idl_input()[0].name, "mod2_0");
+	BOOST_CHECK_EQUAL(pd.idl_input()[0].name, "mod");
+	BOOST_CHECK_EQUAL(pi::get_version(pd.idl_input()[0]), pi::meta_parameters::version(2,0));
 
 	BOOST_CHECK_EQUAL(pd.next(), true);
 	BOOST_CHECK_EQUAL(pd.part_name(), "def");
