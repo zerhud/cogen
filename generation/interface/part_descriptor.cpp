@@ -51,7 +51,7 @@ mi::part_descriptor::part_descriptor(mg::options::view o, std::vector<mp::loader
 	filter::request freq;
 	//freq.mod_name = cur_mod_name();
 
-	std::string versioning = opts_.get_opt<std::string>(options::template_option::versioning).value_or(""s);
+	std::string versioning = opts_.get_opt<std::string>(options::template_option::versioning).value_or("merge"s);
 	filtered_idl_ = input_idl_;
 	filtered_idl_
 	        | split_version(versioning != "split"sv)

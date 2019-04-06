@@ -99,13 +99,11 @@ nlohmann::json mg::cpp_generator::jsoned_data(const output_info& outputs) const
 	//freq.sel = parser::interface::from_string(opts.part_data().get("filter.sel", ""s));
 
 	cpp::type_converter tcvt;
-	std::string versioning = opts.get_opt<std::string>(options::template_option::versioning, ""s, "cpp"s).value_or(""s);
 	nlohmann::json jsoned =
 	          data
 	        | tcvt
 	        | filter(freq)
 	        | naming(opts.get_opt<std::string>(options::part_option::naming).value_or(""s))
-	        | split_version(versioning != "split"sv)
 	        | interface::to_json(std::make_unique<json_extra_info>())
 	        ;
 

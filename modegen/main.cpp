@@ -23,6 +23,8 @@
 #include "generation/python.hpp"
 #include "generation/part_descriptor.hpp"
 
+#include "generation/interface/part_descriptor.hpp"
+
 #include "parser/interface/loader.hpp"
 
 #include "pythongen.hpp"
@@ -137,7 +139,8 @@ public:
 
 	std::unique_ptr<mg::part_descriptor> create_part_descriptor(mg::options::view v) const override
 	{
-		TODO("create here using options diff gens")
+		auto ng = v.get_opt<std::string>(mg::options::part_option::output_name_gen).value_or("single");
+		if(ng=="interface"s) return std::make_unique<mg::interface::part_descriptor>(v, parsers());
 		return std::make_unique<mg::single_part_descriptor>(std::move(v), parsers());
 	}
 

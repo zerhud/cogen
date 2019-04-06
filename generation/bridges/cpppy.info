@@ -41,6 +41,5 @@ gen
 		input python/cpppy.jinja
 		output %mod%.py
 		output_ng interface
-		modularization "split"
 	}
 }

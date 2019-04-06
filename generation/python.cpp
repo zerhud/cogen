@@ -7,6 +7,8 @@
  *************************************************************************/
 
 #include "python.hpp"
+#include "output_info.hpp"
+#include "part_descriptor.hpp"
 
 namespace mg = modegen::generation;
 
@@ -15,5 +17,8 @@ nlohmann::json mg::python::jsoned_data(const mg::output_info& outputs) const
 	TODO("place code here");
 	nlohmann::json ret;
 	ret["generator"] = "python";
+
+	auto& cur_part = *outputs.current_part();
+	for(auto& mod:cur_part.idl_input()) ret["mod_name"].push_back(mod.name);
 	return ret;
 }
