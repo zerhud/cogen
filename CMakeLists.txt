@@ -122,6 +122,7 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pythongen_data.cpp"
 		-Djinja_env_file="${CMAKE_CURRENT_LIST_DIR}/modegen/scripts/jinja_env.py"
 		-Dinput="${CMAKE_CURRENT_LIST_DIR}/modegen/pythongen_data.cpp.in"
 		-Doutput="${CMAKE_CURRENT_BINARY_DIR}/pythongen_data.cpp"
+		-Dtemplates_dir_path="${templates_dir_path}"
 		-P "${CMAKE_CURRENT_LIST_DIR}/cmake/configure_file.cmake"
 	DEPENDS
 		"${CMAKE_CURRENT_LIST_DIR}/modegen/pythongen_data.cpp.in"
