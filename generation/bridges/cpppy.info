@@ -38,7 +38,7 @@ gen
 	}
 	pymod {
 		filegen python
-		input python/cpppy.jinja
+		input python/cpppy.cpp.jinja
 		output %mod%.py
 		output_ng interface
 	}
