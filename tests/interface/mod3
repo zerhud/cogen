@@ -1,0 +1,9 @@
+module mod1 v1.0:
+string foo_m1();
+
+module mod2 v1.0:
+string foo_m2();
+
+module mod2 v1.1:
+string foo_m21();
+

@@ -24,6 +24,7 @@ public:
 	virtual const options::view& opts() const =0 ;
 	virtual bool need_output() const =0 ;
 	virtual bool next() =0 ;
+	virtual part_descriptor* reset() =0 ;
 
 	virtual std::vector<parser::interface::module> idl_input() const =0 ;
 	virtual boost::property_tree::ptree data_input() const =0 ;
@@ -41,6 +42,7 @@ public:
 	const options::view& opts() const override ;
 	bool need_output() const override ;
 	bool next() override ;
+	part_descriptor* reset() override ;
 
 	std::vector<parser::interface::module> idl_input() const override ;
 	boost::property_tree::ptree data_input() const override ;

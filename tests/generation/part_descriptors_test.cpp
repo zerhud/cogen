@@ -101,6 +101,13 @@ BOOST_AUTO_TEST_CASE(few_mods)
 	BOOST_CHECK_EQUAL(pd.idl_input()[0].name, "other");
 
 	BOOST_CHECK_EQUAL(pd.next(), false);
+	
+	BOOST_CHECK_EQUAL(pd.reset(), &pd);
+	BOOST_CHECK_EQUAL(pd.part_name(), "def");
+	BOOST_CHECK_EQUAL(pd.file_name(), "mod.ext");
+	BOOST_CHECK_EQUAL(pd.next(), true);
+	BOOST_CHECK_EQUAL(pd.part_name(), "def");
+	BOOST_CHECK_EQUAL(pd.file_name(), "other.ext");
 }
 BOOST_AUTO_TEST_CASE(splited_by_ver_modules)
 {

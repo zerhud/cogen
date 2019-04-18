@@ -48,8 +48,13 @@ mg::part_descriptor* mg::output_info::current_part() const
 
 mg::part_descriptor* mg::output_info::require(std::string_view name) const
 {
-	for(auto& p:parts_) if(p->part_name() == name) return p.get();
-	throw errors::error("no such part found"s + std::string(name));
+	for(std::size_t i=0;i<parts_.size();++i) {
+		auto* p = parts_[i].get();
+		if(p->part_name() != name) continue;
+		return (cur_part_ && i==*cur_part_) ? p : p->reset();
+	}
+
+	throw errors::error("no such part found \""s + std::string(name) + "\""s);
 }
 
 bool mg::output_info::next()
@@ -57,6 +62,7 @@ bool mg::output_info::next()
 	if(parts_.empty()) return false;
 	if(!cur_part_) {
 		cur_part_ = 0;
+		parts_[0]->reset();
 		return true;
 	}
 
@@ -64,6 +70,8 @@ bool mg::output_info::next()
 	if(*cur_part_+1 == final) return false;
 
 	cur_part_ = *cur_part_ + 1;
+	parts_[*cur_part_]->reset();
+
 	return true;
 }
 

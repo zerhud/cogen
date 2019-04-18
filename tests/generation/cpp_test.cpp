@@ -60,6 +60,7 @@ MOCK_BASE_CLASS( part_desc_mock, modegen::generation::part_descriptor )
 	MOCK_METHOD( opts, 0 )
 	MOCK_METHOD( need_output, 0 )
 	MOCK_METHOD( next, 0 )
+	MOCK_METHOD( reset, 0 )
 	MOCK_METHOD( idl_input, 0 )
 	MOCK_METHOD( data_input, 0 )
 	static std::vector<mi::module> mods;
@@ -99,6 +100,7 @@ BOOST_AUTO_TEST_CASE( no_data_is_error )
 
 	auto pd = std::make_unique<part_desc_mock>();
 	MOCK_EXPECT( pd->idl_input ).exactly(1).returns( part_desc_mock::mods );
+	MOCK_EXPECT( pd->reset ).exactly(1).returns( pd.get() );
 	mg::output_info oi;
 	oi.add_part(std::move(pd)).next();
 	BOOST_CHECK_THROW(gen.jsoned_data(oi), modegen::errors::gen_error);
@@ -117,6 +119,7 @@ BOOST_AUTO_TEST_CASE( extra_namespaces )
 	MOCK_EXPECT( pd->idl_input ).once().returns( mi::parse("module mod v1.0: int foo();"sv).mods );
 	MOCK_EXPECT( pd->data_input ).once().returns( pt::ptree{} );
 	MOCK_EXPECT( pd->opts ).once().returns( opts );
+	MOCK_EXPECT( pd->reset ).exactly(1).returns( pd.get() );
 
 	mg::output_info oi;
 	oi.add_part(std::move(pd)).next();
@@ -144,6 +147,7 @@ BOOST_AUTO_TEST_CASE(extra_data)
 	MOCK_EXPECT( pd->idl_input ).once().returns( mi::parse("module mod v1.0: int foo();"sv).mods );
 	MOCK_EXPECT( pd->data_input ).once().returns( extra_data );
 	MOCK_EXPECT( pd->opts ).once().returns( opts );
+	MOCK_EXPECT( pd->reset ).exactly(1).returns( pd.get() );
 
 	mg::output_info oi;
 	oi.add_part(std::move(pd)).next();
@@ -168,6 +172,7 @@ BOOST_AUTO_TEST_CASE( ctor_prefix_ptr_siffux )
 	MOCK_EXPECT( pd->idl_input ).once().returns( mi::parse("module mod v1.0: int foo();"sv).mods );
 	MOCK_EXPECT( pd->data_input ).once().returns( pt::ptree{} );
 	MOCK_EXPECT( pd->opts ).once().returns( opts );
+	MOCK_EXPECT( pd->reset ).exactly(1).returns( pd.get() );
 
 	mg::output_info oi;
 	oi.add_part( std::move(pd) ).next();
@@ -186,6 +191,7 @@ BOOST_AUTO_TEST_CASE( defaults )
 	MOCK_EXPECT( pd->idl_input ).exactly(5).returns( mi::parse("module mod v1.0: int foo();"sv).mods );
 	MOCK_EXPECT( pd->data_input ).exactly(5).returns( pt::ptree{} );
 	MOCK_EXPECT( pd->opts ).exactly(5).returns( opts );
+	MOCK_EXPECT( pd->reset ).exactly(1).returns( pd.get() );
 
 	mg::output_info oi;
 	oi.add_part( std::move(pd) ).next();
@@ -228,6 +234,7 @@ BOOST_AUTO_TEST_CASE( without_includes )
 	MOCK_EXPECT( pd->idl_input ).exactly(1).returns( mi::parse("module mod v1.0: int foo();"sv).mods );
 	MOCK_EXPECT( pd->data_input ).exactly(1).returns( pt::ptree{} );
 	MOCK_EXPECT( pd->opts ).exactly(1).returns( opts );
+	MOCK_EXPECT( pd->reset ).exactly(1).returns( pd.get() );
 
 	mg::output_info oi;
 	oi.add_part( std::move(pd) ).next();
@@ -250,6 +257,7 @@ BOOST_AUTO_TEST_CASE(with_lnag_includes)
 	MOCK_EXPECT( pd->idl_input ).exactly(1).returns( mi::parse("module mod v1.0: string foo(date d, list<i8> l);"sv).mods );
 	MOCK_EXPECT( pd->data_input ).exactly(1).returns( pt::ptree{} );
 	MOCK_EXPECT( pd->opts ).exactly(1).returns( opts );
+	MOCK_EXPECT( pd->reset ).exactly(1).returns( pd.get() );
 
 	mg::output_info oi;
 	oi.add_part( std::move(pd) ).next();
@@ -286,6 +294,7 @@ BOOST_AUTO_TEST_CASE(with_setts_includes)
 	MOCK_EXPECT( pd->idl_input ).exactly(1).returns( mi::parse("module mod v1.0: string foo(date d, list<i8> l);"sv).mods );
 	MOCK_EXPECT( pd->data_input ).exactly(1).returns( pt::ptree{} );
 	MOCK_EXPECT( pd->opts ).exactly(1).returns( opts );
+	MOCK_EXPECT( pd->reset ).exactly(1).returns( pd.get() );
 
 	mg::output_info oi;
 	oi.add_part(std::move(pd)).next();
@@ -323,17 +332,18 @@ BOOST_AUTO_TEST_SUITE_END() // includes
 BOOST_AUTO_TEST_SUITE( error_data )
 //BOOST_AUTO_TEST_CASE( no_part_opts )
 //{
-    //auto opts_tree = std::make_shared<mo::container>();
-    //mg::cpp_generator gen;
-    //mg::options::view opts(opts_tree, "def"sv);
+	//auto opts_tree = std::make_shared<mo::container>();
+	//mg::cpp_generator gen;
+	//mg::options::view opts(opts_tree, "def"sv);
 
-    //auto pd = std::make_unique<part_desc_mock>();
-    //MOCK_EXPECT( pd->idl_input ).exactly(1).returns( mi::parse("module mod v1.0: string foo(date d, list<i8> l);"sv).mods );
-    //MOCK_EXPECT( pd->opts ).exactly(1).returns( opts );
-    //MOCK_EXPECT( pd->data_input ).exactly(1).returns( pt::ptree{} );
+	//auto pd = std::make_unique<part_desc_mock>();
+	//MOCK_EXPECT( pd->idl_input ).exactly(1).returns( mi::parse("module mod v1.0: string foo(date d, list<i8> l);"sv).mods );
+	//MOCK_EXPECT( pd->opts ).exactly(1).returns( opts );
+	//MOCK_EXPECT( pd->data_input ).exactly(1).returns( pt::ptree{} );
+	//MOCK_EXPECT( pd->reset ).exactly(1).returns( pd.get() );
 
-    //mg::output_info oi;
-    //oi.add_part(std::move(pd)).next();
-    //BOOST_CHECK_THROW( gen.jsoned_data(oi), modegen::errors::error );
+	//mg::output_info oi;
+	//oi.add_part(std::move(pd)).next();
+	//BOOST_CHECK_THROW( gen.jsoned_data(oi), modegen::errors::error );
 //}
 BOOST_AUTO_TEST_SUITE_END() // error_data

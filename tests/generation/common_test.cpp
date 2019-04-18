@@ -60,13 +60,15 @@ struct fake_data_gen : modegen::generation::file_data {
 
 struct ab_part_desc : modegen::generation::part_descriptor {
 	mo::view opts_;
+	int& reset_calls;
 	mutable int cur_iter = 0;
-	ab_part_desc(mo::view o) : opts_(std::move(o)) {}
+	ab_part_desc(mo::view o, int* rc) : opts_(std::move(o)), reset_calls(*rc) {}
 
 	std::string part_name() const override {return std::string(opts_.part()); }
 	const mo::view& opts() const override {return opts_;}
 	bool need_output() const override {return cur_iter < 2;}
 	bool next() override {return cur_iter < 2;}
+	modegen::generation::part_descriptor* reset() override { ++reset_calls; cur_iter = 0; return this; }
 	std::string file_name() const override
 	{
 		++cur_iter;
@@ -228,15 +230,19 @@ BOOST_AUTO_TEST_CASE(extra_generator_data)
 BOOST_AUTO_TEST_CASE(output_name_generator)
 {
 	BOOST_TEST_CHECKPOINT("fill mock");
+	int reset_calls=0;
 	mo::view cur_opts(nullptr, ""sv);
 	auto opt_saver = [&cur_opts](mo::view no){ cur_opts = std::move(no); };
-	auto pdesc_maker = [&cur_opts](mo::view no) {return std::make_unique<ab_part_desc>(std::move(no));};
+	auto pdesc_maker = [&reset_calls](mo::view no) {return std::make_unique<ab_part_desc>(std::move(no), &reset_calls);};
 
 	int cur_iter = 0;
-	auto result_checker = [&cur_iter](const mg::tmpl_gen_env& gdata) {
+	auto result_checker = [&cur_iter, &reset_calls](const mg::tmpl_gen_env& gdata) {
 		BOOST_REQUIRE( gdata.out_file() );
-		if(cur_iter == 0) BOOST_CHECK_EQUAL( *gdata.out_file(), fs::path("some_dir") / "a.hpp" );
-		if(cur_iter == 1) BOOST_CHECK_EQUAL( *gdata.out_file(), fs::path("some_dir") / "b.hpp" );
+		BOOST_TEST_CONTEXT("cur_iter=" << cur_iter << "; reset_calls=" << reset_calls) {
+			BOOST_CHECK_EQUAL( reset_calls, 1 );
+			if(cur_iter == 0) BOOST_CHECK_EQUAL( *gdata.out_file(), fs::path("some_dir") / "a.hpp" );
+			if(cur_iter == 1) BOOST_CHECK_EQUAL( *gdata.out_file(), fs::path("some_dir") / "b.hpp" );
+		}
 		++cur_iter;
 		return true;
 	};

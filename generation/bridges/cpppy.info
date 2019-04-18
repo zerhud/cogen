@@ -23,6 +23,12 @@ gen
 		input definitions.jinja
 		output modules.cpp
 	}
+	pymod {
+		filegen python
+		input python/cpppy.cpp.jinja
+		output %mod%.cpp
+		output_ng interface
+	}
 	cmake {
 		filegen cmake
 		input plain.jinja
@@ -33,13 +39,8 @@ gen
 				part cpp_dec
 				part header
 				part definition
+				part pymod
 			}
 		}
-	}
-	pymod {
-		filegen python
-		input python/cpppy.cpp.jinja
-		output %mod%.py
-		output_ng interface
 	}
 }

@@ -27,6 +27,7 @@ MOCK_BASE_CLASS( part_desc_mock, modegen::generation::part_descriptor )
 	MOCK_METHOD( opts, 0 )
 	MOCK_METHOD( need_output, 0 )
 	MOCK_METHOD( next, 0 )
+	MOCK_METHOD( reset, 0 )
 	MOCK_METHOD( idl_input, 0 )
 	MOCK_METHOD( data_input, 0 )
 };
@@ -37,14 +38,22 @@ BOOST_AUTO_TEST_CASE(add_library)
 	opts->raw().put("gen.cmake.project", "proj");
 	opts->raw().put("gen.cmake.libraries.interface.part", "some_part");
 	opts->raw().put("gen.cmake.libraries.interface.file", "some_file.cpp");
-	opts->raw().put("gen.some_part.output", "part_file.cpp");
+	//opts->raw().put("gen.some_part.output", "part_file.cpp");
 	mg::options::view opts_view(opts, "cmake"s);
 
-	auto pg = std::make_unique<part_desc_mock>();
-	MOCK_EXPECT( pg->opts ).once().returns( opts_view );
+	auto cmake_pg = std::make_unique<part_desc_mock>();
+	MOCK_EXPECT( cmake_pg->opts ).once().returns( opts_view );
+	MOCK_EXPECT( cmake_pg->part_name ).returns( "cmake" );
+	MOCK_EXPECT( cmake_pg->reset ).returns( cmake_pg.get() );
+
+	auto some_pg = std::make_unique<part_desc_mock>();
+	MOCK_EXPECT( some_pg->part_name ).returns( "some_part" );
+	MOCK_EXPECT( some_pg->next ).returns( false );
+	MOCK_EXPECT( some_pg->file_name ).returns( "part_file.cpp" );
+	MOCK_EXPECT( some_pg->reset ).returns( some_pg.get() );
 
 	mg::output_info oi;
-	oi.add_part(std::move(pg)).next();
+	oi.add_part(std::move(cmake_pg)).add_part(std::move(some_pg)).next();
 
 
 	mg::cmake cm;
@@ -57,3 +66,35 @@ BOOST_AUTO_TEST_CASE(add_library)
 	BOOST_CHECK_EQUAL(data["libraries"]["interface"]["files"][0], "part_file.cpp");
 	BOOST_CHECK_EQUAL(data["libraries"]["interface"]["files"][1], "some_file.cpp");
 }
+
+BOOST_AUTO_TEST_CASE(multioutputs)
+{
+	auto opts=std::make_shared<mg::options::container>();
+	opts->raw().put("gen.cmake.project", "proj");
+	opts->raw().put("gen.cmake.libraries.interface.part", "some_part");
+	opts->raw().put("", "");
+	mg::options::view opts_view(opts, "cmake"s);
+
+	auto cmake_pg = std::make_unique<part_desc_mock>();
+	MOCK_EXPECT( cmake_pg->opts ).once().returns( opts_view );
+	MOCK_EXPECT( cmake_pg->reset ).once().returns( cmake_pg.get() );
+	MOCK_EXPECT( cmake_pg->part_name ).returns( "cmake" );
+	MOCK_EXPECT( cmake_pg->file_name ).returns( "cm_fn" );
+	MOCK_EXPECT( cmake_pg->next ).returns( false );
+
+	auto some_pg = std::make_unique<part_desc_mock>();
+	MOCK_EXPECT( some_pg->opts ).once().returns( opts_view );
+	MOCK_EXPECT( some_pg->reset ).once().returns( some_pg.get() );
+	MOCK_EXPECT( some_pg->part_name ).returns( "some_part" );
+	MOCK_EXPECT( some_pg->file_name ).returns( "sm_fn" );
+	MOCK_EXPECT( some_pg->next ).returns( false );
+
+	mg::output_info oi;
+	oi.add_part(std::move(cmake_pg)).add_part(std::move(some_pg)).next();
+
+	mg::cmake cm;
+	auto data = cm.jsoned_data(oi);
+	BOOST_REQUIRE(data["libraries"]["interface"]["files"].is_array());
+	BOOST_REQUIRE_EQUAL(data["libraries"]["interface"]["files"].size(), 2);
+}
+

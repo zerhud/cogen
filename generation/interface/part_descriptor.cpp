@@ -90,6 +90,13 @@ bool mi::part_descriptor::next()
 	return false;
 }
 
+mg::part_descriptor* mi::part_descriptor::reset()
+{
+	TODO( "need we checks if cur_pos==0 or filtered_idl.size() <= cur_pos (all was iterated or non)" );
+	cur_pos = 0;
+	return this;
+}
+
 std::vector<mp::interface::module> mi::part_descriptor::idl_input() const
 {
 	assert( cur_pos < filtered_idl_.size() || filtered_idl_.empty() );

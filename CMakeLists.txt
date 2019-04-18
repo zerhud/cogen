@@ -81,6 +81,7 @@ target_sources_copy(modegen_interfaces "${dbg_python_templates_dir}"
 	generation/bridges/cpppy.info
 	generation/bridges/pycpp.info
 	generation/bridges/cpppy.cpp.jinja
+	generation/bridges/pycpp.py.jinja
 	)
 # generation part for interface
 target_sources_local(modegen_interfaces to_json.hpp to_json.cpp "generation/interface/")

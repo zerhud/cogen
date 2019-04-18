@@ -30,6 +30,7 @@ public:
 	const options::view& opts() const override ;
 	bool need_output() const override ;
 	bool next() override ;
+	generation::part_descriptor* reset() override ;
 
 	std::vector<parser::interface::module> idl_input() const override ;
 	boost::property_tree::ptree data_input() const override ;

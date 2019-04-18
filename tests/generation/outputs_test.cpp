@@ -30,6 +30,7 @@ struct simple_part_desc : mg::part_descriptor {
 	const mg::options::view& opts() const override {throw 1;}
 	bool need_output() const override {return false;}
 	bool next() override {return false;}
+	mg::part_descriptor* reset() override { return this; }
 
 	std::vector<modegen::parser::interface::module> idl_input() const override { return {}; }
 	boost::property_tree::ptree data_input() const override { return boost::property_tree::ptree{}; }
@@ -89,3 +90,5 @@ BOOST_AUTO_TEST_CASE(tree)
 	BOOST_CHECK( outputs.current_part() );
 }
 BOOST_AUTO_TEST_SUITE_END() // iterate
+TODO("write test for require current part")
+
