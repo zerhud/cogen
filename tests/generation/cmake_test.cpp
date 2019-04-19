@@ -82,12 +82,14 @@ BOOST_AUTO_TEST_CASE(multioutputs)
 	MOCK_EXPECT( cmake_pg->file_name ).returns( "cm_fn" );
 	MOCK_EXPECT( cmake_pg->next ).returns( false );
 
+	mock::sequence seq_next, seq_fname;
 	auto some_pg = std::make_unique<part_desc_mock>();
-	MOCK_EXPECT( some_pg->opts ).once().returns( opts_view );
 	MOCK_EXPECT( some_pg->reset ).once().returns( some_pg.get() );
-	MOCK_EXPECT( some_pg->part_name ).returns( "some_part" );
-	MOCK_EXPECT( some_pg->file_name ).returns( "sm_fn" );
-	MOCK_EXPECT( some_pg->next ).returns( false );
+	MOCK_EXPECT( some_pg->part_name ).exactly(1).returns( "some_part" );
+	MOCK_EXPECT( some_pg->file_name ).once().in(seq_fname).returns( "sm_fn1.txt" );
+	MOCK_EXPECT( some_pg->file_name ).once().in(seq_fname).returns( "sm_fn2.txt" );
+	MOCK_EXPECT( some_pg->next ).once().in(seq_next).returns( true );
+	MOCK_EXPECT( some_pg->next ).once().in(seq_next).returns( false );
 
 	mg::output_info oi;
 	oi.add_part(std::move(cmake_pg)).add_part(std::move(some_pg)).next();
@@ -96,5 +98,7 @@ BOOST_AUTO_TEST_CASE(multioutputs)
 	auto data = cm.jsoned_data(oi);
 	BOOST_REQUIRE(data["libraries"]["interface"]["files"].is_array());
 	BOOST_REQUIRE_EQUAL(data["libraries"]["interface"]["files"].size(), 2);
+	BOOST_REQUIRE_EQUAL(data["libraries"]["interface"]["files"][0], "sm_fn1.txt");
+	BOOST_REQUIRE_EQUAL(data["libraries"]["interface"]["files"][1], "sm_fn2.txt");
 }
 
