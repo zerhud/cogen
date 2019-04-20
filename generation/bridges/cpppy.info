@@ -26,7 +26,7 @@ gen
 	pymod {
 		filegen python
 		input python/cpppy.cpp.jinja
-		output %mod%.cpp
+		output %mod%_%vm%.%vi%.cpp
 		output_ng interface
 	}
 	cmake {

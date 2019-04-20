@@ -30,8 +30,15 @@ const pi::module& mi::part_descriptor::cur_mod() const
 }
 
 mi::part_descriptor::part_descriptor(mg::options::view o, std::vector<mp::loader_ptr> ldrs)
+    : part_descriptor(std::move(o), std::move(ldrs), false)
+{
+}
+
+mi::part_descriptor::part_descriptor(options::view o, std::vector<parser::loader_ptr> ldrs, bool untie)
     : opts_(std::move(o))
 {
+	std::vector<parser::interface::module> input_idl_;
+
 	for(auto& _ldr:ldrs) {
 		mp::data_tree::loader* exd_ldr = dynamic_cast<mp::data_tree::loader*>(_ldr.get());
 		if(exd_ldr) {
@@ -48,14 +55,11 @@ mi::part_descriptor::part_descriptor(mg::options::view o, std::vector<mp::loader
 		}
 	}
 
-	filter::request freq;
-	//freq.mod_name = cur_mod_name();
-
 	std::string versioning = opts_.get_opt<std::string>(options::template_option::versioning).value_or("merge"s);
 	filtered_idl_ = input_idl_;
 	filtered_idl_
 	        | split_version(versioning != "split"sv)
-	        | filter(freq)
+	        | filter(filter::request{})
 	       ;
 }
 

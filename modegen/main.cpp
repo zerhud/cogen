@@ -141,6 +141,7 @@ public:
 	{
 		auto ng = v.get_opt<std::string>(mg::options::part_option::output_name_gen).value_or("single");
 		if(ng=="interface"s) return std::make_unique<mg::interface::part_descriptor>(v, parsers());
+		if(ng=="interface,unite"s) return std::make_unique<mg::interface::part_descriptor>(v ,parsers(), true);
 		return std::make_unique<mg::single_part_descriptor>(std::move(v), parsers());
 	}
 
