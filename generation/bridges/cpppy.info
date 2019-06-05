@@ -24,7 +24,7 @@ gen
 		output modules.cpp
 	}
 	pymod {
-		filegen python
+		inc_part cpp_dec
 		input python/cpppy.cpp.jinja
 		output %mod%_%vm%.%vi%.cpp
 		output_ng interface
@@ -34,12 +34,16 @@ gen
 		input plain.jinja
 		output CMakeLists.txt
 		project interface
+		deps {
+			pybind11 { }
+		}
 		libraries {
 			interface {
 				part cpp_dec
 				part header
 				part definition
 				part pymod
+				dep "pybind11::embed"
 			}
 		}
 	}

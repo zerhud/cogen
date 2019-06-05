@@ -4,10 +4,20 @@ project(<= cdata.project => VERSION <= cdata.version => LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+<% for dep in cdata.deps -%>
+find_package( <= dep.pack => REQUIRED)
+<% endfor %>
+
 <% for item, value in cdata.libraries.items() %>
-add_library("<= item =>" STATIC
+add_library("<= item =>-static" STATIC
 <% for file in value.files %>	<= file =>
 <% endfor -%>
 )
+add_library("<= item =>" SHARED
+<% for file in value.files %>	<= file =>
+<% endfor -%>
+)
+<% if value.deps %>target_link_libraries("<= item =>" PRIVATE <% for dep in value.deps %>	<= dep =><% endfor %>) <% endif %>
+<% if value.deps %>target_link_libraries("<= item =>-static" PUBLIC <% for dep in value.deps %>	<= dep =><% endfor %>) <% endif %>
 <% endfor %>
 
