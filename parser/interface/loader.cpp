@@ -13,6 +13,8 @@
 
 #include "errors.h"
 
+using namespace std::literals;
+
 modegen::parser::interface::loader_impl::loader_impl() : loader_impl(std::vector<FS::path>{})
 {
 }
@@ -38,6 +40,7 @@ void modegen::parser::interface::loader_impl::load(std::istream &input, std::str
 void modegen::parser::interface::loader_impl::load(FS::path file)
 {
 	if(!file.is_absolute()) throw errors::error("cannot load relative path");
+	if(!FS::exists(file)) throw errors::error("cannot load file "s+file.string());
 
 	if(already_loaded(file)) return;
 	loaded_files.emplace_back(file);
