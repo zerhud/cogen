@@ -157,13 +157,13 @@ public:
 private:
 	std::optional<FS::path> resolve_file(FS::path p, const std::vector<FS::path> final_search) const
 	{
-		FS::path ret;
+		std::optional<FS::path> ret;
 		for(auto& sp:final_search) {
 			ret = sp / p;
-			if(FS::exists(ret)) return ret;
+			if(FS::exists(*ret)) return ret;
 		}
 
-		return std::nullopt;
+		return ret;
 	}
 
 	modegen::parser::loaders_manager lman;

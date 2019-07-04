@@ -7,6 +7,11 @@
  *************************************************************************/
 
 #include "generator.hpp"
+
+#include <cassert>
+
+#include "options.hpp"
+#include "provider.hpp"
 #include "exceptions.hpp"
 
 namespace mpg = modegen::pg;
@@ -40,6 +45,15 @@ void mpg::generator::generate(std::string_view part, std::ostream& out) const
 
 void mpg::generator::init_parts()
 {
+	assert(prov);
+	assert(setts);
+
+	auto plist = setts->part_list();
+	for(auto&& p:plist) {
+		options::part_view psetts(setts,p);
+		auto part = prov->create_part(std::move(psetts));
+		pman.add(std::move(part));
+	}
 }
 
 void mpg::generator::build_deps()

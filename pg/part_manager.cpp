@@ -12,6 +12,11 @@ namespace mpg = modegen::pg;
 
 std::size_t mpg::part_manager::count() const
 {
-	return 10;
+	return store.size();
+}
+
+void mpg::part_manager::add(mpg::part_descriptor_ptr p)
+{
+	store.emplace_back(std::move(p));
 }
 

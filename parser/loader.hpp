@@ -9,7 +9,9 @@
 #pragma once
 
 #include <map>
+#include <vector>
 #include "config.hpp"
+
 #include FILESYSTEM
 
 namespace modegen::parser {

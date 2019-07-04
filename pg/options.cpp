@@ -45,7 +45,7 @@ const boost::property_tree::ptree& mo::container::raw() const
 std::vector<std::string> mo::container::part_list() const
 {
 	std::vector<std::string> ret;
-	auto gchild = opts.get_child_optional("gen");
+	auto gchild = opts.get_child_optional("part");
 	if(gchild) for(auto& ps:*gchild) ret.emplace_back(ps.first);
 	return ret;
 }
@@ -136,11 +136,12 @@ std::string mo::container::solve_key(subsetts opt)
 
 mo::container::path_t mo::container::make_part_key(mo::any_option key, const std::string& p)
 {
-	return path_t("gen"s) / path_t(p) / path_t(solve_key(key));
+	return path_t("part"s) / path_t(p) / path_t(solve_key(key));
 }
 
 mo::container::path_t mo::container::make_part_default_key(any_option key, const std::string& p)
 {
+	(void)p;
 	return path_t("defaults"s) / path_t(solve_key(key));
 }
 
@@ -148,7 +149,7 @@ mo::container::path_t mo::container::make_subset_key(mo::subsetts key, const std
 {
 	if(is_toplevel_subset(key)) return path_t(solve_key(key)) / path_t(param);
 
-	path_t rpath = path_t("gen"s) / path_t(part) / path_t(solve_key(key), '.') ;
+	path_t rpath = path_t("part"s) / path_t(part) / path_t(solve_key(key), '.') ;
 	if(!param.empty()) rpath /= path_t(param);
 	return rpath;
 }
