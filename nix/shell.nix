@@ -1,7 +1,7 @@
 {
 	  system ? builtins.currentSystem
 	, pkgs ? import<nixos-unstable> { inherit system; }
-	, compiler_name ? "gcc8"
+	, compiler_name ? "gcc9"
 	, enable_clcov ? false
 }:
 
@@ -12,6 +12,6 @@ let
 in pkgs.callPackage ./default.nix {
 	inherit stdenv turtle enable_clcov;
 	py_jinja = pkgs.python3Packages.jinja2;
-        clang = pkgs.clang_7;
+	clang = pkgs.clang_7;
 }
 
