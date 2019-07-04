@@ -23,11 +23,15 @@ set(tests_gcommon
 	cmake
 	)
 set(tests_interface mdp checker )
+set(tests_pg uc)
 foreach(tname ${tests_interface})
 	add_unit_test(${tname} "tests/interface/" "modegen_interfaces")
 endforeach()
 foreach(tname ${tests_gcommon})
 	add_unit_test(${tname} "tests/generation/" "modegen_interfaces")
+endforeach()
+foreach(tname ${tests_pg})
+	add_unit_test(${tname} "tests/pg/" "part_generation")
 endforeach()
 add_unit_test("dt_loader" "tests/data_tree/" "modegen_interfaces")
 

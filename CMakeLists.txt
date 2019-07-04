@@ -92,6 +92,22 @@ target_sources_local(modegen_interfaces part_descriptor.hpp part_descriptor.cpp 
 # generation part for cpp
 target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "generation/cpp/")
 
+add_library(part_generation "pg/declarations.hpp" ${main_config_file})
+target_include_directories(part_generation PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
+
+target_sources_local(part_generation "generator.hpp" "generator.cpp" "pg/")
+target_sources_local(part_generation "part_descriptor.hpp" "part_descriptor.cpp" "pg/")
+target_sources_local(part_generation "output_descriptor.hpp" "output_descriptor.cpp" "pg/")
+target_sources_local(part_generation "final_generator.hpp" "final_generator.cpp" "pg/")
+target_sources_local(part_generation "generator.hpp" "generator.cpp" "pg/")
+target_sources_local(part_generation "part_manager.hpp" "part_manager.cpp" "pg/")
+target_sources_local(part_generation "options.hpp" "options.cpp" "pg/")
+target_sources_local(part_generation "provider.hpp" "provider.cpp" "pg/")
+target_sources_local(part_generation "exceptions.hpp" "exceptions.cpp" "pg/")
+target_sources_local(part_generation "cpp.hpp" "cpp.cpp" "pg/langs/")
+target_sources_local(part_generation "cmake.hpp" "cmake.cpp" "pg/langs/")
+target_sources_local(part_generation "python.hpp" "python.cpp" "pg/langs/")
+
 # lohman json
 set(lohman_json_file "${CMAKE_CURRENT_BINARY_DIR}/nlohman/json.hpp")
 set(lohman_json_url "https://github.com/nlohmann/json/raw/develop/single_include/nlohmann/json.hpp")
@@ -111,7 +127,7 @@ add_executable(modegen modegen/main.cpp)
 target_sources(modegen PRIVATE modegen/pythongen.cpp modegen/pythongen.hpp)
 target_sources(modegen PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/pythongen_data.cpp")
 target_link_libraries(modegen PRIVATE
-	modegen_interfaces
+	modegen_interfaces part_generation
 	${Boost_LIBRARIES} pybind11::embed
 	${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
 	)
