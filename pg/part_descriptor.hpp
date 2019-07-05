@@ -19,6 +19,7 @@ public:
 
 	virtual std::string_view name() const =0 ;
 	virtual std::vector<output_descriptor_ptr> outputs() const =0 ;
+	virtual void build_outputs(const part_manager& pman, const provider& prov) =0 ;
 };
 
 } // namespace modegen::pg

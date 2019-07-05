@@ -20,3 +20,8 @@ void mpg::part_manager::add(mpg::part_descriptor_ptr p)
 	store.emplace_back(std::move(p));
 }
 
+std::vector<mpg::part_descriptor_ptr> mpg::part_manager::list() const
+{
+	return store;
+}
+

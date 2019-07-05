@@ -19,6 +19,7 @@ public:
 	std::size_t count() const ;
 	void add(part_descriptor_ptr p);
 	part_descriptor_ptr require(std::string_view name) const ;
+	std::vector<part_descriptor_ptr> list() const ;
 };
 
 } // namespace modegen::pg

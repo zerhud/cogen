@@ -13,6 +13,7 @@
 #include "options.hpp"
 #include "provider.hpp"
 #include "exceptions.hpp"
+#include "part_descriptor.hpp"
 
 namespace mpg = modegen::pg;
 
@@ -58,5 +59,7 @@ void mpg::generator::init_parts()
 
 void mpg::generator::build_deps()
 {
+	auto plist = pman.list();
+	for(auto&& p:plist) p->build_outputs(pman, *prov);
 }
 
