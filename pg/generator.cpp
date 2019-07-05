@@ -60,6 +60,6 @@ void mpg::generator::init_parts()
 void mpg::generator::build_deps()
 {
 	auto plist = pman.list();
-	for(auto&& p:plist) p->build_outputs(pman, *prov);
+	for(auto& p:plist) p->build_outputs(pman, *prov);
 }
 

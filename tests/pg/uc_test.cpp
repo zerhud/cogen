@@ -52,15 +52,30 @@ BOOST_AUTO_TEST_CASE(without_build)
 	mpg::generator g(nullptr,nullptr);
 	BOOST_CHECK_EQUAL(g.parts().count(), 0);
 }
-
+BOOST_AUTO_TEST_CASE(part_is_null)
+{
+	//auto setts = std::make_shared<mpo::container>();
+	//setts->raw().put("part.fcpp.file_single","test.cpp");
+	//auto prov = std::make_shared<mock_provider>();
+	//MOCK_EXPECT(prov->create_part).once().returns(nullptr);
+	//mpg::generator gen(prov,setts);
+	//BOOST_CHECK_THROWS( gen.build_env() );
+	BOOST_FAIL("not done test");
+}
 BOOST_AUTO_TEST_CASE(withou_generation)
 {
 	auto setts = std::make_shared<mpo::container>();
-	setts->raw().put("part.fcpp.file_single","test.cpp");
 	auto prov = std::make_shared<mock_provider>();
-	MOCK_EXPECT(prov->create_part).once().returns(nullptr);
+	auto part = std::make_shared<mock_part>();
+
+	setts->raw().put("part.fcpp.file_single","test.cpp");
+
+	MOCK_EXPECT( part->build_outputs ).once();
+	MOCK_EXPECT(prov->create_part).once().returns(part);
+
 	mpg::generator gen(prov,setts);
 	BOOST_CHECK_EQUAL(gen.parts().count(), 0);
+
 	gen.build_env();
 	BOOST_CHECK_EQUAL(gen.parts().count(), 1);
 }
