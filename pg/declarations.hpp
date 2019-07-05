@@ -24,6 +24,8 @@
 
 namespace modegen::pg {
 
+enum class output_lang { json, cpp, cmake, python, javascript };
+
 class provider;
 class generator;
 class part_descriptor;

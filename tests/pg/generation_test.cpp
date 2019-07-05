@@ -7,7 +7,7 @@
  *************************************************************************/
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE common_generator
+#define BOOST_TEST_MODULE generation
 
 #include <boost/test/unit_test.hpp>
 #include <turtle/mock.hpp>
@@ -24,14 +24,16 @@ namespace mpe = modegen::pg::errors;
 
 MOCK_BASE_CLASS( mock_provider, mpg::provider)
 {
+	MOCK_METHOD( create_output, 2 )
 	MOCK_METHOD( create_part, 1 )
 	MOCK_METHOD( input, 0 )
 };
 
 MOCK_BASE_CLASS( mock_part, mpg::part_descriptor )
 {
+	MOCK_METHOD( lang, 0 )
 	MOCK_METHOD( name, 0 )
-	MOCK_METHOD( outputs, 0 )
+	MOCK_METHOD( outputs, 1 )
 	MOCK_METHOD( build_outputs, 2 )
 };
 
@@ -59,7 +61,7 @@ BOOST_AUTO_TEST_CASE(withou_generation)
 	setts->raw().put("part.fcpp.file_single","test.cpp");
 
 	MOCK_EXPECT( part->build_outputs ).once();
-	MOCK_EXPECT(prov->create_part).once().returns(part);
+	MOCK_EXPECT( prov->create_part ).once().returns(part);
 
 	mpg::generator gen(prov,setts);
 	BOOST_CHECK_EQUAL(gen.parts().count(), 0);
