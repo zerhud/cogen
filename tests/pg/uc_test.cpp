@@ -24,6 +24,18 @@ namespace mpg = modegen::pg;
 namespace mpo = modegen::pg::options;
 namespace mpi = modegen::parser::interface;
 
+// use cases
+// 01. all modules to one file
+// 02. each module to own flie
+// 03. each module to own file in own dir (with same structure)
+// 04. cpp one unite file, python module to own file
+// 05. one cmake file and library for each module
+// 06. cmake installs python's modules
+// 07. one module depends from other, all to one
+// 08. module A depends form B and C, each per file
+// 09. A.foo depends from B.bar and C.car. each per file (b has B.foo and B.booz, each per file).
+// 10. module has few thinks inside, each per file
+
 MOCK_BASE_CLASS( mock_provider, mpg::provider)
 {
 	MOCK_METHOD( create_part, 1 )
@@ -46,54 +58,8 @@ MOCK_BASE_CLASS( mock_iloader, mpi::loader )
 	MOCK_METHOD( finish_loads, 0 )
 };
 
-BOOST_AUTO_TEST_SUITE(without_data)
-BOOST_AUTO_TEST_CASE(without_build)
-{
-	mpg::generator g(nullptr,nullptr);
-	BOOST_CHECK_EQUAL(g.parts().count(), 0);
-}
-BOOST_AUTO_TEST_CASE(part_is_null)
-{
-	//auto setts = std::make_shared<mpo::container>();
-	//setts->raw().put("part.fcpp.file_single","test.cpp");
-	//auto prov = std::make_shared<mock_provider>();
-	//MOCK_EXPECT(prov->create_part).once().returns(nullptr);
-	//mpg::generator gen(prov,setts);
-	//BOOST_CHECK_THROWS( gen.build_env() );
-	BOOST_FAIL("not done test");
-}
-BOOST_AUTO_TEST_CASE(withou_generation)
-{
-	auto setts = std::make_shared<mpo::container>();
-	auto prov = std::make_shared<mock_provider>();
-	auto part = std::make_shared<mock_part>();
-
-	setts->raw().put("part.fcpp.file_single","test.cpp");
-
-	MOCK_EXPECT( part->build_outputs ).once();
-	MOCK_EXPECT(prov->create_part).once().returns(part);
-
-	mpg::generator gen(prov,setts);
-	BOOST_CHECK_EQUAL(gen.parts().count(), 0);
-
-	gen.build_env();
-	BOOST_CHECK_EQUAL(gen.parts().count(), 1);
-}
-BOOST_AUTO_TEST_SUITE_END() // without_data
-
 BOOST_AUTO_TEST_SUITE(all_to_one)
 BOOST_AUTO_TEST_CASE(one_module)
 {
-	auto setts = std::make_shared<mpo::container>();
-	auto prov = std::make_shared<mock_provider>();
-	auto part = std::make_shared<mock_part>();
-
-	MOCK_EXPECT( part->build_outputs ).once();
-	MOCK_EXPECT( prov->create_part).once().returns( part );
-
-	setts->raw().put("part.fcpp.file_single", "test.cpp");
-
-	mpg::generator gen(prov,setts);
-	gen.build_env();
 }
 BOOST_AUTO_TEST_SUITE_END() // all_to_one

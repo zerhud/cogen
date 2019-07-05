@@ -16,6 +16,7 @@
 #include "part_descriptor.hpp"
 
 namespace mpg = modegen::pg;
+using namespace std::literals;
 
 mpg::generator::generator(mpg::provider_ptr p, mpg::options::container_ptr s)
 	: prov(std::move(p))
@@ -52,7 +53,10 @@ void mpg::generator::init_parts()
 	auto plist = setts->part_list();
 	for(auto&& p:plist) {
 		options::part_view psetts(setts,p);
+
 		auto part = prov->create_part(std::move(psetts));
+		if(part==nullptr) throw errors::error("part "s + p + " cannot be created"s);
+
 		pman.add(std::move(part));
 	}
 }
