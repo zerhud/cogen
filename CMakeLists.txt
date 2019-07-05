@@ -94,6 +94,7 @@ target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "g
 
 add_library(part_generation "pg/declarations.hpp" ${main_config_file})
 target_include_directories(part_generation PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
+target_link_libraries(part_generation PRIVATE stdc++fs)
 
 target_sources_local(part_generation "generator.hpp" "generator.cpp" "pg/")
 target_sources_local(part_generation "part_descriptor.hpp" "part_descriptor.cpp" "pg/")

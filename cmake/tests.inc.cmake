@@ -31,7 +31,7 @@ foreach(tname ${tests_gcommon})
 	add_unit_test(${tname} "tests/generation/" "modegen_interfaces")
 endforeach()
 foreach(tname ${tests_pg})
-	add_unit_test(${tname} "tests/pg/" "part_generation")
+	add_unit_test(${tname} "tests/pg/" "part_generation;modegen_interfaces")
 endforeach()
 add_unit_test("dt_loader" "tests/data_tree/" "modegen_interfaces")
 
