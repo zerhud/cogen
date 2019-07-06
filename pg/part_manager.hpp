@@ -20,6 +20,7 @@ public:
 	void add(part_descriptor_ptr p);
 	part_descriptor_ptr require(std::string_view name) const ;
 	std::vector<part_descriptor_ptr> list() const ;
+	output_descriptor_ptr query_entity(const std::vector<std::regex>& filter={}) const ;
 };
 
 } // namespace modegen::pg

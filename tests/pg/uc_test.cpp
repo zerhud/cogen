@@ -48,7 +48,7 @@ MOCK_BASE_CLASS( mock_part, mpg::part_descriptor )
 {
 	MOCK_METHOD( lang, 0 )
 	MOCK_METHOD( name, 0 )
-	MOCK_METHOD( outputs, 1 )
+	MOCK_METHOD( outputs, 0 )
 	MOCK_METHOD( build_outputs, 2 )
 };
 
