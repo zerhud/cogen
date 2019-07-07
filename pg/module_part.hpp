@@ -10,20 +10,23 @@
 
 #include <regex>
 #include <vector>
-#include "declarations.hpp"
+#include "part_descriptor.hpp"
+#include "options.hpp"
 
 namespace modegen::pg {
 
-/// info file representation, for man how edit this file - configurator.
-class part_manager {
-	std::vector<part_descriptor_ptr> store;
+/// a single part in info file. manages lang compiler.
+class module_part : public part_descriptor {
+	provider_ptr prov;
+	options::part_view setts;
+	std::vector<output_descriptor_ptr> outs_;
 public:
-	std::size_t count() const ;
-	part_manager& add(part_descriptor_ptr p);
-	part_descriptor_ptr require(std::string_view name) const ;
-	std::vector<part_descriptor_ptr> list() const ;
-	std::vector<output_descriptor_ptr> list_output() const ;
+	module_part(provider_ptr p, options::part_view s);
+
+	output_lang lang() const override ;
+	std::string_view name() const override ;
+	std::vector<output_descriptor_ptr> outputs() const override ;
+	void build_outputs(const part_manager& pman, const provider& prov) override ;
 };
 
 } // namespace modegen::pg
-

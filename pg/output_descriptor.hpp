@@ -9,15 +9,18 @@
 #pragma once
 
 #include <vector>
+#include <nlohman/json.hpp>
 #include "declarations.hpp"
 
 namespace modegen::pg {
 
+/// lang compiler.. compiles to data tree (json)
+/// modules (or other inputs) for it can be used in template
 class output_descriptor {
 public:
 	virtual ~output_descriptor() noexcept =default ;
 
-	nlohman::json data() const =0 ;
+	virtual nlohmann::json data() const =0 ;
 	virtual FS::path file() const =0 ;
 };
 

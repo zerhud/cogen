@@ -76,6 +76,7 @@ std::string mo::container::descr_message(mo::part_option opt)
 	if(opt==part_option::output_name_gen) return "output file name generator"s;
 	if(opt==part_option::file_generator) return "which generator use to provide data tree"s;
 	if(opt==part_option::naming) return "the name convension to use"s;
+	if(opt==part_option::output_lang) return "output language"s;
 	assert(false);
 	return "unknown part option"s;
 }
@@ -113,6 +114,7 @@ std::string mo::container::solve_key(part_option opt)
 	if(opt==part_option::output_name_gen) return "output_ng"s;
 	if(opt==part_option::file_generator) return "filegen"s;
 	if(opt==part_option::naming) return "naming"s;
+	if(opt==part_option::output_lang) return "output_lang"s;
 	assert(false);
 	return ""s;
 }

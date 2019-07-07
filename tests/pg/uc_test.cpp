@@ -10,12 +10,11 @@
 #define BOOST_TEST_MODULE module use cases
 
 #include <boost/test/unit_test.hpp>
-#include <turtle/mock.hpp>
 
-#include "pg/provider.hpp"
+#include "mocks.hpp"
+
 #include "pg/generator.hpp"
 #include "pg/options.hpp"
-#include "pg/part_descriptor.hpp"
 
 #include "parser/interface/loader.hpp"
 
@@ -38,38 +37,21 @@ namespace mpi = modegen::parser::interface;
 // error cases
 // 01. part depends from part on other language
 
-MOCK_BASE_CLASS( mock_provider, mpg::provider)
-{
-	MOCK_METHOD( create_part, 1 )
-	MOCK_METHOD( input, 0 )
-};
-
-MOCK_BASE_CLASS( mock_part, mpg::part_descriptor )
-{
-	MOCK_METHOD( lang, 0 )
-	MOCK_METHOD( name, 0 )
-	MOCK_METHOD( outputs, 0 )
-	MOCK_METHOD( build_outputs, 2 )
-};
-
-MOCK_BASE_CLASS( mock_iloader, mpi::loader )
-{
-	void load(std::istream& /*input*/, std::string /*fn*/) override {}
-	void load(FS::path /*file*/) override {}
-
-	MOCK_METHOD( result, 0 )
-	MOCK_METHOD( finish_loads, 0 )
-};
 
 BOOST_AUTO_TEST_SUITE(all_to_one)
 BOOST_AUTO_TEST_CASE(one_module)
 {
-	auto pf = mpi::parse("module m1 v1.1:");
+	auto pf = mpi::parse("module m1 v1.1: int foo();");
 	auto setts = std::make_shared<mpo::container>();
-	setts->raw().put("part.fcpp.lang", "cpp");
-	setts->raw().put("part.fcpp.file_single", "test.cpp");
+	auto prov = std::make_shared<pgmocks::mock_provider>();
+	setts->raw().put("part.fcp1.lang", "cpp");
+	setts->raw().put("part.fcp1.file_single", "test1.cpp");
+	setts->raw().put("part.fcp2.lang", "cpp");
+	setts->raw().put("part.fcp2.file_single", "test2.cpp");
 
-	module_part part(output_lang::cpp, "fcpp");
+	mpg::part_manager pm;
+	pm.add(std::make_shared<mpg::module_part>(prov, mpo::part_view(setts,"fcp1")));
+	BOOST_CHECK_EQUAL(pm.require("fcp1")->name(), "fcp1");
 }
 BOOST_AUTO_TEST_CASE(two_modules)
 {

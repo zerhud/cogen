@@ -25,6 +25,7 @@
 namespace modegen::pg {
 
 enum class output_lang { json, cpp, cmake, python, javascript };
+std::string to_string(output_lang l);
 
 class provider;
 class generator;
@@ -53,5 +54,17 @@ class filters_view;
 
 } // namespace options
 
-} // namespace modegen::pg
+/// conversion from string by return type.
+/// this class must be used as a function.
+class from_string {
+	// use std::string insteed of string_view cause
+	// the temporaty variable can to be destroyed before operator call
+	// (also it can be destroyed after ; operator, but we cannot garantee it)
+	// it is normal for small string
+	std::string val;
+public:
+	from_string(std::string s);
+	operator output_lang() const ;
+};
 
+} // namespace modegen::pg

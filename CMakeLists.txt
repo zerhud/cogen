@@ -98,6 +98,7 @@ target_link_libraries(part_generation PRIVATE stdc++fs)
 
 target_sources_local(part_generation "generator.hpp" "generator.cpp" "pg/")
 target_sources_local(part_generation "part_descriptor.hpp" "part_descriptor.cpp" "pg/")
+target_sources_local(part_generation "module_part.hpp" "module_part.cpp" "pg/")
 target_sources_local(part_generation "output_descriptor.hpp" "output_descriptor.cpp" "pg/")
 target_sources_local(part_generation "final_generator.hpp" "final_generator.cpp" "pg/")
 target_sources_local(part_generation "generator.hpp" "generator.cpp" "pg/")
