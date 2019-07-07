@@ -23,7 +23,7 @@ set(tests_gcommon
 	cmake
 	)
 set(tests_interface mdp checker )
-set(tests_pg uc part_manager generation)
+set(tests_pg uc part_manager part_descriptor generation)
 foreach(tname ${tests_interface})
 	add_unit_test(${tname} "tests/interface/" "modegen_interfaces")
 endforeach()

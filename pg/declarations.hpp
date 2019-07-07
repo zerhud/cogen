@@ -26,6 +26,7 @@ namespace modegen::pg {
 
 enum class output_lang { json, cpp, cmake, python, javascript };
 std::string to_string(output_lang l);
+inline std::ostream& operator << (std::ostream& out, output_lang o) { out << to_string(o); return out; }
 
 class provider;
 class generator;
