@@ -15,11 +15,13 @@
 
 #include "pg/generator.hpp"
 #include "pg/options.hpp"
+#include "pg/parts/modules.hpp"
 
 #include "parser/interface/loader.hpp"
 
 namespace mp = modegen::parser;
 namespace mpg = modegen::pg;
+namespace mpp = modegen::pg::parts;
 namespace mpo = modegen::pg::options;
 namespace mpi = modegen::parser::interface;
 
@@ -50,7 +52,7 @@ BOOST_AUTO_TEST_CASE(one_module)
 	setts->raw().put("part.fcp2.file_single", "test2.cpp");
 
 	mpg::part_manager pm;
-	pm.add(std::make_shared<mpg::module_part>(prov, mpo::part_view(setts,"fcp1")));
+	pm.add(std::make_shared<mpp::module_part>(prov, mpo::part_view(setts,"fcp1")));
 	BOOST_CHECK_EQUAL(pm.require("fcp1")->name(), "fcp1");
 }
 BOOST_AUTO_TEST_CASE(two_modules)

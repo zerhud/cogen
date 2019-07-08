@@ -11,7 +11,6 @@
 
 #include "pg/provider.hpp"
 #include "pg/part_descriptor.hpp"
-#include "pg/module_part.hpp"
 #include "pg/output_descriptor.hpp"
 #include "parser/interface/loader.hpp"
 

@@ -108,6 +108,9 @@ public:
 	void file_generator(std::string_view fg);
 	std::string_view part() const ;
 	std::string_view file_generator() const ;
+	
+	std::string output_mode() const ;
+	std::string output_tmpl() const ;
 
 	boost::property_tree::ptree get_subset(subsetts s, const std::string& param="", const std::string& part="") const ;
 

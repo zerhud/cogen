@@ -10,10 +10,10 @@
 
 #include <regex>
 #include <vector>
-#include "part_descriptor.hpp"
-#include "options.hpp"
+#include "pg/part_descriptor.hpp"
+#include "pg/options.hpp"
 
-namespace modegen::pg {
+namespace modegen::pg::parts {
 
 /// a single part in info file. manages lang compiler.
 class module_part : public part_descriptor {
@@ -29,4 +29,4 @@ public:
 	void build_outputs(const part_manager& pman, const provider& prov) override ;
 };
 
-} // namespace modegen::pg
+} // namespace modegen::pg::parts

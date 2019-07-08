@@ -6,38 +6,45 @@
  * or <http://www.gnu.org/licenses/> for details
  *************************************************************************/
 
-#include "module_part.hpp"
+#include "modules.hpp"
+
 #include "parser/interface/loader.hpp"
 #include "parser/data_tree/loader.hpp"
 
-#include "exceptions.hpp"
+#include "pg/provider.hpp"
+#include "pg/exceptions.hpp"
 
 namespace mpg = modegen::pg;
+namespace mpp = modegen::pg::parts;
 
-mpg::module_part::module_part(provider_ptr p, options::part_view s)
+mpp::module_part::module_part(provider_ptr p, options::part_view s)
     : prov(std::move(p))
     , setts(std::move(s))
 {
 	if(!prov) throw errors::error("cannot create module_part without provider");
+	auto lng = lang();
+	assert( lng==output_lang::cpp || lng==output_lang::python || lng==output_lang::javascript );
 }
 
-modegen::pg::output_lang modegen::pg::module_part::lang() const
+mpg::output_lang mpp::module_part::lang() const
 {
 	return from_string(setts.get<std::string>(options::part_option::output_lang));
 }
 
-std::string_view modegen::pg::module_part::name() const
+std::string_view mpp::module_part::name() const
 {
 	return setts.part();
 }
 
-std::vector<modegen::pg::output_descriptor_ptr> modegen::pg::module_part::outputs() const
+std::vector<mpg::output_descriptor_ptr> mpp::module_part::outputs() const
 {
 	if(outs_.empty()) throw errors::error("no outs: call build_outputs first");
 	return outs_;
 }
 
-void modegen::pg::module_part::build_outputs(const modegen::pg::part_manager& pman, const modegen::pg::provider& prov)
+void mpp::module_part::build_outputs(const mpg::part_manager& pman, const mpg::provider& prov)
 {
-	;
+	// file_single filter..
+	// file_bymod (name with tmpl) filter...
+	auto mods = prov.input();
 }
