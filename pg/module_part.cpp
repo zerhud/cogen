@@ -33,6 +33,7 @@ std::string_view modegen::pg::module_part::name() const
 
 std::vector<modegen::pg::output_descriptor_ptr> modegen::pg::module_part::outputs() const
 {
+	if(outs_.empty()) throw errors::error("no outs: call build_outputs first");
 	return outs_;
 }
 
