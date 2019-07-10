@@ -13,6 +13,7 @@
 
 #include "mocks.hpp"
 #include "pg/parts/modules.hpp"
+#include "pg/parts/noinput.hpp"
 #include "pg/exceptions.hpp"
 #include "pg/part_manager.hpp"
 #include "parser/interface/grammar.hpp"
@@ -22,7 +23,7 @@ namespace mpg = modegen::pg;
 namespace mpp = modegen::pg::parts;
 using namespace std::literals;
 
-typedef std::tuple<mpp::module_part> part_types;
+typedef std::tuple<mpp::module_part, mpp::noinput> part_types;
 
 auto prov_setts()
 {

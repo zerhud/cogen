@@ -16,12 +16,12 @@
 namespace modegen::pg::parts {
 
 /// a single part in info file. manages lang compiler.
-class nointput : public part_descriptor {
+class noinput : public part_descriptor {
 	provider_ptr prov;
 	options::part_view setts;
-	std::vector<output_descriptor_ptr> outs_;
+	output_descriptor_ptr out_;
 public:
-	module_part(provider_ptr p, options::part_view s);
+	noinput(provider_ptr p, options::part_view s);
 
 	output_lang lang() const override ;
 	std::string_view name() const override ;

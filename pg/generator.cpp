@@ -29,7 +29,7 @@ mpg::generator::generator(mpg::provider_ptr p, mpg::options::container_ptr s)
 void mpg::generator::build_env()
 {
 	init_parts();
-	build_deps();
+	build_outs();
 }
 
 mpg::part_manager& mpg::generator::parts()
@@ -61,7 +61,7 @@ void mpg::generator::init_parts()
 	}
 }
 
-void mpg::generator::build_deps()
+void mpg::generator::build_outs()
 {
 	auto plist = pman.list();
 	for(auto& p:plist) p->build_outputs(pman, *prov);

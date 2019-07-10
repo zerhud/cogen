@@ -19,7 +19,7 @@ class generator final {
 	part_manager pman;
 
 	void init_parts();
-	void build_deps();
+	void build_outs();
 public:
 	generator(provider_ptr p, options::container_ptr s);
 

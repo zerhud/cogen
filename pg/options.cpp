@@ -198,6 +198,7 @@ std::string mo::part_view::output_mode() const
 		if(s.first == "file_bymod"s) return s.first;
 		if(s.first == "file_byent"s) return s.first;
 		if(s.first == "file_single"s) return s.first;
+		if(s.first == "file"s) return s.first;
 	}
 
 	throw errors::error("no output found");
