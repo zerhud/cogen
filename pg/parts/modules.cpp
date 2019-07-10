@@ -8,8 +8,9 @@
 
 #include "modules.hpp"
 
-#include "parser/interface/loader.hpp"
 #include "parser/data_tree/loader.hpp"
+#include "parser/interface/loader.hpp"
+#include "parser/interface/helpers.hpp"
 
 #include "pg/provider.hpp"
 #include "pg/exceptions.hpp"
@@ -69,6 +70,17 @@ void mpp::module_part::build_outputs(const mpg::part_manager& pman, const mpg::p
 		outs_.emplace_back(prov.create_output(lang(), ftmpl));
 	}
 	else if(mode==fgmode::bymod) {
+		for(auto& mod:mods) {
+			std::string tmpl = ftmpl;
+			auto mpos = tmpl.find("$mod");
+			if(mpos!=std::string::npos) tmpl.replace(mpos,4,mod.name);
+			auto ver = mpi::get_version(mod);
+			auto vpos = tmpl.find("$va");
+			if(vpos!=std::string::npos) tmpl.replace(vpos,3,std::to_string(ver.major_v));
+			vpos = tmpl.find("$vi");
+			if(vpos!=std::string::npos) tmpl.replace(vpos,3,std::to_string(ver.minor_v));
+			outs_.emplace_back(prov.create_output(lang(), tmpl));
+		}
 	}
 	else if(mode==fgmode::byent) {
 		throw errors::notready("byent output mode");
