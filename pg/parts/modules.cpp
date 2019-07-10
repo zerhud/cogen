@@ -68,4 +68,9 @@ void mpp::module_part::build_outputs(const mpg::part_manager& pman, const mpg::p
 	if(mode==fgmode::single) {
 		outs_.emplace_back(prov.create_output(lang(), ftmpl));
 	}
+	else if(mode==fgmode::bymod) {
+	}
+	else if(mode==fgmode::byent) {
+		throw errors::notready("byent output mode");
+	}
 }

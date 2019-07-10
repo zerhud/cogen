@@ -20,5 +20,7 @@ public:
 	const char* what() const noexcept override ;
 };
 
+struct notready : error { notready(std::string fn); };
+
 } // namespace modegen::pg::errors
 
