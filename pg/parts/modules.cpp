@@ -16,6 +16,18 @@
 
 namespace mpg = modegen::pg;
 namespace mpp = modegen::pg::parts;
+namespace mpi = modegen::parser::interface;
+
+using namespace std::literals;
+
+std::tuple<mpp::module_part::fgmode,std::string> mpp::module_part::outinfo() const
+{
+	auto tmpl = setts.output_tmpl();
+	auto mode = setts.output_mode();
+
+	if(mode=="file_bymod"s) return std::make_tuple(fgmode::bymod, tmpl);
+	return std::make_tuple(fgmode::single, tmpl);
+}
 
 mpp::module_part::module_part(provider_ptr p, options::part_view s)
     : prov(std::move(p))
@@ -46,5 +58,14 @@ void mpp::module_part::build_outputs(const mpg::part_manager& pman, const mpg::p
 {
 	// file_single filter..
 	// file_bymod (name with tmpl) filter...
-	auto mods = prov.input();
+	auto inputs = prov.input();
+	std::shared_ptr<mpi::loader> mods_ldr;
+	for(auto& i:inputs) if(mods_ldr = std::dynamic_pointer_cast<mpi::loader>(i); mods_ldr) break;
+	if(!mods_ldr) throw errors::error("part "s + std::string(name()) + " requires module input"s);
+	auto mods = mods_ldr->result();
+
+	auto [mode, ftmpl] = outinfo();
+	if(mode==fgmode::single) {
+		outs_.emplace_back(prov.create_output(lang(), ftmpl));
+	}
 }

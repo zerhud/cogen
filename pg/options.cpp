@@ -9,6 +9,7 @@
 #include <iostream>
 #include <boost/property_tree/json_parser.hpp>
 #include "options.hpp"
+#include "exceptions.hpp"
 
 namespace mo = modegen::pg::options;
 
@@ -188,6 +189,24 @@ void mo::part_view::part(std::string_view p)
 void mo::part_view::file_generator(std::string_view fg)
 {
 	def_fgen = fg;
+}
+
+std::string mo::part_view::output_mode() const
+{
+	auto sub = get_subset(subsetts::part_data);
+	for(auto& s:sub) {
+		if(s.first == "file_bymod"s) return s.first;
+		if(s.first == "file_byent"s) return s.first;
+		if(s.first == "file_single"s) return s.first;
+	}
+
+	throw errors::error("no output found");
+}
+
+std::string mo::part_view::output_tmpl() const
+{
+	std::string key = "part."s + std::string(part()) + '.' + output_mode();
+	return opts->raw().get<std::string>(key);
 }
 
 std::string_view mo::part_view::part() const

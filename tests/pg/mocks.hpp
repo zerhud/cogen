@@ -30,7 +30,7 @@ MOCK_BASE_CLASS( mock_part, modegen::pg::part_descriptor )
 	MOCK_METHOD( build_outputs, 2 )
 };
 
-MOCK_BASE_CLASS( mock_iloader, modegen::parser::interface::loader )
+MOCK_BASE_CLASS( iloader, modegen::parser::interface::loader )
 {
 	void load(std::istream& /*input*/, std::string /*fn*/) override {}
 	void load(FS::path /*file*/) override {}
