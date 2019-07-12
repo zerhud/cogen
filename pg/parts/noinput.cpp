@@ -11,9 +11,8 @@
 
 namespace mpg = modegen::pg;
 
-mpg::parts::noinput::noinput(mpg::provider_ptr p, mpg::options::part_view s)
-    : prov(std::move(p))
-    , setts(std::move(s))
+mpg::parts::noinput::noinput(mpg::options::part_view s)
+    : setts(std::move(s))
 {
 }
 
@@ -32,8 +31,16 @@ std::vector<mpg::output_descriptor_ptr> mpg::parts::noinput::outputs() const
 	return {out_};
 }
 
-void mpg::parts::noinput::build_outputs(const mpg::part_manager& pman, const mpg::provider& prov)
+void mpg::parts::noinput::build_outputs(const mpg::part_manager& pman, mpg::provider_const_ptr prov)
 {
 	assert(lang()==output_lang::cmake);
-	out_ = prov.create_output(lang(),setts.output_tmpl());
+	prov_ = prov;
+
+	out_ = prov_->create_output(lang(),setts.output_tmpl());
 }
+
+std::vector<std::string> mpg::parts::noinput::map_to_outputs(const std::string& tmpl) const
+{
+	return {};
+}
+

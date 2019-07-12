@@ -15,19 +15,20 @@
 #include "parser/interface/loader.hpp"
 
 namespace pgmocks {
-MOCK_BASE_CLASS( mock_provider, modegen::pg::provider)
+MOCK_BASE_CLASS( provider, modegen::pg::provider)
 {
 	MOCK_METHOD( create_part, 1 )
 	MOCK_METHOD( create_output, 2 )
 	MOCK_METHOD( input, 0 )
 };
 
-MOCK_BASE_CLASS( mock_part, modegen::pg::part_descriptor )
+MOCK_BASE_CLASS( part, modegen::pg::part_descriptor )
 {
 	MOCK_METHOD( lang, 0 )
 	MOCK_METHOD( name, 0 )
 	MOCK_METHOD( outputs, 0 )
 	MOCK_METHOD( build_outputs, 2 )
+	MOCK_METHOD( map_to_outputs, 1 )
 };
 
 MOCK_BASE_CLASS( iloader, modegen::parser::interface::loader )
@@ -43,6 +44,7 @@ MOCK_BASE_CLASS( part_output, modegen::pg::output_descriptor )
 {
 	MOCK_METHOD( data, 0 );
 	MOCK_METHOD( file, 0 );
+	MOCK_METHOD( override_setts, 1 );
 };
 
 template<typename Vec, typename... Args>

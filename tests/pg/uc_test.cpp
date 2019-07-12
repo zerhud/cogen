@@ -15,15 +15,15 @@
 
 #include "pg/generator.hpp"
 #include "pg/options.hpp"
-#include "pg/parts/modules.hpp"
+#include "pg/info_part.hpp"
 
 #include "parser/interface/loader.hpp"
 
 namespace mp = modegen::parser;
 namespace mpg = modegen::pg;
-namespace mpp = modegen::pg::parts;
 namespace mpo = modegen::pg::options;
 namespace mpi = modegen::parser::interface;
+namespace mpp = modegen::pg::parts;
 
 // use cases
 // 01. all modules to one file [out_single]
@@ -45,14 +45,13 @@ BOOST_AUTO_TEST_CASE(one_module)
 {
 	auto pf = mpi::parse("module m1 v1.1: int foo();");
 	auto setts = std::make_shared<mpo::container>();
-	auto prov = std::make_shared<pgmocks::mock_provider>();
 	setts->raw().put("part.fcp1.lang", "cpp");
 	setts->raw().put("part.fcp1.file_single", "test1.cpp");
 	setts->raw().put("part.fcp2.lang", "cpp");
 	setts->raw().put("part.fcp2.file_single", "test2.cpp");
 
 	mpg::part_manager pm;
-	pm.add(std::make_shared<mpp::module_part>(prov, mpo::part_view(setts,"fcp1")));
+	pm.add(std::make_shared<mpp::module_part>(mpo::part_view(setts,"fcp1")));
 	BOOST_CHECK_EQUAL(pm.require("fcp1")->name(), "fcp1");
 }
 BOOST_AUTO_TEST_CASE(two_modules)
@@ -67,3 +66,4 @@ BOOST_AUTO_TEST_CASE(two_modules)
 	auto pf = mpi::parse("module m1 v1.1: module m2 v2.2:");
 }
 BOOST_AUTO_TEST_SUITE_END() // permod
+

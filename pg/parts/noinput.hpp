@@ -17,16 +17,17 @@ namespace modegen::pg::parts {
 
 /// a single part in info file. manages lang compiler.
 class noinput : public part_descriptor {
-	provider_ptr prov;
+	provider_const_ptr prov_;
 	options::part_view setts;
 	output_descriptor_ptr out_;
 public:
-	noinput(provider_ptr p, options::part_view s);
+	noinput(options::part_view s);
 
 	output_lang lang() const override ;
 	std::string_view name() const override ;
 	std::vector<output_descriptor_ptr> outputs() const override ;
-	void build_outputs(const part_manager& pman, const provider& prov) override ;
+	void build_outputs(const part_manager& pman, provider_const_ptr prov) override ;
+	std::vector<std::string> map_to_outputs(const std::string& tmpl) const override ;
 };
 
 } // namespace modegen::pg::parts

@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <nlohman/json.hpp>
+#include <boost/property_tree/ptree.hpp>
 #include "declarations.hpp"
 
 namespace modegen::pg {
@@ -20,10 +21,10 @@ class output_descriptor {
 public:
 	virtual ~output_descriptor() noexcept =default ;
 
+	virtual void override_setts(boost::property_tree::ptree s) =0 ;
 	virtual nlohmann::json data() const =0 ;
 	virtual FS::path file() const =0 ;
 };
 
 } // namespace modegen::pg
-
 

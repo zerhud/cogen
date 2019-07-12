@@ -36,6 +36,7 @@ class part_manager;
 class final_generator;
 
 typedef std::shared_ptr<provider> provider_ptr;
+typedef std::shared_ptr<const provider> provider_const_ptr;
 typedef std::shared_ptr<part_descriptor> part_descriptor_ptr;
 typedef std::shared_ptr<output_descriptor> output_descriptor_ptr;
 

@@ -20,8 +20,8 @@ namespace mpg = modegen::pg;
 
 BOOST_AUTO_TEST_CASE(list_require_part_by_name)
 {
-	auto part1 = std::make_shared<pgmocks::mock_part>();
-	auto part2 = std::make_shared<pgmocks::mock_part>();
+	auto part1 = std::make_shared<pgmocks::part>();
+	auto part2 = std::make_shared<pgmocks::part>();
 	MOCK_EXPECT( part1->name ).returns("part1");
 	MOCK_EXPECT( part2->name ).returns("part2");
 
@@ -38,8 +38,8 @@ BOOST_AUTO_TEST_CASE(list_require_part_by_name)
 
 BOOST_AUTO_TEST_CASE(list_outputs)
 {
-	auto part1 = std::make_shared<pgmocks::mock_part>();
-	auto part2 = std::make_shared<pgmocks::mock_part>();
+	auto part1 = std::make_shared<pgmocks::part>();
+	auto part2 = std::make_shared<pgmocks::part>();
 	auto part1_out1 = std::make_shared<pgmocks::part_output>();
 	auto part1_out2 = std::make_shared<pgmocks::part_output>();
 	auto part2_out1 = std::make_shared<pgmocks::part_output>();
@@ -63,8 +63,8 @@ BOOST_AUTO_TEST_CASE(list_outputs)
 
 BOOST_AUTO_TEST_CASE(list_outputs_with_nullptr)
 {
-	auto part1 = std::make_shared<pgmocks::mock_part>();
-	auto part2 = std::make_shared<pgmocks::mock_part>();
+	auto part1 = std::make_shared<pgmocks::part>();
+	auto part2 = std::make_shared<pgmocks::part>();
 	auto part1_out1 = std::make_shared<pgmocks::part_output>();
 	auto part1_out2 = std::make_shared<pgmocks::part_output>();
 	MOCK_EXPECT( part1->name ).returns("part1");
