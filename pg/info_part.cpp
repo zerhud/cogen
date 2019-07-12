@@ -17,12 +17,11 @@
 #include "exceptions.hpp"
 
 namespace mpg = modegen::pg;
-namespace mpp = modegen::pg::parts;
 namespace mpi = modegen::parser::interface;
 
 using namespace std::literals;
 
-std::tuple<mpp::module_part::fgmode,std::string> mpp::module_part::outinfo() const
+std::tuple<mpg::info_part::fgmode,std::string> mpg::info_part::outinfo() const
 {
 	auto tmpl = setts.output_tmpl();
 	auto mode = setts.output_mode();
@@ -32,30 +31,30 @@ std::tuple<mpp::module_part::fgmode,std::string> mpp::module_part::outinfo() con
 	return std::make_tuple(fgmode::single, tmpl);
 }
 
-mpp::module_part::module_part(options::part_view s)
+mpg::info_part::info_part(options::part_view s)
     : setts(std::move(s))
 {
 	auto lng = lang();
 	assert( lng==output_lang::cpp || lng==output_lang::python || lng==output_lang::javascript );
 }
 
-mpg::output_lang mpp::module_part::lang() const
+mpg::output_lang mpg::info_part::lang() const
 {
 	return from_string(setts.get<std::string>(options::part_option::output_lang));
 }
 
-std::string_view mpp::module_part::name() const
+std::string_view mpg::info_part::name() const
 {
 	return setts.part();
 }
 
-std::vector<mpg::output_descriptor_ptr> mpp::module_part::outputs() const
+std::vector<mpg::output_descriptor_ptr> mpg::info_part::outputs() const
 {
 	if(outs_.empty()) throw errors::error("no outs: call build_outputs first");
 	return outs_;
 }
 
-void mpp::module_part::build_outputs(const mpg::part_manager& pman, mpg::provider_const_ptr prov)
+void mpg::info_part::build_outputs(const mpg::part_manager& pman, mpg::provider_const_ptr prov)
 {
 	prov_ = prov;
 	if(!prov_) throw errors::error("cannot build outputs without provider");
@@ -81,7 +80,7 @@ void mpp::module_part::build_outputs(const mpg::part_manager& pman, mpg::provide
 	}
 }
 
-std::vector<std::string> mpp::module_part::map_to_outputs(const std::string& tmpl) const
+std::vector<std::string> mpg::info_part::map_to_outputs(const std::string& tmpl) const
 {
 	if(!prov_) throw errors::error("cannot map to outputs without provider");
 	std::vector<std::string> ret;
@@ -105,7 +104,7 @@ std::vector<std::string> mpp::module_part::map_to_outputs(const std::string& tmp
 	return ret;
 }
 
-bool mpp::module_part::replace(std::string& tmpl, const std::string& var_name, const std::string& value) const
+bool mpg::info_part::replace(std::string& tmpl, const std::string& var_name, const std::string& value) const
 {
 	auto pos = tmpl.find(var_name);
 	bool found = pos!=std::string::npos;

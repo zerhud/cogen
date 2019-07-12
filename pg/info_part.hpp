@@ -13,10 +13,10 @@
 #include "pg/part_descriptor.hpp"
 #include "pg/options.hpp"
 
-namespace modegen::pg::parts {
+namespace modegen::pg {
 
 /// a single part in info file. manages lang compiler.
-class module_part : public part_descriptor {
+class info_part : public part_descriptor {
 	enum class fgmode { single, bymod, byent };
 	provider_const_ptr prov_;
 	options::part_view setts;
@@ -25,7 +25,7 @@ class module_part : public part_descriptor {
 	std::tuple<fgmode,std::string> outinfo() const ;
 	bool replace(std::string& tmpl, const std::string& var_name, const std::string& value) const ;
 public:
-	module_part(options::part_view s);
+	info_part(options::part_view s);
 
 	output_lang lang() const override ;
 	std::string_view name() const override ;

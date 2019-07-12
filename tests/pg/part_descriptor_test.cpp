@@ -13,17 +13,15 @@
 
 #include "mocks.hpp"
 #include "pg/info_part.hpp"
-#include "pg/parts/noinput.hpp"
 #include "pg/exceptions.hpp"
 #include "pg/part_manager.hpp"
 #include "parser/interface/grammar.hpp"
 
 namespace mpi = modegen::parser::interface;
 namespace mpg = modegen::pg;
-namespace mpp = modegen::pg::parts;
 using namespace std::literals;
 
-typedef std::tuple<mpp::module_part, mpp::noinput> part_types;
+typedef std::tuple<mpg::info_part> part_types;
 
 auto prov_setts()
 {
@@ -41,12 +39,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(constants, T, part_types)
 	BOOST_CHECK_EQUAL( pd.lang(), mpg::output_lang::cpp );
 }
 
-BOOST_AUTO_TEST_SUITE(module_part)
+BOOST_AUTO_TEST_SUITE(info_part)
 BOOST_AUTO_TEST_CASE(outputs_without_build)
 {
 	auto [prov,setts] = prov_setts();
 	setts->raw().put("part.fcpp.file_single", "test.cpp");
-	mpp::module_part pd(mpg::options::part_view(setts, "fcpp"sv));
+	mpg::info_part pd(mpg::options::part_view(setts, "fcpp"sv));
 	BOOST_CHECK_THROW( pd.outputs(), mpg::errors::error );
 }
 BOOST_AUTO_TEST_SUITE(single_output)
@@ -58,7 +56,7 @@ BOOST_AUTO_TEST_CASE(one_module)
 	auto [prov,setts] = prov_setts();
 	setts->raw().put("part.fcpp.file_single", "test.cpp");
 	mpg::part_manager pman;
-	auto pd = std::make_shared<mpp::module_part>(mpg::options::part_view(setts, "fcpp"sv));
+	auto pd = std::make_shared<mpg::info_part>(mpg::options::part_view(setts, "fcpp"sv));
 
 	MOCK_EXPECT(output->override_setts);
 	MOCK_EXPECT(ldr->result).returns(pf.mods);
@@ -79,7 +77,7 @@ BOOST_AUTO_TEST_CASE(normal)
 	auto [prov,setts] = prov_setts();
 	setts->raw().put("part.fcpp.file_bymod", "test_$mod_$va_$vi.cpp");
 	mpg::part_manager pman;
-	auto pd = std::make_shared<mpp::module_part>(mpg::options::part_view(setts, "fcpp"sv));
+	auto pd = std::make_shared<mpg::info_part>(mpg::options::part_view(setts, "fcpp"sv));
 
 	MOCK_EXPECT(output->override_setts);
 	MOCK_EXPECT(ldr->result).returns(pf.mods);
@@ -92,4 +90,4 @@ BOOST_AUTO_TEST_CASE(normal)
 	BOOST_REQUIRE_EQUAL(outs.size(), 2);
 }
 BOOST_AUTO_TEST_SUITE_END() // bymod_output
-BOOST_AUTO_TEST_SUITE_END() // module_part
+BOOST_AUTO_TEST_SUITE_END() // info_part
