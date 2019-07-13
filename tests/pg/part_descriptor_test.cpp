@@ -39,7 +39,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(constants, T, part_types)
 	BOOST_CHECK_EQUAL( pd.lang(), mpg::output_lang::cpp );
 }
 
-BOOST_AUTO_TEST_SUITE(info_part)
 BOOST_AUTO_TEST_CASE(outputs_without_build)
 {
 	auto [prov,setts] = prov_setts();
@@ -90,4 +89,3 @@ BOOST_AUTO_TEST_CASE(normal)
 	BOOST_REQUIRE_EQUAL(outs.size(), 2);
 }
 BOOST_AUTO_TEST_SUITE_END() // bymod_output
-BOOST_AUTO_TEST_SUITE_END() // info_part

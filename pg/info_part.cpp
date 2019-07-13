@@ -8,18 +8,21 @@
 
 #include "info_part.hpp"
 
-#include "parser/data_tree/loader.hpp"
-#include "parser/interface/loader.hpp"
-#include "parser/interface/helpers.hpp"
-
 #include "provider.hpp"
 #include "output_descriptor.hpp"
+#include "part_algos.hpp"
 #include "exceptions.hpp"
 
 namespace mpg = modegen::pg;
-namespace mpi = modegen::parser::interface;
 
 using namespace std::literals;
+
+void mpg::info_part::create_algos(const provider& prov)
+{
+	algos_.clear();
+	algos_.emplace_back(prov.create_algos(input_lang::mdl));
+	algos_.emplace_back(prov.create_algos(input_lang::data));
+}
 
 std::tuple<mpg::info_part::fgmode,std::string> mpg::info_part::outinfo() const
 {
@@ -58,6 +61,9 @@ void mpg::info_part::build_outputs(const mpg::part_manager& pman, mpg::provider_
 {
 	prov_ = prov;
 	if(!prov_) throw errors::error("cannot build outputs without provider");
+	create_algos(*prov);
+
+	//TODO: filter in algos..
 
 	// file_single filter..
 	// file_bymod (name with tmpl) filter...
@@ -80,35 +86,18 @@ void mpg::info_part::build_outputs(const mpg::part_manager& pman, mpg::provider_
 	}
 }
 
+std::vector<mpg::part_algos_ptr> mpg::info_part::input_managers() const
+{
+	return algos_;
+}
+
 std::vector<std::string> mpg::info_part::map_to_outputs(const std::string& tmpl) const
 {
 	if(!prov_) throw errors::error("cannot map to outputs without provider");
-	std::vector<std::string> ret;
+	if(algos_.empty()) throw errors::error("no input managers found: build outputs first");
 
-	auto inputs = prov_->input();
-	std::shared_ptr<mpi::loader> mods_ldr;
-	for(auto& i:inputs) if(mods_ldr = std::dynamic_pointer_cast<mpi::loader>(i); mods_ldr) break;
-	if(!mods_ldr) throw errors::error("part "s + std::string(name()) + " requires module input"s);
-	auto mods = mods_ldr->result();
+	return algos_[0]->map(tmpl); //algo[0] is mods: see create_algo fnc
+	//TODO: map to other possible algos.. (add test for data for example)
 
-	//TODO: add mod's filter here
-
-	for(auto& mod:mods) {
-		std::string& cur = ret.emplace_back(tmpl);
-		auto ver = mpi::get_version(mod);
-		replace(cur, "$mod"s, mod.name);
-		replace(cur, "$va"s, std::to_string(ver.major_v));
-		replace(cur, "$vi"s, std::to_string(ver.minor_v));
-	}
-
-	return ret;
-}
-
-bool mpg::info_part::replace(std::string& tmpl, const std::string& var_name, const std::string& value) const
-{
-	auto pos = tmpl.find(var_name);
-	bool found = pos!=std::string::npos;
-	if(found) tmpl.replace(pos, var_name.size(), value);
-	return found;
 }
 

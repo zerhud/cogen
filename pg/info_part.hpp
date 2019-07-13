@@ -21,9 +21,10 @@ class info_part : public part_descriptor {
 	provider_const_ptr prov_;
 	options::part_view setts;
 	std::vector<output_descriptor_ptr> outs_;
+	std::vector<part_algos_ptr> algos_;
 
+	void create_algos(const provider& prov) ;
 	std::tuple<fgmode,std::string> outinfo() const ;
-	bool replace(std::string& tmpl, const std::string& var_name, const std::string& value) const ;
 public:
 	info_part(options::part_view s);
 
@@ -31,6 +32,7 @@ public:
 	std::string_view name() const override ;
 	std::vector<output_descriptor_ptr> outputs() const override ;
 	void build_outputs(const part_manager& pman, provider_const_ptr prov) override ;
+	std::vector<part_algos_ptr> input_managers() const override ;
 	std::vector<std::string> map_to_outputs(const std::string& tmpl) const override ;
 };
 

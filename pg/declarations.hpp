@@ -24,6 +24,7 @@
 
 namespace modegen::pg {
 
+enum class  input_lang { mdl, data };
 enum class output_lang { json, cpp, cmake, python, javascript };
 std::string to_string(output_lang l);
 inline std::ostream& operator << (std::ostream& out, output_lang o) { out << to_string(o); return out; }
@@ -34,6 +35,7 @@ class part_descriptor;
 class output_descriptor;
 class part_manager;
 class final_generator;
+class part_algos;
 
 struct jinja_env;
 
@@ -41,6 +43,7 @@ typedef std::shared_ptr<provider> provider_ptr;
 typedef std::shared_ptr<const provider> provider_const_ptr;
 typedef std::shared_ptr<part_descriptor> part_descriptor_ptr;
 typedef std::shared_ptr<output_descriptor> output_descriptor_ptr;
+typedef std::shared_ptr<part_algos> part_algos_ptr;
 
 /// helpers and abstractions for read options.
 /// for access to options should be used clases from this namespace.

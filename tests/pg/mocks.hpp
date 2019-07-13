@@ -12,14 +12,17 @@
 #include "pg/provider.hpp"
 #include "pg/part_descriptor.hpp"
 #include "pg/output_descriptor.hpp"
+#include "pg/part_algos.hpp"
 #include "parser/interface/loader.hpp"
 
 namespace pgmocks {
 MOCK_BASE_CLASS( provider, modegen::pg::provider)
 {
+	MOCK_METHOD( create_algos, 1 )
 	MOCK_METHOD( create_part, 1 )
 	MOCK_METHOD( create_output, 2 )
 	MOCK_METHOD( input, 0 )
+	MOCK_METHOD( generate_from_jinja, 1 )
 };
 
 MOCK_BASE_CLASS( part, modegen::pg::part_descriptor )
@@ -28,6 +31,7 @@ MOCK_BASE_CLASS( part, modegen::pg::part_descriptor )
 	MOCK_METHOD( name, 0 )
 	MOCK_METHOD( outputs, 0 )
 	MOCK_METHOD( build_outputs, 2 )
+	MOCK_METHOD( input_managers, 0 )
 	MOCK_METHOD( map_to_outputs, 1 )
 };
 
