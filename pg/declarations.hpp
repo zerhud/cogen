@@ -35,6 +35,8 @@ class output_descriptor;
 class part_manager;
 class final_generator;
 
+struct jinja_env;
+
 typedef std::shared_ptr<provider> provider_ptr;
 typedef std::shared_ptr<const provider> provider_const_ptr;
 typedef std::shared_ptr<part_descriptor> part_descriptor_ptr;
