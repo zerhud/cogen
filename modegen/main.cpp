@@ -15,21 +15,14 @@
 #include <boost/process.hpp>
 #include <pybind11/embed.h>
 
-#include "generation/common.hpp"
-#include "generation/provider.hpp"
-#include "generation/file_data.hpp"
-#include "generation/cpp.hpp"
-#include "generation/cmake.hpp"
-#include "generation/python.hpp"
-#include "generation/part_descriptor.hpp"
+#include "pg/provider.hpp"
 
-#include "generation/interface/part_descriptor.hpp"
 
 #include "parser/interface/loader.hpp"
 
 #include "pythongen.hpp"
 
-namespace mg = modegen::generation;
+namespace mg = modegen::pg;
 namespace mi = modegen::parser::interface;
 namespace po = boost::program_options;
 

@@ -17,6 +17,8 @@ mpp::module_algos::module_algos(const std::vector<modegen::parser::loader_ptr>& 
 {
 	for(auto ldr:ldrs) if(mldr_ = std::dynamic_pointer_cast<mpi::loader>(ldr)) break;
 	if(!mldr_) throw errors::error("cannot create module algo without module loader");
+
+	mods_ = mldr_->result();
 }
 
 void mpp::module_algos::set_filter(boost::property_tree::ptree fdata)
@@ -31,9 +33,7 @@ std::vector<std::string> mpp::module_algos::map(const std::string& tmpl) const
 
 	std::vector<std::string> ret;
 
-	auto mods = mldr_->result();
-
-	for(auto& mod:mods) {
+	for(auto& mod:mods_) {
 		std::string& cur = ret.emplace_back(tmpl);
 		auto ver = mpi::get_version(mod);
 		replace(cur, "$mod"s, mod.name);
@@ -50,5 +50,10 @@ bool mpp::module_algos::replace(std::string& tmpl, const std::string& var_name, 
 	bool found = pos!=std::string::npos;
 	if(found) tmpl.replace(pos, var_name.size(), value);
 	return found;
+}
+
+std::vector<modegen::parser::interface::module> mpp::module_algos::mods() const
+{
+	return mods_;
 }
 

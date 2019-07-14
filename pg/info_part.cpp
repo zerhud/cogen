@@ -29,8 +29,7 @@ std::tuple<mpg::info_part::fgmode,std::string> mpg::info_part::outinfo() const
 	auto tmpl = setts.output_tmpl();
 	auto mode = setts.output_mode();
 
-	if(mode=="file_bymod"s) return std::make_tuple(fgmode::bymod, tmpl);
-	if(mode=="file_byent"s) return std::make_tuple(fgmode::byent, tmpl);
+	if(mode=="file_map"s) return std::make_tuple(fgmode::map, tmpl);
 	return std::make_tuple(fgmode::single, tmpl);
 }
 
@@ -61,9 +60,9 @@ void mpg::info_part::build_outputs(const mpg::part_manager& pman, mpg::provider_
 {
 	prov_ = prov;
 	if(!prov_) throw errors::error("cannot build outputs without provider");
-	create_algos(*prov);
+	create_algos(*prov_);
 
-	//TODO: filter in algos..
+	TODO(call filter in algos)
 
 	// file_single filter..
 	// file_bymod (name with tmpl) filter...
@@ -73,16 +72,13 @@ void mpg::info_part::build_outputs(const mpg::part_manager& pman, mpg::provider_
 		auto out = outs_.emplace_back(prov_->create_output(lang(), ftmpl));
 		out->override_setts(setts.get_subset(options::subsetts::part_data));
 	}
-	else if(mode==fgmode::bymod) {
+	else if(mode==fgmode::map) {
 		auto osetts = setts.get_subset(options::subsetts::part_data);
 		auto tmpls = map_to_outputs(ftmpl);
 		for(auto& tmpl:tmpls) {
 			auto out = outs_.emplace_back(prov_->create_output(lang(), tmpl));
 			out->override_setts(osetts);
 		}
-	}
-	else if(mode==fgmode::byent) {
-		throw errors::notready("byent output mode");
 	}
 }
 
@@ -94,10 +90,9 @@ std::vector<mpg::part_algos_ptr> mpg::info_part::input_managers() const
 std::vector<std::string> mpg::info_part::map_to_outputs(const std::string& tmpl) const
 {
 	if(!prov_) throw errors::error("cannot map to outputs without provider");
-	if(algos_.empty()) throw errors::error("no input managers found: build outputs first");
+	if(algos_.empty()) throw errors::error("no input managers found");
 
 	return algos_[0]->map(tmpl); //algo[0] is mods: see create_algo fnc
-	//TODO: map to other possible algos.. (add test for data for example)
-
+	TODO("map to other possible algos.. (add test for data for example)")
 }
 

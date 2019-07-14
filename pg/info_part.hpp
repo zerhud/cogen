@@ -17,7 +17,7 @@ namespace modegen::pg {
 
 /// a single part in info file. manages lang compiler.
 class info_part : public part_descriptor {
-	enum class fgmode { single, bymod, byent };
+	enum class fgmode { single, map };
 	provider_const_ptr prov_;
 	options::part_view setts;
 	std::vector<output_descriptor_ptr> outs_;
