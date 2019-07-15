@@ -13,6 +13,7 @@
 
 namespace modegen::pg::palgos {
 
+//TODO: rename to module or modules
 class module_algos : public part_algos {
 	std::vector<parser::interface::module> mods_;
 	std::shared_ptr<modegen::parser::interface::loader> mldr_;

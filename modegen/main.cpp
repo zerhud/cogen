@@ -16,7 +16,7 @@
 #include <pybind11/embed.h>
 
 #include "pg/provider.hpp"
-
+#include "pg/part_algos/module.hpp"
 
 #include "parser/interface/loader.hpp"
 
@@ -36,6 +36,12 @@ public:
 		(void)self_path;
 	}
 
+	std::unique_ptr<mg::part_algos> create_algos(mg::input_lang il) const override
+	{
+		if(il==mg::input_lang::module) return std::make_unique<mg::palgos::module_algos>();
+		return nullptr;
+	}
+
 	modegen::parser::loader_ptr create_loader(std::string_view target, FS::path input)
 	{
 		auto ldr = lman.require(target);
@@ -48,22 +54,19 @@ public:
 		return ldr;
 	}
 
-	std::vector<modegen::parser::loader_ptr> parsers() const override
+	std::vector<modegen::parser::loader_ptr> input() const override
 	{
 		// nonconst only first time called
 		return const_cast<decltype(lman)&>(lman).finish_loads();
 	}
 
-	mg::file_data_ptr generator(std::string_view name) const override
+	mg::output_descriptor_ptr craete_output(mg::output_lang lng, FS::path p) const override
 	{
-		if(name == "cpp"sv) return std::make_shared<mg::cpp_generator>();
-		if(name == "cmake"sv) return std::make_shared<mg::cmake>();
-		if(name == "python"sv) return std::make_shared<mg::python>();
-		throw std::runtime_error("no such generator was loaded \""s + std::string(name) + "\""s);
+		throw std::runtime_error("no such generator was loaded \""s + mg::to_string(lng) + "\""s);
 	}
 
-	void json_jinja(const mg::tmpl_gen_env& data) const override
-	{
+	void generate_from_jinja(const mg::jinja_env& env) const override
+	{/*
 		nlohmann::json json_data;
 
 		auto fnc_list = data.emb_fnc_list();
@@ -93,14 +96,14 @@ public:
 		        .tmpl(data.tmpl(), data.out_file())
 		        .script(data.exec_after())
 		        ;
-	}
+	*/}
 
 	void add_search_path(const FS::path& p)
 	{
 		search_pathes.push_back(p);
 	}
 
-	FS::path resolve_file(const FS::path& p, const FS::path& assumed, std::string_view gen_name) const override
+	/*FS::path resolve_file(const FS::path& p, const FS::path& assumed, std::string_view gen_name) const override
 	{
 		if(p.is_absolute()) return p;
 
@@ -128,9 +131,9 @@ public:
 		std::string err_msg = u8"cannot find file "s + p.generic_u8string() + u8"\ntry to search in:\n"s;
 		for(const auto& sp:final_search) err_msg += u8"\t" + sp.generic_u8string() + u8"\n"s;
 		throw std::runtime_error(err_msg);
-	}
+	}*/
 
-	std::unique_ptr<mg::part_descriptor> create_part_descriptor(mg::options::view v) const override
+	std::unique_ptr<mg::part_descriptor> create_part(mg::options::part_view&& v) const override
 	{
 		auto ng = v.get_opt<std::string>(mg::options::part_option::output_name_gen).value_or("single");
 		if(ng=="interface"s) return std::make_unique<mg::interface::part_descriptor>(v, parsers());
