@@ -8,6 +8,7 @@ option(ENABLE_TODO "enable todo warnings in debug mode" ON)
 option(ENABLE_TESTS "enable tests.. it depends on turtle library" ON)
 option(LOW_MEMORY "assume we don't have efough memroty for complie grammars (gcc optimizations)" ON)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(Boost COMPONENTS program_options unit_test_framework system REQUIRED)
 find_package(pybind11 REQUIRED)
 find_package(Threads REQUIRED)
