@@ -24,6 +24,12 @@ mpg::generator::generator(mpg::provider_ptr p, mpg::options::container_ptr s)
 {
 }
 
+mpg::options::container_ptr mpg::generator::opts() const
+{
+	assert(setts);
+	return setts;
+}
+
 /// builds all parts.
 /// after building all part are ready for generate output.
 void mpg::generator::build_env()

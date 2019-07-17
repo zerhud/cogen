@@ -17,6 +17,8 @@
 
 #include "pg/provider.hpp"
 #include "pg/part_algos/module.hpp"
+#include "pg/generator.hpp"
+#include "pg/options.hpp"
 
 #include "parser/interface/loader.hpp"
 
@@ -38,7 +40,8 @@ public:
 
 	std::unique_ptr<mg::part_algos> create_algos(mg::input_lang il) const override
 	{
-		if(il==mg::input_lang::module) return std::make_unique<mg::palgos::module_algos>();
+		if(il==mg::input_lang::mdl) return std::make_unique<mg::palgos::module_algos>(input());
+		if(il==mg::input_lang::data) return nullptr;
 		return nullptr;
 	}
 
@@ -60,7 +63,7 @@ public:
 		return const_cast<decltype(lman)&>(lman).finish_loads();
 	}
 
-	mg::output_descriptor_ptr craete_output(mg::output_lang lng, FS::path p) const override
+	mg::output_descriptor_ptr create_output(mg::output_lang lng, FS::path p) const override
 	{
 		throw std::runtime_error("no such generator was loaded \""s + mg::to_string(lng) + "\""s);
 	}
@@ -133,12 +136,9 @@ public:
 		throw std::runtime_error(err_msg);
 	}*/
 
-	std::unique_ptr<mg::part_descriptor> create_part(mg::options::part_view&& v) const override
+	mg::part_descriptor_ptr create_part(mg::options::part_view&& v) const override
 	{
-		auto ng = v.get_opt<std::string>(mg::options::part_option::output_name_gen).value_or("single");
-		if(ng=="interface"s) return std::make_unique<mg::interface::part_descriptor>(v, parsers());
-		if(ng=="interface,unite"s) return std::make_unique<mg::interface::part_descriptor>(v ,parsers(), true);
-		return std::make_unique<mg::single_part_descriptor>(std::move(v), parsers());
+		return nullptr;
 	}
 
 	std::vector<std::string> list_target() const
@@ -148,7 +148,7 @@ public:
 
 	std::vector<std::string> list_generators() const
 	{
-		return { u8"cpp"s, u8"cmake"s, u8"py"s };
+		return { "cpp"s, "cmake"s, "py"s };
 	}
 private:
 	std::optional<FS::path> resolve_file(FS::path p, const std::vector<FS::path> final_search) const
@@ -220,20 +220,21 @@ int main(int argc, char** argv)
 		else if(key=="generator"sv) {
 			if(gen) gen->generate(out_dir);
 
-			FS::path info_path = prov->resolve_file(val, "", "");
+			//FS::path info_path = prov->resolve_file(val, "", "");
+			FS::path info_path = val;
 			gen = std::make_unique<mg::generator>(prov, info_path.parent_path());
-			boost::property_tree::read_info(info_path.u8string(), gen->options());
+			boost::property_tree::read_info(info_path.u8string(), gen->opts()->raw());
 		}
 		else if(key=="option"sv) {
 			if(!gen) throw std::runtime_error("cannot override option without generator");
 
 			std::cmatch m;
 			std::regex_match(val.data(), m, key_val_parser);
-			gen->options().put(m[1].str(),m[3].str());
+			gen->opts()->raw().put(m[1].str(),m[3].str());
 		}
 		else if(key=="aoption"sv) {
 			if(!gen) throw std::runtime_error("cannot add option without generator");
-			gen->options().add(key,val);
+			gen->opts()->raw().add(key,val);
 		}
 		else if(key=="include"sv) {
 			prov->add_search_path(val);

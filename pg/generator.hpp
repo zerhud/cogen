@@ -23,6 +23,8 @@ class generator final {
 public:
 	generator(provider_ptr p, options::container_ptr s);
 
+	options::container_ptr opts() const ;
+
 	void build_env() ;
 	part_manager& parts() ;
 
