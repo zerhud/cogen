@@ -222,8 +222,9 @@ int main(int argc, char** argv)
 
 			//FS::path info_path = prov->resolve_file(val, "", "");
 			FS::path info_path = val;
-			gen = std::make_unique<mg::generator>(prov, info_path.parent_path());
-			boost::property_tree::read_info(info_path.u8string(), gen->opts()->raw());
+			auto opts = std::make_shared<mg::options::container>(info_path);
+			gen = std::make_unique<mg::generator>(prov, opts);
+			boost::property_tree::read_info(info_path.u8string(), opts->raw());
 		}
 		else if(key=="option"sv) {
 			if(!gen) throw std::runtime_error("cannot override option without generator");

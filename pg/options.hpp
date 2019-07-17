@@ -23,11 +23,17 @@ enum class subsetts { file_generator, part_data, part_forwards };
 typedef std::variant<part_option, part_idl_filter, template_option> any_option;
 
 class container {
+	FS::path opts_file;
 	boost::property_tree::ptree opts;
 	typedef boost::property_tree::ptree::path_type path_t;
 public:
 	/// returns option's help message
 	static std::string description_message(any_option opt) ;
+
+	container() =default ;
+	container(FS::path of);
+
+	FS::path opts_dir() const ;
 
 	boost::property_tree::ptree& raw() ;
 	const boost::property_tree::ptree& raw() const ;

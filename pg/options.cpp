@@ -33,6 +33,16 @@ std::string mo::container::description_message(mo::any_option opt)
 	return "unknown option chapter"s;
 }
 
+mo::container::container(FS::path of)
+    : opts_file(std::move(of))
+{
+}
+
+FS::path mo::container::opts_dir() const
+{
+	return opts_file.parent_path();
+}
+
 boost::property_tree::ptree& mo::container::raw()
 {
 	return opts;
