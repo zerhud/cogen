@@ -15,7 +15,7 @@ namespace mpi = modegen::parser::interface;
 
 mpp::module_algos::module_algos(const std::vector<modegen::parser::loader_ptr>& ldrs)
 {
-	for(auto ldr:ldrs) if(mldr_ = std::dynamic_pointer_cast<mpi::loader>(ldr)) break;
+	for(auto ldr:ldrs) if((mldr_ = std::dynamic_pointer_cast<mpi::loader>(ldr))) break;
 	if(!mldr_) throw errors::error("cannot create module algo without module loader");
 
 	mods_ = mldr_->result();

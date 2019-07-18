@@ -25,7 +25,7 @@ namespace pi = modegen::parser::interface;
 
 const pi::module& mi::part_descriptor::cur_mod() const
 {
-	assert( cur_pos < filtered_idl_.size() | filtered_idl_.empty() );
+	assert( cur_pos < filtered_idl_.size() || filtered_idl_.empty() );
 	return filtered_idl_[cur_pos];
 }
 
