@@ -17,7 +17,7 @@ class cpp : public output_descriptor {
 	FS::path out_file_;
 	nlohmann::json data_;
 public:
-	cpp(provider_ptr p, FS::path o);
+	cpp(provider_const_ptr p, FS::path o);
 
 	void override_setts(boost::property_tree::ptree s) override ;
 	nlohmann::json data() const override ;

@@ -19,6 +19,10 @@
 #include "pg/part_algos/module.hpp"
 #include "pg/generator.hpp"
 #include "pg/options.hpp"
+#include "pg/info_part.hpp"
+#include "pg/langs/cpp.hpp"
+#include "pg/langs/python.hpp"
+#include "pg/langs/cmake.hpp"
 
 #include "parser/interface/loader.hpp"
 
@@ -30,7 +34,7 @@ namespace po = boost::program_options;
 
 using namespace std::literals;
 
-class gen_prov : public mg::provider
+class gen_prov : public mg::provider, public std::enable_shared_from_this<gen_prov>
 {
 public:
 	gen_prov(FS::path self_path)
@@ -65,6 +69,8 @@ public:
 
 	mg::output_descriptor_ptr create_output(mg::output_lang lng, FS::path p) const override
 	{
+		if(lng==mg::output_lang::cpp) return std::make_shared<mg::outputs::cpp>(shared_from_this(), std::move(p));
+		//if(lng==mg::output_lang::cmake) return std::make_shared<mg::outputs::cmake>(shared_form_this(), std::move(p));
 		throw std::runtime_error("no such generator was loaded \""s + mg::to_string(lng) + "\""s);
 	}
 
@@ -138,7 +144,7 @@ public:
 
 	mg::part_descriptor_ptr create_part(mg::options::part_view&& v) const override
 	{
-		return nullptr;
+		return std::make_shared<mg::info_part>(std::move(v));
 	}
 
 	std::vector<std::string> list_target() const
