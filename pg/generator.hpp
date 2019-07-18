@@ -29,7 +29,6 @@ public:
 	part_manager& parts() ;
 
 	void generate(const FS::path& output_dir) const ;
-	void generate(std::string_view part, std::ostream& out) const ;
 };
 
 } // namespace modegen::pg

@@ -14,6 +14,7 @@
 #include "provider.hpp"
 #include "exceptions.hpp"
 #include "part_descriptor.hpp"
+#include "output_descriptor.hpp"
 
 namespace mpg = modegen::pg;
 using namespace std::literals;
@@ -45,10 +46,18 @@ mpg::part_manager& mpg::generator::parts()
 
 void mpg::generator::generate(const FS::path& output_dir) const
 {
-}
+	assert(prov);
+	if(!FS::exists(output_dir)) FS::create_directories(output_dir);
+	else if(!FS::is_directory(output_dir)) throw errors::error("you must specify directory for output");
 
-void mpg::generator::generate(std::string_view part, std::ostream& out) const
-{
+	auto olist = pman.list_output();
+	for(auto& out:olist) {
+		assert(out);
+		jinja_env env;
+		env.output = output_dir / out->file();
+		env.data = out->data();
+		prov->generate_from_jinja(env);
+	}
 }
 
 void mpg::generator::init_parts()

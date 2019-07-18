@@ -9,10 +9,17 @@
 #pragma once
 
 #include <vector>
+#include <nlohman/json.hpp>
 #include "declarations.hpp"
 #include "parser/loader.hpp"
 
 namespace modegen::pg {
+
+struct jinja_env {
+	FS::path templ;
+	FS::path output;
+	nlohmann::json data;
+};
 
 class provider {
 public:
