@@ -126,6 +126,7 @@ add_custom_command(OUTPUT "${lohman_json_file}"
 )
 
 target_sources(modegen_interfaces PRIVATE "${lohman_json_file}" )
+target_sources(part_generation PRIVATE "${lohman_json_file}" )
 
 # main programm: run selected generator and sets options
 add_executable(modegen modegen/main.cpp)

@@ -68,7 +68,7 @@ public:
 			for(auto& child:cur_data) {
 				auto [leaf_key, is_leaf] = iterate_child(child, key);
 				if(is_leaf) {
-					const bool exists = result.get_child_optional(leaf_key);
+					const bool exists = result.get_child_optional(leaf_key) == boost::none;
 					if(exists) throw ptree_bad_path("already exists", leaf_key);
 					result.put( leaf_key, child.second.data());
 				}
