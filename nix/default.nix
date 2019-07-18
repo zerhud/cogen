@@ -10,10 +10,11 @@
 	, clang
 	, llvm_7
 	, pybind11
+        , cquery
 }:
 
 let
-  clcov_deps = if enable_clcov then [clang llvm_7] else [];
+  clcov_deps = if enable_clcov then [clang llvm_7 cquery] else [];
   python3_diswar = python3.overrideAttrs( old : {
 	  postPatch = old.postPatch + ''
 	  sed -i '55d' Modules/_decimal/libmpdec/context.c
