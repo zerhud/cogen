@@ -8,11 +8,18 @@
 
 #include "cpp.hpp"
 
+namespace mpg = modegen::pg;
 namespace mgo = modegen::pg::outputs;
 
 mgo::cpp::cpp(provider_const_ptr p, FS::path o)
 {
 }
+
+mpg::output_lang mgo::cpp::lang() const
+{
+	return output_lang::cpp;
+}
+
 void mgo::cpp::override_setts(boost::property_tree::ptree s)
 {
 }

@@ -19,6 +19,7 @@ class cpp : public output_descriptor {
 public:
 	cpp(provider_const_ptr p, FS::path o);
 
+	output_lang lang() const override ;
 	void override_setts(boost::property_tree::ptree s) override ;
 	nlohmann::json data() const override ;
 	FS::path file() const override ;

@@ -14,6 +14,7 @@
 #include "exceptions.hpp"
 
 namespace mpg = modegen::pg;
+namespace mpo = modegen::pg::options;
 
 using namespace std::literals;
 
@@ -38,6 +39,13 @@ mpg::info_part::info_part(options::part_view s)
 {
 	auto lng = lang();
 	assert( lng==output_lang::cpp || lng==output_lang::python || lng==output_lang::javascript );
+}
+
+FS::path mpg::info_part::tmpl_file() const
+{
+	assert(prov_);
+	auto file = setts.get<std::string>(mpo::part_option::input);
+	return prov_->resolve_file(file, setts.container()->opts_dir(), lang());
 }
 
 mpg::output_lang mpg::info_part::lang() const

@@ -28,6 +28,7 @@ class info_part : public part_descriptor {
 public:
 	info_part(options::part_view s);
 
+	FS::path tmpl_file() const override ;
 	output_lang lang() const override ;
 	std::string_view name() const override ;
 	std::vector<output_descriptor_ptr> outputs() const override ;

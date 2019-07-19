@@ -16,8 +16,8 @@
 namespace modegen::pg {
 
 struct jinja_env {
-	FS::path templ;
-	FS::path output;
+	FS::path tmpl;
+	FS::path out_file;
 	nlohmann::json data;
 };
 
@@ -30,7 +30,7 @@ public:
 	virtual output_descriptor_ptr create_output(output_lang lng, FS::path p) const =0 ;
 	virtual std::vector<parser::loader_ptr> input() const =0 ;
 	virtual void generate_from_jinja(const jinja_env& env) const =0 ;
-	//virtual FS::path resolve_file(const FS::path& p, const FS::path& assumed, std::string_view gen_name) const =0 ;
+	virtual FS::path resolve_file(const FS::path& p, const FS::path& assumed, output_lang lng) const =0 ;
 };
 
 } // namespace modegen::pg

@@ -50,13 +50,16 @@ void mpg::generator::generate(const FS::path& output_dir) const
 	if(!FS::exists(output_dir)) FS::create_directories(output_dir);
 	else if(!FS::is_directory(output_dir)) throw errors::error("you must specify directory for output");
 
-	auto olist = pman.list_output();
-	for(auto& out:olist) {
-		assert(out);
+	auto plist = pman.list();
+	for(auto& part:plist) {
 		jinja_env env;
-		env.output = output_dir / out->file();
-		env.data = out->data();
-		prov->generate_from_jinja(env);
+		env.tmpl = part->tmpl_file();
+		auto olist = part->outputs();
+		for(auto& out:olist) {
+			env.data = out->data();
+			env.out_file = output_dir / out->file();
+			prov->generate_from_jinja(env);
+		}
 	}
 }
 

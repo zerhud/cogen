@@ -75,44 +75,49 @@ public:
 	}
 
 	void generate_from_jinja(const mg::jinja_env& env) const override
-	{/*
+	{
 		nlohmann::json json_data;
 
-		auto fnc_list = data.emb_fnc_list();
-		for(auto& ef:fnc_list) {
-			if(std::holds_alternative<std::string>(ef.second)) {
-				json_data["extra_data"][ef.first]["name"] = ef.first;
-				json_data["extra_data"][ef.first]["script"] = std::get<std::string>(ef.second);
-			}
-			else if(std::holds_alternative<FS::path>(ef.second)) {
-				json_data["extra_data"][ef.first]["name"] = ef.first;
-				json_data["extra_data"][ef.first]["file"] = std::get<FS::path>(ef.second).u8string();
-			}
-		}
+		//auto fnc_list = data.emb_fnc_list();
+		//for(auto& ef:fnc_list) {
+			//if(std::holds_alternative<std::string>(ef.second)) {
+				//json_data["extra_data"][ef.first]["name"] = ef.first;
+				//json_data["extra_data"][ef.first]["script"] = std::get<std::string>(ef.second);
+			//}
+			//else if(std::holds_alternative<FS::path>(ef.second)) {
+				//json_data["extra_data"][ef.first]["name"] = ef.first;
+				//json_data["extra_data"][ef.first]["file"] = std::get<FS::path>(ef.second).u8string();
+			//}
+		//}
 
-		mg::python_evaluator ev(data.data());
+		modegen::generation::python_evaluator ev(env.data);
 		ev
 		        .sys_path("some/path"s)
-		        .script(data.exec_before())
+		        //.script(data.exec_before())
 		        ;
 
-		auto emb_fnc_list = data.emb_fnc_list();
-		for(const auto& ef:emb_fnc_list) {
-			ev.add_emb_fnc(ef.first, ef.second);
-		}
+		//auto emb_fnc_list = data.emb_fnc_list();
+		//for(const auto& ef:emb_fnc_list) {
+			//ev.add_emb_fnc(ef.first, ef.second);
+		//}
 
 		ev
-		        .tmpl(data.tmpl(), data.out_file())
-		        .script(data.exec_after())
+		        .tmpl(env.tmpl, env.out_file)
+		        //.script(data.exec_after())
 		        ;
-	*/}
+	}
 
 	void add_search_path(const FS::path& p)
 	{
 		search_pathes.push_back(p);
 	}
 
-	/*FS::path resolve_file(const FS::path& p, const FS::path& assumed, std::string_view gen_name) const override
+	FS::path resolve_file(const FS::path& p, const FS::path& assumed, mg::output_lang lng) const override
+	{
+		return resolve_file(p, assumed, mg::to_string(lng));
+	}
+
+	FS::path resolve_file(const FS::path& p, const FS::path& assumed, std::string_view gen_name) const
 	{
 		if(p.is_absolute()) return p;
 
@@ -140,7 +145,7 @@ public:
 		std::string err_msg = u8"cannot find file "s + p.generic_u8string() + u8"\ntry to search in:\n"s;
 		for(const auto& sp:final_search) err_msg += u8"\t" + sp.generic_u8string() + u8"\n"s;
 		throw std::runtime_error(err_msg);
-	}*/
+	}
 
 	mg::part_descriptor_ptr create_part(mg::options::part_view&& v) const override
 	{

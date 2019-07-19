@@ -23,10 +23,12 @@ MOCK_BASE_CLASS( provider, modegen::pg::provider)
 	MOCK_METHOD( create_output, 2 )
 	MOCK_METHOD( input, 0 )
 	MOCK_METHOD( generate_from_jinja, 1 )
+	MOCK_METHOD( resolve_file, 3 )
 };
 
 MOCK_BASE_CLASS( part, modegen::pg::part_descriptor )
 {
+	MOCK_METHOD( tmpl_file, 0 )
 	MOCK_METHOD( lang, 0 )
 	MOCK_METHOD( name, 0 )
 	MOCK_METHOD( outputs, 0 )
@@ -46,6 +48,7 @@ MOCK_BASE_CLASS( iloader, modegen::parser::interface::loader )
 
 MOCK_BASE_CLASS( part_output, modegen::pg::output_descriptor )
 {
+	MOCK_METHOD( lang, 0 );
 	MOCK_METHOD( data, 0 );
 	MOCK_METHOD( file, 0 );
 	MOCK_METHOD( override_setts, 1 );
