@@ -92,7 +92,7 @@ std::string mg::naming::convert(const std::string& name, mg::name_conversion c)
 			ret += s;
 		}
 	} else {
-		assert(("not call name_conversion was used",false));
+		assert(*(int*)"not call name_conversion was used" * 0);
 		ret = name;
 	}
 
