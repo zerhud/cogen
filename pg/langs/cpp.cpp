@@ -12,6 +12,7 @@ namespace mpg = modegen::pg;
 namespace mgo = modegen::pg::outputs;
 
 mgo::cpp::cpp(provider_const_ptr p, FS::path o)
+	: out_file_(std::move(o))
 {
 }
 

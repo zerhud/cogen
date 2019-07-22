@@ -28,7 +28,7 @@ public:
 	void build_env() ;
 	part_manager& parts() ;
 
-	void generate(const FS::path& output_dir) const ;
+	void generate(const FS::path& output_dir) ;
 };
 
 } // namespace modegen::pg

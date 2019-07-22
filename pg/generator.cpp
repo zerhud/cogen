@@ -44,9 +44,11 @@ mpg::part_manager& mpg::generator::parts()
 	return pman;
 }
 
-void mpg::generator::generate(const FS::path& output_dir) const
+void mpg::generator::generate(const FS::path& output_dir)
 {
 	assert(prov);
+	build_env();
+
 	if(!FS::exists(output_dir)) FS::create_directories(output_dir);
 	else if(!FS::is_directory(output_dir)) throw errors::error("you must specify directory for output");
 

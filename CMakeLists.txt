@@ -71,10 +71,6 @@ target_sources_local(modegen_interfaces python.hpp    python.cpp    "generation/
 target_sources_local(modegen_interfaces cmake.hpp     cmake.cpp     "generation/")
 target_sources_local(modegen_interfaces output_info.hpp        output_info.cpp        "generation/")
 target_sources_local(modegen_interfaces part_descriptor.hpp    part_descriptor.cpp    "generation/")
-target_sources_copy(modegen_interfaces "${dbg_cpp_templates_dir}"
-	generation/cpp/declarations.info generation/cpp/render.jinja
-	generation/cpp/declarations.jinja generation/cpp/header.jinja generation/cpp/definitions.jinja
-	)
 target_sources_copy(modegen_interfaces "${dbg_cmake_templates_dir}"
 	generation/cmake/plain.jinja
 	)
@@ -112,6 +108,11 @@ target_sources_local(part_generation "exceptions.hpp" "exceptions.cpp" "pg/")
 target_sources_local(part_generation "cpp.hpp" "cpp.cpp" "pg/langs/")
 target_sources_local(part_generation "cmake.hpp" "cmake.cpp" "pg/langs/")
 target_sources_local(part_generation "python.hpp" "python.cpp" "pg/langs/")
+target_sources_copy(part_generation "${dbg_cpp_templates_dir}"
+	pg/tmpls/cpp_decl.info
+	pg/tmpls/cpp/render.jinja pg/tmpls/cpp/declarations.jinja
+	pg/tmpls/cpp/header.jinja pg/tmpls/cpp/definitions.jinja
+	)
 
 # lohman json
 set(lohman_json_file "${CMAKE_CURRENT_BINARY_DIR}/nlohman/json.hpp")

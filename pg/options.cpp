@@ -211,7 +211,7 @@ std::string mo::part_view::output_mode() const
 		if(s.first == "file"s) return s.first;
 	}
 
-	throw errors::error("no output found");
+	throw errors::error("no output found for part "s + std::string(def_part));
 }
 
 std::string mo::part_view::output_tmpl() const

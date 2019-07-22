@@ -231,8 +231,7 @@ int main(int argc, char** argv)
 		else if(key=="generator"sv) {
 			if(gen) gen->generate(out_dir);
 
-			//FS::path info_path = prov->resolve_file(val, "", "");
-			FS::path info_path = val;
+			FS::path info_path = prov->resolve_file(val, "", "");
 			auto opts = std::make_shared<mg::options::container>(info_path);
 			gen = std::make_unique<mg::generator>(prov, opts);
 			boost::property_tree::read_info(info_path.u8string(), opts->raw());
