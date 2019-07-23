@@ -29,6 +29,10 @@ enum class output_lang { json, cpp, cmake, python, javascript };
 std::string to_string(output_lang l);
 inline std::ostream& operator << (std::ostream& out, output_lang o) { out << to_string(o); return out; }
 
+enum class name_conversion{underscore, camel_case, title_case, as_is};
+std::string_view to_string(name_conversion c);
+inline std::ostream& operator << (std::ostream& out, name_conversion o) { out << to_string(o); return out; }
+
 class provider;
 class generator;
 class part_descriptor;
@@ -72,6 +76,7 @@ class from_string {
 public:
 	from_string(std::string s);
 	operator output_lang() const ;
+	operator name_conversion() const ;
 };
 
 } // namespace modegen::pg

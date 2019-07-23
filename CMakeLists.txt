@@ -107,6 +107,7 @@ target_sources_local(part_generation "options.hpp" "options.cpp" "pg/")
 target_sources_local(part_generation "provider.hpp" "provider.cpp" "pg/")
 target_sources_local(part_generation "exceptions.hpp" "exceptions.cpp" "pg/")
 target_sources_local(part_generation "cpp.hpp" "cpp.cpp" "pg/langs/")
+target_sources_local(part_generation "type_converter.hpp" "type_converter.cpp" "pg/langs/cpp/")
 target_sources_local(part_generation "cmake.hpp" "cmake.cpp" "pg/langs/")
 target_sources_local(part_generation "python.hpp" "python.cpp" "pg/langs/")
 target_sources_copy(part_generation "${dbg_cpp_templates_dir}"

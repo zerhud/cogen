@@ -104,3 +104,8 @@ std::vector<std::string> mpg::info_part::map_to_outputs(const std::string& tmpl)
 	TODO("map to other possible algos.. (add test for data for example)")
 }
 
+mpg::options::part_view mpg::info_part::opts() const
+{
+	return setts;
+}
+

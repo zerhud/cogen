@@ -13,6 +13,7 @@
 #include "pg/part_descriptor.hpp"
 #include "pg/output_descriptor.hpp"
 #include "pg/part_algos.hpp"
+#include "pg/options.hpp"
 #include "parser/interface/loader.hpp"
 
 namespace pgmocks {
@@ -35,6 +36,7 @@ MOCK_BASE_CLASS( part, modegen::pg::part_descriptor )
 	MOCK_METHOD( build_outputs, 2 )
 	MOCK_METHOD( input_managers, 0 )
 	MOCK_METHOD( map_to_outputs, 1 )
+	MOCK_METHOD( opts, 0 )
 };
 
 MOCK_BASE_CLASS( iloader, modegen::parser::interface::loader )

@@ -25,6 +25,7 @@ public:
 	virtual void build_outputs(const part_manager& pman, provider_const_ptr prov) =0 ;
 	virtual std::vector<part_algos_ptr> input_managers() const =0 ;
 	virtual std::vector<std::string> map_to_outputs(const std::string& tmpl) const =0 ;
+	virtual options::part_view opts() const =0 ;
 };
 
 } // namespace modegen::pg
