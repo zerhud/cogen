@@ -90,7 +90,7 @@ target_sources_local(modegen_interfaces part_descriptor.hpp part_descriptor.cpp 
 target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "generation/cpp/")
 
 add_library(part_generation "pg/declarations.hpp" ${main_config_file})
-target_include_directories(part_generation PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
+target_include_directories(part_generation PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/pg" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
 target_link_libraries(part_generation PRIVATE stdc++fs)
 
 target_sources_local(part_generation "generator.hpp" "generator.cpp" "pg/")
@@ -98,6 +98,7 @@ target_sources_local(part_generation "part_descriptor.hpp" "part_descriptor.cpp"
 target_sources_local(part_generation "info_part.hpp" "info_part.cpp" "pg/")
 target_sources_local(part_generation "part_algos.hpp" "part_algos.cpp" "pg/")
 target_sources_local(part_generation "module.hpp" "module.cpp" "pg/part_algos/")
+target_sources_local(part_generation "to_json.hpp" "to_json.cpp" "pg/part_algos/interface/")
 target_sources_local(part_generation "output_descriptor.hpp" "output_descriptor.cpp" "pg/")
 target_sources_local(part_generation "final_generator.hpp" "final_generator.cpp" "pg/")
 target_sources_local(part_generation "generator.hpp" "generator.cpp" "pg/")

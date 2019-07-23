@@ -16,8 +16,9 @@ namespace modegen::pg::outputs {
 class cpp : public output_descriptor {
 	FS::path out_file_;
 	nlohmann::json data_;
+	std::vector<part_algos_ptr> imngs_;
 public:
-	cpp(provider_const_ptr p, FS::path o);
+	cpp(provider_const_ptr p, FS::path o, const part_descriptor& part);
 
 	output_lang lang() const override ;
 	void override_setts(boost::property_tree::ptree s) override ;

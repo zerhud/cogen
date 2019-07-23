@@ -20,7 +20,7 @@ MOCK_BASE_CLASS( provider, modegen::pg::provider)
 {
 	MOCK_METHOD( create_algos, 1 )
 	MOCK_METHOD( create_part, 1 )
-	MOCK_METHOD( create_output, 2 )
+	MOCK_METHOD( create_output, 3 )
 	MOCK_METHOD( input, 0 )
 	MOCK_METHOD( generate_from_jinja, 1 )
 	MOCK_METHOD( resolve_file, 3 )

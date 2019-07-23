@@ -77,14 +77,14 @@ void mpg::info_part::build_outputs(const mpg::part_manager& pman, mpg::provider_
 
 	auto [mode, ftmpl] = outinfo();
 	if(mode==fgmode::single) {
-		auto out = outs_.emplace_back(prov_->create_output(lang(), ftmpl));
+		auto out = outs_.emplace_back(prov_->create_output(lang(), ftmpl, *this));
 		out->override_setts(setts.get_subset(options::subsetts::part_data));
 	}
 	else if(mode==fgmode::map) {
 		auto osetts = setts.get_subset(options::subsetts::part_data);
 		auto tmpls = map_to_outputs(ftmpl);
 		for(auto& tmpl:tmpls) {
-			auto out = outs_.emplace_back(prov_->create_output(lang(), tmpl));
+			auto out = outs_.emplace_back(prov_->create_output(lang(), tmpl, *this));
 			out->override_setts(osetts);
 		}
 	}
