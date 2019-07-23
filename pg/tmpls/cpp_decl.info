@@ -1,0 +1,48 @@
+defaults {
+	lang cpp
+	naming underscore
+}
+part
+{
+	dec {
+		input declarations.jinja
+		file declarations.hpp
+	}
+	header {
+		inc_part dec
+		input header.jinja
+		file module.hpp
+		filter {
+			sel interface
+			sel record
+		}
+	}
+	definition {
+		inc_part dec
+		inc_part header
+		input definitions.jinja
+		file module.cpp
+		forwards {
+			before { script "print('before')" }
+			ex {
+				gen_str {
+					name gen_str
+					script "def gen_str(a):\n\tprint(a)\n\treturn \"\""
+				}
+			}
+		}
+	}
+	cmake {
+		filegen cmake
+		input plain.jinja
+		file CMakeLists.txt
+		project interface
+		libraries {
+			interface {
+				part dec
+				part header
+				part definition
+			}
+		}
+	}
+}
