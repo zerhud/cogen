@@ -51,7 +51,7 @@ MOCK_BASE_CLASS( iloader, modegen::parser::interface::loader )
 MOCK_BASE_CLASS( part_output, modegen::pg::output_descriptor )
 {
 	MOCK_METHOD( lang, 0 );
-	MOCK_METHOD( data, 0 );
+	MOCK_METHOD( data, 1 );
 	MOCK_METHOD( file, 0 );
 	MOCK_METHOD( override_setts, 1 );
 };

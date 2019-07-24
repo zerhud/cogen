@@ -32,7 +32,6 @@ nlohmann::json mg::cmake::jsoned_data(const output_info& outputs) const
 		for(auto& f:l.second) {
 			auto val = f.second.get_value<std::string>();
 			if(f.first=="file"sv) files.emplace_back(val);
-			//if(f.first=="part"sv) files.emplace_back(opts.get<std::string>(options::part_option::output, val));
 			if(f.first=="part"sv) files_from_part(files, outputs.require(val));
 			if(f.first=="dep"sv) deps.emplace_back(val);
 		}

@@ -23,7 +23,7 @@ public:
 
 	virtual output_lang lang() const =0 ;
 	virtual void override_setts(boost::property_tree::ptree s) =0 ;
-	virtual nlohmann::json data() const =0 ;
+	virtual nlohmann::json data(const part_manager& pman) const =0 ;
 	virtual FS::path file() const =0 ;
 };
 

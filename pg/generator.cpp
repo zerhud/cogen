@@ -58,7 +58,7 @@ void mpg::generator::generate(const FS::path& output_dir)
 		env.tmpl = part->tmpl_file();
 		auto olist = part->outputs();
 		for(auto& out:olist) {
-			env.data = out->data();
+			env.data = out->data(pman);
 			env.out_file = output_dir / out->file();
 			prov->generate_from_jinja(env);
 		}

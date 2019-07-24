@@ -9,6 +9,7 @@
 #include "cpp.hpp"
 
 #include "part_descriptor.hpp"
+#include "part_manager.hpp"
 #include "part_algos/module.hpp"
 #include "part_algos/interface/common.hpp"
 #include "part_algos/interface/to_json.hpp"
@@ -40,7 +41,7 @@ void mgo::cpp::override_setts(boost::property_tree::ptree s)
 {
 }
 
-nlohmann::json mgo::cpp::data() const
+nlohmann::json mgo::cpp::data(const part_manager& pman) const
 {
 	using generation::interface::operator |;
 
@@ -61,14 +62,13 @@ nlohmann::json mgo::cpp::data() const
 	auto mods = malg->mods();
 	nlohmann::json jsoned = mods | tcvt | jsoner;
 
-	auto incs = includes(tcvt.includes());
+	auto incs = includes(tcvt.includes(), pman);
 	for(std::size_t i=0;i<incs.size();++i) {
 		jsoned["incs"][i]["n"] = incs[i].name;
 		jsoned["incs"][i]["sys"] = incs[i].sys;
 	}
 
 	add_extra_namespaces(jsoned);
-	TODO("part must call it?");
 	set_constructors_prefix(jsoned);
 
 	return jsoned;
@@ -79,7 +79,20 @@ FS::path mgo::cpp::file() const
 	return out_file_;
 }
 
-std::vector<mgo::cpp::inc_info> mgo::cpp::includes(const std::vector<std::string> sys) const
+std::vector<mgo::cpp::inc_info> mgo::cpp::solve_part_includes(const std::string& pname, const part_manager& pman) const
+{
+	part_descriptor_ptr inc_part = pman.require(pname);
+	auto out_list = inc_part->outputs();
+
+	std::vector<inc_info> ret;
+	for(auto& out:out_list) {
+		inc_info& ii = ret.emplace_back(out->file(), false);
+		ii.is_cpp = out->lang() == output_lang::cpp;
+	}
+	return ret;
+}
+
+std::vector<mgo::cpp::inc_info> mgo::cpp::includes(const std::vector<std::string> sys, const part_manager& pman) const
 {
 	std::vector<inc_info> ret;
 	ret.reserve(sys.size());
@@ -94,8 +107,8 @@ std::vector<mgo::cpp::inc_info> mgo::cpp::includes(const std::vector<std::string
 	}
 	for(auto& i:part_data) {
 		if(i.first == "inc_part"sv) {
-			TODO("need to include other part, get output and include it");
-			//ret.emplace_back(solve_part_include(i.second.get_value<std::string>(), opts), false);
+			auto part_includes = solve_part_includes(i.second.get_value<std::string>(), pman);
+			for(auto& pi:part_includes) ret.emplace_back(std::move(pi));
 		}
 	}
 	for(auto& i:part_data) {
@@ -118,7 +131,8 @@ void mgo::cpp::add_extra_namespaces(nlohmann::json& cdata) const
 	}
 }
 
-
+// other languages may not have pointers and constructors can be with same name
+// cause of it we place this function here insteed of part logic
 void mgo::cpp::set_constructors_prefix(nlohmann::json& cdata) const
 {
 	using namespace modegen::generation::interface;

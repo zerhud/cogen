@@ -33,7 +33,7 @@ part
 		}
 	}
 	cmake {
-		filegen cmake
+		lang cmake
 		input plain.jinja
 		file CMakeLists.txt
 		project interface

@@ -70,7 +70,7 @@ public:
 	mg::output_descriptor_ptr create_output(mg::output_lang lng, FS::path p, const mg::part_descriptor& part) const override
 	{
 		if(lng==mg::output_lang::cpp) return std::make_shared<mg::outputs::cpp>(shared_from_this(), std::move(p), part);
-		//if(lng==mg::output_lang::cmake) return std::make_shared<mg::outputs::cmake>(shared_form_this(), std::move(p));
+		if(lng==mg::output_lang::cmake) return std::make_shared<mg::outputs::cmake>(shared_from_this(), std::move(p), part);
 		throw std::runtime_error("no such generator was loaded \""s + mg::to_string(lng) + "\""s);
 	}
 
