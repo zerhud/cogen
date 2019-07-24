@@ -17,7 +17,7 @@ namespace modegen::pg {
 class part_algos {
 public:
 	virtual ~part_algos() noexcept =default ;
-	virtual void set_filter(boost::property_tree::ptree fdata) =0 ;
+	virtual void set_filter(const options::part_view& pinfo) =0 ;
 	virtual std::vector<std::string> map(const std::string& tmpl) const =0 ;
 };
 

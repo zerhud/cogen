@@ -7,7 +7,14 @@
  *************************************************************************/
 
 #include "module.hpp"
+
+#include "interface/common.hpp"
+#include "interface/filter.hpp"
+#include "interface/naming.hpp"
+#include "options.hpp"
+
 #include "parser/interface/helpers.hpp"
+
 #include "pg/exceptions.hpp"
 
 namespace mpp = modegen::pg::palgos;
@@ -21,9 +28,14 @@ mpp::module_algos::module_algos(const std::vector<modegen::parser::loader_ptr>& 
 	mods_ = mldr_->result();
 }
 
-void mpp::module_algos::set_filter(boost::property_tree::ptree fdata)
+void mpp::module_algos::set_filter(const options::part_view& pinfo)
 {
-	//TODO: support fliter
+	using namespace generation::interface;
+	using namespace options;
+	using generation::interface::operator | ;
+
+	filter::request req;
+	mods_ | filter(req) | naming(from_string(pinfo.get<std::string>(part_option::naming)));
 }
 
 std::vector<std::string> mpp::module_algos::map(const std::string& tmpl) const

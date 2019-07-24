@@ -137,13 +137,13 @@ public:
 
 		auto ret = resolve_file(p, final_search);
 		if(ret) return *ret;
-		ret = resolve_file(p.generic_u8string() + u8".info", final_search);
+		ret = resolve_file(p.generic_u8string() + ".info"s, final_search);
 		if(ret) return *ret;
-		ret = resolve_file(p.generic_u8string() + u8".jinja", final_search);
+		ret = resolve_file(p.generic_u8string() + ".jinja"s, final_search);
 		if(ret) return *ret;
 
-		std::string err_msg = u8"cannot find file "s + p.generic_u8string() + u8"\ntry to search in:\n"s;
-		for(const auto& sp:final_search) err_msg += u8"\t" + sp.generic_u8string() + u8"\n"s;
+		std::string err_msg = "cannot find file "s + p.generic_u8string() + "\ntry to search in:\n"s;
+		for(const auto& sp:final_search) err_msg += "\t"s + sp.generic_u8string() + "\n"s;
 		throw std::runtime_error(err_msg);
 	}
 

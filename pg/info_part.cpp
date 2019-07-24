@@ -37,8 +37,6 @@ std::tuple<mpg::info_part::fgmode,std::string> mpg::info_part::outinfo() const
 mpg::info_part::info_part(options::part_view s)
     : setts(std::move(s))
 {
-	auto lng = lang();
-	assert( lng==output_lang::cpp || lng==output_lang::python || lng==output_lang::javascript );
 }
 
 FS::path mpg::info_part::tmpl_file() const
@@ -68,12 +66,11 @@ void mpg::info_part::build_outputs(const mpg::part_manager& pman, mpg::provider_
 {
 	prov_ = prov;
 	if(!prov_) throw errors::error("cannot build outputs without provider");
+
 	create_algos(*prov_);
+	assert(!algos_.empty());
 
-	TODO(call filter in algos)
-
-	// file_single filter..
-	// file_bymod (name with tmpl) filter...
+	for(auto& alg:algos_) alg->set_filter(setts);
 
 	auto [mode, ftmpl] = outinfo();
 	if(mode==fgmode::single) {

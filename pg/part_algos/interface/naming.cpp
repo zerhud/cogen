@@ -11,28 +11,9 @@
 #include <cassert>
 #include <algorithm>
 
+namespace mp = modegen::pg;
 namespace mg = modegen::generation::interface;
 namespace mi = modegen::parser::interface;
-
-std::string_view mg::to_string(mg::name_conversion c)
-{
-	using namespace std::literals;
-	if(c==name_conversion::as_is) return "asis"sv;
-	if(c==name_conversion::underscore) return "underscore"sv;
-	if(c==name_conversion::camel_case) return "camel"sv;
-	if(c==name_conversion::title_case) return "title"sv;
-	assert(false);
-	return "asis"sv;
-}
-
-mg::name_conversion mg::from_string(std::string_view n)
-{
-	using namespace std::literals;
-	if(n=="underscore"sv) return name_conversion::underscore;
-	if(n=="camel"sv) return name_conversion::camel_case;
-	if(n=="title"sv) return name_conversion::title_case;
-	return name_conversion::as_is;
-}
 
 std::vector<std::string> mg::naming::split_name(const std::string &name)
 {
@@ -65,8 +46,10 @@ std::vector<std::string> mg::naming::split_name(const std::string &name)
 	return ret;
 }
 
-std::string mg::naming::convert(const std::string& name, mg::name_conversion c)
+std::string mg::naming::convert(const std::string& name, mp::name_conversion c)
 {
+	using pg::name_conversion;
+
 	std::string ret = name;
 
 	if(c==name_conversion::as_is) return ret;
@@ -99,17 +82,18 @@ std::string mg::naming::convert(const std::string& name, mg::name_conversion c)
 	return ret;
 }
 
-mg::naming::naming(std::string_view sn) : naming(from_string(sn))
+mg::naming::naming(std::string_view sn) : naming(mp::from_string(std::string(sn)))
 {
 }
 
-mg::naming::naming(mg::name_conversion c) : conver(c)
+mg::naming::naming(mp::name_conversion c) : conver(c)
 {
 }
 
 std::vector<mi::module>& mg::naming::operator() (std::vector<mi::module>& mods) const
 {
 	using namespace mi;
+	using mp::name_conversion;
 
 	struct {
 		name_conversion naming = name_conversion::as_is;

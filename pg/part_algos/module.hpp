@@ -20,7 +20,7 @@ class module_algos : public part_algos {
 	bool replace(std::string& tmpl, const std::string& var_name, const std::string& value) const ;
 public:
 	module_algos(const std::vector<modegen::parser::loader_ptr>& ldrs);
-	void set_filter(boost::property_tree::ptree fdata) override ;
+	void set_filter(const options::part_view& pinfo) override ;
 	std::vector<std::string> map(const std::string& tmpl) const override ;
 	std::vector<modegen::parser::interface::module> mods() const ;
 };

@@ -14,8 +14,7 @@
 namespace mg = modegen::generation::interface;
 namespace mi = modegen::parser::interface;
 
-std::string_view mg::to_string(mg::name_conversion c)
-{
+std::string_view mg::to_string(mg::name_conversion c) {
 	using namespace std::literals;
 	if(c==name_conversion::as_is) return "asis"sv;
 	if(c==name_conversion::underscore) return "underscore"sv;

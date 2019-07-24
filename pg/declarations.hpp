@@ -61,7 +61,7 @@ typedef std::variant<std::string, FS::path> descriptor_t;
 
 class part_view; ///< view for part
 class forwards_view;
-class filters_view;
+class filter_view;
 
 } // namespace options
 

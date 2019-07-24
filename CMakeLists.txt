@@ -71,9 +71,6 @@ target_sources_local(modegen_interfaces python.hpp    python.cpp    "generation/
 target_sources_local(modegen_interfaces cmake.hpp     cmake.cpp     "generation/")
 target_sources_local(modegen_interfaces output_info.hpp        output_info.cpp        "generation/")
 target_sources_local(modegen_interfaces part_descriptor.hpp    part_descriptor.cpp    "generation/")
-target_sources_copy(modegen_interfaces "${dbg_cmake_templates_dir}"
-	generation/cmake/plain.jinja
-	)
 target_sources_copy(modegen_interfaces "${dbg_python_templates_dir}"
 	generation/bridges/cpppy.info
 	generation/bridges/pycpp.info
@@ -99,6 +96,8 @@ target_sources_local(part_generation "info_part.hpp" "info_part.cpp" "pg/")
 target_sources_local(part_generation "part_algos.hpp" "part_algos.cpp" "pg/")
 target_sources_local(part_generation "module.hpp" "module.cpp" "pg/part_algos/")
 target_sources_local(part_generation "to_json.hpp" "to_json.cpp" "pg/part_algos/interface/")
+target_sources_local(part_generation "filter.hpp" "filter.cpp" "pg/part_algos/interface/")
+target_sources_local(part_generation "naming.hpp" "naming.cpp" "pg/part_algos/interface/")
 target_sources_local(part_generation "output_descriptor.hpp" "output_descriptor.cpp" "pg/")
 target_sources_local(part_generation "final_generator.hpp" "final_generator.cpp" "pg/")
 target_sources_local(part_generation "generator.hpp" "generator.cpp" "pg/")
@@ -114,6 +113,9 @@ target_sources_copy(part_generation "${dbg_cpp_templates_dir}"
 	pg/tmpls/cpp_decl.info
 	pg/tmpls/cpp/render.jinja pg/tmpls/cpp/declarations.jinja
 	pg/tmpls/cpp/header.jinja pg/tmpls/cpp/definitions.jinja
+	)
+target_sources_copy(part_generation "${dbg_cmake_templates_dir}"
+	pg/tmpls/cmake/plain.jinja
 	)
 
 # lohman json
