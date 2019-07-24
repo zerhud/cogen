@@ -11,20 +11,19 @@
 #include <vector>
 #include <string>
 
-#include "declarations.hpp"
 #include "common.hpp"
 #include "parser/interface/modegen.hpp"
 
-namespace modegen::generation::interface {
+namespace modegen::pg::palgos::interface {
 
 class naming {
 public:
-	explicit naming(pg::name_conversion c);
+	explicit naming(name_conversion c);
 	explicit naming(std::string_view sn);
 	std::vector<parser::interface::module>& operator () (std::vector<parser::interface::module>& mods) const ;
 
 	static std::vector<std::string> split_name(const std::string& name);
-	static std::string convert(const std::string& name, pg::name_conversion c);
+	static std::string convert(const std::string& name, name_conversion c);
 private:
 	pg::name_conversion conver;
 };

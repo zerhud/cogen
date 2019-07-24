@@ -12,8 +12,8 @@
 #include <algorithm>
 
 namespace mp = modegen::pg;
-namespace mg = modegen::generation::interface;
 namespace mi = modegen::parser::interface;
+namespace mg = modegen::pg::palgos::interface;
 
 std::vector<std::string> mg::naming::split_name(const std::string &name)
 {

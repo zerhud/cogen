@@ -23,6 +23,7 @@ namespace mpg = modegen::pg;
 namespace mgo = modegen::pg::outputs;
 namespace mpi = modegen::parser::interface;
 namespace mai = modegen::generation::interface;
+namespace mcpp = modegen::pg::cpp;
 using namespace std::literals;
 
 mgo::cpp::cpp(provider_const_ptr p, FS::path o, const part_descriptor& part)
@@ -43,7 +44,7 @@ void mgo::cpp::override_setts(boost::property_tree::ptree s)
 
 nlohmann::json mgo::cpp::data(const part_manager& pman) const
 {
-	using generation::interface::operator |;
+	using mpg::palgos::operator |;
 
 	struct json_extra_info : generation::interface::to_json_aspect {
 		void as_object(nlohmann::json& jval, const mpi::module& obj) override
@@ -57,7 +58,7 @@ nlohmann::json mgo::cpp::data(const part_manager& pman) const
 	assert(malg);
 
 	mai::to_json jsoner(std::make_unique<json_extra_info>());
-	generation::cpp::type_converter tcvt;
+	mcpp::type_converter tcvt;
 
 	auto mods = malg->mods();
 	nlohmann::json jsoned = mods | tcvt | jsoner;

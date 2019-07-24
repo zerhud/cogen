@@ -30,9 +30,8 @@ mpp::module_algos::module_algos(const std::vector<modegen::parser::loader_ptr>& 
 
 void mpp::module_algos::set_filter(const options::part_view& pinfo)
 {
-	using namespace generation::interface;
+	using namespace mpp::interface;
 	using namespace options;
-	using generation::interface::operator | ;
 
 	filter::request req;
 	mods_ | filter(req) | naming(from_string(pinfo.get<std::string>(part_option::naming)));

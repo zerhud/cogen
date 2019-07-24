@@ -11,7 +11,7 @@
 #include "parser/interface/modegen.hpp"
 #include "common.hpp"
 
-namespace modegen::generation::interface {
+namespace modegen::pg::palgos::interface {
 
 class filter final {
 	typedef parser::interface::module_content_selector mcselector;
@@ -31,5 +31,5 @@ private:
 	const request& query;
 };
 
-} // namespace modegen::cvt
+} // namespace modegen::pg::palgos::interface
 

@@ -12,8 +12,8 @@
 #include <algorithm>
 #include "parser/interface/helpers.hpp"
 
-namespace mg = modegen::generation::interface;
 namespace mi = modegen::parser::interface;
+namespace mg = modegen::pg::palgos::interface;
 
 mg::filter::filter(const request& q)
     : query(q)

@@ -11,9 +11,7 @@
 #include <map>
 #include "parser/interface/modegen.hpp"
 
-namespace modegen {
-namespace generation {
-namespace cpp {
+namespace modegen::pg::cpp {
 
 class type_converter final {
 public:
@@ -46,6 +44,4 @@ private:
 	static std::map<std::string,std::string> incs_maps;
 };
 
-} // namespace cpp
-} // namespace generation
-} // namespace modegen
+} // namespace modegen::pg::cpp

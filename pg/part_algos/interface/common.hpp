@@ -8,9 +8,10 @@
 
 #pragma once
 
+#include "declarations.hpp"
 #include "parser/interface/modegen.hpp"
 
-namespace modegen::generation::interface {
+namespace modegen::pg::palgos {
 
 template<typename Cvt>
 std::result_of_t<Cvt(std::vector<modegen::parser::interface::module>&)> operator | (std::vector<modegen::parser::interface::module>& m, Cvt& c)
@@ -30,4 +31,4 @@ std::result_of_t<Cvt(std::vector<modegen::parser::interface::module>&)> operator
 	return c(m);
 }
 
-} // namespace modegen::generation::interface
+} // namespace modegen::pg::palgos
