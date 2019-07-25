@@ -75,7 +75,7 @@ std::string mg::naming::convert(const std::string& name, mp::name_conversion c)
 			ret += s;
 		}
 	} else {
-		assert(("not call name_conversion was used",false));
+		assert("not call name_conversion was used"==nullptr);
 		ret = name;
 	}
 
