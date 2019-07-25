@@ -18,6 +18,7 @@
 #include "config.hpp"
 #include "pg/provider.hpp"
 #include "pg/part_algos/module.hpp"
+#include "pg/part_algos/data.hpp"
 #include "pg/generator.hpp"
 #include "pg/options.hpp"
 #include "pg/info_part.hpp"
@@ -45,8 +46,9 @@ public:
 	std::unique_ptr<mg::part_algos> create_algos(mg::input_lang il) const override
 	{
 		if(il==mg::input_lang::mdl) return std::make_unique<mg::palgos::module_algos>(input());
-		if(il==mg::input_lang::data) return nullptr;
-		return nullptr;
+		if(il==mg::input_lang::data) return std::make_unique<mg::palgos::data_algos>(input());
+		assert(false);
+		throw std::runtime_error("language algos not implemented for "s + to_string(il));
 	}
 
 	modegen::parser::loader_ptr create_loader(std::string_view target, FS::path input)

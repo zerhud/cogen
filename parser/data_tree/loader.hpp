@@ -10,7 +10,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "parser/loader.hpp"
+#include "../loader.hpp"
 
 namespace modegen::parser::data_tree {
 

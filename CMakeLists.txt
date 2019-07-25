@@ -43,6 +43,24 @@ configure_file("config.hpp.in" "${main_config_file}")
 
 include(cmake/target_sources_local.cmake)
 
+add_library(modegen_parsers ${main_config_file})
+target_link_libraries(modegen_parsers PRIVATE stdc++fs PUBLIC ${Boost_LIBRARIES})
+target_include_directories(modegen_parsers PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/parser" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
+target_include_directories(modegen_parsers SYSTEM PUBLIC "${Boost_LIBRARIES}")
+# grammar need to start compiling first
+target_sources_local(modegen_parsers grammar.hpp         grammar.cpp         "parser/interface/")
+target_sources_local(modegen_parsers errors.h            errors.cpp          "parser/")
+# interface declaration
+target_sources_local(modegen_parsers loader.hpp          loader.cpp          "parser/")
+target_sources_local(modegen_parsers modegen.hpp         modegen.cpp         "parser/interface/")
+target_sources_local(modegen_parsers meta_parameters.hpp meta_parameters.cpp "parser/interface/")
+target_sources_local(modegen_parsers helpers.hpp         helpers.cpp         "parser/interface/")
+target_sources_local(modegen_parsers loader.hpp          loader.cpp          "parser/interface/")
+target_sources_local(modegen_parsers check.hpp           check.cpp           "parser/interface/")
+# data_tree
+target_sources_local(modegen_parsers loader.hpp          loader.cpp          "parser/data_tree/")
+target_sources_local(modegen_parsers ptree_merge.hpp     ""                  "parser/data_tree/")
+
 # interface library: parse interface definitions and generate code by templates
 add_library(modegen_interfaces ${main_config_file})
 target_link_libraries(modegen_interfaces PRIVATE stdc++fs PUBLIC ${Boost_LIBRARIES})
@@ -96,6 +114,7 @@ target_sources_local(part_generation "part_descriptor.hpp" "part_descriptor.cpp"
 target_sources_local(part_generation "info_part.hpp" "info_part.cpp" "pg/")
 target_sources_local(part_generation "part_algos.hpp" "part_algos.cpp" "pg/")
 target_sources_local(part_generation "module.hpp" "module.cpp" "pg/part_algos/")
+target_sources_local(part_generation "data.hpp" "data.cpp" "pg/part_algos/")
 target_sources_local(part_generation "to_json.hpp" "to_json.cpp" "pg/part_algos/interface/")
 target_sources_local(part_generation "filter.hpp" "filter.cpp" "pg/part_algos/interface/")
 target_sources_local(part_generation "naming.hpp" "naming.cpp" "pg/part_algos/interface/")
@@ -141,7 +160,7 @@ target_sources(modegen PRIVATE modegen/pythongen.cpp modegen/pythongen.hpp)
 target_sources(modegen PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/pythongen_data.cpp")
 target_include_directories(modegen SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
 target_link_libraries(modegen PRIVATE
-	modegen_interfaces part_generation
+	modegen_parsers part_generation
 	${Boost_LIBRARIES} pybind11::embed
 	${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
 	)

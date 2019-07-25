@@ -10,7 +10,7 @@
 
 #include "check.hpp"
 #include "modegen.hpp"
-#include "parser/loader.hpp"
+#include "../loader.hpp"
 
 namespace modegen::parser::interface {
 

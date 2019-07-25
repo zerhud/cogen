@@ -70,11 +70,15 @@ void mpg::info_part::build_outputs(const mpg::part_manager& pman, mpg::provider_
 	create_algos(*prov_);
 	assert(!algos_.empty());
 
-	for(auto& alg:algos_) alg->set_filter(setts);
+	for(auto& alg:algos_) {
+		assert(alg);
+		alg->set_filter(setts);
+	}
 
 	auto [mode, ftmpl] = outinfo();
 	if(mode==fgmode::single) {
 		auto out = outs_.emplace_back(prov_->create_output(lang(), ftmpl, *this));
+		assert(out);
 		out->override_setts(setts.get_subset(options::subsetts::part_data));
 	}
 	else if(mode==fgmode::map) {
@@ -82,6 +86,7 @@ void mpg::info_part::build_outputs(const mpg::part_manager& pman, mpg::provider_
 		auto tmpls = map_to_outputs(ftmpl);
 		for(auto& tmpl:tmpls) {
 			auto out = outs_.emplace_back(prov_->create_output(lang(), tmpl, *this));
+			assert(out);
 			out->override_setts(osetts);
 		}
 	}

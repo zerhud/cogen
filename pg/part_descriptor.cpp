@@ -13,6 +13,14 @@
 namespace mpg = modegen::pg;
 using namespace std::literals;
 
+std::string mpg::to_string(input_lang l)
+{
+	if(l==input_lang::mdl) return "mdl"s;
+	if(l==input_lang::data) return "data"s;
+	assert(false);
+	return ""s;
+}
+
 std::string mpg::to_string(output_lang l)
 {
 	if(l==output_lang::cpp) return "cpp";

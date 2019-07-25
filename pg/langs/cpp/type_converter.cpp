@@ -9,7 +9,7 @@
 #include "type_converter.hpp"
 
 #include "parser/interface/helpers.hpp"
-#include "errors.h"
+#include "exceptions.hpp"
 
 using namespace std::literals;
 namespace mi = modegen::parser::interface;
@@ -154,7 +154,7 @@ void mcpp::type_converter::convert(mi::type& t, const mi::export_info& ei)
 	auto npos = type_maps.find(t.name);
 	if(npos!=type_maps.end()) t.name = npos->second;
 	else {
-		if(!t.sub_types.empty()) throw errors::error("cpp_type_cvt", "defined type cannot have parameters");
+		if(!t.sub_types.empty()) throw errors::error("cpp_type_cvt: defined type cannot have parameters");
 		defined_types.emplace_back(type_info{t});
 	}
 
