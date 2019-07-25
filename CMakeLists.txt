@@ -88,6 +88,7 @@ target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "g
 
 add_library(part_generation "pg/declarations.hpp" ${main_config_file})
 target_include_directories(part_generation PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/pg" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
+target_include_directories(part_generation SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
 target_link_libraries(part_generation PRIVATE stdc++fs)
 
 target_sources_local(part_generation "generator.hpp" "generator.cpp" "pg/")
@@ -137,6 +138,7 @@ target_sources(part_generation PRIVATE "${lohman_json_file}" )
 add_executable(modegen modegen/main.cpp)
 target_sources(modegen PRIVATE modegen/pythongen.cpp modegen/pythongen.hpp)
 target_sources(modegen PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/pythongen_data.cpp")
+target_include_directories(modegen SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
 target_link_libraries(modegen PRIVATE
 	modegen_interfaces part_generation
 	${Boost_LIBRARIES} pybind11::embed

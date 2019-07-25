@@ -15,6 +15,7 @@
 #include <boost/process.hpp>
 #include <pybind11/embed.h>
 
+#include "config.hpp"
 #include "pg/provider.hpp"
 #include "pg/part_algos/module.hpp"
 #include "pg/generator.hpp"
@@ -29,7 +30,6 @@
 #include "pythongen.hpp"
 
 namespace mg = modegen::pg;
-namespace mi = modegen::parser::interface;
 namespace po = boost::program_options;
 
 using namespace std::literals;
