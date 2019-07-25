@@ -11,13 +11,13 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "generation/interface/split_version.hpp"
+#include "pg/part_algos/interface/split_version.hpp"
 #include "parser/interface/grammar.hpp"
 #include "parser/interface/helpers.hpp"
 
 using namespace std::literals;
 namespace mi = modegen::parser::interface;
-namespace mg = modegen::generation::interface;
+namespace mg = modegen::pg::palgos::interface;
 using modegen::parser::interface::meta_parameters::version;
 
 BOOST_AUTO_TEST_SUITE(simple)

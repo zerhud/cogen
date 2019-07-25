@@ -15,7 +15,7 @@
 #include "common.hpp"
 #include "parser/interface/modegen.hpp"
 
-namespace modegen::generation::interface {
+namespace modegen::pg::palgos::interface {
 
 class to_json_aspect {
 public:
@@ -78,4 +78,4 @@ private:
 	aspect_ptr_vector gen_asps;
 };
 
-} // namespace modegen::generation::interface
+} // namespace modegen::pg::palgos::interface

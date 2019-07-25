@@ -13,7 +13,7 @@
 #include "parser/interface/modegen.hpp"
 #include "parser/interface/helpers.hpp"
 
-namespace modegen::generation::interface {
+namespace modegen::pg::palgos::interface {
 
 class split_version {
 public:
@@ -32,5 +32,4 @@ private:
 	std::vector<parser::interface::module> result;
 };
 
-} // namespace modegen::generation::interface
-
+} // namespace modegen::pg::palgos::interface

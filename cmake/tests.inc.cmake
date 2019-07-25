@@ -15,15 +15,19 @@ set(tests_gcommon
 	common
 	outputs
 	part_descriptors
-	to_json
 	cpp cpp_type_cvt
-	name_conversion
 	filter
-	split_version
 	cmake
 	)
 set(tests_interface mdp checker )
-set(tests_pg uc part_manager part_descriptor generation)
+set(tests_pg
+	uc
+	part_manager part_descriptor
+	generation
+	split_version
+	to_json
+	name_conversion
+	)
 foreach(tname ${tests_interface})
 	add_unit_test(${tname} "tests/interface/" "modegen_interfaces")
 endforeach()

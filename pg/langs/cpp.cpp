@@ -22,7 +22,7 @@
 namespace mpg = modegen::pg;
 namespace mgo = modegen::pg::outputs;
 namespace mpi = modegen::parser::interface;
-namespace mai = modegen::generation::interface;
+namespace mai = modegen::pg::palgos::interface;
 namespace mcpp = modegen::pg::cpp;
 using namespace std::literals;
 
@@ -46,7 +46,7 @@ nlohmann::json mgo::cpp::data(const part_manager& pman) const
 {
 	using mpg::palgos::operator |;
 
-	struct json_extra_info : generation::interface::to_json_aspect {
+	struct json_extra_info : palgos::interface::to_json_aspect {
 		void as_object(nlohmann::json& jval, const mpi::module& obj) override
 		{
 			jval["namespace"] = obj.name + "_v"s + get_version(obj).value("_"sv) ;
@@ -136,8 +136,6 @@ void mgo::cpp::add_extra_namespaces(nlohmann::json& cdata) const
 // cause of it we place this function here insteed of part logic
 void mgo::cpp::set_constructors_prefix(nlohmann::json& cdata) const
 {
-	using namespace modegen::generation::interface;
-
 	auto nsopts = opts_.get_subset(options::subsetts::file_generator, "cpp"s, ""s);
 	auto ctor_pref = nsopts.get_optional<std::string>("ctor_prefix");
 	auto ptr_suf = nsopts.get_optional<std::string>("ptr_suffix");

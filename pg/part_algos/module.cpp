@@ -11,6 +11,7 @@
 #include "interface/common.hpp"
 #include "interface/filter.hpp"
 #include "interface/naming.hpp"
+#include "interface/split_version.hpp"
 #include "options.hpp"
 
 #include "parser/interface/helpers.hpp"
@@ -19,6 +20,7 @@
 
 namespace mpp = modegen::pg::palgos;
 namespace mpi = modegen::parser::interface;
+using namespace std::literals;
 
 mpp::module_algos::module_algos(const std::vector<modegen::parser::loader_ptr>& ldrs)
 {
@@ -34,7 +36,12 @@ void mpp::module_algos::set_filter(const options::part_view& pinfo)
 	using namespace options;
 
 	filter::request req;
-	mods_ | filter(req) | naming(from_string(pinfo.get<std::string>(part_option::naming)));
+	std::string versioning = pinfo.get_opt<std::string>(options::template_option::versioning).value_or("merge"s);
+	mods_
+		| split_version(versioning != "split"sv)
+		| filter(req)
+		| naming(from_string(pinfo.get<std::string>(part_option::naming)))
+		;
 }
 
 std::vector<std::string> mpp::module_algos::map(const std::string& tmpl) const

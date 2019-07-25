@@ -11,10 +11,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "generation/interface/naming.hpp"
+#include "pg/part_algos/interface/naming.hpp"
 
-using modegen::generation::interface::naming;
-using modegen::generation::interface::name_conversion;
+using modegen::pg::palgos::interface::naming;
+using modegen::pg::name_conversion;
 
 void check_some_name(const std::vector<std::string>& ns)
 {

@@ -11,12 +11,12 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "generation/interface/to_json.hpp"
+#include "pg/part_algos/interface/to_json.hpp"
 #include "parser/interface/grammar.hpp"
 
 using namespace std::literals;
 namespace mi = modegen::parser::interface;
-namespace mg = modegen::generation::interface;
+namespace mg = modegen::pg::palgos::interface;
 
 struct test_json_asp : mg::to_json_aspect {
 	void as_object(nlohmann::json& jval, const modegen::parser::interface::module& obj) override

@@ -14,9 +14,8 @@
 
 #include "parser/interface/meta_parameters.hpp"
 
-namespace mg = modegen::generation;
 namespace mi = modegen::parser::interface;
-namespace mgi = modegen::generation::interface;
+namespace mgi = modegen::pg::palgos::interface;
 using mi::meta_parameters::version;
 
 mgi::split_version::split_version(bool dry_run)

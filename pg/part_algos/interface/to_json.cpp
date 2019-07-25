@@ -14,7 +14,7 @@
 #include "parser/interface/helpers.hpp"
 
 namespace pl = std::placeholders;
-namespace mg = modegen::generation::interface;
+namespace mg = modegen::pg::palgos::interface;
 namespace mi = modegen::parser::interface;
 
 
