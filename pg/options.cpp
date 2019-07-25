@@ -142,7 +142,6 @@ std::string mo::container::solve_key(subsetts opt)
 {
 	if(opt==subsetts::part_data) return ""s;
 	if(opt==subsetts::file_generator) return "filegen"s;
-	if(opt==subsetts::part_forwards) return "forwards"s;
 	assert(false);
 	return ""s;
 }
@@ -239,55 +238,6 @@ boost::property_tree::ptree mo::part_view::get_subset(subsetts s, const std::str
 	            );
 }
 
-mo::forwards_view::forwards_view(mo::container_ptr o, std::string_view part)
-    : opts(std::move(o))
-    , def_part(part)
-{
-}
-
-std::optional<mo::descriptor_t> mo::forwards_view::before() const
-{
-	std::optional<descriptor_t> ret;
-	part_view v(opts, def_part);
-	auto fwd_data = v.get_subset(subsetts::part_forwards);
-	auto bdata = fwd_data.get_child_optional("before"s);
-	if(bdata) ret = extract_desc(*bdata);
-	//for(auto fwd:fwd_data) if(fwd.frist == "before"s) ret.emplace_back(extract_desc(fwd.second));
-	return ret;
-}
-
-std::optional<mo::descriptor_t> mo::forwards_view::after() const
-{
-	std::optional<descriptor_t> ret;
-	part_view v(opts, def_part);
-	auto fwd_data = v.get_subset(subsetts::part_forwards);
-	auto bdata = fwd_data.get_child_optional("after"s);
-	if(bdata) ret = extract_desc(*bdata);
-	//for(auto fwd:fwd_data) if(fwd.frist == "after"s) ret.emplace_back(extract_desc(fwd.second));
-	return ret;
-}
-
-std::vector<mo::forwards_view::ex_descriptor> mo::forwards_view::ex_list() const
-{
-	std::vector<ex_descriptor> ret;
-	part_view v(opts, def_part);
-	auto fwd_data = v.get_subset(subsetts::part_forwards);
-	auto ex_child = fwd_data.get_child_optional("ex"s);
-	if(ex_child) for(auto ex:*ex_child) {
-		ex_descriptor& item = ret.emplace_back();
-		item.name = ex.second.get<std::string>("name"s);
-		item.source = extract_desc(ex.second);
-	}
-	return ret;
-}
-
-mo::descriptor_t mo::forwards_view::extract_desc(const boost::property_tree::ptree& pt) const
-{
-	auto file = pt.get_optional<std::string>("file"s);
-	auto script = pt.get_optional<std::string>("script"s);
-	if(file) return FS::path(*file);
-	return *script;
-}
 
 mo::filter_view::filter_view(mo::container_ptr o, std::string_view p)
 	: opts(std::move(o))

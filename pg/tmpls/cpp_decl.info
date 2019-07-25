@@ -22,15 +22,6 @@ part
 		inc_part header
 		input definitions.jinja
 		file module.cpp
-		forwards {
-			before { script "print('before')" }
-			ex {
-				gen_str {
-					name gen_str
-					script "def gen_str(a):\n\tprint(a)\n\treturn \"\""
-				}
-			}
-		}
 	}
 	cmake {
 		lang cmake

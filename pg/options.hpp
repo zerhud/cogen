@@ -18,7 +18,7 @@ namespace modegen::pg::options {
 enum class part_option {input, output, output_name_gen, file_generator, naming, output_lang};
 enum class part_idl_filter {part_selection, mod_name, content_name, modificator};
 enum class template_option {versioning, modularization};
-enum class subsetts { file_generator, part_data, part_forwards };
+enum class subsetts { file_generator, part_data };
 
 typedef std::variant<part_option, part_idl_filter, template_option> any_option;
 
@@ -151,25 +151,6 @@ public:
 	}
 };
 
-class forwards_view {
-	container_ptr opts;
-	std::string_view def_part;
-public:
-	struct ex_descriptor {
-		std::string name;
-		descriptor_t source;
-	};
-
-	forwards_view(container_ptr o, std::string_view p);
-
-	container_ptr container() const {return opts;}
-
-	std::optional<descriptor_t> after() const ;
-	std::optional<descriptor_t> before() const ;
-	std::vector<ex_descriptor> ex_list() const ;
-private:
-	descriptor_t extract_desc(const boost::property_tree::ptree& pt) const ;
-};
 
 class filter_view {
 	container_ptr opts;
