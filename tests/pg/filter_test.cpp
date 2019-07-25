@@ -12,10 +12,10 @@
 #include <boost/test/unit_test.hpp>
 
 #include "parser/interface/grammar.hpp"
-#include "generation/interface/filter.hpp"
+#include "pg/part_algos/interface/filter.hpp"
 
 using namespace std::literals;
-using modegen::generation::interface::filter;
+using modegen::pg::palgos::interface::filter;
 namespace mi = modegen::parser::interface;
 
 BOOST_AUTO_TEST_SUITE(module_name)

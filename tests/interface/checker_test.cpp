@@ -20,13 +20,13 @@ namespace mi = modegen::parser::interface;
 
 void check_exception(mi::checker& ch, mi::parsed_file& fi, std::string_view path)
 {
-	auto ech = [&path](const modegen::errors::error_info& i){
+	auto ech = [&path](const modegen::parser::errors::error_info& i){
 		BOOST_CHECK_EQUAL( i.path, path );
 		return i.path==path;
 	};
 
 	fi.path = "test";
-	BOOST_CHECK_EXCEPTION(ch(fi), modegen::errors::error_info, ech);
+	BOOST_CHECK_EXCEPTION(ch(fi), modegen::parser::errors::error_info, ech);
 }
 
 BOOST_AUTO_TEST_SUITE(double_name)

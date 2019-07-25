@@ -34,9 +34,11 @@ set(rls_python_templates_dir "${rls_templates_dir}/python")
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
 	set(templates_dir_path "${rls_templates_dir}")
 	set(cpp_templates_dir "${rls_cpp_templates_dir}")
+	set(python_templates_dir "${rls_python_templates_dir}")
 else()
 	set(templates_dir_path "${dbg_templates_dir}")
 	set(cpp_templates_dir "${dbg_cpp_templates_dir}")
+	set(python_templates_dir "${dbg_python_templates_dir}")
 endif()
 
 configure_file("config.hpp.in" "${main_config_file}")
@@ -45,7 +47,9 @@ include(cmake/target_sources_local.cmake)
 
 add_library(modegen_parsers ${main_config_file})
 target_link_libraries(modegen_parsers PRIVATE stdc++fs PUBLIC ${Boost_LIBRARIES})
-target_include_directories(modegen_parsers PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/parser" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
+target_include_directories(modegen_parsers PUBLIC
+	"${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/parser"
+	"${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
 target_include_directories(modegen_parsers SYSTEM PUBLIC "${Boost_LIBRARIES}")
 # grammar need to start compiling first
 target_sources_local(modegen_parsers grammar.hpp         grammar.cpp         "parser/interface/")
@@ -60,49 +64,6 @@ target_sources_local(modegen_parsers check.hpp           check.cpp           "pa
 # data_tree
 target_sources_local(modegen_parsers loader.hpp          loader.cpp          "parser/data_tree/")
 target_sources_local(modegen_parsers ptree_merge.hpp     ""                  "parser/data_tree/")
-
-# interface library: parse interface definitions and generate code by templates
-add_library(modegen_interfaces ${main_config_file})
-target_link_libraries(modegen_interfaces PRIVATE stdc++fs PUBLIC ${Boost_LIBRARIES})
-target_include_directories(modegen_interfaces PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
-# grammar need to start compiling first
-target_sources_local(modegen_interfaces grammar.hpp         grammar.cpp         "parser/interface/")
-target_sources_local(modegen_interfaces errors.h errors.cpp "")
-# interface declaration
-target_sources_local(modegen_interfaces loader.hpp          loader.cpp          "parser/")
-target_sources_local(modegen_interfaces modegen.hpp         modegen.cpp         "parser/interface/")
-target_sources_local(modegen_interfaces meta_parameters.hpp meta_parameters.cpp "parser/interface/")
-target_sources_local(modegen_interfaces helpers.hpp         helpers.cpp         "parser/interface/")
-target_sources_local(modegen_interfaces loader.hpp          loader.cpp          "parser/interface/")
-target_sources_local(modegen_interfaces check.hpp           check.cpp           "parser/interface/")
-# data_tree
-target_sources_local(modegen_interfaces loader.hpp          loader.cpp          "parser/data_tree/")
-target_sources_local(modegen_interfaces ptree_merge.hpp     ""                  "parser/data_tree/")
-# generations
-target_sources_local(modegen_interfaces "generation/declaration.hpp" "" "")
-target_sources_local(modegen_interfaces options.hpp   options.cpp   "generation/")
-target_sources_local(modegen_interfaces provider.hpp  provider.cpp  "generation/")
-target_sources_local(modegen_interfaces common.hpp    common.cpp    "generation/")
-target_sources_local(modegen_interfaces file_data.hpp file_data.cpp "generation/")
-target_sources_local(modegen_interfaces cpp.hpp       cpp.cpp       "generation/")
-target_sources_local(modegen_interfaces python.hpp    python.cpp    "generation/")
-target_sources_local(modegen_interfaces cmake.hpp     cmake.cpp     "generation/")
-target_sources_local(modegen_interfaces output_info.hpp        output_info.cpp        "generation/")
-target_sources_local(modegen_interfaces part_descriptor.hpp    part_descriptor.cpp    "generation/")
-target_sources_copy(modegen_interfaces "${dbg_python_templates_dir}"
-	generation/bridges/cpppy.info
-	generation/bridges/pycpp.info
-	generation/bridges/cpppy.cpp.jinja
-	generation/bridges/pycpp.py.jinja
-	)
-# generation part for interface
-target_sources_local(modegen_interfaces to_json.hpp to_json.cpp "generation/interface/")
-target_sources_local(modegen_interfaces naming.hpp naming.cpp "generation/interface/")
-target_sources_local(modegen_interfaces filter.hpp filter.cpp "generation/interface/")
-target_sources_local(modegen_interfaces split_version.hpp split_version.cpp "generation/interface/")
-target_sources_local(modegen_interfaces part_descriptor.hpp part_descriptor.cpp "generation/interface/")
-# generation part for cpp
-target_sources_local(modegen_interfaces type_converter.hpp type_converter.cpp "generation/cpp/")
 
 add_library(part_generation "pg/declarations.hpp" ${main_config_file})
 target_include_directories(part_generation PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/pg" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
@@ -131,13 +92,16 @@ target_sources_local(part_generation "type_converter.hpp" "type_converter.cpp" "
 target_sources_local(part_generation "cmake.hpp" "cmake.cpp" "pg/langs/")
 target_sources_local(part_generation "python.hpp" "python.cpp" "pg/langs/")
 target_sources_copy(part_generation "${dbg_cpp_templates_dir}"
-	pg/tmpls/cpp_decl.info
+	pg/tmpls/cpp_decl.info pg/tmpls/cpppy.info
 	pg/tmpls/cpp/render.jinja pg/tmpls/cpp/declarations.jinja
 	pg/tmpls/cpp/header.jinja pg/tmpls/cpp/definitions.jinja
 	)
 target_sources_copy(part_generation "${dbg_cmake_templates_dir}"
 	pg/tmpls/cmake/plain.jinja
 	)
+#target_sources_copy(part_generation "${dbg_python_templates_dir}"
+	#pg/tmpls/
+	#)
 
 # lohman json
 set(lohman_json_file "${CMAKE_CURRENT_BINARY_DIR}/nlohman/json.hpp")
@@ -151,7 +115,7 @@ add_custom_command(OUTPUT "${lohman_json_file}"
 		"${CMAKE_CURRENT_LIST_DIR}/cmake/download_or_get.cmake"
 )
 
-target_sources(modegen_interfaces PRIVATE "${lohman_json_file}" )
+#target_sources(modegen_interfaces PRIVATE "${lohman_json_file}" )
 target_sources(part_generation PRIVATE "${lohman_json_file}" )
 
 # main programm: run selected generator and sets options

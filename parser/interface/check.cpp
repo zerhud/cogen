@@ -215,10 +215,10 @@ bool modegen::parser::interface::checker::combine(modegen::parser::interface::mo
 void modegen::parser::interface::checker::collect_exports(module& mod) const
 {
 	auto collector = [&mod](const auto& c) {
-		if(is_selected(c,module_content_selector::interface)) mod.exports.emplace_back(export_info{.name=c.name, .type=module_content_selector::interface});
-		if(is_selected(c,module_content_selector::record)) mod.exports.emplace_back(export_info{.name=c.name, .type=module_content_selector::record});
-		if(is_selected(c,module_content_selector::enumeration)) mod.exports.emplace_back(export_info{.name=c.name, .type=module_content_selector::enumeration});
-		if(is_selected(c,module_content_selector::function)) mod.exports.emplace_back(export_info{.name=c.name, .type=module_content_selector::function});
+		if(is_selected(c,module_content_selector::interface)) mod.exports.emplace_back(export_info{c.name, module_content_selector::interface});
+		if(is_selected(c,module_content_selector::record)) mod.exports.emplace_back(export_info{c.name, module_content_selector::record});
+		if(is_selected(c,module_content_selector::enumeration)) mod.exports.emplace_back(export_info{c.name, module_content_selector::enumeration});
+		if(is_selected(c,module_content_selector::function)) mod.exports.emplace_back(export_info{c.name, module_content_selector::function});
 	};
 
 	mod.exports.clear();

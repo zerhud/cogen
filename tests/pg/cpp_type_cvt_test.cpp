@@ -12,12 +12,11 @@
 #include <boost/test/unit_test.hpp>
 #include <turtle/mock.hpp>
 
-#include "errors.h"
-#include "generation/cpp/type_converter.hpp"
+#include "pg/langs/cpp/type_converter.hpp"
 #include "parser/interface/grammar.hpp"
 
 using namespace std::literals;
-namespace mg = modegen::generation;
+namespace mg = modegen::pg;
 namespace mi = modegen::parser::interface;
 
 BOOST_AUTO_TEST_CASE(type_converted)
