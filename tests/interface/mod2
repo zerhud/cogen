@@ -1,4 +1,4 @@
-module mod v1.0:
+module mod v2.0:
 
 string bar();
 

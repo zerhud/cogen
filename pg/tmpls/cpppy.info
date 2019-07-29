@@ -1,17 +1,17 @@
 defaults {
-	filegen cpp
+	lang cpp
 	naming underscore
 }
-gen
+part
 {
 	cpp_dec {
 		input declarations.jinja
-		output declarations.hpp
+		file declarations.hpp
 	}
 	header {
 		inc_part cpp_dec
 		input header.jinja
-		output modules.hpp
+		file modules.hpp
 		filter {
 			sel interface
 			sel record
@@ -21,18 +21,18 @@ gen
 		inc_part cpp_dec
 		inc_part header
 		input definitions.jinja
-		output modules.cpp
+		file modules.cpp
 	}
 	pymod {
 		inc_part cpp_dec
 		input python/cpppy.cpp.jinja
-		output %mod%_%vm%.%vi%.cpp
-		output_ng interface
+		file_map $mod_$va.$vi.cpp
+		versioning split
 	}
 	cmake {
-		filegen cmake
+		lang cmake
 		input plain.jinja
-		output CMakeLists.txt
+		file CMakeLists.txt
 		project interface
 		deps {
 			pybind11 { }

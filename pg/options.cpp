@@ -204,9 +204,7 @@ std::string mo::part_view::output_mode() const
 {
 	auto sub = get_subset(subsetts::part_data);
 	for(auto& s:sub) {
-		if(s.first == "file_bymod"s) return s.first;
-		if(s.first == "file_byent"s) return s.first;
-		if(s.first == "file_single"s) return s.first;
+		if(s.first == "file_map"s) return s.first;
 		if(s.first == "file"s) return s.first;
 	}
 
