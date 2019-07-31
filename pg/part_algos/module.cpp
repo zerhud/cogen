@@ -55,7 +55,7 @@ std::vector<std::string> mpp::module_algos::map(const std::string& tmpl) const
 		std::string& cur = ret.emplace_back(tmpl);
 		auto ver = mpi::get_version(mod);
 		replace(cur, "$mod"s, mod.name);
-		replace(cur, "$va"s, std::to_string(ver.major_v));
+		replace(cur, "$vm"s, std::to_string(ver.major_v));
 		replace(cur, "$vi"s, std::to_string(ver.minor_v));
 	}
 

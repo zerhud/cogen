@@ -95,6 +95,7 @@ target_sources_copy(part_generation "${dbg_cpp_templates_dir}"
 	pg/tmpls/cpp_decl.info pg/tmpls/cpppy.info
 	pg/tmpls/cpp/render.jinja pg/tmpls/cpp/declarations.jinja
 	pg/tmpls/cpp/header.jinja pg/tmpls/cpp/definitions.jinja
+	pg/tmpls/cpp/cpppy.jinja
 	)
 target_sources_copy(part_generation "${dbg_cmake_templates_dir}"
 	pg/tmpls/cmake/plain.jinja

@@ -62,7 +62,7 @@ std::vector<mpg::output_descriptor_ptr> mpg::info_part::outputs() const
 	return outs_;
 }
 
-void mpg::info_part::build_outputs(const mpg::part_manager& pman, mpg::provider_const_ptr prov)
+void mpg::info_part::build_outputs(mpg::provider_const_ptr prov)
 {
 	prov_ = prov;
 	if(!prov_) throw errors::error("cannot build outputs without provider");

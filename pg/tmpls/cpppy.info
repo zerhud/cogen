@@ -25,7 +25,7 @@ part
 	}
 	pymod {
 		inc_part cpp_dec
-		input python/cpppy.cpp.jinja
+		input python/cpppy.jinja
 		file_map $mod_$va.$vi.cpp
 		versioning split
 	}
@@ -35,15 +35,15 @@ part
 		file CMakeLists.txt
 		project interface
 		deps {
-			pybind11 { }
+			pybind11 { ldep "pybind11::embed" }
 		}
 		libraries {
-			interface {
+			"$mod-$vm.$vi" {
 				part cpp_dec
 				part header
 				part definition
 				part pymod
-				dep "pybind11::embed"
+				dep pybind11
 			}
 		}
 	}
