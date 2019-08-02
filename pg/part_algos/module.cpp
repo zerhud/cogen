@@ -24,10 +24,36 @@ using namespace std::literals;
 
 mpp::module_algos::module_algos(const std::vector<modegen::parser::loader_ptr>& ldrs)
 {
-	for(auto ldr:ldrs) if((mldr_ = std::dynamic_pointer_cast<mpi::loader>(ldr))) break;
-	if(!mldr_) throw errors::error("cannot create module algo without module loader");
+	std::shared_ptr<parser::interface::loader> mldr;
+	for(auto ldr:ldrs) if((mldr = std::dynamic_pointer_cast<mpi::loader>(ldr))) break;
+	if(!mldr) throw errors::error("cannot create module algo without module loader");
 
-	mods_ = mldr_->result();
+	mods_ = mldr->result();
+}
+
+std::vector<std::string> mpp::module_algos::map_to(const std::string& tmpl)
+{
+	tmpl_ = tmpl;
+	mapped_.clear();
+
+	for(auto& mod:mods_) {
+		std::string cur = tmpl;
+
+		const bool rmod = replace(cur, "$mod"s, mod.name);
+		if(!rmod) {
+			mapped_[cur] = mods_;
+			break;
+		}
+
+		auto ver = mpi::get_version(mod);
+		replace(cur, "$va"s, std::to_string(ver.major_v));
+		replace(cur, "$vi"s, std::to_string(ver.minor_v));
+		mapped_[cur].emplace_back(mod);
+	}
+
+	std::vector<std::string> ret;
+	for(auto& [key,val]:mapped_) ret.emplace_back(key);
+	return ret;
 }
 
 void mpp::module_algos::set_filter(const options::part_view& pinfo)
@@ -46,7 +72,6 @@ void mpp::module_algos::set_filter(const options::part_view& pinfo)
 
 std::vector<std::string> mpp::module_algos::map(const std::string& tmpl) const
 {
-	assert(mldr_);
 	using namespace std::literals;
 
 	std::vector<std::string> ret;
