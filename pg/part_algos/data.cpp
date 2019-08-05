@@ -15,8 +15,7 @@ ma::data_algos::data_algos(const std::vector<mp::loader_ptr>& ldrs)
 {
 }
 
-
-std::vector<std::string> ma::data_algos::map_to(const std::string& tmpl)
+std::map<std::string,std::any> ma::data_algos::map_to(const std::string& tmpl)
 {
 	(void)tmpl;
 	return {};

@@ -66,4 +66,13 @@ auto make_vector(Vec&& obj, Args&&... objs)
 	};
 }
 
+template<typename Key, typename Value>
+std::vector<Key> mapk_to_vec(const std::map<Key,Value>& map)
+{
+	std::vector<Key> ret;
+	for(auto& i:map) ret.emplace_back(i.first);
+	return ret;
+}
+
+
 } // namespace pgmocks

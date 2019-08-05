@@ -31,7 +31,7 @@ mpp::module_algos::module_algos(const std::vector<modegen::parser::loader_ptr>& 
 	mods_ = mldr->result();
 }
 
-std::vector<std::string> mpp::module_algos::map_to(const std::string& tmpl)
+std::map<std::string,std::any> mpp::module_algos::map_to(const std::string& tmpl)
 {
 	tmpl_ = tmpl;
 	mapped_.clear();
@@ -51,8 +51,8 @@ std::vector<std::string> mpp::module_algos::map_to(const std::string& tmpl)
 		mapped_[cur].emplace_back(mod);
 	}
 
-	std::vector<std::string> ret;
-	for(auto& [key,val]:mapped_) ret.emplace_back(key);
+	std::map<std::string,std::any> ret;
+	for(auto& [key,val]:mapped_) ret[key]=val;
 	return ret;
 }
 
