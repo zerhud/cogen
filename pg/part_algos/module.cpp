@@ -34,25 +34,23 @@ mpp::module_algos::module_algos(const std::vector<modegen::parser::loader_ptr>& 
 std::map<std::string,std::any> mpp::module_algos::map_to(const std::string& tmpl)
 {
 	tmpl_ = tmpl;
-	mapped_.clear();
-
-	for(auto& mod:mods_) {
-		std::string cur = tmpl;
-
-		const bool rmod = replace(cur, "$mod"s, mod.name);
-		if(!rmod) {
-			mapped_[cur] = mods_;
-			break;
-		}
-
-		auto ver = mpi::get_version(mod);
-		replace(cur, "$va"s, std::to_string(ver.major_v));
-		replace(cur, "$vi"s, std::to_string(ver.minor_v));
-		mapped_[cur].emplace_back(mod);
-	}
+	mapped_ = inner_map(tmpl);
 
 	std::map<std::string,std::any> ret;
 	for(auto& [key,val]:mapped_) ret[key]=val;
+	return ret;
+}
+
+std::map<std::string, std::vector<std::string>> mpp::module_algos::map_from(const std::string& tmpl)
+{
+	auto mapped = inner_map(tmpl);
+	std::map<std::string, std::vector<std::string>> ret;
+
+	for(auto& [mtmpl, mdata]:mapped) {
+		std::vector<std::string>& out_set = ret[mtmpl];
+		for(auto& mod:mdata) out_set.emplace_back(require_data(mod));
+	}
+
 	return ret;
 }
 
@@ -93,6 +91,35 @@ bool mpp::module_algos::replace(std::string& tmpl, const std::string& var_name, 
 	bool found = pos!=std::string::npos;
 	if(found) tmpl.replace(pos, var_name.size(), value);
 	return found;
+}
+
+std::map<std::string, std::vector<mpi::module>> mpp::module_algos::inner_map(const std::string& tmpl) const
+{
+	std::map<std::string, std::vector<mpi::module>> ret;
+
+	for(auto& mod:mods_) {
+		std::string cur = tmpl;
+
+		const bool rmod = replace(cur, "$mod"s, mod.name);
+		if(!rmod) {
+			ret[cur] = mods_;
+			break;
+		}
+
+		auto ver = mpi::get_version(mod);
+		replace(cur, "$va"s, std::to_string(ver.major_v));
+		replace(cur, "$vi"s, std::to_string(ver.minor_v));
+		ret[cur].emplace_back(mod);
+	}
+
+	return ret;
+}
+
+std::string mpp::module_algos::require_data(const mpi::module& mod) const
+{
+	using namespace modegen::parser::interface;
+	for(auto& [file,imods]:mapped_) for(auto& imod:imods) if(imod==mod) return file;
+	throw errors::error("cannot find module "s+mod.name+" in mapped to files");
 }
 
 std::vector<modegen::parser::interface::module> mpp::module_algos::mods() const

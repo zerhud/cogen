@@ -19,6 +19,7 @@ public:
 	void set_filter(const options::part_view& pinfo) override ;
 	std::vector<std::string> map(const std::string& tmpl) const override ;
 	std::map<std::string,std::any> map_to(const std::string& tmpl) override ;
+	std::map<std::string,std::vector<std::string>> map_from(const std::string& tmpl) override ;
 };
 
 } // namespace modegen::pg::palgos
