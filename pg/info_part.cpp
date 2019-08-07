@@ -76,6 +76,12 @@ void mpg::info_part::build_outputs(mpg::provider_const_ptr prov)
 	}
 
 	auto [mode, ftmpl] = outinfo();
+
+	part_algos::mapped_data mapped;
+	for(auto& alg:algos_) {
+		mapped = alg->map_to(std::move(mapped));
+	}
+
 	if(mode==fgmode::single) {
 		auto out = outs_.emplace_back(prov_->create_output(lang(), ftmpl, *this));
 		assert(out);
@@ -95,6 +101,12 @@ void mpg::info_part::build_outputs(mpg::provider_const_ptr prov)
 std::vector<mpg::part_algos_ptr> mpg::info_part::input_managers() const
 {
 	return algos_;
+}
+
+std::map<std::string,std::vector<std::string>> mpg::info_part::map_from(const std::string& tmpl) const
+{
+	(void)tmpl;
+	return {};
 }
 
 std::vector<std::string> mpg::info_part::map_to_outputs(const std::string& tmpl) const

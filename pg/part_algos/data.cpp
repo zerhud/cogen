@@ -10,16 +10,16 @@
 
 namespace ma = modegen::pg::palgos ;
 namespace mp = modegen::parser;
+namespace mg = modegen::pg;
 
 ma::data_algos::data_algos(const std::vector<mp::loader_ptr>& ldrs)
 {
 	(void)ldrs;
 }
 
-std::map<std::string,std::any> ma::data_algos::map_to(const std::string& tmpl)
+mg::part_algos::mapped_data ma::data_algos::map_to(mg::part_algos::mapped_data md)
 {
-	(void)tmpl;
-	return {};
+	return md;
 }
 
 std::map<std::string, std::vector<std::string>> ma::data_algos::map_from(const std::string& tmpl)

@@ -26,7 +26,8 @@ public:
 	module_algos(const std::vector<modegen::parser::loader_ptr>& ldrs);
 	void set_filter(const options::part_view& pinfo) override ;
 	std::vector<std::string> map(const std::string& tmpl) const override ;
-	std::map<std::string,std::any> map_to(const std::string& tmpl) override ;
+	std::map<std::string,std::any> map_to_str(const std::string& tmpl) ;
+	mapped_data map_to(mapped_data md) override ;
 	std::map<std::string,std::vector<std::string>> map_from(const std::string& tmpl) override ;
 	std::vector<modegen::parser::interface::module> mods() const ;
 };

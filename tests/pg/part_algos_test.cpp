@@ -14,37 +14,50 @@
 #include "mocks.hpp"
 #include "pg/part_algos/module.hpp"
 
+namespace mg = modegen::pg;
 namespace pa = modegen::pg::palgos;
 namespace pi = modegen::parser::interface;
 using namespace std::literals;
+
+namespace pgmocks
+{
+	mg::part_algos::mapped_data map_str(std::string s)
+	{
+		mg::part_algos::mapped_data ret;
+		ret[s];
+		return ret;
+	}
+}
 
 BOOST_AUTO_TEST_SUITE(modules)
 BOOST_AUTO_TEST_SUITE(map)
 BOOST_AUTO_TEST_SUITE(map_to)
 BOOST_AUTO_TEST_CASE(result)
 {
+	using pgmocks::map_str;
 	using pgmocks::mapk_to_vec;
+
 	auto pf = pi::parse("module m1 v1.0: module m1 v1.1: module m2 v1.0: module m2 v2.0:"sv);
 	auto ildr = std::make_shared<pgmocks::iloader>();
 	MOCK_EXPECT(ildr->result).once().returns(pf.mods);
 
 	pa::module_algos ma({ildr});
-	auto maps = mapk_to_vec(ma.map_to("test"s));
+	auto maps = mapk_to_vec(ma.map_to(map_str("test"s)));
 	BOOST_REQUIRE_EQUAL(maps.size(), 1);
 	BOOST_CHECK_EQUAL(maps[0], "test"s);
 
-	maps = mapk_to_vec(ma.map_to("$mod"s));
+	maps = mapk_to_vec(ma.map_to(map_str("$mod"s)));
 	BOOST_REQUIRE_EQUAL(maps.size(), 2);
 	BOOST_CHECK_EQUAL(maps[0], "m1"s);
 	BOOST_CHECK_EQUAL(maps[1], "m2"s);
 
-	maps = mapk_to_vec(ma.map_to("$mod_$va"s));
+	maps = mapk_to_vec(ma.map_to(map_str("$mod_$va"s)));
 	BOOST_REQUIRE_EQUAL(maps.size(), 3);
 	BOOST_CHECK_EQUAL(maps[0], "m1_1"s);
 	BOOST_CHECK_EQUAL(maps[1], "m2_1"s);
 	BOOST_CHECK_EQUAL(maps[2], "m2_2"s);
 
-	maps = mapk_to_vec(ma.map_to("$mod_$va_$vi"));
+	maps = mapk_to_vec(ma.map_to(map_str("$mod_$va_$vi"s)));
 	BOOST_REQUIRE_EQUAL(maps.size(), 4);
 	BOOST_CHECK_EQUAL(maps[0], "m1_1_0"s);
 	BOOST_CHECK_EQUAL(maps[1], "m1_1_1"s);
@@ -55,6 +68,7 @@ BOOST_AUTO_TEST_SUITE_END() // map_to
 BOOST_AUTO_TEST_SUITE(map_from)
 BOOST_AUTO_TEST_CASE(result)
 {
+	using pgmocks::map_str;
 	using pgmocks::mapk_to_vec;
 
 	auto pf = pi::parse("module m1 v1.0: module m1 v1.1: module m2 v1.0: module m2 v2.0:"sv);
@@ -62,7 +76,7 @@ BOOST_AUTO_TEST_CASE(result)
 	MOCK_EXPECT(ildr->result).once().returns(pf.mods);
 
 	pa::module_algos ma({ildr});
-	auto outs = mapk_to_vec(ma.map_to("test_$mod_$va_$vi"s));
+	auto outs = mapk_to_vec(ma.map_to(map_str("test_$mod_$va_$vi"s)));
 	BOOST_REQUIRE_EQUAL(outs.size(), 4);
 
 	auto from = ma.map_from("t$mod_$va");

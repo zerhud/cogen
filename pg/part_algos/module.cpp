@@ -18,6 +18,7 @@
 
 #include "pg/exceptions.hpp"
 
+namespace mp = modegen::pg;
 namespace mpp = modegen::pg::palgos;
 namespace mpi = modegen::parser::interface;
 using namespace std::literals;
@@ -31,7 +32,21 @@ mpp::module_algos::module_algos(const std::vector<modegen::parser::loader_ptr>& 
 	mods_ = mldr->result();
 }
 
-std::map<std::string,std::any> mpp::module_algos::map_to(const std::string& tmpl)
+mp::part_algos::mapped_data mpp::module_algos::map_to(mp::part_algos::mapped_data md)
+{
+	mapped_data ret;
+
+	for(auto& cur_d:md) {
+		auto mapped = inner_map(cur_d.first);
+		for(auto& item:mapped) {
+			ret[item.first].emplace_back(item.second);
+		}
+	}
+
+	return ret;
+}
+
+std::map<std::string,std::any> mpp::module_algos::map_to_str(const std::string& tmpl)
 {
 	tmpl_ = tmpl;
 	mapped_ = inner_map(tmpl);
