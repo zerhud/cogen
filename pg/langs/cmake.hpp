@@ -17,14 +17,14 @@ namespace modegen::pg::outputs {
 class cmake : public output_descriptor {
 	FS::path out_file_;
 	nlohmann::json data_;
-	std::vector<part_algos_ptr> imngs_;
-	const options::part_view opts_;
+	std::vector<std::any> inputs_;
+	std::optional<options::part_view> opts_;
 	void files_from_part(std::vector<std::string>& files, part_descriptor* part) const ;
 public:
-	cmake(provider_const_ptr p, FS::path o, const part_descriptor& part);
+	cmake(FS::path o, std::vector<std::any> data);
 
 	output_lang lang() const override ;
-	void override_setts(boost::property_tree::ptree s) override ;
+	void setts(const options::part_view& s) override ;
 	nlohmann::json data(const part_manager& pman) const override ;
 	FS::path file() const override ;
 };

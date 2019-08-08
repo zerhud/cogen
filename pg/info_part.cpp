@@ -82,19 +82,9 @@ void mpg::info_part::build_outputs(mpg::provider_const_ptr prov)
 		mapped = alg->map_to(std::move(mapped));
 	}
 
-	if(mode==fgmode::single) {
-		auto out = outs_.emplace_back(prov_->create_output(lang(), ftmpl, *this));
-		assert(out);
-		out->override_setts(setts.get_subset(options::subsetts::part_data));
-	}
-	else if(mode==fgmode::map) {
-		auto osetts = setts.get_subset(options::subsetts::part_data);
-		auto tmpls = map_to_outputs(ftmpl);
-		for(auto& tmpl:tmpls) {
-			auto out = outs_.emplace_back(prov_->create_output(lang(), tmpl, *this));
-			assert(out);
-			out->override_setts(osetts);
-		}
+	for(auto mi:mapped) {
+		auto out = outs_.emplace_back(prov_->create_output(lang(), mi.first, mi.second));
+		out->setts(opts());
 	}
 }
 

@@ -24,18 +24,18 @@ class cpp : public output_descriptor {
 
 	FS::path out_file_;
 	nlohmann::json data_;
-	std::vector<part_algos_ptr> imngs_;
-	const options::part_view opts_;
+	std::vector<std::any> input_;
+	std::optional<options::part_view> opts_;
 
 	std::vector<inc_info> solve_part_includes(const std::string& pname, const part_manager& pman) const ;
 	std::vector<inc_info> includes(const std::vector<std::string> sys, const part_manager& pman) const ;
 	void add_extra_namespaces(nlohmann::json& cdata) const ;
 	void set_constructors_prefix(nlohmann::json& cdata) const ;
 public:
-	cpp(provider_const_ptr p, FS::path o, const part_descriptor& part);
+	cpp(FS::path o, std::vector<std::any> data);
 
 	output_lang lang() const override ;
-	void override_setts(boost::property_tree::ptree s) override ;
+	void setts(const options::part_view& s) override ;
 	nlohmann::json data(const part_manager& pman) const override ;
 	FS::path file() const override ;
 };

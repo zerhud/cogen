@@ -26,10 +26,9 @@ namespace mai = modegen::pg::palgos::interface;
 namespace mcpp = modegen::pg::cpp;
 using namespace std::literals;
 
-mgo::cpp::cpp(provider_const_ptr p, FS::path o, const part_descriptor& part)
-	: out_file_(std::move(o))
-	, imngs_(part.input_managers())
-	, opts_(part.opts())
+mgo::cpp::cpp(FS::path o, std::vector<std::any> data)
+    : out_file_(std::move(o))
+    , input_(std::move(data))
 {
 }
 
@@ -38,8 +37,9 @@ mpg::output_lang mgo::cpp::lang() const
 	return output_lang::cpp;
 }
 
-void mgo::cpp::override_setts(boost::property_tree::ptree s)
+void mgo::cpp::setts(const mpg::options::part_view& s)
 {
+	opts_ = s;
 }
 
 nlohmann::json mgo::cpp::data(const part_manager& pman) const
@@ -53,14 +53,14 @@ nlohmann::json mgo::cpp::data(const part_manager& pman) const
 		}
 	};
 
-	std::shared_ptr<mpg::palgos::module_algos> malg;
-	for(auto&i:imngs_) if(malg=std::dynamic_pointer_cast<mpg::palgos::module_algos>(i);malg) break;
-	assert(malg);
+	std::vector<mpi::module> mods;
+	for(auto& id:input_) {
+		if(typeid(mods)==id.type()) mods = std::any_cast<std::vector<mpi::module>>(id);
+	}
 
 	mai::to_json jsoner(std::make_unique<json_extra_info>());
 	mcpp::type_converter tcvt;
 
-	auto mods = malg->mods();
 	nlohmann::json jsoned = mods | tcvt | jsoner;
 
 	auto incs = includes(tcvt.includes(), pman);
@@ -98,7 +98,7 @@ std::vector<mgo::cpp::inc_info> mgo::cpp::includes(const std::vector<std::string
 	std::vector<inc_info> ret;
 	ret.reserve(sys.size());
 
-	auto part_data = opts_.get_subset(options::subsetts::part_data);
+	auto part_data = opts_->get_subset(options::subsetts::part_data);
 
 	for(auto& s:sys) ret.emplace_back(std::move(s), true);
 	for(auto& i:part_data) {
@@ -123,7 +123,7 @@ std::vector<mgo::cpp::inc_info> mgo::cpp::includes(const std::vector<std::string
 
 void mgo::cpp::add_extra_namespaces(nlohmann::json& cdata) const
 {
-	auto nsopts = opts_.get_subset(options::subsetts::file_generator, "cpp"s, ""s);
+	auto nsopts = opts_->get_subset(options::subsetts::file_generator, "cpp"s, ""s);
 
 	std::size_t i=0;
 	for(auto& en:nsopts) {
@@ -136,11 +136,11 @@ void mgo::cpp::add_extra_namespaces(nlohmann::json& cdata) const
 // cause of it we place this function here insteed of part logic
 void mgo::cpp::set_constructors_prefix(nlohmann::json& cdata) const
 {
-	auto nsopts = opts_.get_subset(options::subsetts::file_generator, "cpp"s, ""s);
+	auto nsopts = opts_->get_subset(options::subsetts::file_generator, "cpp"s, ""s);
 	auto ctor_pref = nsopts.get_optional<std::string>("ctor_prefix");
 	auto ptr_suf = nsopts.get_optional<std::string>("ptr_suffix");
 
-	name_conversion naming = from_string(opts_.get_opt<std::string>(options::part_option::naming).value_or(""s));
+	name_conversion naming = from_string(opts_->get_opt<std::string>(options::part_option::naming).value_or(""s));
 	if(naming==name_conversion::title_case) {
 		cdata["ctor_prefix"] = ctor_pref ? *ctor_pref : "Create"s;
 		cdata["ptr_suffix"] = ptr_suf ? *ptr_suf : "Ptr"s;

@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(one_module)
 	setts->raw().put("part.fcpp.file_single", "test.cpp");
 	auto pd = std::make_shared<mpg::info_part>(mpg::options::part_view(setts, "fcpp"sv));
 
-	MOCK_EXPECT(output->override_setts);
+	MOCK_EXPECT(output->setts);
 	MOCK_EXPECT(ldr->result).returns(pf.mods);
 	MOCK_EXPECT(prov->input).returns(std::vector<modegen::parser::loader_ptr>{ldr});
 	MOCK_EXPECT(prov->create_output).once().with(mpg::output_lang::cpp, "test.cpp"s, mock::any).returns(output);
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(normal)
 	setts->raw().put("part.fcpp.file_bymod", "test_$mod_$va_$vi.cpp");
 	auto pd = std::make_shared<mpg::info_part>(mpg::options::part_view(setts, "fcpp"sv));
 
-	MOCK_EXPECT(output->override_setts);
+	MOCK_EXPECT(output->setts);
 	MOCK_EXPECT(ldr->result).returns(pf.mods);
 	MOCK_EXPECT(prov->input).returns(std::vector<modegen::parser::loader_ptr>{ldr});
 	MOCK_EXPECT(prov->create_output).once().with(mpg::output_lang::cpp, "test_mod1_1_1.cpp"s, mock::any).returns(output);

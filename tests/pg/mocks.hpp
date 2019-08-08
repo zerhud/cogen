@@ -54,7 +54,7 @@ MOCK_BASE_CLASS( part_output, modegen::pg::output_descriptor )
 	MOCK_METHOD( lang, 0 );
 	MOCK_METHOD( data, 1 );
 	MOCK_METHOD( file, 0 );
-	MOCK_METHOD( override_setts, 1 );
+	MOCK_METHOD( setts, 1 );
 };
 
 template<typename Vec, typename... Args>

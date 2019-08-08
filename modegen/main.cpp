@@ -31,6 +31,7 @@
 #include "pythongen.hpp"
 
 namespace mg = modegen::pg;
+namespace mpi = modegen::parser::interface;
 namespace po = boost::program_options;
 
 using namespace std::literals;
@@ -69,10 +70,10 @@ public:
 		return const_cast<decltype(lman)&>(lman).finish_loads();
 	}
 
-	mg::output_descriptor_ptr create_output(mg::output_lang lng, FS::path p, const mg::part_descriptor& part) const override
+	mg::output_descriptor_ptr create_output(mg::output_lang lng, FS::path p, std::vector<std::any> data) const override
 	{
-		if(lng==mg::output_lang::cpp) return std::make_shared<mg::outputs::cpp>(shared_from_this(), std::move(p), part);
-		if(lng==mg::output_lang::cmake) return std::make_shared<mg::outputs::cmake>(shared_from_this(), std::move(p), part);
+		if(lng==mg::output_lang::cpp) return std::make_shared<mg::outputs::cpp>(std::move(p), std::move(data));
+		if(lng==mg::output_lang::cmake) return std::make_shared<mg::outputs::cmake>(std::move(p), std::move(data));
 		throw std::runtime_error("no such generator was loaded \""s + mg::to_string(lng) + "\""s);
 	}
 
