@@ -19,7 +19,6 @@ class cmake : public output_descriptor {
 	nlohmann::json data_;
 	std::vector<std::any> inputs_;
 	std::optional<options::part_view> opts_;
-	void files_from_part(std::vector<std::string>& files, part_descriptor* part) const ;
 public:
 	cmake(FS::path o, std::vector<std::any> data);
 

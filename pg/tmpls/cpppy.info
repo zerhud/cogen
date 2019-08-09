@@ -25,7 +25,7 @@ part
 	}
 	pymod {
 		inc_part cpp_dec
-		input python/cpppy.jinja
+		input cpppy.jinja
 		file_map $mod_$va.$vi.cpp
 		versioning split
 	}
@@ -38,7 +38,7 @@ part
 			pybind11 { ldep "pybind11::embed" }
 		}
 		libraries {
-			"$mod-$vm.$vi" {
+			"$mod" {
 				part cpp_dec
 				part header
 				part definition

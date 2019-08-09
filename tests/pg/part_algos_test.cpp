@@ -13,6 +13,7 @@
 
 #include "mocks.hpp"
 #include "pg/part_algos/module.hpp"
+#include "pg/exceptions.hpp"
 
 namespace mg = modegen::pg;
 namespace pa = modegen::pg::palgos;
@@ -98,6 +99,14 @@ BOOST_AUTO_TEST_CASE(result)
 	BOOST_REQUIRE_EQUAL(test_pos->second.size(), 1);
 	BOOST_CHECK_EQUAL(test_pos->second[0], "test_m2_2_0");
 	++test_pos;
+}
+BOOST_AUTO_TEST_CASE(was_not_map_to)
+{
+	auto pf = pi::parse("module m1 v1.0: module m1 v1.1: module m2 v1.0: module m2 v2.0:"sv);
+	auto ildr = std::make_shared<pgmocks::iloader>();
+	MOCK_EXPECT(ildr->result).once().returns(pf.mods);
+	pa::module_algos ma({ildr});
+	BOOST_CHECK_THROW( ma.map_from("$mod"), modegen::pg::errors::error );
 }
 BOOST_AUTO_TEST_SUITE_END() // map_from
 BOOST_AUTO_TEST_SUITE_END() // map

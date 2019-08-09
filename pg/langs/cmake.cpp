@@ -53,16 +53,27 @@ nlohmann::json mpo::cmake::data(const part_manager& pman) const
 	for(auto l:*libs) {
 		std::vector<std::string> deps;
 		std::vector<std::string> files;
+		std::map<std::string,std::vector<std::string>> libs;
 		for(auto& f:l.second) {
 			auto val = f.second.get_value<std::string>();
 			if(f.first=="file"sv) files.emplace_back(val);
-			if(f.first=="part"sv) files_from_part(files, pman.require(val).get());
 			if(f.first=="dep"sv) deps.emplace_back(val);
+			if(f.first=="part"sv) {
+				auto mlibs = pman.require(val)->map_from(l.first);
+				for(auto& [n,l]:mlibs) for(auto& i:l) libs[n].emplace_back(i);
+			}
 		}
 
-
-		data["libraries"][l.first]["files"] = files;
-		data["libraries"][l.first]["deps"] = deps;
+		if(libs.empty()) {
+			assert(false);
+			data["libraries"][l.first]["files"] = files;
+			data["libraries"][l.first]["deps"] = deps;
+		}
+		else {
+			data["libraries"][l.first]["deps"] = deps;
+			for(auto& [lname,pdeps]:libs) data["libraries"][lname]["files"] = pdeps;
+			for(auto& file:files) data["libraries"][l.first]["files"].emplace_back(file);
+		}
 	}
 
 	auto deps = part.get_child_optional("deps");
@@ -78,12 +89,5 @@ nlohmann::json mpo::cmake::data(const part_manager& pman) const
 FS::path mpo::cmake::file() const
 {
 	return out_file_;
-}
-
-void mpo::cmake::files_from_part(std::vector<std::string>& files, part_descriptor* part) const
-{
-	assert( part );
-	auto olist = part->outputs();
-	for(auto& o:olist) files.emplace_back(o->file());
 }
 

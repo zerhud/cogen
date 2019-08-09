@@ -34,12 +34,14 @@ mpp::module_algos::module_algos(const std::vector<modegen::parser::loader_ptr>& 
 
 mp::part_algos::mapped_data mpp::module_algos::map_to(mp::part_algos::mapped_data md)
 {
+	mapped_.clear();
 	mapped_data ret;
 
 	for(auto& cur_d:md) {
 		auto mapped = inner_map(cur_d.first);
 		for(auto& item:mapped) {
 			ret[item.first].emplace_back(item.second);
+			for(auto& ii:item.second) mapped_[item.first].emplace_back(ii);
 		}
 	}
 
