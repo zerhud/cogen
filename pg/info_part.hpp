@@ -34,7 +34,6 @@ public:
 	std::vector<output_descriptor_ptr> outputs() const override ;
 	void build_outputs(provider_const_ptr prov) override ;
 	std::vector<part_algos_ptr> input_managers() const override ;
-	std::vector<std::string> map_to_outputs(const std::string& tmpl) const override ;
 	std::map<std::string,std::vector<std::string>> map_from(const std::string& tmpl) const override ;
 	options::part_view opts() const override ;
 };

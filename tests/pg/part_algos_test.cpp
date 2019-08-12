@@ -100,6 +100,44 @@ BOOST_AUTO_TEST_CASE(result)
 	BOOST_CHECK_EQUAL(test_pos->second[0], "test_m2_2_0");
 	++test_pos;
 }
+BOOST_AUTO_TEST_CASE(same_map)
+{
+	using pgmocks::map_str;
+	using pgmocks::mapk_to_vec;
+
+	auto pf = pi::parse("module m1 v1.0: module m1 v1.1: module m2 v1.0: module m2 v2.0:"sv);
+	auto ildr = std::make_shared<pgmocks::iloader>();
+	MOCK_EXPECT(ildr->result).once().returns(pf.mods);
+
+	pa::module_algos ma({ildr});
+	auto outs = mapk_to_vec(ma.map_to(map_str("test_$mod_$va_$vi"s)));
+	BOOST_REQUIRE_EQUAL(outs.size(), 4);
+
+	auto from = ma.map_from("t$mod_$va_$vi");
+	BOOST_REQUIRE_EQUAL(from.size(), 4);
+
+	auto test_pos = from.begin();
+	BOOST_CHECK_EQUAL(test_pos->first, "tm1_1_0");
+	BOOST_REQUIRE_EQUAL(test_pos->second.size(), 1);
+	BOOST_CHECK_EQUAL(test_pos->second[0], "test_m1_1_0");
+	++test_pos;
+
+	BOOST_CHECK_EQUAL(test_pos->first, "tm1_1_1");
+	BOOST_REQUIRE_EQUAL(test_pos->second.size(), 1);
+	BOOST_CHECK_EQUAL(test_pos->second[0], "test_m1_1_1");
+	++test_pos;
+
+	BOOST_CHECK_EQUAL(test_pos->first, "tm2_1_0");
+	BOOST_REQUIRE_EQUAL(test_pos->second.size(), 1);
+	BOOST_CHECK_EQUAL(test_pos->second[0], "test_m2_1_0");
+	++test_pos;
+
+	BOOST_CHECK_EQUAL(test_pos->first, "tm2_2_0");
+	BOOST_REQUIRE_EQUAL(test_pos->second.size(), 1);
+	BOOST_CHECK_EQUAL(test_pos->second[0], "test_m2_2_0");
+	++test_pos;
+
+}
 BOOST_AUTO_TEST_CASE(was_not_map_to)
 {
 	auto pf = pi::parse("module m1 v1.0: module m1 v1.1: module m2 v1.0: module m2 v2.0:"sv);

@@ -102,15 +102,6 @@ std::map<std::string,std::vector<std::string>> mpg::info_part::map_from(const st
 	return ret;
 }
 
-std::vector<std::string> mpg::info_part::map_to_outputs(const std::string& tmpl) const
-{
-	if(!prov_) throw errors::error("cannot map to outputs without provider");
-	if(algos_.empty()) throw errors::error("no input managers found");
-
-	return algos_[0]->map(tmpl); //algo[0] is mods: see create_algo fnc
-	TODO("map to other possible algos.. (add test for data for example)")
-}
-
 mpg::options::part_view mpg::info_part::opts() const
 {
 	return setts;
