@@ -12,3 +12,10 @@ string bar_m1();
 #string foo_m21();
 i8 tratata();
 
+interface inter {
+	i8 foo() mutable ;
+	constructor(i8 p) ;
+}
+
+enum +auto_io e {one two}
+

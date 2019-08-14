@@ -26,7 +26,7 @@ namespace <= render.gen_namespace_name(module, cdata) => {
 	<= render.decl_meta_params(obj) =>
 	class <= render.decl_depricated(obj) =><= obj.name => ;
 	using <= render.ptr(obj,cdata) => = std::shared_ptr<<= obj.name =>>;
-	<% for cnst in obj.constructors %><= render.ptr(obj,cdata) => <= cdata.cnst_prefix =><= obj.name =>(<=render.fparam(cnst.params)=>);<% endfor %>
+	<% for cnst in obj.constructors %>std::unique_ptr<<= obj.name =>> <= render.constructor_name(cnst,obj,cdata) =>(<=render.fparam(cnst.params)=>);<% endfor %>
 	<%- elif obj.type == "record" -%>
 	<= render.decl_meta_params(obj) =>
 	struct <= render.decl_depricated(obj) =><= obj.name => ;

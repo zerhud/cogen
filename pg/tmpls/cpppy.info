@@ -24,7 +24,7 @@ part
 		file modules.cpp
 	}
 	pymod {
-		inc_part cpp_dec
+		inc_part header
 		input cpppy.jinja
 		file_map $mod_$va.$vi.cpp
 		versioning split
@@ -43,7 +43,7 @@ part
 				part header
 				part definition
 				part pymod
-				dep pybind11
+				dep pybind11::embed
 			}
 		}
 	}

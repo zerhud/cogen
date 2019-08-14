@@ -45,6 +45,8 @@ public:
 };
 <% endmacro -%>
 
+<%- macro constructor_name(cns, obj, cdata) -%><= cdata.ctor_prefix =><= obj.name =><% endmacro -%>
+
 <% macro enum(obj, module, cdata) -%>
 <% set nn = gen_namespace_name(module, cdata) %>
 std::string <= nn =>::to_string(<=nn=>::<=obj.name=> v)
