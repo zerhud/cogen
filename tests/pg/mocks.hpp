@@ -35,7 +35,6 @@ MOCK_BASE_CLASS( part, modegen::pg::part_descriptor )
 	MOCK_METHOD( outputs, 0 )
 	MOCK_METHOD( build_outputs, 1 )
 	MOCK_METHOD( input_managers, 0 )
-	MOCK_METHOD( map_to_outputs, 1 )
 	MOCK_METHOD( map_from, 1 )
 	MOCK_METHOD( opts, 0 )
 };

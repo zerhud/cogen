@@ -49,33 +49,37 @@ nlohmann::json mpo::cmake::data(const part_manager& pman) const
 	data["project"] = part.get<std::string>("project");
 	data["version"] = part.get("version", "0.0.0.0"s);
 
+	// add_library..
 	auto libs = part.get_child_optional("libraries");
 	for(auto l:*libs) {
-		std::vector<std::string> deps;
 		std::vector<std::string> files;
+		std::vector<std::string> target_link_libraries;
 		std::map<std::string,std::vector<std::string>> libs;
 		for(auto& f:l.second) {
 			auto val = f.second.get_value<std::string>();
 			if(f.first=="file"sv) files.emplace_back(val);
-			if(f.first=="dep"sv) deps.emplace_back(val);
+			if(f.first=="dep"sv) target_link_libraries.emplace_back(val);
 			if(f.first=="part"sv) {
 				auto mlibs = pman.require(val)->map_from(l.first);
 				for(auto& [n,l]:mlibs) for(auto& i:l) libs[n].emplace_back(i);
 			}
 		}
 
-		if(libs.empty()) {
-			assert(false);
-			data["libraries"][l.first]["files"] = files;
-			data["libraries"][l.first]["deps"] = deps;
+		const bool was_mapped = !libs.empty();
+		if(was_mapped) {
+			for(auto& [lname,pdeps]:libs) {
+				data["libraries"][lname]["files"] = pdeps;
+				for(auto& file:files) data["libraries"][lname]["files"].emplace_back(file);
+				data["libraries"][lname]["target_link_libraries"] = target_link_libraries;
+			}
 		}
 		else {
-			data["libraries"][l.first]["deps"] = deps;
-			for(auto& [lname,pdeps]:libs) data["libraries"][lname]["files"] = pdeps;
-			for(auto& file:files) data["libraries"][l.first]["files"].emplace_back(file);
+			data["libraries"][l.first]["files"] = files;
+			data["libraries"][l.first]["target_link_libraries"] = target_link_libraries;
 		}
 	}
 
+	// find_package..
 	auto deps = part.get_child_optional("deps");
 	if(deps) for(auto& d:*deps) {
 		nlohmann::json ddata;

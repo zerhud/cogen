@@ -1,5 +1,3 @@
-<= cdata =>
-
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(<= cdata.project => VERSION <= cdata.version => LANGUAGES C CXX)
 
@@ -19,7 +17,7 @@ add_library("<= item =>" SHARED
 <% for file in value.files %>	<= file =>
 <% endfor -%>
 )
-<% if value.deps %>target_link_libraries("<= item =>" PRIVATE <% for dep in value.deps %>	<= dep =><% endfor %>) <% endif %>
-<% if value.deps %>target_link_libraries("<= item =>-static" PUBLIC <% for dep in value.deps %>	<= dep =><% endfor %>) <% endif %>
+<% if value.target_link_libraries %>target_link_libraries("<= item =>" PRIVATE	<% for dep in value.target_link_libraries %> <= dep =><% endfor %>) <% endif %>
+<% if value.target_link_libraries %>target_link_libraries("<= item =>-static" PUBLIC	<% for dep in value.target_link_libraries %> <= dep =><% endfor %>) <% endif %>
 <% endfor %>
 
