@@ -1,0 +1,39 @@
+defaults {
+	lang cpp
+	naming underscore
+}
+part
+{
+	dec {
+		input declarations.jinja
+		file declarations.hpp
+	}
+	header {
+		inc_part dec
+		input header.jinja
+		file module.hpp
+		filter {
+			sel interface
+			sel record
+		}
+	}
+	definition {
+		inc_part dec
+		inc_part header
+		input definitions.jinja
+		file module.cpp
+	}
+	cmake {
+		lang cmake
+		input plain.jinja
+		file CMakeLists.txt
+		project interface
+		libraries {
+			interface {
+				part dec
+				part header
+				part definition
+			}
+		}
+	}
+}

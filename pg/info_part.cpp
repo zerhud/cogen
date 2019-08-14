@@ -14,6 +14,7 @@
 #include "exceptions.hpp"
 
 namespace mpg = modegen::pg;
+namespace mpo = modegen::pg::options;
 
 using namespace std::literals;
 
@@ -29,16 +30,20 @@ std::tuple<mpg::info_part::fgmode,std::string> mpg::info_part::outinfo() const
 	auto tmpl = setts.output_tmpl();
 	auto mode = setts.output_mode();
 
-	if(mode=="file_bymod"s) return std::make_tuple(fgmode::bymod, tmpl);
-	if(mode=="file_byent"s) return std::make_tuple(fgmode::byent, tmpl);
+	if(mode=="file_map"s) return std::make_tuple(fgmode::map, tmpl);
 	return std::make_tuple(fgmode::single, tmpl);
 }
 
 mpg::info_part::info_part(options::part_view s)
     : setts(std::move(s))
 {
-	auto lng = lang();
-	assert( lng==output_lang::cpp || lng==output_lang::python || lng==output_lang::javascript );
+}
+
+FS::path mpg::info_part::tmpl_file() const
+{
+	assert(prov_);
+	auto file = setts.get<std::string>(mpo::part_option::input);
+	return prov_->resolve_file(file, setts.container()->opts_dir(), lang());
 }
 
 mpg::output_lang mpg::info_part::lang() const
@@ -57,32 +62,28 @@ std::vector<mpg::output_descriptor_ptr> mpg::info_part::outputs() const
 	return outs_;
 }
 
-void mpg::info_part::build_outputs(const mpg::part_manager& pman, mpg::provider_const_ptr prov)
+void mpg::info_part::build_outputs(mpg::provider_const_ptr prov)
 {
 	prov_ = prov;
 	if(!prov_) throw errors::error("cannot build outputs without provider");
-	create_algos(*prov);
 
-	//TODO: filter in algos..
+	create_algos(*prov_);
+	assert(!algos_.empty());
 
-	// file_single filter..
-	// file_bymod (name with tmpl) filter...
+	for(auto& alg:algos_) {
+		assert(alg);
+		alg->set_filter(setts);
+	}
 
 	auto [mode, ftmpl] = outinfo();
-	if(mode==fgmode::single) {
-		auto out = outs_.emplace_back(prov_->create_output(lang(), ftmpl));
-		out->override_setts(setts.get_subset(options::subsetts::part_data));
-	}
-	else if(mode==fgmode::bymod) {
-		auto osetts = setts.get_subset(options::subsetts::part_data);
-		auto tmpls = map_to_outputs(ftmpl);
-		for(auto& tmpl:tmpls) {
-			auto out = outs_.emplace_back(prov_->create_output(lang(), tmpl));
-			out->override_setts(osetts);
-		}
-	}
-	else if(mode==fgmode::byent) {
-		throw errors::notready("byent output mode");
+
+	part_algos::mapped_data mapped;
+	mapped[ftmpl] = {};
+
+	for(auto& alg:algos_) mapped = alg->map_to(std::move(mapped));
+	for(auto mi:mapped) {
+		auto out = outs_.emplace_back(prov_->create_output(lang(), mi.first, mi.second));
+		out->setts(opts());
 	}
 }
 
@@ -91,13 +92,18 @@ std::vector<mpg::part_algos_ptr> mpg::info_part::input_managers() const
 	return algos_;
 }
 
-std::vector<std::string> mpg::info_part::map_to_outputs(const std::string& tmpl) const
+std::map<std::string,std::vector<std::string>> mpg::info_part::map_from(const std::string& tmpl) const
 {
-	if(!prov_) throw errors::error("cannot map to outputs without provider");
-	if(algos_.empty()) throw errors::error("no input managers found: build outputs first");
+	std::map<std::string,std::vector<std::string>> ret;
+	for(auto& alg:algos_) {
+		auto map = alg->map_from(tmpl);
+		for(auto& [k,v]:map) for(auto& i:v) ret[k].emplace_back(i);
+	}
+	return ret;
+}
 
-	return algos_[0]->map(tmpl); //algo[0] is mods: see create_algo fnc
-	//TODO: map to other possible algos.. (add test for data for example)
-
+mpg::options::part_view mpg::info_part::opts() const
+{
+	return setts;
 }
 

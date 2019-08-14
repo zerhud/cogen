@@ -15,32 +15,41 @@
 #include <boost/process.hpp>
 #include <pybind11/embed.h>
 
-#include "generation/common.hpp"
-#include "generation/provider.hpp"
-#include "generation/file_data.hpp"
-#include "generation/cpp.hpp"
-#include "generation/cmake.hpp"
-#include "generation/python.hpp"
-#include "generation/part_descriptor.hpp"
-
-#include "generation/interface/part_descriptor.hpp"
+#include "config.hpp"
+#include "pg/provider.hpp"
+#include "pg/part_algos/module.hpp"
+#include "pg/part_algos/data.hpp"
+#include "pg/generator.hpp"
+#include "pg/options.hpp"
+#include "pg/info_part.hpp"
+#include "pg/langs/cpp.hpp"
+#include "pg/langs/python.hpp"
+#include "pg/langs/cmake.hpp"
 
 #include "parser/interface/loader.hpp"
 
 #include "pythongen.hpp"
 
-namespace mg = modegen::generation;
-namespace mi = modegen::parser::interface;
+namespace mg = modegen::pg;
+namespace mpi = modegen::parser::interface;
 namespace po = boost::program_options;
 
 using namespace std::literals;
 
-class gen_prov : public mg::provider
+class gen_prov : public mg::provider, public std::enable_shared_from_this<gen_prov>
 {
 public:
 	gen_prov(FS::path self_path)
 	{
 		(void)self_path;
+	}
+
+	std::unique_ptr<mg::part_algos> create_algos(mg::input_lang il) const override
+	{
+		if(il==mg::input_lang::mdl) return std::make_unique<mg::palgos::module_algos>(input());
+		if(il==mg::input_lang::data) return std::make_unique<mg::palgos::data_algos>(input());
+		assert(false);
+		throw std::runtime_error("language algos not implemented for "s + to_string(il));
 	}
 
 	modegen::parser::loader_ptr create_loader(std::string_view target, FS::path input)
@@ -55,50 +64,49 @@ public:
 		return ldr;
 	}
 
-	std::vector<modegen::parser::loader_ptr> parsers() const override
+	std::vector<modegen::parser::loader_ptr> input() const override
 	{
 		// nonconst only first time called
 		return const_cast<decltype(lman)&>(lman).finish_loads();
 	}
 
-	mg::file_data_ptr generator(std::string_view name) const override
+	mg::output_descriptor_ptr create_output(mg::output_lang lng, FS::path p, std::vector<std::any> data) const override
 	{
-		if(name == "cpp"sv) return std::make_shared<mg::cpp_generator>();
-		if(name == "cmake"sv) return std::make_shared<mg::cmake>();
-		if(name == "python"sv) return std::make_shared<mg::python>();
-		throw std::runtime_error("no such generator was loaded \""s + std::string(name) + "\""s);
+		if(lng==mg::output_lang::cpp) return std::make_shared<mg::outputs::cpp>(std::move(p), std::move(data));
+		if(lng==mg::output_lang::cmake) return std::make_shared<mg::outputs::cmake>(std::move(p), std::move(data));
+		throw std::runtime_error("no such generator was loaded \""s + mg::to_string(lng) + "\""s);
 	}
 
-	void json_jinja(const mg::tmpl_gen_env& data) const override
+	void generate_from_jinja(const mg::jinja_env& env) const override
 	{
 		nlohmann::json json_data;
 
-		auto fnc_list = data.emb_fnc_list();
-		for(auto& ef:fnc_list) {
-			if(std::holds_alternative<std::string>(ef.second)) {
-				json_data["extra_data"][ef.first]["name"] = ef.first;
-				json_data["extra_data"][ef.first]["script"] = std::get<std::string>(ef.second);
-			}
-			else if(std::holds_alternative<FS::path>(ef.second)) {
-				json_data["extra_data"][ef.first]["name"] = ef.first;
-				json_data["extra_data"][ef.first]["file"] = std::get<FS::path>(ef.second).u8string();
-			}
-		}
+		//auto fnc_list = data.emb_fnc_list();
+		//for(auto& ef:fnc_list) {
+			//if(std::holds_alternative<std::string>(ef.second)) {
+				//json_data["extra_data"][ef.first]["name"] = ef.first;
+				//json_data["extra_data"][ef.first]["script"] = std::get<std::string>(ef.second);
+			//}
+			//else if(std::holds_alternative<FS::path>(ef.second)) {
+				//json_data["extra_data"][ef.first]["name"] = ef.first;
+				//json_data["extra_data"][ef.first]["file"] = std::get<FS::path>(ef.second).u8string();
+			//}
+		//}
 
-		mg::python_evaluator ev(data.data());
+		modegen::generation::python_evaluator ev(env.data);
 		ev
 		        .sys_path("some/path"s)
-		        .script(data.exec_before())
+		        //.script(data.exec_before())
 		        ;
 
-		auto emb_fnc_list = data.emb_fnc_list();
-		for(const auto& ef:emb_fnc_list) {
-			ev.add_emb_fnc(ef.first, ef.second);
-		}
+		//auto emb_fnc_list = data.emb_fnc_list();
+		//for(const auto& ef:emb_fnc_list) {
+			//ev.add_emb_fnc(ef.first, ef.second);
+		//}
 
 		ev
-		        .tmpl(data.tmpl(), data.out_file())
-		        .script(data.exec_after())
+		        .tmpl(env.tmpl, env.out_file)
+		        //.script(data.exec_after())
 		        ;
 	}
 
@@ -107,7 +115,12 @@ public:
 		search_pathes.push_back(p);
 	}
 
-	FS::path resolve_file(const FS::path& p, const FS::path& assumed, std::string_view gen_name) const override
+	FS::path resolve_file(const FS::path& p, const FS::path& assumed, mg::output_lang lng) const override
+	{
+		return resolve_file(p, assumed, mg::to_string(lng));
+	}
+
+	FS::path resolve_file(const FS::path& p, const FS::path& assumed, std::string_view gen_name) const
 	{
 		if(p.is_absolute()) return p;
 
@@ -127,22 +140,19 @@ public:
 
 		auto ret = resolve_file(p, final_search);
 		if(ret) return *ret;
-		ret = resolve_file(p.generic_u8string() + u8".info", final_search);
+		ret = resolve_file(p.generic_u8string() + ".info"s, final_search);
 		if(ret) return *ret;
-		ret = resolve_file(p.generic_u8string() + u8".jinja", final_search);
+		ret = resolve_file(p.generic_u8string() + ".jinja"s, final_search);
 		if(ret) return *ret;
 
-		std::string err_msg = u8"cannot find file "s + p.generic_u8string() + u8"\ntry to search in:\n"s;
-		for(const auto& sp:final_search) err_msg += u8"\t" + sp.generic_u8string() + u8"\n"s;
+		std::string err_msg = "cannot find file "s + p.generic_u8string() + "\ntry to search in:\n"s;
+		for(const auto& sp:final_search) err_msg += "\t"s + sp.generic_u8string() + "\n"s;
 		throw std::runtime_error(err_msg);
 	}
 
-	std::unique_ptr<mg::part_descriptor> create_part_descriptor(mg::options::view v) const override
+	mg::part_descriptor_ptr create_part(mg::options::part_view&& v) const override
 	{
-		auto ng = v.get_opt<std::string>(mg::options::part_option::output_name_gen).value_or("single");
-		if(ng=="interface"s) return std::make_unique<mg::interface::part_descriptor>(v, parsers());
-		if(ng=="interface,unite"s) return std::make_unique<mg::interface::part_descriptor>(v ,parsers(), true);
-		return std::make_unique<mg::single_part_descriptor>(std::move(v), parsers());
+		return std::make_shared<mg::info_part>(std::move(v));
 	}
 
 	std::vector<std::string> list_target() const
@@ -152,7 +162,7 @@ public:
 
 	std::vector<std::string> list_generators() const
 	{
-		return { u8"cpp"s, u8"cmake"s, u8"py"s };
+		return { "cpp"s, "cmake"s, "py"s };
 	}
 private:
 	std::optional<FS::path> resolve_file(FS::path p, const std::vector<FS::path> final_search) const
@@ -225,19 +235,20 @@ int main(int argc, char** argv)
 			if(gen) gen->generate(out_dir);
 
 			FS::path info_path = prov->resolve_file(val, "", "");
-			gen = std::make_unique<mg::generator>(prov, info_path.parent_path());
-			boost::property_tree::read_info(info_path.u8string(), gen->options());
+			auto opts = std::make_shared<mg::options::container>(info_path);
+			gen = std::make_unique<mg::generator>(prov, opts);
+			boost::property_tree::read_info(info_path.u8string(), opts->raw());
 		}
 		else if(key=="option"sv) {
 			if(!gen) throw std::runtime_error("cannot override option without generator");
 
 			std::cmatch m;
 			std::regex_match(val.data(), m, key_val_parser);
-			gen->options().put(m[1].str(),m[3].str());
+			gen->opts()->raw().put(m[1].str(),m[3].str());
 		}
 		else if(key=="aoption"sv) {
 			if(!gen) throw std::runtime_error("cannot add option without generator");
-			gen->options().add(key,val);
+			gen->opts()->raw().add(key,val);
 		}
 		else if(key=="include"sv) {
 			prov->add_search_path(val);

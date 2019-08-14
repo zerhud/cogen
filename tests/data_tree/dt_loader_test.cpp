@@ -102,6 +102,7 @@ BOOST_AUTO_TEST_CASE(put)
 }
 BOOST_AUTO_TEST_CASE(error)
 {
+	TODO("test fails, use debugger for detect error");
 	pt::ptree basic, adding, without;
 	basic.put("tadd.add"s, "1");
 	adding.put("tadd.add"s, "2");

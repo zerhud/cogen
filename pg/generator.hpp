@@ -23,11 +23,12 @@ class generator final {
 public:
 	generator(provider_ptr p, options::container_ptr s);
 
+	options::container_ptr opts() const ;
+
 	void build_env() ;
 	part_manager& parts() ;
 
-	void generate(const FS::path& output_dir) const ;
-	void generate(std::string_view part, std::ostream& out) const ;
+	void generate(const FS::path& output_dir) ;
 };
 
 } // namespace modegen::pg

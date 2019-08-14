@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include <vector>
+#include <any>
+#include <map>
 #include <boost/property_tree/ptree.hpp>
 #include "declarations.hpp"
 
@@ -16,9 +17,13 @@ namespace modegen::pg {
 
 class part_algos {
 public:
+	typedef std::map<std::string,std::vector<std::any>> mapped_data;
+
 	virtual ~part_algos() noexcept =default ;
-	virtual void set_filter(boost::property_tree::ptree fdata) =0 ;
+	virtual void set_filter(const options::part_view& pinfo) =0 ;
 	virtual std::vector<std::string> map(const std::string& tmpl) const =0 ;
+	virtual mapped_data map_to(mapped_data md) =0 ;
+	virtual std::map<std::string,std::vector<std::string>> map_from(const std::string& tmpl) =0 ;
 };
 
 } // namespace modegen::pg

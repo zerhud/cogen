@@ -14,6 +14,7 @@
 #include "provider.hpp"
 #include "exceptions.hpp"
 #include "part_descriptor.hpp"
+#include "output_descriptor.hpp"
 
 namespace mpg = modegen::pg;
 using namespace std::literals;
@@ -22,6 +23,12 @@ mpg::generator::generator(mpg::provider_ptr p, mpg::options::container_ptr s)
 	: prov(std::move(p))
 	, setts(std::move(s))
 {
+}
+
+mpg::options::container_ptr mpg::generator::opts() const
+{
+	assert(setts);
+	return setts;
 }
 
 /// builds all parts.
@@ -37,12 +44,25 @@ mpg::part_manager& mpg::generator::parts()
 	return pman;
 }
 
-void mpg::generator::generate(const FS::path& output_dir) const
+void mpg::generator::generate(const FS::path& output_dir)
 {
-}
+	assert(prov);
+	build_env();
 
-void mpg::generator::generate(std::string_view part, std::ostream& out) const
-{
+	if(!FS::exists(output_dir)) FS::create_directories(output_dir);
+	else if(!FS::is_directory(output_dir)) throw errors::error("you must specify directory for output");
+
+	auto plist = pman.list();
+	for(auto& part:plist) {
+		jinja_env env;
+		env.tmpl = part->tmpl_file();
+		auto olist = part->outputs();
+		for(auto& out:olist) {
+			env.data = out->data(pman);
+			env.out_file = output_dir / out->file();
+			prov->generate_from_jinja(env);
+		}
+	}
 }
 
 void mpg::generator::init_parts()
@@ -64,6 +84,9 @@ void mpg::generator::init_parts()
 void mpg::generator::build_outs()
 {
 	auto plist = pman.list();
-	for(auto& p:plist) p->build_outputs(pman, prov);
+	for(auto& p:plist) {
+		assert(p);
+		p->build_outputs(prov);
+	}
 }
 
