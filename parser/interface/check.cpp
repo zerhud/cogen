@@ -204,7 +204,10 @@ bool modegen::parser::interface::checker::combine(modegen::parser::interface::mo
 
 	to.file_name += "; " + from.file_name;
 	for(auto& cnt:from.content) to.content.emplace_back(std::move(cnt));
-	for(auto& imp:from.imports) to.imports.emplace_back(std::move(imp)); TODO(duplicate imports?)
+	for(auto& imp:from.imports) to.imports.emplace_back(std::move(imp));
+
+	std::sort(to.imports.begin(),to.imports.end());
+	to.imports.erase( std::unique(to.imports.begin(),to.imports.end()), to.imports.end() );
 
 	//std::optional<meta_parameters::deprication> to_dep_param;
 	//for(auto& par:to.meta_params) if(std::holds_alternative<meta_parameters::deprication>(par)) to_dep_param.emplace(std::move(par));
