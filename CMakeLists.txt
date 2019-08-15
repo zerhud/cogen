@@ -50,7 +50,7 @@ target_link_libraries(modegen_parsers PRIVATE stdc++fs PUBLIC ${Boost_LIBRARIES}
 target_include_directories(modegen_parsers PUBLIC
 	"${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/parser"
 	"${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
-target_include_directories(modegen_parsers SYSTEM PUBLIC "${Boost_LIBRARIES}")
+target_include_directories(modegen_parsers SYSTEM PUBLIC "${Boost_INCLUDE_DIR}")
 # grammar need to start compiling first
 target_sources_local(modegen_parsers grammar.hpp         grammar.cpp         "parser/interface/")
 target_sources_local(modegen_parsers errors.h            errors.cpp          "parser/")
