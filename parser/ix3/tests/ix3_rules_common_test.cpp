@@ -38,4 +38,9 @@ BOOST_AUTO_TEST_CASE(type)
 
 	data = "li st"s;
 	BOOST_CHECK_THROW( result = txt::parse(txt::type, data), std::exception );
+
+	data = "list<a,b>"s;
+	BOOST_CHECK_NO_THROW( result = txt::parse(txt::type, data) );
+	BOOST_TEST( result.name == "list"s );
+	BOOST_TEST( result.sub_types.size() == 2 );
 }

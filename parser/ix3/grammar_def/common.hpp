@@ -19,6 +19,7 @@ extern decltype(x3::space)& space;
 using boost::spirit::x3::lit;
 using boost::spirit::x3::skip;
 using boost::spirit::x3::omit;
+using boost::spirit::x3::attr;
 using boost::spirit::x3::lexeme;
 
 auto const quoted_string_1_def = *(char_ >> !lit('\'') | lit("\\'") >> x3::attr('\'')) >> char_;
@@ -29,7 +30,7 @@ auto const quoted2_string_def = lexeme[lit("\"") >> -quoted_string_2_def >> lit(
 auto const single_variable_name_def = lexeme[char_("A-Za-z_") >> *char_("0-9A-Za-z_")];
 auto const variable_name_def = single_variable_name % '.';
 
-auto const type_def = single_variable_name >> *(lit('<') >> type >> lit('>'));
+auto const type_def = single_variable_name >> -(lit('<') >> type % ',' >> lit('>'));
 
 class type_class           : x3::annotate_on_success {};
 class variable_name_class  : x3::annotate_on_success {};
