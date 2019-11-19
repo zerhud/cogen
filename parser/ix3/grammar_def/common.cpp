@@ -14,7 +14,7 @@ namespace ix3::text {
 decltype(x3::char_)& char_ = x3::char_;
 decltype(x3::space)& space = x3::space;
 
-//BOOST_SPIRIT_INSTANTIATE( decltype(type),             iterator_type, context_type )
+BOOST_SPIRIT_INSTANTIATE( decltype(type),             iterator_type, context_type )
 BOOST_SPIRIT_INSTANTIATE( decltype(variable_name),    iterator_type, context_type )
 BOOST_SPIRIT_INSTANTIATE( decltype(quoted1_string),   iterator_type, context_type )
 BOOST_SPIRIT_INSTANTIATE( decltype(quoted2_string),   iterator_type, context_type )

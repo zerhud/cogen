@@ -42,6 +42,7 @@ namespace ix3::text {
 		bool success = boost::spirit::x3::phrase_parse(begin, end, make_grammar(rule, std::move(env)), boost::spirit::x3::space, result);
 
 		if(!success) throw std::runtime_error("cannot parse");
+		if(begin!=end) throw std::runtime_error("parse not finished");
 
 		return result;
 	}

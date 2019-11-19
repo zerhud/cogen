@@ -29,7 +29,7 @@ auto const quoted2_string_def = lexeme[lit("\"") >> -quoted_string_2_def >> lit(
 auto const single_variable_name_def = lexeme[char_("A-Za-z_") >> *char_("0-9A-Za-z_")];
 auto const variable_name_def = single_variable_name % '.';
 
-//auto const type_def = ;
+auto const type_def = single_variable_name >> *(lit('<') >> type >> lit('>'));
 
 class type_class           : x3::annotate_on_success {};
 class variable_name_class  : x3::annotate_on_success {};
@@ -37,7 +37,7 @@ class quoted1_string_class : x3::annotate_on_success {};
 class quoted2_string_class : x3::annotate_on_success {};
 class single_variable_name_class   : x3::annotate_on_success {};
 
-//BOOST_SPIRIT_DEFINE( type )
+BOOST_SPIRIT_DEFINE( type )
 BOOST_SPIRIT_DEFINE( variable_name )
 BOOST_SPIRIT_DEFINE( quoted1_string )
 BOOST_SPIRIT_DEFINE( quoted2_string )

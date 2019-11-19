@@ -17,7 +17,25 @@
 #include "grammar/common.hpp"
 #include "operators/common.hpp"
 
-BOOST_AUTO_TEST_CASE(simpe)
+using namespace std::literals;
+namespace ast = ix3::ast;
+namespace txt = ix3::text;
+
+BOOST_AUTO_TEST_CASE(type)
 {
-	BOOST_FAIL("empty test");
+	ast::type result;
+	std::string data = "list<type>"s;
+	BOOST_CHECK_NO_THROW( result = txt::parse(txt::type, data) );
+	BOOST_TEST( result.name == "list"s );
+	BOOST_TEST( result.sub_types.size() == 1 );
+	BOOST_TEST( result.sub_types[0].get().name == "type"s );
+	BOOST_TEST( result.sub_types[0].get().sub_types.size() == 0 );
+
+	data = "list"s;
+	BOOST_CHECK_NO_THROW( result = txt::parse(txt::type, data) );
+	BOOST_TEST( result.name == "list"s );
+	BOOST_TEST( result.sub_types.size() == 0 );
+
+	data = "li st"s;
+	BOOST_CHECK_THROW( result = txt::parse(txt::type, data), std::exception );
 }
