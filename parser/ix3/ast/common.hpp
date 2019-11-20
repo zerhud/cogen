@@ -31,7 +31,7 @@ struct single_variable_name : string_t, x3::position_tagged {};
 struct variable_name : std::vector<string_t>, x3::position_tagged {};
 
 struct type : x3::position_tagged {
-	single_variable_name name;
+	variable_name name;
 	std::vector<forward_ast<type>> sub_types;
 };
 

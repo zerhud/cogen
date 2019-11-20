@@ -24,16 +24,18 @@ namespace txt = ix3::text;
 BOOST_AUTO_TEST_CASE(type)
 {
 	ast::type result;
+
 	std::string data = "list<type>"s;
 	BOOST_CHECK_NO_THROW( result = txt::parse(txt::type, data) );
-	BOOST_TEST( result.name == "list"s );
+	BOOST_TEST( result.name.size() == 1 );
+	BOOST_TEST( result.name.at(0) == "list"s );
 	BOOST_TEST( result.sub_types.size() == 1 );
-	BOOST_TEST( result.sub_types[0].get().name == "type"s );
+	BOOST_TEST( result.sub_types[0].get().name.at(0) == "type"s );
 	BOOST_TEST( result.sub_types[0].get().sub_types.size() == 0 );
 
 	data = "list"s;
 	BOOST_CHECK_NO_THROW( result = txt::parse(txt::type, data) );
-	BOOST_TEST( result.name == "list"s );
+	BOOST_TEST( result.name.at(0) == "list"s );
 	BOOST_TEST( result.sub_types.size() == 0 );
 
 	data = "li st"s;
@@ -41,7 +43,7 @@ BOOST_AUTO_TEST_CASE(type)
 
 	data = "list<a,b>"s;
 	BOOST_CHECK_NO_THROW( result = txt::parse(txt::type, data) );
-	BOOST_TEST( result.name == "list"s );
+	BOOST_TEST( result.name.at(0) == "list"s );
 	BOOST_TEST( result.sub_types.size() == 2 );
 }
 

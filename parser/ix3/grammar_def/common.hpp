@@ -30,7 +30,7 @@ auto const quoted2_string_def = lexeme[lit("\"") >> -quoted_string_2_def >> lit(
 auto const single_variable_name_def = lexeme[char_("A-Za-z_") >> *char_("0-9A-Za-z_")];
 auto const variable_name_def = single_variable_name % '.';
 
-auto const type_def = single_variable_name >> -(lit('<') >> type % ',' >> lit('>'));
+auto const type_def = variable_name >> -(lit('<') >> type % ',' >> lit('>'));
 
 
 auto const meta_set_def = *(('@' >> meta_version) | meta_depricated | meta_documentation);

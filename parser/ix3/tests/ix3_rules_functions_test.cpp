@@ -48,9 +48,9 @@ BOOST_AUTO_TEST_CASE(function)
 	BOOST_CHECK_NO_THROW( result = txt::parse(txt::function, data) );
 	BOOST_TEST( result.params.size() == 2 );
 	BOOST_TEST( result.params[0].name == "a"s );
-	BOOST_TEST( result.params[0].param_type.name == "type"s );
+	BOOST_TEST( result.params[0].param_type.name.at(0) == "type"s );
 	BOOST_TEST( result.params[0].required == true );
 	BOOST_TEST( result.params[1].required == false );
-	BOOST_TEST( result.return_type.name == "rtype"s );
+	BOOST_TEST( result.return_type.name.at(0) == "rtype"s );
 }
 
