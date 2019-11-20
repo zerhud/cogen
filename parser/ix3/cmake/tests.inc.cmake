@@ -16,7 +16,7 @@ macro(add_unit_test tname path lib)
 	add_test(NAME ${tname} COMMAND ${tname}_test)
 endmacro()
 
-set(tests_parser rules_common)
+set(tests_parser rules_common rules_functions)
 foreach(tname ${tests_parser})
 	add_unit_test(${tname} "tests/" "${PROJECT_NAME}")
 endforeach()
