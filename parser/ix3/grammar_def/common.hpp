@@ -34,8 +34,8 @@ auto const type_def = single_variable_name >> -(lit('<') >> type % ',' >> lit('>
 
 
 auto const meta_set_def = *(('@' >> meta_version) | meta_depricated | meta_documentation);
-auto const meta_version_def = lit("v") >> x3::int_ >> '.' >> x3::int_;
-auto const meta_depricated_def = lit("@depricated") >> meta_version >> lit('(') >> quoted2_string >> lit(')');
+auto const meta_version_def = 'v' >> x3::int_ >> '.' >> x3::int_;
+auto const meta_depricated_def = lit("@depricated") >> meta_version >> '(' >> quoted2_string >> ')';
 auto const meta_documentation_def = '#' >> lexeme[ *(char_ - x3::eol) >> x3::eol ];
 
 class type_class           : x3::annotate_on_success {};

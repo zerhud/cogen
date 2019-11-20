@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(docs)
 	BOOST_CHECK_NO_THROW( result = txt::parse(txt::meta_documentation, data) );
 	BOOST_TEST( result.body == "kuku"s );
 
-	data = "#ku ku\n";
+	data = "# ku ku\n";
 	BOOST_CHECK_NO_THROW( result = txt::parse(txt::meta_documentation, data) );
 	BOOST_TEST( result.body == "ku ku"s );
 }
