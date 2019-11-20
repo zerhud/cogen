@@ -18,7 +18,7 @@ namespace ix3::text {
 auto const is_static_def = lit("static") >> attr(true);
 auto const is_mutable_def = (lit("mutable") >> attr(true)) | (lit("const") >> attr(false));
 
-auto const function_parameter_def = (omit['-'] >> attr(false) | omit['+'] >> attr(true)) >> type >> single_variable_name;
+auto const function_parameter_def = is_required >> type >> single_variable_name;
 auto const constructor_def = meta_set >> lit("constructor") >> omit['('] >> -(function_parameter % ',') >> omit[')'];
 auto const function_def =
 	   meta_set
