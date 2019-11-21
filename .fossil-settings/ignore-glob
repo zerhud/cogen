@@ -1,5 +1,6 @@
 compile_commands.json
 build/*
+parser/ix3/build/*
 cbuild/*
 build-cov/*
 *.user

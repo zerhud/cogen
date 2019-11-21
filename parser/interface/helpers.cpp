@@ -142,6 +142,11 @@ bool mi::operator == (const std::vector<mi::module>& left, const std::vector<mi:
 		;
 }
 
+bool mi::operator < (const mi::using_directive& left, const mi::using_directive& right)
+{
+	return (right.is_system < left.is_system) && (left.mod_name < right.mod_name);
+}
+
 bool mi::meta_parameters::operator <=(const mi::meta_parameters::version& left, const mi::meta_parameters::version& right)
 {
 	return left.major_v <= right.major_v && left.minor_v <= right.minor_v;

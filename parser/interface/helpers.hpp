@@ -51,6 +51,8 @@ bool operator == (const type& left, const type& right);
 bool operator == (const meta_parameters::parameter_set& left, const meta_parameters::parameter_set& right);
 bool operator == (const std::vector<module>& left, const std::vector<module>& right);
 
+bool operator < (const using_directive& left, const using_directive& right);
+
 namespace meta_parameters {
 bool operator < (const version& left, const version& right);
 bool operator <= (const version& left, const version& right);
