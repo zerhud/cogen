@@ -1,10 +1,3 @@
-if("${turtle} " STREQUAL " ")
-	find_file(turtle turtle/mock.hpp)
-	get_filename_component(turtle "${turtle}" DIRECTORY)
-	get_filename_component(turtle "${turtle}" DIRECTORY)
-	set(turtle "${turtle}" CACHE PATH "path to turtle framework" FORCE)
-endif()
-
 find_package(Boost 1.69 COMPONENTS unit_test_framework REQUIRED)
 
 # unit tests...
