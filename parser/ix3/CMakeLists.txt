@@ -17,20 +17,24 @@ target_include_directories(
 target_sources(${PROJECT_NAME} PRIVATE ast/common.cpp ast/common.hpp)
 target_sources(${PROJECT_NAME} PRIVATE ast/functions.hpp)
 target_sources(${PROJECT_NAME} PRIVATE ast/entity.hpp)
+target_sources(${PROJECT_NAME} PRIVATE ast/file.hpp)
 
 target_sources(${PROJECT_NAME} PRIVATE fusion/common.hpp)
 target_sources(${PROJECT_NAME} PRIVATE fusion/functions.hpp)
 target_sources(${PROJECT_NAME} PRIVATE fusion/entity.hpp)
+target_sources(${PROJECT_NAME} PRIVATE fusion/file.hpp)
 
 target_sources(${PROJECT_NAME} PRIVATE grammar/common.hpp)
 target_sources(${PROJECT_NAME} PRIVATE grammar/functions.hpp)
 target_sources(${PROJECT_NAME} PRIVATE grammar/entity.hpp)
+target_sources(${PROJECT_NAME} PRIVATE grammar/file.hpp)
 
 target_sources(${PROJECT_NAME} PRIVATE operators/common.cpp operators/common.hpp)
 
 target_sources(${PROJECT_NAME} PRIVATE grammar_def/common.cpp grammar_def/common.hpp)
 target_sources(${PROJECT_NAME} PRIVATE grammar_def/functions.cpp grammar_def/functions.hpp)
 target_sources(${PROJECT_NAME} PRIVATE grammar_def/entity.cpp grammar_def/entity.hpp)
+target_sources(${PROJECT_NAME} PRIVATE grammar_def/file.cpp grammar_def/file.hpp)
 
 
 if(enable_tests)
