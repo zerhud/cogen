@@ -45,8 +45,10 @@ configure_file("config.hpp.in" "${main_config_file}")
 
 include(cmake/target_sources_local.cmake)
 
+add_subdirectory(parser/ix3)
+
 add_library(modegen_parsers ${main_config_file})
-target_link_libraries(modegen_parsers PRIVATE stdc++fs PUBLIC ${Boost_LIBRARIES})
+target_link_libraries(modegen_parsers PRIVATE stdc++fs ix3 PUBLIC ${Boost_LIBRARIES})
 target_include_directories(modegen_parsers PUBLIC
 	"${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/parser"
 	"${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
@@ -64,33 +66,35 @@ target_sources_local(modegen_parsers check.hpp           check.cpp           "pa
 # data_tree
 target_sources_local(modegen_parsers loader.hpp          loader.cpp          "parser/data_tree/")
 target_sources_local(modegen_parsers ptree_merge.hpp     ""                  "parser/data_tree/")
+# adapter
+target_sources_local(modegen_parsers ix3_loader.hpp      ix3_loader.cpp      "parser/interface/")
 
 add_library(part_generation "pg/declarations.hpp" ${main_config_file})
 target_include_directories(part_generation PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/pg" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
 target_include_directories(part_generation SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
 target_link_libraries(part_generation PRIVATE stdc++fs)
 
-target_sources_local(part_generation "generator.hpp" "generator.cpp" "pg/")
-target_sources_local(part_generation "part_descriptor.hpp" "part_descriptor.cpp" "pg/")
-target_sources_local(part_generation "info_part.hpp" "info_part.cpp" "pg/")
-target_sources_local(part_generation "part_algos.hpp" "part_algos.cpp" "pg/")
-target_sources_local(part_generation "module.hpp" "module.cpp" "pg/part_algos/")
-target_sources_local(part_generation "data.hpp" "data.cpp" "pg/part_algos/")
-target_sources_local(part_generation "to_json.hpp" "to_json.cpp" "pg/part_algos/interface/")
-target_sources_local(part_generation "filter.hpp" "filter.cpp" "pg/part_algos/interface/")
-target_sources_local(part_generation "naming.hpp" "naming.cpp" "pg/part_algos/interface/")
-target_sources_local(part_generation "split_version.hpp" "split_version.cpp" "pg/part_algos/interface/")
+target_sources_local(part_generation "generator.hpp"         "generator.cpp"         "pg/")
+target_sources_local(part_generation "part_descriptor.hpp"   "part_descriptor.cpp"   "pg/")
+target_sources_local(part_generation "info_part.hpp"         "info_part.cpp"         "pg/")
+target_sources_local(part_generation "part_algos.hpp"        "part_algos.cpp"        "pg/")
+target_sources_local(part_generation "module.hpp"            "module.cpp"            "pg/part_algos/")
+target_sources_local(part_generation "data.hpp"              "data.cpp"              "pg/part_algos/")
+target_sources_local(part_generation "to_json.hpp"           "to_json.cpp"           "pg/part_algos/interface/")
+target_sources_local(part_generation "filter.hpp"            "filter.cpp"            "pg/part_algos/interface/")
+target_sources_local(part_generation "naming.hpp"            "naming.cpp"            "pg/part_algos/interface/")
+target_sources_local(part_generation "split_version.hpp"     "split_version.cpp"     "pg/part_algos/interface/")
 target_sources_local(part_generation "output_descriptor.hpp" "output_descriptor.cpp" "pg/")
-target_sources_local(part_generation "final_generator.hpp" "final_generator.cpp" "pg/")
-target_sources_local(part_generation "generator.hpp" "generator.cpp" "pg/")
-target_sources_local(part_generation "part_manager.hpp" "part_manager.cpp" "pg/")
-target_sources_local(part_generation "options.hpp" "options.cpp" "pg/")
-target_sources_local(part_generation "provider.hpp" "provider.cpp" "pg/")
-target_sources_local(part_generation "exceptions.hpp" "exceptions.cpp" "pg/")
-target_sources_local(part_generation "cpp.hpp" "cpp.cpp" "pg/langs/")
-target_sources_local(part_generation "type_converter.hpp" "type_converter.cpp" "pg/langs/cpp/")
-target_sources_local(part_generation "cmake.hpp" "cmake.cpp" "pg/langs/")
-target_sources_local(part_generation "python.hpp" "python.cpp" "pg/langs/")
+target_sources_local(part_generation "final_generator.hpp"   "final_generator.cpp"   "pg/")
+target_sources_local(part_generation "generator.hpp"         "generator.cpp"         "pg/")
+target_sources_local(part_generation "part_manager.hpp"      "part_manager.cpp"      "pg/")
+target_sources_local(part_generation "options.hpp"           "options.cpp"           "pg/")
+target_sources_local(part_generation "provider.hpp"          "provider.cpp"          "pg/")
+target_sources_local(part_generation "exceptions.hpp"        "exceptions.cpp"        "pg/")
+target_sources_local(part_generation "cpp.hpp"               "cpp.cpp"               "pg/langs/")
+target_sources_local(part_generation "type_converter.hpp"    "type_converter.cpp"    "pg/langs/cpp/")
+target_sources_local(part_generation "cmake.hpp"             "cmake.cpp"             "pg/langs/")
+target_sources_local(part_generation "python.hpp"            "python.cpp"            "pg/langs/")
 target_sources_copy(part_generation "${dbg_cpp_templates_dir}"
 	pg/tmpls/cpp_decl.info pg/tmpls/cpppy.info
 	pg/tmpls/cpp/render.jinja pg/tmpls/cpp/declarations.jinja
@@ -152,6 +156,6 @@ if(LOW_MEMORY AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 if(ENABLE_TESTS)
-	include(cmake/tests.inc.cmake)
+	#include(cmake/tests.inc.cmake)
 endif()
 
