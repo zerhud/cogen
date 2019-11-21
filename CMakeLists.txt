@@ -67,7 +67,7 @@ target_sources_local(modegen_parsers check.hpp           check.cpp           "pa
 target_sources_local(modegen_parsers loader.hpp          loader.cpp          "parser/data_tree/")
 target_sources_local(modegen_parsers ptree_merge.hpp     ""                  "parser/data_tree/")
 # adapter
-target_sources_local(modegen_parsers ix3_loader.hpp      ix3_loader.cpp      "parser/interface/")
+#target_sources_local(modegen_parsers ix3_loader.hpp      ix3_loader.cpp      "parser/interface/")
 
 add_library(part_generation "pg/declarations.hpp" ${main_config_file})
 target_include_directories(part_generation PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/pg" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
@@ -156,6 +156,6 @@ if(LOW_MEMORY AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 if(ENABLE_TESTS)
-	#include(cmake/tests.inc.cmake)
+	include(cmake/tests.inc.cmake)
 endif()
 

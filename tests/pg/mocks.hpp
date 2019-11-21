@@ -17,6 +17,15 @@
 #include "parser/interface/loader.hpp"
 
 namespace pgmocks {
+
+MOCK_BASE_CLASS( part_alogs,  modegen::pg::part_algos )
+{
+	MOCK_METHOD( map, 1 )
+	MOCK_METHOD( map_to, 1 )
+	MOCK_METHOD( map_from, 1 )
+	MOCK_METHOD( set_filter, 1 )
+};
+
 MOCK_BASE_CLASS( provider, modegen::pg::provider)
 {
 	MOCK_METHOD( create_algos, 1 )
