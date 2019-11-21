@@ -9,10 +9,12 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 #include <string_view>
 #include <type_traits>
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/support/utf8.hpp>
+#include <boost/spirit/home/x3/support/utility/error_reporting.hpp>
 
 namespace ix3::text {
 
@@ -20,15 +22,31 @@ namespace ix3::text {
 
 	struct parser_env {};
 
-
-	template<typename Parser, typename Env>
-	auto make_grammar(const Parser& parser, Env&& env)
-	{
-		return boost::spirit::x3::with<Env,Env>(std::move(env))[parser];
-	}
-
 	using iterator_type = std::string_view::const_iterator;
-	using context_type = x3::context<parser_env,parser_env,x3::phrase_parse_context<decltype(x3::space)>::type>;
+	using error_handler_type = x3::error_handler<iterator_type>;
+	using context_type = x3::context
+		<
+		 parser_env,parser_env
+		,x3::context
+		 <
+		  x3::error_handler_tag,std::reference_wrapper<error_handler_type>
+		 ,x3::phrase_parse_context<decltype(x3::space)>::type
+		 >
+		>;
+
+	template<typename Parser, typename Env, typename ErrHndl>
+	auto make_grammar(const Parser& parser, Env&& env, ErrHndl&& eh)
+	{
+		return
+			x3::with<x3::error_handler_tag,std::reference_wrapper<error_handler_type>>(std::forward<ErrHndl>(eh))
+			[
+				boost::spirit::x3::with<Env,Env>(std::move(env))
+				[
+					parser
+				]
+			]
+			;
+	}
 
 	template<typename Id, typename Attribute>
 	Attribute parse(boost::spirit::x3::rule<Id, Attribute> rule, std::string_view data, parser_env&& env=parser_env{})
@@ -39,7 +57,8 @@ namespace ix3::text {
 		auto begin = data.begin();
 
 		Attribute result;
-		bool success = boost::spirit::x3::phrase_parse(begin, end, make_grammar(rule, std::move(env)), boost::spirit::x3::space, result);
+		error_handler_type eh(begin, end, std::cerr);
+		bool success = boost::spirit::x3::phrase_parse(begin, end, make_grammar(rule, std::move(env), std::ref(eh)), boost::spirit::x3::space, result);
 
 		if(!success) throw std::runtime_error("cannot parse");
 		if(begin!=end) throw std::runtime_error("parse not finished");
