@@ -43,7 +43,41 @@ BOOST_AUTO_TEST_CASE(enumeration)
 	BOOST_TEST( result.meta_params.cnt.size() == 1 );
 }
 
+BOOST_AUTO_TEST_CASE(record_item)
+{
+	ast::record_item result;
+
+	std::string data = "+type a";
+	BOOST_CHECK_NO_THROW( result = txt::parse(txt::record_item, data) );
+	BOOST_TEST( result.name == "a"s );
+	BOOST_TEST( result.is_required );
+}
+
 BOOST_AUTO_TEST_CASE(record)
 {
-	BOOST_FAIL("empty test");
+	ast::record result;
+
+	std::string data = "record r { +type a; }"s;
+	BOOST_CHECK_NO_THROW( result = txt::parse(txt::record, data) );
+	BOOST_TEST( result.name == "r"s );
+	BOOST_TEST( result.members.size() == 1 );
+}
+
+BOOST_AUTO_TEST_CASE(interface)
+{
+	ast::interface result;
+
+	std::string data = "interface i +i +ex { type foo(); }"s;
+	BOOST_CHECK_NO_THROW( result = txt::parse(txt::interface, data) );
+	BOOST_TEST( result.name == "i"s );
+	BOOST_TEST( result.use_as_exception );
+	BOOST_TEST( result.realization_in_client );
+	BOOST_TEST( result.mem_funcs.size() == 1 );
+	BOOST_TEST( result.constructors.size() == 0 );
+
+	data = "interface i +ex +i { type foo(); }"s;
+	BOOST_CHECK_NO_THROW( result = txt::parse(txt::interface, data) );
+	BOOST_TEST( result.name == "i"s );
+	BOOST_TEST( result.use_as_exception );
+	BOOST_TEST( result.realization_in_client );
 }

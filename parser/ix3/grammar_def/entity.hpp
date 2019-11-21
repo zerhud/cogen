@@ -17,11 +17,34 @@
 
 namespace ix3::text {
 
-auto const record_def = meta_set >> lit("record") >> single_variable_name >> -(lit("+ex") >> attr(true)) >> '{' >> *record_item >> '}';
-auto const interface_def = meta_set >> lit("interface") >> single_variable_name >> -(lit("+i") >> attr(true)) >> -(lit("+ex") >> attr(true)) >> '{' >> -(constructor % ';') >> function % ';' >> '}';
-auto const enumeration_def = meta_set >> lit("enum") >> single_variable_name >> -(lit("+auto_io") >> attr(true)) >> -(lit("+flags") >> attr(true)) >> '{' >> enum_element % ',' >> '}';
 auto const record_item_def = meta_set >> is_required >> type >> single_variable_name;
 auto const enum_element_def = single_variable_name >> -(lit("=>") >> quoted2_string);
+auto const record_def = meta_set
+	>> lit("record")
+	>> single_variable_name
+	>> -(lit("+ex") >> attr(true))
+	>> '{' >> *(record_item >> ';') >> '}'
+	;
+
+auto const interface_def = meta_set
+	>> lit("interface")
+	>> single_variable_name
+	>> -(lit("+i") >> attr(true))
+	>> -(lit("+ex") >> attr(true))
+	>> '{'
+	>> *(constructor >> ';')
+	>> *(function >> ';')
+	>> '}'
+	;
+
+auto const enumeration_def = meta_set
+	>> lit("enum")
+	>> single_variable_name
+	>> -(lit("+auto_io") >> attr(true)) >> -(lit("+flags") >> attr(true))
+	>> '{'
+	>> enum_element % ','
+	>> '}'
+	;
 
 class  record_class : x3::annotate_on_success {} ;
 class  interface_class : x3::annotate_on_success {} ;
