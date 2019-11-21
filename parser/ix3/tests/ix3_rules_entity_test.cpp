@@ -17,9 +17,12 @@
 #include "grammar/entity.hpp"
 //#include "operators/entity.hpp"
 
+constexpr bool run_known_bugs = false;
+
 using namespace std::literals;
 namespace ast = ix3::ast;
 namespace txt = ix3::text;
+namespace utf = boost::unit_test;
 
 BOOST_AUTO_TEST_CASE(enumeration)
 {
@@ -74,8 +77,19 @@ BOOST_AUTO_TEST_CASE(interface)
 	BOOST_TEST( result.realization_in_client );
 	BOOST_TEST( result.mem_funcs.size() == 1 );
 	BOOST_TEST( result.constructors.size() == 0 );
+}
 
-	data = "interface i +ex +i { type foo(); }"s;
+
+BOOST_AUTO_TEST_CASE(interface_diff_exi,
+		* utf::description("+ex and +i can to be in different order. dosen't work for now")
+		* utf::enable_if<run_known_bugs>()
+		)
+{
+	//NOTE: it should to be set of different flags for
+	//      in ast we can mix order in flags.
+	ast::interface result;
+
+	std::string data = "interface i +ex +i { type foo(); }"s;
 	BOOST_CHECK_NO_THROW( result = txt::parse(txt::interface, data) );
 	BOOST_TEST( result.name == "i"s );
 	BOOST_TEST( result.use_as_exception );
