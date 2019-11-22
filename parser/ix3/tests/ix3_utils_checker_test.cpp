@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(few_modules)
 BOOST_AUTO_TEST_CASE(version)
 {
 	ast::file_content result;
-	std::string data = "module mod v1.1: @v1.2 record r{+type a;}"s;
+	std::string data = "module mod v1.2: @v1.1 record r{+type a;}"s;
 	result = txt::parse(txt::file_content, data);
 
 	checker ch;

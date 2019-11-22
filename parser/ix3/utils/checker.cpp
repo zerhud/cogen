@@ -18,7 +18,7 @@ void ix3::utils::checker::on_obj(ast::record& obj)
 {
 	auto obj_ver = ast::get<ast::meta::version>(obj.meta_params);
 	if(obj_ver) {
-		if(module().version < *obj_ver) throw mod_version_is_less();
+		if(module().version <= *obj_ver) throw mod_version_is_less();
 	}
 }
 
