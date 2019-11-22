@@ -28,6 +28,9 @@ public:
 
 	void operator () (ast::file_content file);
 	std::vector<ast::module> extract_result() ;
+
+	struct error : std::runtime_error { error(std::string e) noexcept; };
+	struct mod_version_is_less : error { mod_version_is_less() noexcept; };
 };
 
 } // namespace ix3::utils

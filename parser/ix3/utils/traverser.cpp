@@ -17,7 +17,6 @@ void ix3::utils::traverser::trav_module(const ast::module& mod)
 {
 	mstack_.clear();
 
-
 	auto before = [this](auto& o){
 		make_path(cur_mod_.name, o.name);
 		mstack_.push_back(o.meta_params);
@@ -44,9 +43,9 @@ void ix3::utils::traverser::trav_module(const ast::module& mod)
 		boost::apply_visitor(before, c.var);
 		boost::apply_visitor(trav_fnc, c.var);
 		mstack_.pop_back();
-		on_obj(cur_mod_);
 	}
 
+	on_obj(cur_mod_);
 	mstack_.pop_back();
 }
 

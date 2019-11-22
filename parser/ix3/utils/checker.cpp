@@ -44,5 +44,12 @@ void ix3::utils::checker::operator() (ast::file_content file)
 
 std::vector<ix3::ast::module> ix3::utils::checker::extract_result()
 {
-	return result;
+	std::vector<ast::module> ret;
+	ret.swap(result);
+	return ret;
 }
+
+ix3::utils::checker::error::error(std::string e) noexcept : std::runtime_error(e) {}
+ix3::utils::checker::mod_version_is_less::mod_version_is_less() noexcept
+    : error("module version is less then content versin")
+{}
