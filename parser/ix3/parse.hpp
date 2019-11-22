@@ -35,10 +35,10 @@ namespace ix3::text {
 		>;
 
 	template<typename Parser, typename Env, typename ErrHndl>
-	auto make_grammar(const Parser& parser, Env&& env, ErrHndl&& eh)
+	auto make_grammar(const Parser& parser, Env&& env, ErrHndl& eh)
 	{
 		return
-			x3::with<x3::error_handler_tag,std::reference_wrapper<error_handler_type>>(std::forward<ErrHndl>(eh))
+			x3::with<x3::error_handler_tag,std::reference_wrapper<ErrHndl>>(std::ref(eh))
 			[
 				boost::spirit::x3::with<Env,Env>(std::move(env))
 				[
@@ -46,6 +46,20 @@ namespace ix3::text {
 				]
 			]
 			;
+	}
+
+	template<typename Id, typename Attribute, typename Iterator>
+	Attribute parse(boost::spirit::x3::rule<Id, Attribute> rule, Iterator begin, Iterator end, parser_env&& env=parser_env{})
+	{
+		Attribute result;
+		//error_handler_type eh(begin, end, std::cerr);
+		x3::error_handler<Iterator> eh(begin, end, std::cerr);
+		bool success = boost::spirit::x3::phrase_parse(begin, end, make_grammar(rule, std::move(env), eh), boost::spirit::x3::space, result);
+
+		if(!success) throw std::runtime_error("cannot parse");
+		if(begin!=end) throw std::runtime_error("parse not finished");
+
+		return result;
 	}
 
 	template<typename Id, typename Attribute>
@@ -56,14 +70,7 @@ namespace ix3::text {
 		auto end = data.end();
 		auto begin = data.begin();
 
-		Attribute result;
-		error_handler_type eh(begin, end, std::cerr);
-		bool success = boost::spirit::x3::phrase_parse(begin, end, make_grammar(rule, std::move(env), std::ref(eh)), boost::spirit::x3::space, result);
-
-		if(!success) throw std::runtime_error("cannot parse");
-		if(begin!=end) throw std::runtime_error("parse not finished");
-
-		return result;
+		return parse(rule, begin, end, std::move(env));
 	}
 
 } // namespace ix3::text

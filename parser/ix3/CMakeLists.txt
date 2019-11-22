@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_library(Boost 1.69 REQUIRED)
 
-add_library(${PROJECT_NAME} SHARED parse.hpp)
+add_library(${PROJECT_NAME} SHARED parse.hpp loader.cpp loader.hpp)
 target_include_directories(
 	${PROJECT_NAME}
 	PRIVATE ${Boost_INCLUDE_DIRS}
