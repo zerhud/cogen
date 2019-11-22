@@ -40,6 +40,7 @@ target_sources(${PROJECT_NAME} PRIVATE grammar_def/file.cpp grammar_def/file.hpp
 # utils
 target_sources(${PROJECT_NAME} PRIVATE utils/traverser.cpp utils/traverser.hpp)
 target_sources(${PROJECT_NAME} PRIVATE utils/checker.cpp   utils/checker.hpp)
+target_sources(${PROJECT_NAME} PRIVATE utils/meta.hpp)
 
 
 if(enable_tests)
