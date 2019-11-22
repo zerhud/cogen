@@ -40,7 +40,6 @@ class generator;
 class part_descriptor;
 class output_descriptor;
 class part_manager;
-class final_generator;
 class part_algos;
 
 struct jinja_env;

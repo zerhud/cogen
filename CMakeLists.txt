@@ -85,7 +85,6 @@ target_sources_local(part_generation "filter.hpp"            "filter.cpp"       
 target_sources_local(part_generation "naming.hpp"            "naming.cpp"            "pg/part_algos/interface/")
 target_sources_local(part_generation "split_version.hpp"     "split_version.cpp"     "pg/part_algos/interface/")
 target_sources_local(part_generation "output_descriptor.hpp" "output_descriptor.cpp" "pg/")
-target_sources_local(part_generation "final_generator.hpp"   "final_generator.cpp"   "pg/")
 target_sources_local(part_generation "generator.hpp"         "generator.cpp"         "pg/")
 target_sources_local(part_generation "part_manager.hpp"      "part_manager.cpp"      "pg/")
 target_sources_local(part_generation "options.hpp"           "options.cpp"           "pg/")
