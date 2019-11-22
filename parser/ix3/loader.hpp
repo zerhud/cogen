@@ -10,6 +10,7 @@
 
 #include <filesystem>
 #include "ast/file.hpp"
+#include "utils/checker.hpp"
 
 namespace ix3 {
 
@@ -31,8 +32,15 @@ public:
 
 	std::vector<ix3::ast::module> result() const ;
 private:
+	ast::file_content parse_stream(std::istream& input) const ;
+	std::filesystem::path search_file(const std::filesystem::path& f) const ;
+	bool already_loaded(const std::filesystem::path& p) const ;
+
 	std::vector<std::filesystem::path> includes_dir;
-	std::vector<ast::file_content> ast_in_files;
+	std::vector<std::filesystem::path> cur_dir;
+	std::vector<std::filesystem::path> loaded_files;
+
+	utils::checker checker;
 	std::vector<ast::module> finished_ast;
 };
 

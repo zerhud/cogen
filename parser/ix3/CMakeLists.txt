@@ -36,6 +36,10 @@ target_sources(${PROJECT_NAME} PRIVATE grammar_def/functions.cpp grammar_def/fun
 target_sources(${PROJECT_NAME} PRIVATE grammar_def/entity.cpp grammar_def/entity.hpp)
 target_sources(${PROJECT_NAME} PRIVATE grammar_def/file.cpp grammar_def/file.hpp)
 
+# utils
+target_sources(${PROJECT_NAME} PRIVATE utils/traverser.cpp utils/traverser.hpp)
+target_sources(${PROJECT_NAME} PRIVATE utils/checker.cpp   utils/checker.hpp)
+
 
 if(enable_tests)
 	include(cmake/tests.inc.cmake)

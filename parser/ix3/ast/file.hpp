@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <filesystem>
+
 #include "common.hpp"
 #include "entity.hpp"
 
@@ -34,6 +36,7 @@ struct module {
 struct file_content {
 	std::vector<module> modules;
 	std::vector<include_st> includes;
+	std::filesystem::path path;
 };
 
 } // namespace ix3::ast
