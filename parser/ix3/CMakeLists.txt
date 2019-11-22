@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_library(Boost 1.69 REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED parse.hpp loader.cpp loader.hpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs)
 target_include_directories(
 	${PROJECT_NAME}
 	PRIVATE ${Boost_INCLUDE_DIRS}
@@ -40,7 +39,7 @@ target_sources(${PROJECT_NAME} PRIVATE grammar_def/file.cpp grammar_def/file.hpp
 # utils
 target_sources(${PROJECT_NAME} PRIVATE utils/traverser.cpp utils/traverser.hpp)
 target_sources(${PROJECT_NAME} PRIVATE utils/checker.cpp   utils/checker.hpp)
-target_sources(${PROJECT_NAME} PRIVATE utils/meta.hpp)
+target_sources(${PROJECT_NAME} PRIVATE utils/meta.cpp      utils/meta.hpp)
 
 
 if(enable_tests)
