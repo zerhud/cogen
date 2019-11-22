@@ -29,6 +29,14 @@ void ix3::utils::checker::on_obj(ast::enumeration& obj)
 {
 }
 
+void ix3::utils::checker::on_obj(ast::record_item& obj)
+{
+}
+
+void ix3::utils::checker::on_obj(ast::constructor& obj)
+{
+}
+
 void ix3::utils::checker::operator() (ast::file_content file)
 {
 	for(auto& m:file.modules) trav_module(m);

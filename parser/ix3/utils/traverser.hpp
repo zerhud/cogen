@@ -32,17 +32,20 @@ protected:
 	std::string path() const ;
 	std::vector<ast::meta::set> meta_stack() const ;
 private:
-	virtual void on_obj(ast::module& obj) {}
-	virtual void on_obj(ast::record& obj) {}
-	virtual void on_obj(ast::function& obj) {}
-	virtual void on_obj(ast::interface& obj) {}
-	virtual void on_obj(ast::enumeration& obj) {}
+	virtual void on_obj(ast::module& obj)      { (void)obj; }
+	virtual void on_obj(ast::record& obj)      { (void)obj; }
+	virtual void on_obj(ast::function& obj)    { (void)obj; }
+	virtual void on_obj(ast::interface& obj)   { (void)obj; }
+	virtual void on_obj(ast::enumeration& obj) { (void)obj; }
+	virtual void on_obj(ast::record_item& obj) { (void)obj; }
+	virtual void on_obj(ast::constructor& obj) { (void)obj; }
 
 	template<typename T, typename... Args>
-	static std::string make_path(T&& v1, Args... v)
+	std::string make_path(T&& v1, Args... v)
 	{
-		if constexpr(sizeof...(Args)==0) return v1;
-		else return v1 + pdel + make_path(std::forward<Args>(v)...);
+		if constexpr(sizeof...(Args)==0) path_ = v1;
+		else path_ = v1 + pdel + make_path(std::forward<Args>(v)...);
+		return path_;
 	}
 
 	const static std::string pdel;

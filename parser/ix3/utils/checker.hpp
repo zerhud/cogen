@@ -16,11 +16,13 @@ namespace ix3::utils {
 class checker : public traverser {
 	std::vector<ast::module> result;
 
-	void on_obj(ast::module& obj) override ;
-	void on_obj(ast::record& obj) override ;
-	void on_obj(ast::function& obj) override ;
-	void on_obj(ast::interface& obj) override ;
+	void on_obj(ast::module& obj)      override ;
+	void on_obj(ast::record& obj)      override ;
+	void on_obj(ast::function& obj)    override ;
+	void on_obj(ast::interface& obj)   override ;
 	void on_obj(ast::enumeration& obj) override ;
+	void on_obj(ast::record_item& obj) override ;
+	void on_obj(ast::constructor& obj) override ;
 public:
 	checker() noexcept =default ;
 

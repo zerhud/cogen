@@ -19,15 +19,22 @@ void ix3::utils::traverser::trav_module(const ast::module& mod)
 
 
 	auto before = [this](auto& o){
-		path_ = make_path(cur_mod_.name, o.name);
+		make_path(cur_mod_.name, o.name);
 		mstack_.push_back(o.meta_params);
 	};
 
 	auto trav_fnc = overloaded {
-		[this](ast::record& o){ on_obj(o); },
-		[this](ast::function& o){ on_obj(o); },
-		[this](ast::interface& o){ on_obj(o); },
-		[this](ast::enumeration& o){ on_obj(o); }
+		[this](ast::function& o)   { on_obj(o); },
+		[this](ast::enumeration& o){ on_obj(o); },
+		[this,&before](ast::record& o){
+			for(auto&i:o.members) { on_obj(i); }
+			on_obj(o);
+		},
+		[this,&before](ast::interface& o){
+			for(auto& m:o.mem_funcs)    { on_obj(m); }
+			for(auto& c:o.constructors) { on_obj(c); }
+			on_obj(o);
+		},
 	};
 
 	cur_mod_ = mod;
