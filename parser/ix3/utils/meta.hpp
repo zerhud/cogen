@@ -18,11 +18,17 @@ std::optional<Meta> get(const meta::set& s)
 {
 	for(auto& c:s.cnt)
 	{
-		Meta* m = boost::get<Meta*>(c);
+		const Meta* m = boost::get<Meta>(&c.var);
 		if(m) return *m;
 	}
 
 	return std::nullopt;
 }
+
+namespace meta {
+
+bool operator < (const version& left, const version& right);
+
+} // namespace meta
 
 } // namespace ix3::ast
