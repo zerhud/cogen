@@ -55,10 +55,28 @@ BOOST_AUTO_TEST_CASE(few_modules)
 
 BOOST_AUTO_TEST_CASE(version)
 {
+	checker ch;
 	ast::file_content result;
+
 	std::string data = "module mod v1.2: @v1.1 record r{+type a;}"s;
 	result = txt::parse(txt::file_content, data);
-
-	checker ch;
 	BOOST_CHECK_THROW( ch(result), checker::parent_version_is_greater );
+
+	data = "module mod v1.1: @v1.1 record r{+type a;}"s;
+	result = txt::parse(txt::file_content, data);
+	BOOST_CHECK_NO_THROW( ch(result) );
+
+	data = "module mod v1.2: @v1.1 type f();"s;
+	result = txt::parse(txt::file_content, data);
+	BOOST_CHECK_THROW( ch(result), checker::parent_version_is_greater );
+
+	data = "module mod v1.2: "
+	       "@v1.2 type f(); "
+	       "@v1.2 interface i{ type f() const ; } "
+	       "@v1.2 type f(); "
+	       "@v1.2 record r{+type a;} "
+	       "@v1.2 type f(); "s;
+	result = txt::parse(txt::file_content, data);
+	ch(result);
+	//BOOST_CHECK_NO_THROW( ch(result) );
 }

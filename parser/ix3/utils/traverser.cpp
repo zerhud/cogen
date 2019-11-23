@@ -15,38 +15,43 @@ const std::string ix3::utils::traverser::pdel = "."s;
 
 void ix3::utils::traverser::trav_module(const ast::module& mod)
 {
-	mstack_.clear();
+	parents_.clear();
 
 	auto before = [this](auto& o){
 		make_path(cur_mod_.name, o.name);
-		mstack_.push_back(o.meta_params);
 	};
 
 	auto trav_fnc = overloaded {
 		[this](ast::function& o)   { on_obj(o); },
 		[this](ast::enumeration& o){ on_obj(o); },
 		[this,&before](ast::record& o){
+			before(o);
+			parents_.emplace_back(&o);
 			for(auto&i:o.members) { on_obj(i); }
+			parents_.pop_back();
 			on_obj(o);
 		},
 		[this,&before](ast::interface& o){
+			before(o);
+			parents_.emplace_back(&o);
 			for(auto& m:o.mem_funcs)    { on_obj(m); }
 			for(auto& c:o.constructors) { on_obj(c); }
+			parents_.pop_back();
 			on_obj(o);
 		},
 	};
 
 	cur_mod_ = mod;
-	mstack_.push_back(cur_mod_.meta_params);
 
+	parents_.emplace_back(&cur_mod_);
 	for(auto& c:cur_mod_.content) {
 		boost::apply_visitor(before, c.var);
 		boost::apply_visitor(trav_fnc, c.var);
-		mstack_.pop_back();
 	}
 
+	assert(parents_.size()==1);
 	on_obj(cur_mod_);
-	mstack_.pop_back();
+	parents_.clear();
 }
 
 ix3::ast::module& ix3::utils::traverser::module()
@@ -58,9 +63,3 @@ std::string ix3::utils::traverser::path() const
 {
 	return path_;
 }
-
-std::vector<ix3::ast::meta::set> ix3::utils::traverser::meta_stack() const
-{
-	return mstack_;
-}
-

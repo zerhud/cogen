@@ -29,6 +29,7 @@ namespace meta {
 
 bool operator < (const version& left, const version& right);
 bool operator <= (const version& left, const version& right);
+bool operator != (const version& left, const version& right);
 
 } // namespace meta
 

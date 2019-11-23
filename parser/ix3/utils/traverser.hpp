@@ -26,11 +26,23 @@ public:
 	traverser() noexcept =default ;
 	virtual ~traverser() noexcept =default ;
 protected:
+	typedef std::variant<ast::module*, ast::record*, ast::interface*> parent_t;
+
 	ast::module& module() ;
 	void trav_module(const ast::module& mod) ;
 
 	std::string path() const ;
 	std::vector<ast::meta::set> meta_stack() const ;
+
+	template<typename P>
+	P* parent(std::size_t ind)
+	{
+		if(parents_.size() <= ind) return nullptr;
+		std::size_t pind = parents_.size() - ind - 1;
+		if(std::holds_alternative<P*>(parents_[pind]))
+			return std::get<P*>(parents_[pind]);
+		return nullptr;
+	}
 private:
 	virtual void on_obj(ast::module& obj)      { (void)obj; }
 	virtual void on_obj(ast::record& obj)      { (void)obj; }
@@ -53,6 +65,7 @@ private:
 	std::string path_;
 	ast::module cur_mod_;
 	std::vector<ast::meta::set> mstack_;
+	std::vector<parent_t> parents_;
 };
 
 } // namespace ix3::utils

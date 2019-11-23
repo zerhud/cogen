@@ -31,6 +31,7 @@ public:
 
 	struct error : std::runtime_error { error(std::string e) noexcept; };
 	struct parent_version_is_greater : error { parent_version_is_greater() noexcept; };
+	struct module_version_mismatch : error { module_version_mismatch() noexcept ; };
 };
 
 } // namespace ix3::utils
