@@ -11,6 +11,7 @@
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 
 #include "common.hpp"
+#include "grammar/meta.hpp"
 #include "grammar/common.hpp"
 #include "grammar/entity.hpp"
 #include "grammar/functions.hpp"

@@ -8,9 +8,13 @@
 
 #pragma once
 
-#include "ast/common.hpp"
+#include "ast/meta.hpp"
 
 #include <boost/fusion/include/adapt_struct.hpp>
 
-BOOST_FUSION_ADAPT_STRUCT(ix3::ast::type,      name, sub_types)
+BOOST_FUSION_ADAPT_STRUCT(ix3::ast::meta::set, cnt)
+
+BOOST_FUSION_ADAPT_STRUCT(ix3::ast::meta::version,       major_v, minor_v)
+BOOST_FUSION_ADAPT_STRUCT(ix3::ast::meta::depricated,    since, message )
+BOOST_FUSION_ADAPT_STRUCT(ix3::ast::meta::documentation, body)
 

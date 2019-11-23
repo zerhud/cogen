@@ -11,6 +11,7 @@ endmacro()
 
 set(tests_parser
 	rules_common
+	rules_meta
 	rules_functions
 	rules_entity
 	rules_file

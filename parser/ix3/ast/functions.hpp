@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "meta.hpp"
 #include "common.hpp"
 
 namespace ix3::ast {

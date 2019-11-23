@@ -20,10 +20,5 @@ BOOST_SPIRIT_INSTANTIATE( decltype(quoted1_string),   iterator_type, context_typ
 BOOST_SPIRIT_INSTANTIATE( decltype(quoted2_string),   iterator_type, context_type )
 BOOST_SPIRIT_INSTANTIATE( decltype(single_variable_name),   iterator_type, context_type )
 
-BOOST_SPIRIT_INSTANTIATE( decltype(meta_set), iterator_type, context_type )
-BOOST_SPIRIT_INSTANTIATE( decltype(meta_version), iterator_type, context_type )
-BOOST_SPIRIT_INSTANTIATE( decltype(meta_depricated), iterator_type, context_type )
-BOOST_SPIRIT_INSTANTIATE( decltype(meta_documentation), iterator_type, context_type )
-
 BOOST_SPIRIT_INSTANTIATE( decltype(is_required), iterator_type, context_type )
 } // namespace ix3::text

@@ -10,7 +10,9 @@
 
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 
+#include "meta.hpp"
 #include "common.hpp"
+#include "grammar/meta.hpp"
 #include "grammar/functions.hpp"
 
 namespace ix3::text {

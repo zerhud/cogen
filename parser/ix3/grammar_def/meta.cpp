@@ -6,11 +6,14 @@
  * or <http://www.gnu.org/licenses/> for details
  *************************************************************************/
 
-#pragma once
+#include "meta.hpp"
+#include "../parse.hpp"
 
-#include "ast/common.hpp"
+namespace ix3::text {
 
-#include <boost/fusion/include/adapt_struct.hpp>
+BOOST_SPIRIT_INSTANTIATE( decltype(meta_set), iterator_type, context_type )
+BOOST_SPIRIT_INSTANTIATE( decltype(meta_version), iterator_type, context_type )
+BOOST_SPIRIT_INSTANTIATE( decltype(meta_depricated), iterator_type, context_type )
+BOOST_SPIRIT_INSTANTIATE( decltype(meta_documentation), iterator_type, context_type )
 
-BOOST_FUSION_ADAPT_STRUCT(ix3::ast::type,      name, sub_types)
-
+} // namespace ix3::text

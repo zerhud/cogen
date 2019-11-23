@@ -9,7 +9,7 @@
 #pragma once
 
 #include <optional>
-#include "ast/common.hpp"
+#include "ast/meta.hpp"
 
 namespace ix3::ast {
 

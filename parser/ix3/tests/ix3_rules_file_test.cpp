@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(module)
 	BOOST_CHECK_NO_THROW( result = txt::parse(txt::module, data) );
 	BOOST_TEST( result.content.size() == 1 );
 
-	data = "module mod v2.0: enum e{a,b} type fnc()";
+	data = "module mod v2.0: enum e{a,b} type fnc();";
 	BOOST_CHECK_NO_THROW( result = txt::parse(txt::module, data) );
 	BOOST_TEST( result.content.size() == 2 );
 }
