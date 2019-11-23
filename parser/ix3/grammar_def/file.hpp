@@ -26,7 +26,7 @@ auto const module_def = meta_set
 	>> single_variable_name
 	>> meta_version
 	>> ':'
-	>> *(record | function | interface | enumeration)
+	>> *(record | (function >> ';') | interface | enumeration)
 	;
 
 
