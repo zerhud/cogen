@@ -60,5 +60,5 @@ BOOST_AUTO_TEST_CASE(version)
 	result = txt::parse(txt::file_content, data);
 
 	checker ch;
-	BOOST_CHECK_THROW( ch(result), checker::mod_version_is_less );
+	BOOST_CHECK_THROW( ch(result), checker::parent_version_is_greater );
 }

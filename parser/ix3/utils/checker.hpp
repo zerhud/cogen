@@ -30,7 +30,7 @@ public:
 	std::vector<ast::module> extract_result() ;
 
 	struct error : std::runtime_error { error(std::string e) noexcept; };
-	struct mod_version_is_less : error { mod_version_is_less() noexcept; };
+	struct parent_version_is_greater : error { parent_version_is_greater() noexcept; };
 };
 
 } // namespace ix3::utils

@@ -10,7 +10,9 @@
 
 bool ix3::ast::meta::operator < (const version& left, const version& right)
 {
-	return left.major_v < right.major_v && left.minor_v < right.minor_v;
+	if(left.major_v < right.major_v) return true;
+	if(right.major_v < left.major_v) return false;
+	return left.minor_v < right.minor_v;
 }
 
 bool ix3::ast::meta::operator <= (const version& left, const version& right)

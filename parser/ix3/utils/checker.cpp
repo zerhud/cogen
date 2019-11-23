@@ -18,7 +18,7 @@ void ix3::utils::checker::on_obj(ast::record& obj)
 {
 	auto obj_ver = ast::get<ast::meta::version>(obj.meta_params);
 	if(obj_ver) {
-		if(module().version <= *obj_ver) throw mod_version_is_less();
+		if(*obj_ver < module().version) throw parent_version_is_greater();
 	}
 }
 
@@ -55,6 +55,6 @@ std::vector<ix3::ast::module> ix3::utils::checker::extract_result()
 }
 
 ix3::utils::checker::error::error(std::string e) noexcept : std::runtime_error(e) {}
-ix3::utils::checker::mod_version_is_less::mod_version_is_less() noexcept
+ix3::utils::checker::parent_version_is_greater::parent_version_is_greater() noexcept
     : error("module version is less then content versin")
 {}
