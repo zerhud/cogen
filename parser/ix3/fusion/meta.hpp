@@ -14,6 +14,7 @@
 
 BOOST_FUSION_ADAPT_STRUCT(ix3::ast::meta::set, cnt)
 
+BOOST_FUSION_ADAPT_STRUCT(ix3::ast::meta::oapi,          key, val)
 BOOST_FUSION_ADAPT_STRUCT(ix3::ast::meta::version,       major_v, minor_v)
 BOOST_FUSION_ADAPT_STRUCT(ix3::ast::meta::depricated,    since, message )
 BOOST_FUSION_ADAPT_STRUCT(ix3::ast::meta::documentation, body)

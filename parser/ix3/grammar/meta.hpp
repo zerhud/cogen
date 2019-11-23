@@ -17,16 +17,19 @@ namespace ix3::text {
 namespace x3 = boost::spirit::x3;
 
 class meta_set_class;
+class meat_oapi_class;
 class meta_version_class;
 class meta_depricated_class;
 class meta_documentation_class;
 
 const x3::rule<meta_set_class, ast::meta::set> meta_set = "meta_set";
+const x3::rule<meta_version_class, ast::meta::oapi> meta_oapi = "meta_oapi";
 const x3::rule<meta_version_class, ast::meta::version> meta_version = "meta_version";
 const x3::rule<meta_depricated_class, ast::meta::depricated> meta_depricated = "meta_depricated";
 const x3::rule<meta_documentation_class, ast::meta::documentation> meta_documentation = "meta_documentation";
 
 BOOST_SPIRIT_DECLARE(decltype(meta_set))
+BOOST_SPIRIT_DECLARE(decltype(meta_oapi))
 BOOST_SPIRIT_DECLARE(decltype(meta_version))
 BOOST_SPIRIT_DECLARE(decltype(meta_depricated))
 BOOST_SPIRIT_DECLARE(decltype(meta_documentation))

@@ -43,6 +43,13 @@ namespace meta {
 		std::string value() const override ;
 	};
 
+	struct oapi : meta_parameter, x3::position_tagged {
+		std::string key;
+		std::string val;
+		std::string_view name() const override ;
+		std::string value() const override ;
+	};
+
 	struct set {
 		typedef variant_t<version, depricated, documentation> parameter_t;
 		std::vector<parameter_t> cnt;

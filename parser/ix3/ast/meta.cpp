@@ -13,6 +13,7 @@ using namespace std::literals;
 std::string_view ix3::ast::meta::version::name() const { return "versin"sv; }
 std::string_view ix3::ast::meta::depricated::name() const { return "depricated"sv; }
 std::string_view ix3::ast::meta::documentation::name() const { return "documentation"sv; }
+std::string_view ix3::ast::meta::oapi::name() const { return "oapi"sv; }
 
 std::string ix3::ast::meta::version::value() const
 {
@@ -21,10 +22,17 @@ std::string ix3::ast::meta::version::value() const
 
 std::string ix3::ast::meta::depricated::value() const
 {
-	return "since " + since.value() + ": " + message;
+	std::string ret = "since " + since.value();
+	if(!message.empty()) ret += ": " + message;
+	return ret;
 }
 
 std::string ix3::ast::meta::documentation::value() const
 {
 	return body;
+}
+
+std::string ix3::ast::meta::oapi::value() const
+{
+	return key + ": " + val;
 }

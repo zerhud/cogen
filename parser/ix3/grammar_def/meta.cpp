@@ -12,6 +12,7 @@
 namespace ix3::text {
 
 BOOST_SPIRIT_INSTANTIATE( decltype(meta_set), iterator_type, context_type )
+BOOST_SPIRIT_INSTANTIATE( decltype(meta_oapi), iterator_type, context_type )
 BOOST_SPIRIT_INSTANTIATE( decltype(meta_version), iterator_type, context_type )
 BOOST_SPIRIT_INSTANTIATE( decltype(meta_depricated), iterator_type, context_type )
 BOOST_SPIRIT_INSTANTIATE( decltype(meta_documentation), iterator_type, context_type )

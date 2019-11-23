@@ -55,6 +55,16 @@ BOOST_AUTO_TEST_CASE(depricated)
 	BOOST_TEST( result.since.minor_v == 1 );
 }
 
+BOOST_AUTO_TEST_CASE(oapi)
+{
+	ast::meta::oapi result;
+
+	std::string data = "@oapi key=val";
+	BOOST_CHECK_NO_THROW( result = txt::parse(txt::meta_oapi, data) );
+	BOOST_TEST( result.key == "key" );
+	BOOST_TEST( result.val == "val" );
+}
+
 BOOST_AUTO_TEST_CASE(meta_set)
 {
 	ast::meta::set result;
