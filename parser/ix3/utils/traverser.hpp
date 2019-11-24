@@ -26,10 +26,11 @@ public:
 	traverser() noexcept =default ;
 	virtual ~traverser() noexcept =default ;
 protected:
+	enum class trav_direction { paret_first, child_first } ;
 	typedef std::variant<ast::module*, ast::record*, ast::interface*> parent_t;
 
 	ast::module& module() ;
-	void trav_module(const ast::module& mod) ;
+	void trav_module(const ast::module& mod, trav_direction direction = trav_direction::child_first) ;
 
 	std::string path() const ;
 	std::vector<ast::meta::set> meta_stack() const ;
@@ -61,6 +62,23 @@ private:
 	}
 
 	const static std::string pdel;
+
+	template<typename O, typename Fnc>
+	void inner_trav(O& obj, const Fnc& fnc)
+	{
+		make_path(cur_mod_.name, obj.name);
+		if(cur_direction==trav_direction::paret_first)
+			on_obj(obj);
+
+		parents_.emplace_back(&obj);
+		fnc();
+		parents_.pop_back();
+
+		if(cur_direction==trav_direction::child_first)
+			on_obj(obj);
+	}
+
+	trav_direction cur_direction = trav_direction::child_first;
 
 	std::string path_;
 	ast::module cur_mod_;

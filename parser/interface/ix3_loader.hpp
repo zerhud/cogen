@@ -15,9 +15,14 @@
 namespace modegen::parser::interface {
 	
 class ix3_loader : public loader {
+	class details;
+	std::unique_ptr<details> pimpl_;
+	details& pimpl() { return *pimpl_; }
+	const details& pimpl() const { return *pimpl_; }
 public:
 	ix3_loader();
 	ix3_loader(std::vector<FS::path> includes);
+	~ix3_loader() noexcept override ;
 
 	void load(std::istream& input, std::string fn) override ;
 	void load(FS::path file) override ;

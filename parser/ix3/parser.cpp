@@ -26,6 +26,7 @@ ix3::parser::parser(std::vector<std::filesystem::path> incs)
 
 ix3::ast::file_content ix3::parser::parse_stream(std::istream& input) const
 {
+	input >> std::noskipws ;
 	std::istream_iterator<char> end;
 	std::istream_iterator<char> begin(input);
 
@@ -68,7 +69,8 @@ void ix3::parser::parse(std::filesystem::path file)
 
 void ix3::parser::finish_loads()
 {
-	if(cur_dir.empty()) return;
+	if(!finished_ast.empty()) return;
+
 	cur_dir.clear();
 	finished_ast = checker.extract_result();
 }

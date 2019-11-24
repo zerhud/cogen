@@ -59,8 +59,16 @@ struct deprication : meta_parameter {
 	bool add(const meta_parameter& other) override ;
 };
 
+struct oapi : meta_parameter {
+	std::string key;
+	std::string val;
+	std::string_view name() const override;
+	std::string value() const override;
+	bool add(const meta_parameter& other) override ;
+};
+
 struct parameter_set  {
-	typedef std::variant<version,documentation,deprication> parameter_type;
+	typedef std::variant<version,documentation,deprication,oapi> parameter_type;
 	std::vector<parameter_type> set;
 
 	void push_back(parameter_type p);

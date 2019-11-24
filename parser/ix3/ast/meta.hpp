@@ -51,7 +51,7 @@ namespace meta {
 	};
 
 	struct set {
-		typedef variant_t<version, depricated, documentation> parameter_t;
+		typedef variant_t<version, depricated, documentation, oapi> parameter_t;
 		std::vector<parameter_t> cnt;
 	};
 } // namespace meta

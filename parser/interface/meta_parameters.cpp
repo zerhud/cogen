@@ -88,3 +88,19 @@ bool modegen::parser::interface::meta_parameters::deprication::add(const modegen
 	// we cannt have two deprication attribute
 	return false;
 }
+
+std::string_view modegen::parser::interface::meta_parameters::oapi::name() const
+{
+	return "oapi"sv;
+}
+
+std::string modegen::parser::interface::meta_parameters::oapi::value() const
+{
+	return key + ": " + val;
+}
+
+bool modegen::parser::interface::meta_parameters::oapi::add(const modegen::parser::interface::meta_parameter& other)
+{
+	(void)other;
+	return false;
+}

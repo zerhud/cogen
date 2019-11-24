@@ -91,7 +91,7 @@ void ix3::utils::checker::on_obj(ast::constructor& obj)
 
 void ix3::utils::checker::operator() (ast::file_content file)
 {
-	for(auto& m:file.modules) trav_module(m);
+	for(auto& m:file.modules) trav_module(m, trav_direction::child_first);
 }
 
 std::vector<ix3::ast::module> ix3::utils::checker::extract_result()

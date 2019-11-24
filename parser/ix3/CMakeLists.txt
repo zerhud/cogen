@@ -43,6 +43,7 @@ target_sources(${PROJECT_NAME} PRIVATE grammar_def/file.cpp      grammar_def/fil
 
 # utils
 target_sources(${PROJECT_NAME} PRIVATE utils/traverser.cpp utils/traverser.hpp)
+target_sources(${PROJECT_NAME} PRIVATE utils/evaluator.cpp utils/evaluator.hpp)
 target_sources(${PROJECT_NAME} PRIVATE utils/checker.cpp   utils/checker.hpp)
 target_sources(${PROJECT_NAME} PRIVATE utils/meta.cpp      utils/meta.hpp)
 

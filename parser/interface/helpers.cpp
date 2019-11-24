@@ -32,6 +32,11 @@ bool mi::meta_parameters::operator == (const mi::meta_parameters::deprication& l
 	return left.message == right.message && left.since == right.since;
 }
 
+bool mi::meta_parameters::operator == (const oapi& left, const oapi& right)
+{
+	return left.value() == right.value();
+}
+
 bool mi::operator == (const mi::module& left, const mi::module& right)
 {
 	return left.name == right.name

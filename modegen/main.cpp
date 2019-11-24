@@ -27,6 +27,7 @@
 #include "pg/langs/cmake.hpp"
 
 #include "parser/interface/loader.hpp"
+#include "parser/interface/ix3_loader.hpp"
 
 #include "pythongen.hpp"
 
