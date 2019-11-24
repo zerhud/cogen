@@ -8,7 +8,7 @@
 
 #include "cpp.hpp"
 
-#include "part_descriptor.hpp"
+#include "output_configurator.hpp"
 #include "part_manager.hpp"
 #include "part_algos/module.hpp"
 #include "part_algos/interface/common.hpp"

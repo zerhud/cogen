@@ -10,13 +10,13 @@
 
 #include <regex>
 #include <vector>
-#include "pg/part_descriptor.hpp"
+#include "pg/output_configurator.hpp"
 #include "pg/options.hpp"
 
 namespace modegen::pg {
 
 /// a single part in info file. manages lang compiler.
-class info_part : public part_descriptor {
+class info_part : public outout_configurator {
 	enum class fgmode { single, map };
 	provider_const_ptr prov_;
 	options::part_view setts;

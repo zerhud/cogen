@@ -74,8 +74,9 @@ target_include_directories(part_generation PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" 
 target_include_directories(part_generation SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
 target_link_libraries(part_generation PRIVATE stdc++fs)
 
+target_sources_local(part_generation "declarations.hpp"      "declarations.cpp"      "pg/")
 target_sources_local(part_generation "generator.hpp"         "generator.cpp"         "pg/")
-target_sources_local(part_generation "part_descriptor.hpp"   "part_descriptor.cpp"   "pg/")
+target_sources_local(part_generation "output_configurator.hpp"                    "" "pg/")
 target_sources_local(part_generation "info_part.hpp"         "info_part.cpp"         "pg/")
 target_sources_local(part_generation "part_algos.hpp"        "part_algos.cpp"        "pg/")
 target_sources_local(part_generation "module.hpp"            "module.cpp"            "pg/part_algos/")

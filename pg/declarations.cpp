@@ -7,7 +7,7 @@
  *************************************************************************/
 
 #include <cassert>
-#include "part_descriptor.hpp"
+#include "declarations.hpp"
 #include "exceptions.hpp"
 
 namespace mpg = modegen::pg;
@@ -66,4 +66,3 @@ mpg::from_string::operator mpg::name_conversion() const
 	if(val=="as_is"sv) return name_conversion::as_is;
 	throw errors::error("no such name_conversion: "s + std::string(val));
 }
-

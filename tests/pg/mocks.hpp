@@ -10,7 +10,7 @@
 #include <turtle/mock.hpp>
 
 #include "pg/provider.hpp"
-#include "pg/part_descriptor.hpp"
+#include "pg/output_configurator.hpp"
 #include "pg/output_descriptor.hpp"
 #include "pg/part_algos.hpp"
 #include "pg/options.hpp"
@@ -36,7 +36,7 @@ MOCK_BASE_CLASS( provider, modegen::pg::provider)
 	MOCK_METHOD( resolve_file, 3 )
 };
 
-MOCK_BASE_CLASS( part, modegen::pg::part_descriptor )
+MOCK_BASE_CLASS( part, modegen::pg::outout_configurator )
 {
 	MOCK_METHOD( tmpl_file, 0 )
 	MOCK_METHOD( lang, 0 )

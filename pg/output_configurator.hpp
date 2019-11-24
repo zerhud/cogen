@@ -14,9 +14,9 @@
 
 namespace modegen::pg {
 
-class part_descriptor {
+class outout_configurator {
 public:
-	virtual ~part_descriptor() noexcept =default ;
+	virtual ~outout_configurator() noexcept =default ;
 
 	virtual FS::path tmpl_file() const =0 ;
 	virtual output_lang lang() const =0 ;

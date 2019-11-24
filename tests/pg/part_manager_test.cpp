@@ -12,7 +12,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "mocks.hpp"
-#include "pg/part_descriptor.hpp"
+#include "pg/output_configurator.hpp"
 #include "pg/part_manager.hpp"
 #include "pg/exceptions.hpp"
 

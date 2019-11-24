@@ -17,7 +17,7 @@
 #include "pg/provider.hpp"
 #include "pg/generator.hpp"
 #include "pg/options.hpp"
-#include "pg/part_descriptor.hpp"
+#include "pg/output_configurator.hpp"
 #include "pg/exceptions.hpp"
 
 namespace mpg = modegen::pg;
