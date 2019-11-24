@@ -8,15 +8,15 @@
 
 #include <fstream>
 
-#include "loader.hpp"
 #include "parse.hpp"
+#include "parser.hpp"
 #include "grammar/all.hpp"
 
 using namespace std::literals;
 
-ix3::loader::loader() noexcept =default ;
+ix3::parser::parser() noexcept =default ;
 
-ix3::loader::loader(std::vector<std::filesystem::path> incs)
+ix3::parser::parser(std::vector<std::filesystem::path> incs)
 	: includes_dir(std::move(incs))
 {
 	for(auto& id:includes_dir) {
@@ -24,7 +24,7 @@ ix3::loader::loader(std::vector<std::filesystem::path> incs)
 	}
 }
 
-ix3::ast::file_content ix3::loader::parse_stream(std::istream& input) const
+ix3::ast::file_content ix3::parser::parse_stream(std::istream& input) const
 {
 	std::istream_iterator<char> end;
 	std::istream_iterator<char> begin(input);
@@ -36,7 +36,7 @@ ix3::ast::file_content ix3::loader::parse_stream(std::istream& input) const
 	return text::parse(text::file_content, data, text::parser_env{});
 }
 
-void ix3::loader::load(std::istream& input, std::string fn)
+void ix3::parser::parse(std::istream& input, std::string fn)
 {
 	ast::file_content result = parse_stream(input);
 
@@ -50,12 +50,12 @@ void ix3::loader::load(std::istream& input, std::string fn)
 
 	loaded_files.emplace_back(result.path);
 
-	for(auto& i:result.includes) load(search_file(i.path));
+	for(auto& i:result.includes) parse(search_file(i.path));
 
 	checker(std::move(result));
 }
 
-void ix3::loader::load(std::filesystem::path file)
+void ix3::parser::parse(std::filesystem::path file)
 {
 	if(!file.is_absolute()) throw std::runtime_error("cannot load relative path"s);
 	if(!std::filesystem::exists(file)) throw std::runtime_error("file "s + file.string() + " doesn't exists"s);
@@ -63,28 +63,28 @@ void ix3::loader::load(std::filesystem::path file)
 	if(already_loaded(file)) return;
 
 	std::fstream file_stream(file.generic_u8string());
-	load(file_stream, file.generic_u8string());
+	parse(file_stream, file.generic_u8string());
 }
 
-void ix3::loader::finish_loads()
+void ix3::parser::finish_loads()
 {
 	if(cur_dir.empty()) return;
 	cur_dir.clear();
 	finished_ast = checker.extract_result();
 }
 
-std::vector<ix3::ast::module> ix3::loader::result() const
+std::vector<ix3::ast::module> ix3::parser::result() const
 {
 	return finished_ast;
 }
 
-bool ix3::loader::already_loaded(const std::filesystem::path& p) const
+bool ix3::parser::already_loaded(const std::filesystem::path& p) const
 {
 	for(auto& i:loaded_files) if(i==p) return true;
 	return false;
 }
 
-std::filesystem::path ix3::loader::search_file(const std::filesystem::path& f) const
+std::filesystem::path ix3::parser::search_file(const std::filesystem::path& f) const
 {
 	for(auto i=cur_dir.rbegin();i!=cur_dir.rend();++i) {
 		assert(i->is_absolute());

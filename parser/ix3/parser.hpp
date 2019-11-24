@@ -14,20 +14,20 @@
 
 namespace ix3 {
 
-class loader {
+class parser {
 public:
-	loader(const loader&) =delete ;
-	loader& operator = (const loader&) =delete ;
+	parser(const parser&) =delete ;
+	parser& operator = (const parser&) =delete ;
 
-	loader(loader&& other) noexcept =default ;
-	loader& operator = (loader&& other) noexcept =default ;
+	parser(parser&& other) noexcept =default ;
+	parser& operator = (parser&& other) noexcept =default ;
 
-	loader() noexcept ;
-	loader(std::vector<std::filesystem::path> incs);
-	virtual ~loader() noexcept =default ;
+	parser() noexcept ;
+	parser(std::vector<std::filesystem::path> incs);
+	virtual ~parser() noexcept =default ;
 
-	void load(std::istream& input, std::string fn) ;
-	void load(std::filesystem::path file) ;
+	void parse(std::istream& input, std::string fn) ;
+	void parse(std::filesystem::path file) ;
 	void finish_loads() ;
 
 	std::vector<ix3::ast::module> result() const ;
