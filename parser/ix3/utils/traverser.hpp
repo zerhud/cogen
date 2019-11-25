@@ -14,7 +14,7 @@ namespace ix3::utils {
 
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
-	
+
 class traverser {
 public:
 	traverser(const traverser&) =delete ;
@@ -27,7 +27,7 @@ public:
 	virtual ~traverser() noexcept =default ;
 protected:
 	enum class trav_direction { paret_first, child_first } ;
-	typedef std::variant<ast::module*, ast::record*, ast::interface*> parent_t;
+	typedef std::variant<ast::module*, ast::record*, ast::interface*, ast::function*, ast::enumeration*> parent_t;
 
 	ast::module& module() ;
 	void trav_module(const ast::module& mod, trav_direction direction = trav_direction::child_first) ;
@@ -52,6 +52,15 @@ private:
 	virtual void on_obj(ast::enumeration& obj) { (void)obj; }
 	virtual void on_obj(ast::record_item& obj) { (void)obj; }
 	virtual void on_obj(ast::constructor& obj) { (void)obj; }
+
+	virtual void on_obj(ast::enum_element& obj)       { (void)obj; }
+	virtual void on_obj(ast::function_parameter& obj) { (void)obj; }
+
+	virtual void on_obj(ast::meta::set& obj)           { (void)obj; }
+	virtual void on_obj(ast::meta::oapi& obj)          { (void)obj; }
+	virtual void on_obj(ast::meta::version& obj)       { (void)obj; }
+	virtual void on_obj(ast::meta::depricated& obj)    { (void)obj; }
+	virtual void on_obj(ast::meta::documentation& obj) { (void)obj; }
 
 	template<typename T, typename... Args>
 	std::string make_path(T&& v1, Args... v)

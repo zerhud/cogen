@@ -18,8 +18,16 @@ void ix3::utils::traverser::trav_module(const ast::module& mod, trav_direction d
 	parents_.clear();
 
 	auto trav_fnc = overloaded {
-		[this](ast::function& o)   { on_obj(o); },
-		[this](ast::enumeration& o){ on_obj(o); },
+		[this](ast::function& o){
+			inner_trav(o, [this,&o](){
+				for(auto&p:o.params) on_obj(p);
+			});
+		},
+		[this](ast::enumeration& o){
+			inner_trav(o, [this,&o](){
+				for(auto&e:o.elements) on_obj(e);
+			});
+		},
 		[this](ast::record& o){
 		    inner_trav(o, [this,&o](){
 				for(auto&i:o.members) { on_obj(i); }
