@@ -53,9 +53,9 @@ void ix3_to_modegen::on_obj(ix3::ast::record& obj)
 	mpi::record cr;
 	cr.name = obj.name;
 	cr.use_as_exception = obj.use_as_exception;
-	result.back().content.emplace_back(std::move(cr));
-
 	cr.meta_params = cvt(obj.meta_params);
+
+	result.back().content.emplace_back(std::move(cr));
 }
 
 void ix3_to_modegen::on_obj(ix3::ast::function& obj)
@@ -65,9 +65,11 @@ void ix3_to_modegen::on_obj(ix3::ast::function& obj)
 	cf.is_static = obj.is_static;
 	cf.is_mutable = obj.is_mutable;
 	cf.return_type = cvt(obj.return_type);
-	result.back().content.emplace_back(std::move(cf));
-
 	cf.meta_params = cvt(obj.meta_params);
+	for(auto& p:obj.params)
+		cf.func_params.emplace_back(mpi::func_param{p.name, cvt(p.param_type)});
+
+	result.back().content.emplace_back(std::move(cf));
 }
 
 void ix3_to_modegen::on_obj(ix3::ast::interface& obj)
@@ -76,9 +78,9 @@ void ix3_to_modegen::on_obj(ix3::ast::interface& obj)
 	ci.name = obj.name;
 	ci.use_as_exception = obj.use_as_exception;
 	ci.realization_in_client = obj.realization_in_client;
-	result.back().content.emplace_back(std::move(ci));
-
 	ci.meta_params = cvt(obj.meta_params);
+
+	result.back().content.emplace_back(std::move(ci));
 }
 
 void ix3_to_modegen::on_obj(ix3::ast::enumeration& obj)
@@ -89,9 +91,9 @@ void ix3_to_modegen::on_obj(ix3::ast::enumeration& obj)
 	ce.use_bitmask = obj.use_bitmask;
 	for(auto& e:obj.elements)
 		ce.elements.emplace_back(mpi::enum_element{e.name, e.io});
-	result.back().content.emplace_back(std::move(ce));
-
 	ce.meta_params = cvt(obj.meta_params);
+
+	result.back().content.emplace_back(std::move(ce));
 }
 
 void ix3_to_modegen::on_obj(ix3::ast::record_item& obj)
@@ -101,9 +103,10 @@ void ix3_to_modegen::on_obj(ix3::ast::record_item& obj)
 	cri.param_type = cvt(obj.param_type);
 
 	mpi::record& rec = std::get<mpi::record>(result.back().content.back());
-	rec.members.emplace_back(std::move(cri));
 
 	cri.meta_params = cvt(obj.meta_params);
+
+	rec.members.emplace_back(std::move(cri));
 }
 
 mpi::type ix3_to_modegen::cvt(const ix3::ast::type &obj) const

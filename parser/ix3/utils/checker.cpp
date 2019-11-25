@@ -70,6 +70,7 @@ void ix3::utils::checker::on_obj(ast::interface& obj)
 
 void ix3::utils::checker::on_obj(ast::enumeration& obj)
 {
+	if(obj.gen_io) for(auto& en:obj.elements) if(en.io.empty()) en.io = en.name;
 	details::require_mod_version_is_less(module(), obj);
 }
 
