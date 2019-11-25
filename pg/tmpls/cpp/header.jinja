@@ -12,6 +12,7 @@ namespace <= render.gen_namespace_name(module, cdata) => {
 <= render.decl_depricated(obj) =>
 struct <= obj.name => {
 <%- for mem in obj.members %>
+	<= render.decl_meta_params(mem) =>
 	<= render.type(mem.par_type) => <= mem.name =>;
 <%- endfor %>
 };
