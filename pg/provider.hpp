@@ -26,7 +26,7 @@ class provider {
 public:
 	virtual ~provider() noexcept =default ;
 	//TODO: we need vector here and create all algos at once..
-	virtual std::unique_ptr<part_algos> create_algos(input_lang il) const =0 ;
+	virtual std::unique_ptr<configuration_algos> create_algos(input_lang il) const =0 ;
 	virtual part_descriptor_ptr create_part(options::part_view&& ps) const =0 ;
 	virtual output_descriptor_ptr create_output(output_lang lng, FS::path p, std::vector<std::any> data) const =0 ;
 	virtual std::vector<parser::loader_ptr> input() const =0 ;

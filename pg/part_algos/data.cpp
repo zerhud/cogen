@@ -17,7 +17,7 @@ ma::data_algos::data_algos(const std::vector<mp::loader_ptr>& ldrs)
 	(void)ldrs;
 }
 
-mg::part_algos::mapped_data ma::data_algos::map_to(mg::part_algos::mapped_data md)
+mg::configuration_algos::mapped_data ma::data_algos::map_to(mg::configuration_algos::mapped_data md)
 {
 	return md;
 }

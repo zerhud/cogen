@@ -45,9 +45,9 @@ public:
 		(void)self_path;
 	}
 
-	std::unique_ptr<mg::part_algos> create_algos(mg::input_lang il) const override
+	std::unique_ptr<mg::configuration_algos> create_algos(mg::input_lang il) const override
 	{
-		if(il==mg::input_lang::mdl) return std::make_unique<mg::palgos::module_algos>(input());
+		if(il==mg::input_lang::mdl) return std::make_unique<mg::palgos::interface_conf_algos>(input());
 		if(il==mg::input_lang::data) return std::make_unique<mg::palgos::data_algos>(input());
 		assert(false);
 		throw std::runtime_error("language algos not implemented for "s + to_string(il));

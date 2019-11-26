@@ -18,7 +18,7 @@
 
 namespace pgmocks {
 
-MOCK_BASE_CLASS( part_alogs,  modegen::pg::part_algos )
+MOCK_BASE_CLASS( part_alogs,  modegen::pg::configuration_algos )
 {
 	MOCK_METHOD( map, 1 )
 	MOCK_METHOD( map_to, 1 )

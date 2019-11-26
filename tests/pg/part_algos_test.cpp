@@ -22,9 +22,9 @@ using namespace std::literals;
 
 namespace pgmocks
 {
-	mg::part_algos::mapped_data map_str(std::string s)
+	mg::configuration_algos::mapped_data map_str(std::string s)
 	{
-		mg::part_algos::mapped_data ret;
+		mg::configuration_algos::mapped_data ret;
 		ret[s];
 		return ret;
 	}
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(result)
 	auto ildr = std::make_shared<pgmocks::iloader>();
 	MOCK_EXPECT(ildr->result).once().returns(pf.mods);
 
-	pa::module_algos ma({ildr});
+	pa::interface_conf_algos ma({ildr});
 	auto maps = mapk_to_vec(ma.map_to(map_str("test"s)));
 	BOOST_REQUIRE_EQUAL(maps.size(), 1);
 	BOOST_CHECK_EQUAL(maps[0], "test"s);
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(result)
 	auto ildr = std::make_shared<pgmocks::iloader>();
 	MOCK_EXPECT(ildr->result).once().returns(pf.mods);
 
-	pa::module_algos ma({ildr});
+	pa::interface_conf_algos ma({ildr});
 	auto outs = mapk_to_vec(ma.map_to(map_str("test_$mod_$va_$vi"s)));
 	BOOST_REQUIRE_EQUAL(outs.size(), 4);
 
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(same_map)
 	auto ildr = std::make_shared<pgmocks::iloader>();
 	MOCK_EXPECT(ildr->result).once().returns(pf.mods);
 
-	pa::module_algos ma({ildr});
+	pa::interface_conf_algos ma({ildr});
 	auto outs = mapk_to_vec(ma.map_to(map_str("test_$mod_$va_$vi"s)));
 	BOOST_REQUIRE_EQUAL(outs.size(), 4);
 
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(was_not_map_to)
 	auto pf = pi::parse("module m1 v1.0: module m1 v1.1: module m2 v1.0: module m2 v2.0:"sv);
 	auto ildr = std::make_shared<pgmocks::iloader>();
 	MOCK_EXPECT(ildr->result).once().returns(pf.mods);
-	pa::module_algos ma({ildr});
+	pa::interface_conf_algos ma({ildr});
 	BOOST_CHECK_THROW( ma.map_from("$mod"), modegen::pg::errors::error );
 }
 BOOST_AUTO_TEST_SUITE_END() // map_from

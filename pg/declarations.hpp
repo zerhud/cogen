@@ -40,7 +40,7 @@ class generator;
 class outout_configurator;
 class output_descriptor;
 class part_manager;
-class part_algos;
+class configuration_algos;
 
 struct jinja_env;
 
@@ -48,7 +48,7 @@ typedef std::shared_ptr<provider> provider_ptr;
 typedef std::shared_ptr<const provider> provider_const_ptr;
 typedef std::shared_ptr<outout_configurator> part_descriptor_ptr;
 typedef std::shared_ptr<output_descriptor> output_descriptor_ptr;
-typedef std::shared_ptr<part_algos> part_algos_ptr;
+typedef std::shared_ptr<configuration_algos> part_algos_ptr;
 
 /// helpers and abstractions for read options.
 /// for access to options should be used clases from this namespace.

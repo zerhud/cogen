@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(normal)
 	setts->raw().put("part.fcpp.file", "test_$mod_$va_$vi.cpp");
 	auto pd = std::make_shared<mpg::info_part>(mpg::options::part_view(setts, "fcpp"sv));
 
-	using mapped_data = mpg::part_algos::mapped_data;
+	using mapped_data = mpg::configuration_algos::mapped_data;
 	auto ret_algos = [](mpg::input_lang){
 		auto algos = std::make_unique<pgmocks::part_alogs>();
 		MOCK_EXPECT(algos->set_filter).once();

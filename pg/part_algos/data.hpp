@@ -13,7 +13,7 @@
 
 namespace modegen::pg::palgos {
 
-class data_algos : public part_algos {
+class data_algos : public configuration_algos {
 public:
 	data_algos(const std::vector<modegen::parser::loader_ptr>& ldrs);
 	void set_filter(const options::part_view& pinfo) override ;

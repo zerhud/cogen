@@ -77,7 +77,7 @@ void mpg::info_part::build_outputs(mpg::provider_const_ptr prov)
 
 	auto [mode, ftmpl] = outinfo();
 
-	part_algos::mapped_data mapped;
+	configuration_algos::mapped_data mapped;
 	mapped[ftmpl] = {};
 
 	for(auto& alg:algos_) mapped = alg->map_to(std::move(mapped));

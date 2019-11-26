@@ -23,7 +23,7 @@ namespace mpp = modegen::pg::palgos;
 namespace mpi = modegen::parser::interface;
 using namespace std::literals;
 
-mpp::module_algos::module_algos(const std::vector<modegen::parser::loader_ptr>& ldrs)
+mpp::interface_conf_algos::interface_conf_algos(const std::vector<modegen::parser::loader_ptr>& ldrs)
 {
 	std::shared_ptr<parser::interface::loader> mldr;
 	for(auto ldr:ldrs) if((mldr = std::dynamic_pointer_cast<mpi::loader>(ldr))) break;
@@ -32,7 +32,7 @@ mpp::module_algos::module_algos(const std::vector<modegen::parser::loader_ptr>& 
 	mods_ = mldr->result();
 }
 
-mp::part_algos::mapped_data mpp::module_algos::map_to(mp::part_algos::mapped_data md)
+mp::configuration_algos::mapped_data mpp::interface_conf_algos::map_to(mp::configuration_algos::mapped_data md)
 {
 	mapped_.clear();
 	mapped_data ret;
@@ -48,7 +48,7 @@ mp::part_algos::mapped_data mpp::module_algos::map_to(mp::part_algos::mapped_dat
 	return ret;
 }
 
-std::map<std::string,std::any> mpp::module_algos::map_to_str(const std::string& tmpl)
+std::map<std::string,std::any> mpp::interface_conf_algos::map_to_str(const std::string& tmpl)
 {
 	tmpl_ = tmpl;
 	mapped_ = inner_map(tmpl);
@@ -58,7 +58,7 @@ std::map<std::string,std::any> mpp::module_algos::map_to_str(const std::string& 
 	return ret;
 }
 
-std::map<std::string, std::vector<std::string>> mpp::module_algos::map_from(const std::string& tmpl)
+std::map<std::string, std::vector<std::string>> mpp::interface_conf_algos::map_from(const std::string& tmpl)
 {
 	auto mapped = inner_map(tmpl);
 	std::map<std::string, std::vector<std::string>> ret;
@@ -71,7 +71,7 @@ std::map<std::string, std::vector<std::string>> mpp::module_algos::map_from(cons
 	return ret;
 }
 
-void mpp::module_algos::set_filter(const options::part_view& pinfo)
+void mpp::interface_conf_algos::set_filter(const options::part_view& pinfo)
 {
 	using namespace mpp::interface;
 	using namespace options;
@@ -85,7 +85,7 @@ void mpp::module_algos::set_filter(const options::part_view& pinfo)
 		;
 }
 
-std::vector<std::string> mpp::module_algos::map(const std::string& tmpl) const
+std::vector<std::string> mpp::interface_conf_algos::map(const std::string& tmpl) const
 {
 	using namespace std::literals;
 
@@ -102,7 +102,7 @@ std::vector<std::string> mpp::module_algos::map(const std::string& tmpl) const
 	return ret;
 }
 
-bool mpp::module_algos::replace(std::string& tmpl, const std::string& var_name, const std::string& value) const
+bool mpp::interface_conf_algos::replace(std::string& tmpl, const std::string& var_name, const std::string& value) const
 {
 	auto pos = tmpl.find(var_name);
 	bool found = pos!=std::string::npos;
@@ -110,7 +110,7 @@ bool mpp::module_algos::replace(std::string& tmpl, const std::string& var_name, 
 	return found;
 }
 
-std::map<std::string, std::vector<mpi::module>> mpp::module_algos::inner_map(const std::string& tmpl) const
+std::map<std::string, std::vector<mpi::module>> mpp::interface_conf_algos::inner_map(const std::string& tmpl) const
 {
 	std::map<std::string, std::vector<mpi::module>> ret;
 
@@ -132,14 +132,14 @@ std::map<std::string, std::vector<mpi::module>> mpp::module_algos::inner_map(con
 	return ret;
 }
 
-std::string mpp::module_algos::require_data(const mpi::module& mod) const
+std::string mpp::interface_conf_algos::require_data(const mpi::module& mod) const
 {
 	using namespace modegen::parser::interface;
 	for(auto& [file,imods]:mapped_) for(auto& imod:imods) if(imod==mod) return file;
 	throw errors::error("cannot find module "s+mod.name+" in mapped to files");
 }
 
-std::vector<modegen::parser::interface::module> mpp::module_algos::mods() const
+std::vector<modegen::parser::interface::module> mpp::interface_conf_algos::mods() const
 {
 	return mods_;
 }
