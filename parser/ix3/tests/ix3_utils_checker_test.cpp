@@ -16,6 +16,7 @@
 #include "parse.hpp"
 #include "grammar/all.hpp"
 #include "utils/checker.hpp"
+#include "utils/meta.hpp"
 
 namespace ast = ix3::ast;
 namespace txt = ix3::text;
@@ -77,6 +78,27 @@ BOOST_AUTO_TEST_CASE(version)
 	       "@v1.2 record r{+type a;} "
 	       "@v1.2 type f(); "s;
 	result = txt::parse(txt::file_content, data);
-	ch(result);
-	//BOOST_CHECK_NO_THROW( ch(result) );
+	BOOST_CHECK_NO_THROW( ch(result) );
+}
+
+BOOST_AUTO_TEST_CASE(unite)
+{
+	checker ch;
+	ast::file_content result;
+
+	std::string data = "module mod1 v1.1: module mod1 v1.1:"s;
+	result = txt::parse(txt::file_content, data);
+	BOOST_CHECK_NO_THROW( ch(result) );
+	auto mods = ch.extract_result();
+	BOOST_TEST( mods.size() == 1 );
+
+	data = "module mod1 v1.1: #docs\nmodule mod1 v1.1: type foo();"s;
+	result = txt::parse(txt::file_content, data);
+	BOOST_CHECK_NO_THROW( ch(result) );
+	mods = ch.extract_result();
+	BOOST_REQUIRE_EQUAL( mods.size(), 1 );
+	BOOST_TEST( mods[0].content.size() == 1 );
+	BOOST_TEST( mods[0].meta_params.cnt.size() == 2 );
+	BOOST_TEST( ast::get<ast::meta::version>(mods[0].meta_params).has_value() );
+	BOOST_TEST( ast::get<ast::meta::documentation>(mods[0].meta_params).has_value() );
 }

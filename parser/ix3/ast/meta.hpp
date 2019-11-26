@@ -20,6 +20,9 @@ public:
 };
 
 namespace meta {
+	struct version;
+	bool operator == (const version& left, const version& right) noexcept ;
+
 	struct version : meta_parameter, x3::position_tagged {
 		std::int64_t major_v;
 		std::int64_t minor_v;

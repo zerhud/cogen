@@ -10,6 +10,11 @@
 
 using namespace std::literals;
 
+bool ix3::ast::meta::operator == (const version& left, const version& right) noexcept
+{
+	return left.major_v == right.major_v && left.minor_v == right.minor_v;
+}
+
 std::string_view ix3::ast::meta::version::name() const { return "versin"sv; }
 std::string_view ix3::ast::meta::depricated::name() const { return "depricated"sv; }
 std::string_view ix3::ast::meta::documentation::name() const { return "documentation"sv; }

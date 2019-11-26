@@ -30,6 +30,29 @@ void require_parent_version_is_less(Parent& par, T& obj)
 
 } // namespace ix3::utils::details
 
+ix3::ast::module* ix3::utils::checker::find_same(const ast::module& mod)
+{
+	for(auto& m:result) {
+		if(m.name == mod.name && m.version == mod.version)
+			return &m;
+	}
+
+	return nullptr;
+}
+
+void ix3::utils::checker::merge(ast::module& to, ast::module& from)
+{
+	for(auto& cnt:from.content)
+		to.content.emplace_back(std::move(cnt));
+	from.content.clear();
+
+	for(auto& mp:from.meta_params.cnt) {
+		if(mp.var.type() != typeid(ast::meta::version))
+			to.meta_params.cnt.emplace_back(std::move(mp));
+	}
+	from.meta_params.cnt.clear();
+}
+
 void ix3::utils::checker::on_obj(ast::module& obj)
 {
 	auto obj_ver = ast::get<ast::meta::version>(obj.meta_params);
@@ -38,7 +61,9 @@ void ix3::utils::checker::on_obj(ast::module& obj)
 
 	if(!obj_ver) obj.meta_params.cnt.emplace_back(obj.version);
 
-	result.emplace_back(obj);
+	ast::module* same = find_same(obj);
+	if(same) merge(*same, obj);
+	else result.emplace_back(obj);
 }
 
 void ix3::utils::checker::on_obj(ast::record& obj)

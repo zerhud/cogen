@@ -23,6 +23,9 @@ class checker : public traverser {
 	void on_obj(ast::enumeration& obj) override ;
 	void on_obj(ast::record_item& obj) override ;
 	void on_obj(ast::constructor& obj) override ;
+
+	ast::module* find_same(const ast::module& mod) ;
+	void merge(ast::module& to, ast::module& from);
 public:
 	checker() noexcept =default ;
 
