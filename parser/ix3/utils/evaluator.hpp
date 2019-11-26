@@ -12,6 +12,26 @@
 
 namespace ix3::utils {
 
+class evaluator;
+
+template<typename Cvt>
+std::result_of_t<Cvt(std::vector<ast::module>&)> operator | (std::vector<ast::module>& m, Cvt& c)
+{
+	return c(m);
+}
+
+template<typename Cvt>
+std::result_of_t<Cvt(std::vector<ast::module>&)> operator | (std::vector<ast::module>& m, const Cvt& c)
+{
+	return c(m);
+}
+
+template<typename Cvt>
+std::result_of_t<Cvt(std::vector<ast::module>&)> operator | (std::vector<ast::module>& m, Cvt&& c)
+{
+	return c(m);
+}
+
 class evaluator : public traverser {
 public:
 	std::vector<ast::module>& operator () (std::vector<ast::module>& mods);
