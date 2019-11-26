@@ -17,6 +17,7 @@ set(tests_parser
 	rules_file
 	utils_checker
 	utils_selector
+	utils_remove_empty
 	)
 foreach(tname ${tests_parser})
 	add_unit_test(${tname} "tests/" "${PROJECT_NAME}")
