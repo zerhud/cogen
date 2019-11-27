@@ -48,6 +48,7 @@ target_sources(${PROJECT_NAME} PRIVATE utils/checker.cpp       utils/checker.hpp
 target_sources(${PROJECT_NAME} PRIVATE utils/meta.cpp          utils/meta.hpp)
 target_sources(${PROJECT_NAME} PRIVATE utils/selector.cpp      utils/selector.hpp)
 target_sources(${PROJECT_NAME} PRIVATE utils/remove_empty.cpp  utils/remove_empty.hpp)
+target_sources(${PROJECT_NAME} PRIVATE utils/filter.cpp        utils/filter.hpp)
 
 
 if(enable_tests)

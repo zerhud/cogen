@@ -18,6 +18,7 @@ set(tests_parser
 	utils_checker
 	utils_selector
 	utils_remove_empty
+	utils_filter
 	)
 foreach(tname ${tests_parser})
 	add_unit_test(${tname} "tests/" "${PROJECT_NAME}")
