@@ -10,7 +10,7 @@
 
 #include "provider.hpp"
 #include "output_descriptor.hpp"
-#include "part_algos.hpp"
+#include "configuration_algos.hpp"
 #include "exceptions.hpp"
 
 namespace mpg = modegen::pg;

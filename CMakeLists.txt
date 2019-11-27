@@ -78,7 +78,7 @@ target_sources_local(part_generation "declarations.hpp"      "declarations.cpp" 
 target_sources_local(part_generation "generator.hpp"         "generator.cpp"         "pg/")
 target_sources_local(part_generation "output_configurator.hpp"                    "" "pg/")
 target_sources_local(part_generation "info_part.hpp"         "info_part.cpp"         "pg/")
-target_sources_local(part_generation "part_algos.hpp"        "part_algos.cpp"        "pg/")
+target_sources_local(part_generation "configuration_algos.hpp"                    "" "pg/")
 target_sources_local(part_generation "module.hpp"            "module.cpp"            "pg/part_algos/")
 target_sources_local(part_generation "data.hpp"              "data.cpp"              "pg/part_algos/")
 target_sources_local(part_generation "to_json.hpp"           "to_json.cpp"           "pg/part_algos/interface/")

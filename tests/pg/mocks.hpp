@@ -12,7 +12,7 @@
 #include "pg/provider.hpp"
 #include "pg/output_configurator.hpp"
 #include "pg/output_descriptor.hpp"
-#include "pg/part_algos.hpp"
+#include "pg/configuration_algos.hpp"
 #include "pg/options.hpp"
 #include "parser/interface/loader.hpp"
 

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "../part_algos.hpp"
+#include "../configuration_algos.hpp"
 #include "parser/loader.hpp"
 
 namespace modegen::pg::palgos {
