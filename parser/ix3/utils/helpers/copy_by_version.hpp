@@ -9,6 +9,8 @@
 #pragma once
 
 #include <vector>
+#include <string>
+#include "ast/file.hpp"
 #include "../meta.hpp"
 
 namespace ix3::utils::helpers {
@@ -18,7 +20,12 @@ class copy_by_version {
 	std::vector<T> objs;
 	ObjectTraits traits;
 public:
-	copy_by_version(T obj, ObjectTraits ot=ObjectTraits{}) : objs{obj}, traits(std::move(ot)) {}
+	copy_by_version(T obj, ObjectTraits ot=ObjectTraits{})
+	    : objs{obj}
+	    , traits(std::move(ot))
+	{
+		traits.clear_content(objs[0]);
+	}
 
 	std::vector<T>& mods() { return objs; }
 
