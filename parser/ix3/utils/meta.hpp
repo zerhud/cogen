@@ -25,6 +25,21 @@ std::optional<Meta> get(const meta::set& s)
 	return std::nullopt;
 }
 
+template<typename Meta>
+void set(meta::set& s, Meta val)
+{
+	for(auto& c:s.cnt)
+	{
+		Meta* m = boost::get<Meta>(&c.var);
+		if(m) {
+			*m = std::move(val);
+			return;
+		}
+	}
+
+	s.cnt.emplace_back(std::move(val));
+}
+
 namespace meta {
 
 bool operator < (const version& left, const version& right);

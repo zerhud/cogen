@@ -50,6 +50,7 @@ target_sources(${PROJECT_NAME} PRIVATE utils/selector.cpp          utils/selecto
 target_sources(${PROJECT_NAME} PRIVATE utils/remove_empty.cpp      utils/remove_empty.hpp)
 target_sources(${PROJECT_NAME} PRIVATE utils/filter.cpp            utils/filter.hpp)
 target_sources(${PROJECT_NAME} PRIVATE utils/split_by_version.cpp  utils/split_by_version.hpp)
+target_sources(${PROJECT_NAME} PRIVATE utils/helpers/copy_by_version.hpp utils/helpers/copy_by_version_traits.hpp utils/helpers/copy_by_version_traits.cpp)
 
 
 if(enable_tests)

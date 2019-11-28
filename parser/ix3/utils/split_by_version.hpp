@@ -12,6 +12,7 @@
 #include "evaluator.hpp"
 #include "ast/file.hpp"
 #include "helpers/copy_by_version.hpp"
+#include "helpers/copy_by_version_traits.hpp"
 
 namespace ix3::utils {
 

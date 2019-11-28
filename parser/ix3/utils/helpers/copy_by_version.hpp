@@ -10,7 +10,6 @@
 
 #include <vector>
 #include <string>
-#include "ast/file.hpp"
 #include "../meta.hpp"
 
 namespace ix3::utils::helpers {
@@ -89,24 +88,6 @@ public:
 			if(found) *found = child;
 			else traits.add_child(obj, child);
 		}
-	}
-};
-
-struct module_split_traits {
-	static std::optional<ast::meta::version> get_ver(const ast::module& mod) { return mod.version; }
-	void clear_content(ast::module& mod) { mod.content.clear(); }
-	void update_version(ast::module& mod, const ast::meta::version& ver) { mod.version = ver; }
-	template<typename T>
-	void add_child(ast::module& mod, const T& child) { mod.content.emplace_back(child); }
-	template<typename T>
-	T* find_object(ast::module& mod, const T& child) {
-		for(auto& cnt:mod.content) {
-			if(cnt.var.type() != typeid(T)) continue;
-			T& found = boost::get<T>(cnt.var);
-			if(found.name == child.name) return &found;
-		}
-
-		return nullptr;
 	}
 };
 
