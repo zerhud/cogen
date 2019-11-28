@@ -22,13 +22,13 @@ void split_by_version::eval_module(ast::module& mod)
 std::vector<ix3::ast::module>& split_by_version::extract_result()
 {
 	finished_result.clear();
-	for(auto& r:result) for(auto& m:r.mods) finished_result.emplace_back(m);
+	for(auto& r:result) for(auto& m:r.mods()) finished_result.emplace_back(m);
 	return finished_result;
 }
 
 void split_by_version::on_obj(ast::module& obj)
 {
-	versioned_modules* current = nullptr;
+	cpy_by_ver_t* current = nullptr;
 	for(auto& r:result) {
 		if(r.name()==obj.name) {
 			current = &r;
@@ -39,13 +39,34 @@ void split_by_version::on_obj(ast::module& obj)
 	if(current) current->add(obj);
 	else current = &result.emplace_back(obj);
 
-	for(auto& cnt:obj.content) current->add(cnt);
+	auto adder = [this,current](auto& obj) {
+		using ast::meta::version;
+		auto obj_ver = ast::get<version>(obj.meta_params);
+		current->replace_after(obj, obj_ver);
+	};
+
+	for(auto& cnt:obj.content) {
+		boost::apply_visitor(adder, cnt.var);
+	}
 }
 
 void split_by_version::on_obj(ast::record& obj)
 {
+}
+
+void split_by_version::on_obj(ast::record_item& obj)
+{
 	auto obj_ver = ast::get<version>(obj.meta_params);
 	if(!obj_ver) return;
+
+	auto* par = parent<ast::record>(0);
+	assert(par);
+
+	auto par_ver = ast::get<version>(par->meta_params);
+	if(par_ver && *par_ver < *obj_ver) {
+		//TODO: 1. remove this item somehow
+		//      2. copy record, and set version == obj_ver
+	}
 }
 
 ix3::utils::split_by_version::versioned_modules::versioned_modules(const ix3::ast::module& mod)

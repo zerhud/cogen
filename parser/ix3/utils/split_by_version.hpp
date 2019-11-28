@@ -1,8 +1,8 @@
 /*************************************************************************
- * Copyright © 2019 Hudyaev Alexy <hudyaev.alexy@gmail.com>
- * This file is part of modegen.
- * Distributed under the GNU Affero General Public License.
- * See accompanying file copying (at the root of this repository)
+ * copyright © 2019 hudyaev alexy <hudyaev.alexy@gmail.com>
+ * this file is part of modegen.
+ * distributed under the gnu affero general public license.
+ * see accompanying file copying (at the root of this repository)
  * or <http://www.gnu.org/licenses/> for details
  *************************************************************************/
 
@@ -11,6 +11,7 @@
 #include "meta.hpp"
 #include "evaluator.hpp"
 #include "ast/file.hpp"
+#include "helpers/copy_by_version.hpp"
 
 namespace ix3::utils {
 
@@ -26,7 +27,7 @@ private:
 	void on_obj(ast::function& obj) override    { (void)obj; }
 	void on_obj(ast::interface& obj) override   { (void)obj; }
 	void on_obj(ast::enumeration& obj) override { (void)obj; }
-	void on_obj(ast::record_item& obj) override { (void)obj; }
+	void on_obj(ast::record_item& obj) override ;
 	void on_obj(ast::constructor& obj) override { (void)obj; }
 
 	void on_obj(ast::enum_element& obj) override       { (void)obj; }
@@ -94,9 +95,9 @@ private:
 	};
 
 	bool dry = false;
-	std::vector<versioned_modules> result;
+	typedef helpers::copy_by_version<ast::module, helpers::module_split_traits> cpy_by_ver_t;
+	std::vector<cpy_by_ver_t> result;
 	std::vector<ast::module> finished_result;
-	versioned_modules* current = nullptr;
 };
 
 } // namespace ix3::utils

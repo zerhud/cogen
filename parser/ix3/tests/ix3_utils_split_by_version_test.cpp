@@ -47,5 +47,18 @@ BOOST_AUTO_TEST_CASE( by_mod )
 BOOST_AUTO_TEST_SUITE_END() // simple
 
 BOOST_AUTO_TEST_SUITE(inner_fields)
+BOOST_AUTO_TEST_CASE(record)
+{
+	auto data = txt::parse(txt::file_content, "module mod v1.0: record r { +type low; @v1.1 +type high;}"sv);
+	BOOST_TEST( data.modules.size() == 1 );
+	data.modules | split_by_version(false);
+	BOOST_REQUIRE_EQUAL( data.modules.size(), 2 );
+	BOOST_TEST( data.modules[0].name == "mod" );
+	BOOST_TEST( data.modules[1].name == "mod" );
+	BOOST_TEST( data.modules[0].version.minor_v == 0 );
+	BOOST_TEST( data.modules[1].version.minor_v == 1 );
+	BOOST_TEST( data.modules[0].content.size() == 1 );
+	BOOST_TEST( data.modules[1].content.size() == 2 );
+}
 BOOST_AUTO_TEST_SUITE_END() // inner_fields
 
