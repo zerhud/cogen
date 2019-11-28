@@ -19,6 +19,8 @@ class split_by_version : public evaluator {
 public:
 	split_by_version(bool dry_run = false);
 private:
+	typedef helpers::copy_by_version<ast::module, helpers::module_split_traits> cpy_by_ver_t;
+
 	void eval_module(ast::module& mod) override ;
 	std::vector<ast::module>& extract_result() override ;
 
@@ -39,63 +41,7 @@ private:
 	void on_obj(ast::meta::depricated& obj) override    { (void)obj; }
 	void on_obj(ast::meta::documentation& obj) override { (void)obj; }
 
-	struct versioned_modules {
-		std::vector<ast::module> mods;
-
-		versioned_modules(const ast::module& mod);
-
-		std::string_view name() const ;
-
-		ast::module& max_mod() ;
-		void sort();
-
-		void add(const ast::module& mod);
-
-		template<typename T>
-		void add(const T& obj)
-		{
-			auto adder = [this](auto& obj) {
-				using ast::meta::version;
-				auto obj_ver = ast::get<version>(obj.meta_params);
-				replace_after(obj, obj_ver);
-			};
-			boost::apply_visitor(adder, obj.var);
-		}
-
-		template<typename T>
-		void replace_after(const T& obj, std::optional<ast::meta::version> ver)
-		{
-			if(ver && max_mod().version < *ver) {
-				auto& mm = mods.emplace_back(max_mod());
-				mm.version = *ver;
-				sort();
-			}
-
-			for(auto& m:mods) {
-				if(ver && m.version < *ver) continue;
-
-				T* found;
-				found = find_object(m, obj);
-				if(found) *found = obj;
-				else m.content.emplace_back(obj);
-			}
-		}
-
-		template<typename T>
-		T* find_object(ast::module& mod, const T& obj)
-		{
-			for(auto& cnt:mod.content) {
-				if(cnt.var.type() != typeid(T)) continue;
-				T& found = boost::get<T>(cnt.var);
-				if(found.name == obj.name) return &found;
-			}
-
-			return nullptr;
-		}
-	};
-
 	bool dry = false;
-	typedef helpers::copy_by_version<ast::module, helpers::module_split_traits> cpy_by_ver_t;
 	std::vector<cpy_by_ver_t> result;
 	std::vector<ast::module> finished_result;
 };
