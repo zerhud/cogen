@@ -16,9 +16,6 @@ class remove_empty : public evaluator {
 	std::vector<ast::module> mods;
 	void eval_module(ast::module& mod) override ;
 	std::vector<ast::module>& extract_result() override ;
-//public:
-	//remove_empty() noexcept =default ;
-	//~remove_empty() noexcept override =default ;
 };
 
 } // namespace ix3::utils

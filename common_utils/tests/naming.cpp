@@ -13,7 +13,7 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include "utils/naming.hpp"
+#include "common_utils/naming.hpp"
 
 using namespace gen_utils;
 

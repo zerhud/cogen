@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_library(Boost 1.69 REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED parse.hpp parser.cpp parser.hpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs)
+target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs PUBLIC generation_utils)
 target_include_directories(
 	${PROJECT_NAME}
 	PRIVATE ${Boost_INCLUDE_DIRS}
@@ -50,6 +50,7 @@ target_sources(${PROJECT_NAME} PRIVATE utils/meta.cpp              utils/meta.hp
 target_sources(${PROJECT_NAME} PRIVATE utils/selector.cpp          utils/selector.hpp)
 target_sources(${PROJECT_NAME} PRIVATE utils/remove_empty.cpp      utils/remove_empty.hpp)
 target_sources(${PROJECT_NAME} PRIVATE utils/filter.cpp            utils/filter.hpp)
+target_sources(${PROJECT_NAME} PRIVATE utils/naming.cpp            utils/naming.hpp)
 target_sources(${PROJECT_NAME} PRIVATE utils/split_by_version.cpp  utils/split_by_version.hpp)
 target_sources(${PROJECT_NAME} PRIVATE utils/helpers/copy_by_version.hpp utils/helpers/copy_by_version_traits.hpp utils/helpers/copy_by_version_traits.cpp)
 
