@@ -25,8 +25,9 @@ private:
 	void eval_module(ast::module& mod) override ;
 	std::vector<ast::module>& extract_result() override ;
 
-	std::vector<ast::record> split(const ast::record& obj) const ;
-	std::vector<ast::interface> split(const ast::interface& obj) const ;
+	void split_content(ast::module& mod) const ;
+	std::vector<ast::record> split(const ast::record* obj) const ;
+	std::vector<ast::interface> split(const ast::interface* obj) const ;
 
 	void on_obj(ast::module& obj) override ;
 

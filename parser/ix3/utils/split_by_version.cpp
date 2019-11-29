@@ -39,46 +39,48 @@ void split_by_version::on_obj(ast::module& obj)
 	if(current) current->add(obj);
 	else current = &result.emplace_back(obj);
 
+	split_content(obj);
+
 	auto adder = [this,current](auto& obj) {
 		using ast::meta::version;
 		auto obj_ver = ast::get<version>(obj.meta_params);
-		current->replace_after(obj, obj_ver);
-	};
-
-	decltype(obj.content) for_add;
-	auto remove_begin = std::remove_if(
-		obj.content.begin(), obj.content.end(),
-		[this,&for_add](const auto& obj){
-			const ast::record* record = boost::get<ast::record>(&obj.var);
-			const ast::interface* interface = boost::get<ast::interface>(&obj.var);
-			if(record) {
-				auto splitted = split(*record);
-				for(auto& s:splitted) for_add.emplace_back(std::move(s));
-			}
-			else if(interface) {
-				auto splitted = split(*interface);
-				for(auto& s:splitted) for_add.emplace_back(std::move(s));
-			}
-
-			return record || interface;
-	});
-	obj.content.erase(remove_begin, obj.content.end());
-
-	for(auto& a:for_add) obj.content.emplace_back(std::move(a));
+		current->replace_after(obj, obj_ver); };
 	for(auto& cnt:obj.content) boost::apply_visitor(adder, cnt.var);
 }
 
-std::vector<ix3::ast::record> split_by_version::split(const ast::record& obj) const
+void split_by_version::split_content(ast::module& mod) const
 {
-	helpers::copy_by_version<ast::record, helpers::record_split_traits> cpyer(obj);
-	for(auto& m:obj.members) cpyer.replace_after(m, ast::get<version>(m.meta_params));
+	decltype(mod.content) for_add;
+	auto remove_begin = std::remove_if(
+		mod.content.begin(), mod.content.end(),
+		[this,&for_add](const auto& obj){
+			auto rsplitted = split(boost::get<ast::record>(&obj.var));
+			auto isplitted = split(boost::get<ast::interface>(&obj.var));
+			for(auto& s:rsplitted) for_add.emplace_back(std::move(s));
+			for(auto& s:isplitted) for_add.emplace_back(std::move(s));
+
+			return !rsplitted.empty() || !isplitted.empty();
+	});
+	mod.content.erase(remove_begin, mod.content.end());
+
+	for(auto& a:for_add) mod.content.emplace_back(std::move(a));
+}
+
+std::vector<ix3::ast::record> split_by_version::split(const ast::record* obj) const
+{
+	if(!obj) return {};
+
+	helpers::copy_by_version<ast::record, helpers::record_split_traits> cpyer(*obj);
+	for(auto& m:obj->members) cpyer.replace_after(m, ast::get<version>(m.meta_params));
 	return cpyer.extract_result();
 }
 
-std::vector<ix3::ast::interface> split_by_version::split(const ast::interface& obj) const
+std::vector<ix3::ast::interface> split_by_version::split(const ast::interface* obj) const
 {
-	helpers::copy_by_version<ast::interface, helpers::interface_split_traits> cpyer(obj);
-	for(auto& m:obj.mem_funcs) cpyer.replace_after(m, ast::get<version>(m.meta_params));
-	for(auto& m:obj.constructors) cpyer.replace_after(m, ast::get<version>(m.meta_params));
+	if(!obj) return {};
+
+	helpers::copy_by_version<ast::interface, helpers::interface_split_traits> cpyer(*obj);
+	for(auto& m:obj->mem_funcs) cpyer.replace_after(m, ast::get<version>(m.meta_params));
+	for(auto& m:obj->constructors) cpyer.replace_after(m, ast::get<version>(m.meta_params));
 	return cpyer.extract_result();
 }
