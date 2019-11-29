@@ -45,6 +45,7 @@ configure_file("config.hpp.in" "${main_config_file}")
 
 include(cmake/target_sources_local.cmake)
 
+add_subdirectory(utils)
 add_subdirectory(parser/ix3)
 
 add_library(modegen_parsers ${main_config_file})
