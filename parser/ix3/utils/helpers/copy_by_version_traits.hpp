@@ -56,5 +56,17 @@ struct record_split_traits {
 	}
 };
 
+struct interface_split_traits {
+	static std::optional<ast::meta::version> get_ver(const ast::interface& mod);
+	void clear_content(ast::interface& mod);
+	void update_version(ast::interface& mod, const ast::meta::version& ver);
+
+	void add_child(ast::interface& obj, const ast::constructor& child);
+	void add_child(ast::interface& obj, const ast::function& child);
+
+	ast::function*    find_object(ast::interface& obj, const ast::function& child);
+	ast::constructor* find_object(ast::interface& obj, const ast::constructor& child);
+};
+
 } // namespace ix3::utils::helpers
 

@@ -33,7 +33,8 @@ target_sources(${PROJECT_NAME} PRIVATE grammar/functions.hpp)
 target_sources(${PROJECT_NAME} PRIVATE grammar/entity.hpp)
 target_sources(${PROJECT_NAME} PRIVATE grammar/file.hpp)
 
-target_sources(${PROJECT_NAME} PRIVATE operators/common.cpp operators/common.hpp)
+target_sources(${PROJECT_NAME} PRIVATE operators/common.cpp    operators/common.hpp)
+target_sources(${PROJECT_NAME} PRIVATE operators/functions.cpp operators/functions.hpp)
 
 target_sources(${PROJECT_NAME} PRIVATE grammar_def/common.cpp    grammar_def/common.hpp)
 target_sources(${PROJECT_NAME} PRIVATE grammar_def/meta.cpp      grammar_def/meta.hpp)

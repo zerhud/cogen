@@ -45,26 +45,40 @@ void split_by_version::on_obj(ast::module& obj)
 		current->replace_after(obj, obj_ver);
 	};
 
-	for(auto& cnt:obj.content) {
-		boost::apply_visitor(adder, cnt.var);
-	}
+	decltype(obj.content) for_add;
+	auto remove_begin = std::remove_if(
+		obj.content.begin(), obj.content.end(),
+		[this,&for_add](const auto& obj){
+			const ast::record* record = boost::get<ast::record>(&obj.var);
+			const ast::interface* interface = boost::get<ast::interface>(&obj.var);
+			if(record) {
+				auto splitted = split(*record);
+				for(auto& s:splitted) for_add.emplace_back(std::move(s));
+			}
+			else if(interface) {
+				auto splitted = split(*interface);
+				for(auto& s:splitted) for_add.emplace_back(std::move(s));
+			}
+
+			return record || interface;
+	});
+	obj.content.erase(remove_begin, obj.content.end());
+
+	for(auto& a:for_add) obj.content.emplace_back(std::move(a));
+	for(auto& cnt:obj.content) boost::apply_visitor(adder, cnt.var);
 }
 
-void split_by_version::on_obj(ast::record& obj)
+std::vector<ix3::ast::record> split_by_version::split(const ast::record& obj) const
 {
+	helpers::copy_by_version<ast::record, helpers::record_split_traits> cpyer(obj);
+	for(auto& m:obj.members) cpyer.replace_after(m, ast::get<version>(m.meta_params));
+	return cpyer.extract_result();
 }
 
-void split_by_version::on_obj(ast::record_item& obj)
+std::vector<ix3::ast::interface> split_by_version::split(const ast::interface& obj) const
 {
-	auto obj_ver = ast::get<version>(obj.meta_params);
-	if(!obj_ver) return;
-
-	auto* par = parent<ast::record>(0);
-	assert(par);
-
-	auto par_ver = ast::get<version>(par->meta_params);
-	if(par_ver && *par_ver < *obj_ver) {
-		//TODO: 1. remove this item somehow
-		//      2. copy record, and set version == obj_ver
-	}
+	helpers::copy_by_version<ast::interface, helpers::interface_split_traits> cpyer(obj);
+	for(auto& m:obj.mem_funcs) cpyer.replace_after(m, ast::get<version>(m.meta_params));
+	for(auto& m:obj.constructors) cpyer.replace_after(m, ast::get<version>(m.meta_params));
+	return cpyer.extract_result();
 }

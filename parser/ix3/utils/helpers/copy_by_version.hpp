@@ -75,14 +75,16 @@ public:
 	void replace_after(const Child& child, std::optional<ast::meta::version> ver)
 	{
 		using ast::meta::version;
-		if(ver && *traits.get_ver(max_obj()) < *ver) {
+		auto mver = traits.get_ver(max_obj());
+		if(ver && (!mver || *mver < *ver)) {
 			auto& nobj = objs.emplace_back(max_obj());
 			traits.update_version(nobj, *ver);
 			sort();
 		}
 
 		for(auto& obj:objs) {
-			if(ver && *traits.get_ver(obj) < *ver) continue;
+			auto obj_ver = traits.get_ver(obj);
+			if(ver && (!obj_ver || *obj_ver < *ver)) continue;
 
 			Child* found = traits.find_object(obj, child);
 			if(found) *found = child;

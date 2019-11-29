@@ -7,6 +7,7 @@
  *************************************************************************/
 
 #include "../meta.hpp"
+#include "operators/functions.hpp"
 #include "copy_by_version_traits.hpp"
 
 using namespace ix3::utils::helpers;
@@ -44,5 +45,44 @@ void record_split_traits::clear_content(ast::record& mod)
 void record_split_traits::update_version(ast::record& mod, const ast::meta::version& ver)
 {
 	ast::set(mod.meta_params, ver);
+}
+
+
+std::optional<ix3::ast::meta::version> interface_split_traits::get_ver(const ast::interface& mod)
+{
+	return ast::get<version>(mod.meta_params);
+}
+
+void interface_split_traits::clear_content(ast::interface& mod)
+{
+	mod.mem_funcs.clear();
+	mod.constructors.clear();
+}
+
+void interface_split_traits::update_version(ast::interface& mod, const ast::meta::version& ver)
+{
+	ast::set(mod.meta_params, ver);
+}
+
+void interface_split_traits::add_child(ast::interface& obj, const ast::constructor& child)
+{
+	obj.constructors.emplace_back(child);
+}
+
+void interface_split_traits::add_child(ast::interface& obj, const ast::function& child)
+{
+	obj.mem_funcs.emplace_back(child);
+}
+
+ix3::ast::function*    interface_split_traits::find_object(ast::interface& obj, const ast::function& child)
+{
+	for(auto& c:obj.mem_funcs) if(c.name == child.name) return &c;
+	return nullptr;
+}
+
+ix3::ast::constructor* interface_split_traits::find_object(ast::interface& obj, const ast::constructor& child)
+{
+	for(auto& c:obj.constructors) if(c.params == child.params) return &c;
+	return nullptr;
 }
 

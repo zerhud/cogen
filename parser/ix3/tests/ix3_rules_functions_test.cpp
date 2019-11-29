@@ -15,7 +15,7 @@
 
 #include "parse.hpp"
 #include "grammar/functions.hpp"
-//#include "operators/functions.hpp"
+#include "operators/functions.hpp"
 
 using namespace std::literals;
 namespace ast = ix3::ast;

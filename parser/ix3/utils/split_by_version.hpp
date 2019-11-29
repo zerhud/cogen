@@ -25,22 +25,10 @@ private:
 	void eval_module(ast::module& mod) override ;
 	std::vector<ast::module>& extract_result() override ;
 
+	std::vector<ast::record> split(const ast::record& obj) const ;
+	std::vector<ast::interface> split(const ast::interface& obj) const ;
+
 	void on_obj(ast::module& obj) override ;
-	void on_obj(ast::record& obj)  override ;
-	void on_obj(ast::function& obj) override    { (void)obj; }
-	void on_obj(ast::interface& obj) override   { (void)obj; }
-	void on_obj(ast::enumeration& obj) override { (void)obj; }
-	void on_obj(ast::record_item& obj) override ;
-	void on_obj(ast::constructor& obj) override { (void)obj; }
-
-	void on_obj(ast::enum_element& obj) override       { (void)obj; }
-	void on_obj(ast::function_parameter& obj) override { (void)obj; }
-
-	void on_obj(ast::meta::set& obj) override           { (void)obj; }
-	void on_obj(ast::meta::oapi& obj) override          { (void)obj; }
-	void on_obj(ast::meta::version& obj) override       { (void)obj; }
-	void on_obj(ast::meta::depricated& obj) override    { (void)obj; }
-	void on_obj(ast::meta::documentation& obj) override { (void)obj; }
 
 	bool dry = false;
 	std::vector<cpy_by_ver_t> result;
