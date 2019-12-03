@@ -82,6 +82,8 @@ target_sources_local(part_generation "info_part.hpp"         "info_part.cpp"    
 target_sources_local(part_generation "configuration_algos.hpp"                    "" "pg/")
 target_sources_local(part_generation "module.hpp"            "module.cpp"            "pg/part_algos/")
 target_sources_local(part_generation "data.hpp"              "data.cpp"              "pg/part_algos/")
+target_sources_local(part_generation "data.hpp"              "data.cpp"              "pg/configuration_algos/")
+target_sources_local(part_generation "ix3.hpp"               "ix3.cpp"               "pg/configuration_algos/")
 target_sources_local(part_generation "to_json.hpp"           "to_json.cpp"           "pg/part_algos/interface/")
 target_sources_local(part_generation "filter.hpp"            "filter.cpp"            "pg/part_algos/interface/")
 target_sources_local(part_generation "naming.hpp"            "naming.cpp"            "pg/part_algos/interface/")
