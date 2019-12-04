@@ -9,6 +9,8 @@
 #pragma once
 
 #include "configuration_algos.hpp"
+#include "parser/loader.hpp"
+#include "ix3/ast/file.hpp"
 
 namespace modegen::pg::conf_algos {
 

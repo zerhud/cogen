@@ -73,7 +73,7 @@ target_sources_local(modegen_parsers ix3_loader.hpp      ix3_loader.cpp      "pa
 add_library(part_generation "pg/declarations.hpp" ${main_config_file})
 target_include_directories(part_generation PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/pg" "${CMAKE_CURRENT_BINARY_DIR}" "${config_files_dir}")
 target_include_directories(part_generation SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
-target_link_libraries(part_generation PRIVATE stdc++fs)
+target_link_libraries(part_generation PRIVATE stdc++fs ix3)
 
 target_sources_local(part_generation "declarations.hpp"      "declarations.cpp"      "pg/")
 target_sources_local(part_generation "generator.hpp"         "generator.cpp"         "pg/")

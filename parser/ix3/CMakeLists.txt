@@ -9,10 +9,12 @@ find_library(Boost 1.69 REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED parse.hpp parser.cpp parser.hpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs PUBLIC generation_utils)
-target_include_directories(
-	${PROJECT_NAME}
-	PRIVATE ${Boost_INCLUDE_DIRS}
-	PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
+target_include_directories( ${PROJECT_NAME}
+	PRIVATE
+		${Boost_INCLUDE_DIRS}
+		"${CMAKE_CURRENT_SOURCE_DIR}"
+	PUBLIC
+		"${CMAKE_CURRENT_SOURCE_DIR}/.."
 	)
 
 target_sources(${PROJECT_NAME} PRIVATE ast/common.hpp)

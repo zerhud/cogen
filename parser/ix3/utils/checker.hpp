@@ -9,7 +9,7 @@
 #pragma once
 
 #include "traverser.hpp"
-#include "ast/file.hpp"
+#include "ix3/ast/file.hpp"
 
 namespace ix3::utils {
 

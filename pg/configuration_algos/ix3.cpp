@@ -10,7 +10,7 @@
 
 using namespace modegen::pg::conf_algos;
 
-ix3_conf::ix3_conf(const std::vector<modegen:parser::loader_ptr>& ldrs)
+ix3_conf::ix3_conf(const std::vector<modegen::parser::loader_ptr>& ldrs)
 {
 }
 
@@ -20,14 +20,17 @@ void ix3_conf::set_filter(const options::part_view& pinfo)
 
 std::vector<std::string> ix3_conf::map(const std::string& tmpl) const
 {
+	return {};
 }
 
-mapped_data ix3_conf::map_to(mapped_data md)
+ix3_conf::mapped_data ix3_conf::map_to(mapped_data md)
 {
+	return {};
 }
 
 std::map<std::string,std::vector<std::string>> ix3_conf::map_from(const std::string& tmpl)
 {
+	return {};
 }
 
 
