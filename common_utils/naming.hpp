@@ -17,5 +17,8 @@ namespace gen_utils {
 	std::vector<std::string> split_name(const std::string& name);
 	std::string convert(const std::string& name, name_conversion c);
 
+	std::string_view to_string(name_conversion v);
+	void from_string(std::string_view val, name_conversion& c);
+
 } // namespace gen_utils
 

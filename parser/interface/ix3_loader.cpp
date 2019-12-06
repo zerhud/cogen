@@ -205,3 +205,9 @@ std::vector<modegen::parser::interface::module> modegen::parser::interface::ix3_
 
 	return result;
 }
+
+std::vector<ix3::ast::module> modegen::parser::interface::ix3_loader::ix3_result() const
+{
+	return pimpl().ix_parser.result();
+}
+

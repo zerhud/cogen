@@ -4,7 +4,7 @@ endif
 
 
 syn keyword ix3Modules module enum record interface
-syn keyword ix3Types i32 i64 string list optional date
+syn keyword ix3Types i32 i64 string list optional date data
 
 syn match ix3Comment "#.*$"
 syn match ix3Version "v\d\.\d"

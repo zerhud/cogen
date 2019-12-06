@@ -11,9 +11,10 @@
 #include "check.hpp"
 #include "modegen.hpp"
 #include "loader.hpp"
+#include "ix3/ast/file.hpp"
 
 namespace modegen::parser::interface {
-	
+
 class ix3_loader : public loader {
 	class details;
 	std::unique_ptr<details> pimpl_;
@@ -29,6 +30,7 @@ public:
 	void finish_loads() override ;
 
 	std::vector<module> result() const override ;
+	std::vector<ix3::ast::module> ix3_result() const ;
 };
 
 } // namespace modegen::parser::interface
