@@ -19,6 +19,11 @@ if(NOT HAVE_FILESYSTEM)
 	message(WARNING "we don't have std::filesystem.. try to use expiremental.\nthis mode is supported only for clang, for build coverage report")
 endif()
 
+if(" ${CMAKE_CXX_COMPILER_ID}" STREQUAL " Clang")
+	# see https://github.com/pybind/pybind11/issues/1604
+	set(CMAKE_CXX_FLAGS "-fsized-deallocation")
+endif()
+
 set(config_files_dir "${CMAKE_CURRENT_BINARY_DIR}/cfg")
 set(main_config_file "${config_files_dir}/config.hpp")
 set(templates_dir "share/modegen")

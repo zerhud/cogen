@@ -58,5 +58,3 @@ std::map<std::string,std::vector<std::string>> ix3_conf::map_from(const std::str
 {
 	return {};
 }
-
-
