@@ -136,7 +136,7 @@ add_executable(modegen modegen/main.cpp)
 target_sources(modegen PRIVATE modegen/pythongen.cpp modegen/pythongen.hpp)
 target_sources(modegen PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/pythongen_data.cpp")
 target_include_directories(modegen SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
-target_link_libraries(modegen PRIVATE
+target_link_libraries(modegen PRIVATE cppjinja
 	modegen_parsers part_generation
 	${Boost_LIBRARIES} pybind11::embed
 	${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}

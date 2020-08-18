@@ -14,6 +14,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/process.hpp>
 #include <pybind11/embed.h>
+#include <cppjinja/loader/parser.hpp>
 
 #include "config.hpp"
 #include "pg/provider.hpp"
@@ -39,6 +40,7 @@ using namespace std::literals;
 
 class gen_prov : public mg::provider, public std::enable_shared_from_this<gen_prov>
 {
+	cppjinja::parser cpjp;
 public:
 	gen_prov(FS::path self_path)
 	{
