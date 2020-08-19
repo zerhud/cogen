@@ -40,7 +40,7 @@ using namespace std::literals;
 
 class gen_prov : public mg::provider, public std::enable_shared_from_this<gen_prov>
 {
-	cppjinja::parser cpjp;
+	cppjinja::parser cpjp{{"."}};
 public:
 	gen_prov(FS::path self_path)
 	{

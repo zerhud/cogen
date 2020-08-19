@@ -12,6 +12,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(Boost COMPONENTS program_options unit_test_framework system REQUIRED)
 find_package(pybind11 REQUIRED)
 find_package(Threads REQUIRED)
+find_package(cppjinja REQUIRED)
 include(CheckCXXSourceCompiles)
 
 CHECK_CXX_SOURCE_COMPILES("#include <filesystem>\nint main(int,char**){return 0;}" HAVE_FILESYSTEM)
@@ -136,8 +137,9 @@ add_executable(modegen modegen/main.cpp)
 target_sources(modegen PRIVATE modegen/pythongen.cpp modegen/pythongen.hpp)
 target_sources(modegen PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/pythongen_data.cpp")
 target_include_directories(modegen SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
-target_link_libraries(modegen PRIVATE cppjinja
+target_link_libraries(modegen PRIVATE
 	modegen_parsers part_generation
+	cppjinja::loader cppjinja::evaluator
 	${Boost_LIBRARIES} pybind11::embed
 	${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
 	)
