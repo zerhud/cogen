@@ -5,7 +5,7 @@ option(enable_tests "enable tests" ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_library(Boost 1.69 REQUIRED)
+find_package(Boost REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED parse.hpp parser.cpp parser.hpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs PUBLIC generation_utils)
