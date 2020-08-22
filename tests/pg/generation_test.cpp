@@ -24,6 +24,10 @@ namespace mpg = modegen::pg;
 namespace mpo = modegen::pg::options;
 namespace mpe = modegen::pg::errors;
 
+
+BOOST_AUTO_TEST_SUITE(generation)
+BOOST_AUTO_TEST_SUITE(generator)
+
 BOOST_AUTO_TEST_SUITE(without_data)
 BOOST_AUTO_TEST_CASE(without_build)
 {
@@ -57,3 +61,6 @@ BOOST_AUTO_TEST_CASE(withou_generation)
 	BOOST_CHECK_EQUAL(gen.parts().count(), 1);
 }
 BOOST_AUTO_TEST_SUITE_END() // without_data
+
+BOOST_AUTO_TEST_SUITE_END() // generator
+BOOST_AUTO_TEST_SUITE_END() // generation

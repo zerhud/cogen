@@ -16,6 +16,9 @@
 
 using namespace std::literals;
 
+BOOST_AUTO_TEST_SUITE(parser)
+BOOST_AUTO_TEST_SUITE(interface)
+
 BOOST_AUTO_TEST_CASE(empty_module)
 {
 	std::vector<std::string_view> mods = {
@@ -254,3 +257,5 @@ BOOST_AUTO_TEST_CASE(depricated_meta)
 	BOOST_CHECK_EQUAL(dep.since, version(1,1));
 }
 
+BOOST_AUTO_TEST_SUITE_END() // interface
+BOOST_AUTO_TEST_SUITE_END() // parser

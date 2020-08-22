@@ -30,7 +30,9 @@ namespace pgmocks
 	}
 }
 
+BOOST_AUTO_TEST_SUITE(algos)
 BOOST_AUTO_TEST_SUITE(modules)
+
 BOOST_AUTO_TEST_SUITE(map)
 BOOST_AUTO_TEST_SUITE(map_to)
 BOOST_AUTO_TEST_CASE(result)
@@ -148,5 +150,6 @@ BOOST_AUTO_TEST_CASE(was_not_map_to)
 }
 BOOST_AUTO_TEST_SUITE_END() // map_from
 BOOST_AUTO_TEST_SUITE_END() // map
-BOOST_AUTO_TEST_SUITE_END() // modules
 
+BOOST_AUTO_TEST_SUITE_END() // modules
+BOOST_AUTO_TEST_SUITE_END() // algos

@@ -18,6 +18,8 @@ using namespace std::literals;
 using modegen::pg::palgos::interface::filter;
 namespace mi = modegen::parser::interface;
 
+BOOST_AUTO_TEST_SUITE(filters)
+
 BOOST_AUTO_TEST_SUITE(module_name)
 BOOST_AUTO_TEST_CASE(no_filter)
 {
@@ -72,3 +74,5 @@ BOOST_AUTO_TEST_CASE(pattern)
 	std::visit(std::bind(ncheck, "e2", pl::_1), cnt[1]);
 }
 BOOST_AUTO_TEST_SUITE_END() // content_name
+
+BOOST_AUTO_TEST_SUITE_END() // filters

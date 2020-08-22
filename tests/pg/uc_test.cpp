@@ -24,6 +24,9 @@ namespace mpg = modegen::pg;
 namespace mpo = modegen::pg::options;
 namespace mpi = modegen::parser::interface;
 
+BOOST_AUTO_TEST_SUITE(generation)
+BOOST_AUTO_TEST_SUITE(configuration)
+
 // use cases
 // 01. all modules to one file [out_single]
 // 02. each module to own flie [out_permod]
@@ -66,3 +69,5 @@ BOOST_AUTO_TEST_CASE(two_modules)
 }
 BOOST_AUTO_TEST_SUITE_END() // permod
 
+BOOST_AUTO_TEST_SUITE_END() // configuration
+BOOST_AUTO_TEST_SUITE_END() // generation

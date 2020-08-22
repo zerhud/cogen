@@ -18,6 +18,9 @@
 
 namespace mpg = modegen::pg;
 
+BOOST_AUTO_TEST_SUITE(generation)
+BOOST_AUTO_TEST_SUITE(part_manager)
+
 BOOST_AUTO_TEST_CASE(list_require_part_by_name)
 {
 	auto part1 = std::make_shared<pgmocks::part>();
@@ -76,3 +79,6 @@ BOOST_AUTO_TEST_CASE(list_outputs_with_nullptr)
 	BOOST_CHECK_NO_THROW( pm.add(part1).add(part2) );
 	BOOST_CHECK_THROW(pm.list_output(), mpg::errors::error);
 }
+
+BOOST_AUTO_TEST_SUITE_END() // part_manager
+BOOST_AUTO_TEST_SUITE_END() // generation

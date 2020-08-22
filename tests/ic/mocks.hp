@@ -1,0 +1,43 @@
+/*************************************************************************
+ * Copyright © 2020 Hudyaev Alexy <hudyaev.alexy@gmail.com>
+ * This file is part of modegen.
+ * Distributed under the GNU Affero General Public License.
+ * See accompanying file copying (at the root of this repository)
+ * or <http://www.gnu.org/licenses/> for details
+ *************************************************************************/
+
+#pragma once
+
+#include <turtle/mock.hpp>
+#include "ic/core.hpp"
+
+namespace mic = modegen::ic;
+
+namespace icmocks {
+
+MOCK_BASE_CLASS( input, modegen::ic::input )
+{
+	MOCK_METHOD(to_json, 0)
+};
+
+MOCK_BASE_CLASS( output, modegen::ic::output )
+{
+	MOCK_METHOD(add, 3)
+};
+
+MOCK_BASE_CLASS( provider, modegen::ic::provider )
+{
+};
+
+MOCK_BASE_CLASS( transformation, modegen::ic::transformation )
+{
+	MOCK_CONST_METHOD(operator(), 1, void(modegen::ic::input&), do_trans)
+};
+
+MOCK_BASE_CLASS( configuration, modegen::ic::configuration )
+{
+	MOCK_METHOD(outputs, 0)
+	MOCK_METHOD(mutators, 0)
+};
+
+} // namespace icmocks

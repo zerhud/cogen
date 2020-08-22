@@ -22,11 +22,15 @@ set(tests_pg
 	filter
 	part_algos
 	)
+set(tests_ic core)
 foreach(tname ${tests_interface})
 	add_unit_test(${tname} "tests/interface/" "modegen_parsers")
 endforeach()
 foreach(tname ${tests_pg})
 	add_unit_test(${tname} "tests/pg/" "part_generation;modegen_parsers")
+endforeach()
+foreach(tname ${tests_ic})
+	add_unit_test(${tname} "tests/ic/" "input_configurator")
 endforeach()
 add_unit_test("dt_loader" "tests/data_tree/" "modegen_parsers")
 
