@@ -18,6 +18,7 @@ class input {
 public:
 	virtual ~input() noexcept =default;
 	virtual nlohmann::json to_json() const =0 ;
+	virtual std::shared_ptr<input> clone() const =0 ;
 };
 
 class output {
@@ -42,11 +43,11 @@ public:
 	struct output_info {
 		std::string name;
 		std::string tmpl;
+		std::vector<std::shared_ptr<transformation>> mutators;
 	};
 
 	virtual ~configuration() noexcept =default;
 	virtual std::vector<output_info> outputs() const =0 ;
-	virtual std::vector<std::shared_ptr<transformation>> mutators() const =0 ;
 };
 
 class core {

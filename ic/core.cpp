@@ -17,6 +17,9 @@ void modegen::ic::core::gen(std::shared_ptr<input> data, std::shared_ptr<output>
 	if(!data || !out || !config)
 		throw std::runtime_error("cannot generate output without input, configuration or provider");
 	auto outs = config->outputs();
-	for(auto& oi:outs)
-		out->add(oi.name, oi.tmpl, data->to_json());
+	for(auto& oi:outs) {
+		auto cur_input = data->clone();
+		for(auto& m:oi.mutators) (*m)(*cur_input);
+		out->add(oi.name, oi.tmpl, cur_input->to_json());
+	}
 }

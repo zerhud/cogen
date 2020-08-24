@@ -17,6 +17,7 @@ namespace icmocks {
 
 MOCK_BASE_CLASS( input, modegen::ic::input )
 {
+	MOCK_METHOD(clone, 0)
 	MOCK_METHOD(to_json, 0)
 };
 
@@ -37,7 +38,6 @@ MOCK_BASE_CLASS( transformation, modegen::ic::transformation )
 MOCK_BASE_CLASS( configuration, modegen::ic::configuration )
 {
 	MOCK_METHOD(outputs, 0)
-	MOCK_METHOD(mutators, 0)
 };
 
 } // namespace icmocks
