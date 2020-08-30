@@ -10,7 +10,9 @@
 
 #include <memory>
 #include <vector>
+#include <filesystem>
 #include <nlohman/json.hpp>
+#include "common_utils/naming.hpp"
 
 namespace modegen::ic {
 
@@ -24,36 +26,47 @@ public:
 class output {
 public:
 	virtual ~output() noexcept =default;
-	virtual void add(std::string name, std::string tmpl, nlohmann::json data) =0 ;
+	virtual void gen(std::string dir, std::string tmpl) const =0 ;
+	virtual std::string name() const =0;
 };
 
-class provider {
+class generation_part {
 public:
-	virtual ~provider() noexcept =default;
-};
+	virtual ~generation_part() noexcept =default;
 
-class transformation {
-public:
-	virtual ~transformation() noexcept =default;
-	virtual void operator ()(input& data) const =0 ;
+	virtual std::size_t id() const =0;
+	virtual std::string name() const =0;
+	virtual std::vector<std::shared_ptr<output>> outputs() const =0;
+
+	virtual void rename(gen_utils::name_conversion to) =0 ;
+	virtual void split_versions() =0 ;
+	virtual void map_to(std::string_view tmpl) =0;
 };
 
 class configuration {
 public:
-	struct output_info {
-		std::string name;
-		std::string tmpl;
-		std::vector<std::shared_ptr<transformation>> mutators;
-	};
 
 	virtual ~configuration() noexcept =default;
-	virtual std::vector<output_info> outputs() const =0 ;
+
+	virtual std::filesystem::path output_dir() const =0;
+
+	virtual std::vector<std::shared_ptr<generation_part>> parts() const =0;
+	virtual std::shared_ptr<input> input_copy() const =0 ;
+
+	virtual bool split_versions(std::size_t id) const =0 ;
+	virtual gen_utils::name_conversion naming(std::size_t id) const =0 ;
+	virtual std::string map_tmpl(std::size_t id) const =0 ;
+	virtual std::vector<std::string> map_from(std::size_t id) const =0;
+	virtual std::string tmpl_information(std::size_t id) const =0;
 };
 
 class core {
 public:
 	core() ;
-	void gen(std::shared_ptr<input> data, std::shared_ptr<output> out, std::shared_ptr<configuration> config) const ;
+	void gen(
+	          std::shared_ptr<input> data
+	        , std::shared_ptr<output> out
+	        , std::shared_ptr<configuration> config) const ;
 };
 
 } // namespace modegen::ic
