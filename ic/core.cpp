@@ -12,10 +12,10 @@ modegen::ic::core::core()
 {
 }
 
-void modegen::ic::core::gen(std::shared_ptr<input> data, std::shared_ptr<output> out, std::shared_ptr<configuration> config) const
+void modegen::ic::core::gen(std::shared_ptr<output> out, std::shared_ptr<configuration> config) const
 {
-	if(!data || !out || !config)
-		throw std::runtime_error("cannot generate output without input, configuration or provider");
+	if(!out || !config)
+		throw std::runtime_error("cannot generate output without configuration or output provider");
 	auto parts = config->parts();
 	for(auto& part:parts) {
 		part->rename(config->naming(part->id()));

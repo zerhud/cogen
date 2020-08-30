@@ -42,12 +42,10 @@ MOCK_BASE_CLASS( configuration, modegen::ic::configuration )
 {
 	MOCK_METHOD(output_dir, 0)
 	MOCK_METHOD(parts, 0)
-	MOCK_METHOD(input_copy, 0)
 
 	MOCK_METHOD(split_versions, 1)
 	MOCK_METHOD(naming, 1)
 	MOCK_METHOD(map_tmpl, 1)
-	MOCK_METHOD(map_from, 1)
 	MOCK_METHOD(tmpl_information, 1)
 };
 

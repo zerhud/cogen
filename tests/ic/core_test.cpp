@@ -42,9 +42,8 @@ struct core_fixture {
 		return parts.emplace_back(p);
 	}
 
-	void set_config(std::size_t id, std::string tmpl, std::string mt, std::vector<std::string> mf)
+	void set_config(std::size_t id, std::string tmpl, std::string mt)
 	{
-		MOCK_EXPECT(config->map_from).with(id).returns(mf);
 		MOCK_EXPECT(config->map_tmpl).with(id).returns(mt);
 		MOCK_EXPECT(config->tmpl_information).with(id).returns(tmpl);
 	}
@@ -60,9 +59,8 @@ struct core_fixture {
 
 BOOST_FIXTURE_TEST_CASE(errors, core_fixture)
 {
-	BOOST_CHECK_THROW(core.gen(nullptr, out, config), std::exception);
-	BOOST_CHECK_THROW(core.gen(in, nullptr, config), std::exception);
-	BOOST_CHECK_THROW(core.gen(in, out, nullptr), std::exception);
+	BOOST_CHECK_THROW(core.gen(nullptr, config), std::exception);
+	BOOST_CHECK_THROW(core.gen(out, nullptr), std::exception);
 }
 
 BOOST_FIXTURE_TEST_CASE(map_to, core_fixture)
@@ -71,8 +69,8 @@ BOOST_FIXTURE_TEST_CASE(map_to, core_fixture)
 	assert(parts.size()==2);
 	MOCK_EXPECT(config->parts).once().returns(_parts);
 
-	set_config(0, "tmpl1", "p0", {});
-	set_config(1, "tmpl2", "p1", {});
+	set_config(0, "tmpl1", "p0");
+	set_config(1, "tmpl2", "p1");
 	MOCK_EXPECT(config->output_dir).returns("/test/dir/"s);
 	expect_mods(0, true, gen_utils::name_conversion::as_is);
 	expect_mods(1, false, gen_utils::name_conversion::underscore);
@@ -89,13 +87,12 @@ BOOST_FIXTURE_TEST_CASE(map_to, core_fixture)
 	MOCK_EXPECT(parts[1]->outputs).once().in(building2).returns(mic_outputs_t{out2});
 	MOCK_EXPECT(out2->gen).in(building2).once().with("/test/dir/", "tmpl2");
 
-	core.gen(in, out, config);
-}
-
-BOOST_FIXTURE_TEST_CASE(transaformations, core_fixture)
-{
-	create_parts(2);
+	core.gen(out, config);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // core
+
+BOOST_AUTO_TEST_SUITE(input_data)
+BOOST_AUTO_TEST_SUITE_END() // input_data
+
 BOOST_AUTO_TEST_SUITE_END() // input_configurator

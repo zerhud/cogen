@@ -51,12 +51,10 @@ public:
 	virtual std::filesystem::path output_dir() const =0;
 
 	virtual std::vector<std::shared_ptr<generation_part>> parts() const =0;
-	virtual std::shared_ptr<input> input_copy() const =0 ;
 
 	virtual bool split_versions(std::size_t id) const =0 ;
 	virtual gen_utils::name_conversion naming(std::size_t id) const =0 ;
 	virtual std::string map_tmpl(std::size_t id) const =0 ;
-	virtual std::vector<std::string> map_from(std::size_t id) const =0;
 	virtual std::string tmpl_information(std::size_t id) const =0;
 };
 
@@ -64,8 +62,7 @@ class core {
 public:
 	core() ;
 	void gen(
-	          std::shared_ptr<input> data
-	        , std::shared_ptr<output> out
+	          std::shared_ptr<output> out
 	        , std::shared_ptr<configuration> config) const ;
 };
 
