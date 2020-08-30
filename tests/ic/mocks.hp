@@ -15,10 +15,16 @@ namespace mic = modegen::ic;
 
 namespace icmocks {
 
+MOCK_BASE_CLASS(input_node, modegen::ic::input_node)
+{
+	MOCK_METHOD(rename, 1)
+};
+
 MOCK_BASE_CLASS( input, modegen::ic::input )
 {
 	MOCK_METHOD(clone, 0)
 	MOCK_METHOD(to_json, 0)
+	MOCK_METHOD(all, 0)
 };
 
 MOCK_BASE_CLASS( output, modegen::ic::output )

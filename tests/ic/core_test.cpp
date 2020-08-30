@@ -12,13 +12,13 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include "mocks.hp"
+#include "ic/abstract_part.hpp"
 
 using namespace std::literals;
 
 using mic_outputs_t = std::vector<std::shared_ptr<mic::output>>;
 
 BOOST_AUTO_TEST_SUITE(input_configurator)
-BOOST_AUTO_TEST_SUITE(core)
 
 struct core_fixture {
 	mic::core core;
@@ -57,6 +57,8 @@ struct core_fixture {
 	}
 };
 
+BOOST_AUTO_TEST_SUITE(core)
+
 BOOST_FIXTURE_TEST_CASE(errors, core_fixture)
 {
 	BOOST_CHECK_THROW(core.gen(nullptr, config), std::exception);
@@ -92,7 +94,25 @@ BOOST_FIXTURE_TEST_CASE(map_to, core_fixture)
 
 BOOST_AUTO_TEST_SUITE_END() // core
 
-BOOST_AUTO_TEST_SUITE(input_data)
-BOOST_AUTO_TEST_SUITE_END() // input_data
+BOOST_AUTO_TEST_SUITE(part)
+BOOST_FIXTURE_TEST_CASE(getters, core_fixture)
+{
+	BOOST_CHECK_THROW(mic::abstract::part(10, "test"s, nullptr), std::exception);
+	mic::abstract::part part(10, "test"s, in);
+	BOOST_TEST(part.id() == 10);
+	BOOST_TEST(part.name() == "test"s);
+	BOOST_TEST(part.outputs().empty());
+}
+BOOST_FIXTURE_TEST_CASE(naming, core_fixture)
+{
+	mic::abstract::part part(10, "test"s, in);
+	auto n1 = std::make_shared<icmocks::input_node>();
+	auto n2 = std::make_shared<icmocks::input_node>();
+	MOCK_EXPECT(in->all).returns(std::vector<std::shared_ptr<mic::input_node>>{n1, n2});
+	MOCK_EXPECT(n1->rename).once();
+	MOCK_EXPECT(n2->rename).once();
+	part.rename(gen_utils::name_conversion::camel_case);
+}
+BOOST_AUTO_TEST_SUITE_END() // part
 
 BOOST_AUTO_TEST_SUITE_END() // input_configurator

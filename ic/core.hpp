@@ -16,11 +16,18 @@
 
 namespace modegen::ic {
 
+class input_node {
+public:
+	virtual ~input_node() noexcept =default ;
+	virtual void rename(std::function<std::string(const std::string&)> renamer) =0 ;
+};
+
 class input {
 public:
 	virtual ~input() noexcept =default;
 	virtual nlohmann::json to_json() const =0 ;
 	virtual std::shared_ptr<input> clone() const =0 ;
+	virtual std::vector<std::shared_ptr<input_node>> all() const =0 ;
 };
 
 class output {
