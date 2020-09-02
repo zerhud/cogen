@@ -121,6 +121,9 @@ BOOST_AUTO_TEST_CASE(children)
 	BOOST_TEST(im.children(n1.get())[0]==n2.get());
 	BOOST_REQUIRE(im.children(nullptr).size()==1);
 	BOOST_TEST(im.children(nullptr)[0]==n1.get());
+	im.add(n1.get(), {n3});
+	BOOST_REQUIRE(im.children(n1.get()).size()==2);
+	BOOST_TEST(im.children(n1.get())[1]==n3.get());
 }
 BOOST_AUTO_TEST_CASE(cannot_add_nullptr)
 {
@@ -155,9 +158,10 @@ BOOST_FIXTURE_TEST_CASE(naming, core_fixture)
 BOOST_AUTO_TEST_SUITE(split_versions)
 BOOST_FIXTURE_TEST_CASE(simple, core_fixture)
 {
+	auto r1 = std::make_shared<icmocks::input_node>();
 	auto n1 = std::make_shared<icmocks::input_node>();
-	auto n2 = std::make_shared<icmocks::input_node>();
-	in->add({n1, n2});
+	in->add({r1});
+	in->add(r1.get(), {n1});
 	mic::abstract::part part(10, "test"s, in);
 	part.split_versions();
 }

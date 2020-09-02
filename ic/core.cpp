@@ -55,9 +55,16 @@ void modegen::ic::input::add(
 {
 	if(!node_exists(par))
 		throw std::runtime_error("cannot find parent node");
-	std::vector<input_node*> pointers = to_pointers(list);
+	add_to_parent(par, to_pointers(list));
 	add(false, std::move(list));
-	edges.emplace_back(edge{par, pointers});
+}
+
+bool modegen::ic::input::node_exists(modegen::ic::input_node* node) const
+{
+	auto pos = std::find_if(
+	            nodes.begin(), nodes.end(),
+	            [node](auto& n){return n.get()==node;});
+	return pos != nodes.end();
 }
 
 std::vector<modegen::ic::input_node*> modegen::ic::input::to_pointers(
@@ -68,12 +75,15 @@ std::vector<modegen::ic::input_node*> modegen::ic::input::to_pointers(
 	return pointers;
 }
 
-bool modegen::ic::input::node_exists(modegen::ic::input_node* node) const
+void modegen::ic::input::add_to_parent(modegen::ic::input_node* par, std::vector<modegen::ic::input_node*> list)
 {
-	auto pos = std::find_if(
-	            nodes.begin(), nodes.end(),
-	            [node](auto& n){return n.get()==node;});
-	return pos != nodes.end();
+	for(auto& e:edges) {
+		if(e.parent==par) {
+			e.children.insert(e.children.end(), list.begin(), list.end());
+			return;
+		}
+	}
+	edges.emplace_back(edge{par, std::move(list)});
 }
 
 void modegen::ic::input::add(bool is_root, std::vector<std::shared_ptr<modegen::ic::input_node> > list)

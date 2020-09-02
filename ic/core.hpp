@@ -39,6 +39,7 @@ class input final {
 	        const std::vector<std::shared_ptr<input_node>>& list) const ;
 	bool node_exists(input_node* node) const;
 	void add(bool is_root, std::vector<std::shared_ptr<input_node>> list);
+	void add_to_parent(input_node* par, std::vector<input_node*> list);
 public:
 	input() =default ;
 	~input() noexcept =default;
