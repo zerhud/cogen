@@ -19,15 +19,35 @@ namespace modegen::ic {
 class input_node {
 public:
 	virtual ~input_node() noexcept =default ;
-	virtual void rename(std::function<std::string(const std::string&)> renamer) =0 ;
+	virtual void rename(std::function<std::string(const std::string&)> actor) =0 ;
+	virtual std::uint64_t version() const =0;
+	virtual std::uint64_t level() const =0 ; ///< level 0 is a root
+	virtual std::shared_ptr<input_node> clone() const =0 ;
 };
 
-class input {
+class input final {
+	struct edge {
+		input_node* parent;
+		std::vector<input_node*> children;
+	};
+
+	std::vector<edge> edges;
+	std::vector<std::shared_ptr<input_node>> nodes;
+	std::vector<input_node*> roots;
+
+	std::vector<input_node*> to_pointers(
+	        const std::vector<std::shared_ptr<input_node>>& list) const ;
+	bool node_exists(input_node* node) const;
+	void add(bool is_root, std::vector<std::shared_ptr<input_node>> list);
 public:
-	virtual ~input() noexcept =default;
-	virtual nlohmann::json to_json() const =0 ;
-	virtual std::shared_ptr<input> clone() const =0 ;
-	virtual std::vector<std::shared_ptr<input_node>> all() const =0 ;
+	input() =default ;
+	~input() noexcept =default;
+
+	std::vector<std::shared_ptr<input_node>> all() const ;
+	std::vector<input_node*> children(const input_node* n) const ;
+
+	void add(std::vector<std::shared_ptr<input_node>> list) ;
+	void add(input_node* par, std::vector<std::shared_ptr<input_node>> list) ;
 };
 
 class output {

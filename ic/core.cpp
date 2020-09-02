@@ -27,3 +27,62 @@ void modegen::ic::core::gen(std::shared_ptr<output> out, std::shared_ptr<configu
 			out->gen(config->output_dir(), config->tmpl_information(part->id()));
 	}
 }
+
+std::vector<std::shared_ptr<modegen::ic::input_node> > modegen::ic::input::all() const
+{
+	return nodes;
+}
+
+std::vector<modegen::ic::input_node*> modegen::ic::input::children(const modegen::ic::input_node* n) const
+{
+	for(auto& edge:edges) {
+		assert(node_exists(edge.parent));
+		if(edge.parent==n)
+			return edge.children;
+	}
+	if(n==nullptr) return roots;
+	return {};
+}
+
+void modegen::ic::input::add(std::vector<std::shared_ptr<modegen::ic::input_node> > list)
+{
+	add(true, std::move(list));
+}
+
+void modegen::ic::input::add(
+        modegen::ic::input_node* par,
+        std::vector<std::shared_ptr<modegen::ic::input_node> > list)
+{
+	if(!node_exists(par))
+		throw std::runtime_error("cannot find parent node");
+	std::vector<input_node*> pointers = to_pointers(list);
+	add(false, std::move(list));
+	edges.emplace_back(edge{par, pointers});
+}
+
+std::vector<modegen::ic::input_node*> modegen::ic::input::to_pointers(
+        const std::vector<std::shared_ptr<modegen::ic::input_node> >& list) const
+{
+	std::vector<input_node*> pointers;
+	for(auto& n:list) pointers.emplace_back(n.get());
+	return pointers;
+}
+
+bool modegen::ic::input::node_exists(modegen::ic::input_node* node) const
+{
+	auto pos = std::find_if(
+	            nodes.begin(), nodes.end(),
+	            [node](auto& n){return n.get()==node;});
+	return pos != nodes.end();
+}
+
+void modegen::ic::input::add(bool is_root, std::vector<std::shared_ptr<modegen::ic::input_node> > list)
+{
+	for(auto& n:list) if(!n) throw std::runtime_error("cannot add nullptr");
+	if(is_root) for(auto& n:list) roots.emplace_back(n.get());
+	for(auto& n:list) {
+		if(node_exists(n.get()))
+			throw std::runtime_error("node already exists");
+		nodes.emplace_back(std::move(n));
+	}
+}

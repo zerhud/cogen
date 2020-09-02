@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_SUITE(input_configurator)
 struct core_fixture {
 	mic::core core;
 
-	std::shared_ptr<icmocks::input> in = std::make_shared<icmocks::input>();
+	std::shared_ptr<mic::input> in = std::make_shared<mic::input>();
 	std::shared_ptr<icmocks::output> out = std::make_shared<icmocks::output>();
 	std::shared_ptr<icmocks::configuration> config = std::make_shared<icmocks::configuration>();
 
@@ -94,6 +94,45 @@ BOOST_FIXTURE_TEST_CASE(map_to, core_fixture)
 
 BOOST_AUTO_TEST_SUITE_END() // core
 
+BOOST_AUTO_TEST_SUITE(input)
+BOOST_AUTO_TEST_CASE(all)
+{
+	mic::input im;
+	auto n1 = std::make_shared<icmocks::input_node>();
+	auto n2 = std::make_shared<icmocks::input_node>();
+	im.add({n1, n2});
+	BOOST_REQUIRE(im.all().size()==2);
+	BOOST_TEST(im.all()[0]==n1);
+	BOOST_TEST(im.all()[1]==n2);
+	BOOST_CHECK_THROW(im.add({n1}), std::exception);
+}
+BOOST_AUTO_TEST_CASE(children)
+{
+	mic::input im;
+	auto n1 = std::make_shared<icmocks::input_node>();
+	auto n2 = std::make_shared<icmocks::input_node>();
+	auto n3 = std::make_shared<icmocks::input_node>();
+	BOOST_CHECK_THROW(im.add(n1.get(), {n2}), std::exception);
+	im.add({n1});
+	im.add(n1.get(), {n2});
+	BOOST_REQUIRE(im.all().size()==2);
+	BOOST_TEST(im.children(n2.get()).size()==0);
+	BOOST_REQUIRE(im.children(n1.get()).size()==1);
+	BOOST_TEST(im.children(n1.get())[0]==n2.get());
+	BOOST_REQUIRE(im.children(nullptr).size()==1);
+	BOOST_TEST(im.children(nullptr)[0]==n1.get());
+}
+BOOST_AUTO_TEST_CASE(cannot_add_nullptr)
+{
+	mic::input im;
+	auto n1 = std::make_shared<icmocks::input_node>();
+	auto n2 = std::make_shared<icmocks::input_node>();
+	BOOST_CHECK_THROW(im.add({nullptr}), std::exception);
+	im.add({n1});
+	BOOST_CHECK_THROW(im.add(n1.get(), {n2,nullptr}), std::exception);
+}
+BOOST_AUTO_TEST_SUITE_END() // input
+
 BOOST_AUTO_TEST_SUITE(part)
 BOOST_FIXTURE_TEST_CASE(getters, core_fixture)
 {
@@ -105,14 +144,24 @@ BOOST_FIXTURE_TEST_CASE(getters, core_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(naming, core_fixture)
 {
-	mic::abstract::part part(10, "test"s, in);
 	auto n1 = std::make_shared<icmocks::input_node>();
 	auto n2 = std::make_shared<icmocks::input_node>();
-	MOCK_EXPECT(in->all).returns(std::vector<std::shared_ptr<mic::input_node>>{n1, n2});
+	in->add({n1, n2});
+	mic::abstract::part part(10, "test"s, in);
 	MOCK_EXPECT(n1->rename).once();
 	MOCK_EXPECT(n2->rename).once();
 	part.rename(gen_utils::name_conversion::camel_case);
 }
+BOOST_AUTO_TEST_SUITE(split_versions)
+BOOST_FIXTURE_TEST_CASE(simple, core_fixture)
+{
+	auto n1 = std::make_shared<icmocks::input_node>();
+	auto n2 = std::make_shared<icmocks::input_node>();
+	in->add({n1, n2});
+	mic::abstract::part part(10, "test"s, in);
+	part.split_versions();
+}
+BOOST_AUTO_TEST_SUITE_END() // split_versions
 BOOST_AUTO_TEST_SUITE_END() // part
 
 BOOST_AUTO_TEST_SUITE_END() // input_configurator
