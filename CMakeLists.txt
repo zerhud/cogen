@@ -71,6 +71,7 @@ file(GLOB_RECURSE ic_hdr LIST_DIRECTORIES false RELATIVE "${CMAKE_CURRENT_LIST_D
 add_library(input_configurator STATIC ${ic_src} ${ic_hdr} ${lohman_json_file})
 target_include_directories(input_configurator PUBLIC "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_LIST_DIR}")
 target_link_libraries(input_configurator PUBLIC generation_utils)
+source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/ic/" FILES ${ic_src} ${ic_hdr})
 
 add_library(modegen_parsers ${main_config_file})
 target_link_libraries(modegen_parsers PRIVATE stdc++fs ix3 PUBLIC ${Boost_LIBRARIES})
