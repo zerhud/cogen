@@ -92,7 +92,7 @@ public:
 			//}
 			//else if(std::holds_alternative<FS::path>(ef.second)) {
 				//json_data["extra_data"][ef.first]["name"] = ef.first;
-				//json_data["extra_data"][ef.first]["file"] = std::get<FS::path>(ef.second).u8string();
+				//json_data["extra_data"][ef.first]["file"] = std::get<FS::path>(ef.second).string();
 			//}
 		//}
 
@@ -143,13 +143,13 @@ public:
 
 		auto ret = resolve_file(p, final_search);
 		if(ret) return *ret;
-		ret = resolve_file(p.generic_u8string() + ".info"s, final_search);
+		ret = resolve_file(p.generic_string() + ".info"s, final_search);
 		if(ret) return *ret;
-		ret = resolve_file(p.generic_u8string() + ".jinja"s, final_search);
+		ret = resolve_file(p.generic_string() + ".jinja"s, final_search);
 		if(ret) return *ret;
 
-		std::string err_msg = "cannot find file "s + p.generic_u8string() + "\ntry to search in:\n"s;
-		for(const auto& sp:final_search) err_msg += "\t"s + sp.generic_u8string() + "\n"s;
+		std::string err_msg = "cannot find file "s + p.generic_string() + "\ntry to search in:\n"s;
+		for(const auto& sp:final_search) err_msg += "\t"s + sp.generic_string() + "\n"s;
 		throw std::runtime_error(err_msg);
 	}
 
@@ -240,7 +240,7 @@ int main(int argc, char** argv)
 			FS::path info_path = prov->resolve_file(val, "", "");
 			auto opts = std::make_shared<mg::options::container>(info_path);
 			gen = std::make_unique<mg::generator>(prov, opts);
-			boost::property_tree::read_info(info_path.u8string(), opts->raw());
+			boost::property_tree::read_info(info_path.string(), opts->raw());
 		}
 		else if(key=="option"sv) {
 			if(!gen) throw std::runtime_error("cannot override option without generator");
@@ -261,7 +261,7 @@ int main(int argc, char** argv)
 			if(!FS::exists(out_dir)) FS::create_directories(out_dir);
 		}
 		else {
-			std::cerr << u8"unknown option "sv << key << "="sv << val << std::endl;
+			std::cerr << "unknown option "sv << key << "="sv << val << std::endl;
 		}
 	}
 

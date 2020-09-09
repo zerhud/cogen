@@ -18,7 +18,7 @@ namespace mp = modegen::parser;
 
 std::vector<std::string> mp::loaders_manager::name_list()
 {
-	return {u8"interface"s, u8"ix3", u8"info"s, u8"json"s};
+	return {"interface"s, "ix3"s, "info"s, "json"s};
 }
 
 mp::loaders_manager::loaders_manager()
@@ -43,7 +43,7 @@ mp::loader_ptr mp::loaders_manager::require(std::string_view name)
 		return ret;
 	}
 
-	throw errors::error(u8"no loader with name "s + std::string(name));
+	throw errors::error("no loader with name "s + std::string(name));
 }
 
 std::vector<mp::loader_ptr> mp::loaders_manager::finish_loads()

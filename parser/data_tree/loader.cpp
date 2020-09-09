@@ -40,8 +40,8 @@ void md::loader_impl::load(std::istream& input, std::string fn)
 void md::loader_impl::load(FS::path file)
 {
 	boost::property_tree::ptree file_data;
-	if(cur_format==data_format::info) boost::property_tree::read_info(file.u8string(), file_data);
-	else if(cur_format==data_format::json) boost::property_tree::read_json(file.u8string(), file_data);
+	if(cur_format==data_format::info) boost::property_tree::read_info(file.string(), file_data);
+	else if(cur_format==data_format::json) boost::property_tree::read_json(file.string(), file_data);
 	files[file.generic_string()] = std::move(file_data);
 }
 

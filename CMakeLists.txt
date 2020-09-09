@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(modegen_parser VERSION 0.1.0.0 LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(ENABLE_TODO "enable todo warnings in debug mode" ON)
@@ -54,9 +54,21 @@ include(cmake/target_sources_local.cmake)
 add_subdirectory(common_utils)
 add_subdirectory(parser/ix3)
 
+# lohman json
+set(lohman_json_file "${CMAKE_CURRENT_BINARY_DIR}/nlohman/json.hpp")
+set(lohman_json_url "https://github.com/nlohmann/json/raw/develop/single_include/nlohmann/json.hpp")
+add_custom_command(OUTPUT "${lohman_json_file}"
+	COMMAND "${CMAKE_COMMAND}"
+		-Durl="${lohman_json_url}" -Dout="${lohman_json_file}"
+		-Denv_var="nlohman_json_header"
+		-P "${CMAKE_CURRENT_LIST_DIR}/cmake/download_or_get.cmake"
+	DEPENDS
+		"${CMAKE_CURRENT_LIST_DIR}/cmake/download_or_get.cmake"
+)
+
 file(GLOB_RECURSE ic_src LIST_DIRECTORIES false RELATIVE "${CMAKE_CURRENT_LIST_DIR}" "${CMAKE_CURRENT_LIST_DIR}/ic/*.cpp")
 file(GLOB_RECURSE ic_hdr LIST_DIRECTORIES false RELATIVE "${CMAKE_CURRENT_LIST_DIR}" "${CMAKE_CURRENT_LIST_DIR}/ic/*.hpp")
-add_library(input_configurator STATIC ${ic_src} ${ic_hdr})
+add_library(input_configurator STATIC ${ic_src} ${ic_hdr} ${lohman_json_file})
 target_include_directories(input_configurator PUBLIC "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_LIST_DIR}")
 target_link_libraries(input_configurator PUBLIC generation_utils)
 
@@ -122,18 +134,6 @@ target_sources_copy(part_generation "${dbg_cmake_templates_dir}"
 #target_sources_copy(part_generation "${dbg_python_templates_dir}"
 	#pg/tmpls/
 	#)
-
-# lohman json
-set(lohman_json_file "${CMAKE_CURRENT_BINARY_DIR}/nlohman/json.hpp")
-set(lohman_json_url "https://github.com/nlohmann/json/raw/develop/single_include/nlohmann/json.hpp")
-add_custom_command(OUTPUT "${lohman_json_file}"
-	COMMAND "${CMAKE_COMMAND}"
-		-Durl="${lohman_json_url}" -Dout="${lohman_json_file}"
-		-Denv_var="nlohman_json_header"
-		-P "${CMAKE_CURRENT_LIST_DIR}/cmake/download_or_get.cmake"
-	DEPENDS
-		"${CMAKE_CURRENT_LIST_DIR}/cmake/download_or_get.cmake"
-)
 
 #target_sources(modegen_interfaces PRIVATE "${lohman_json_file}" )
 target_sources(part_generation PRIVATE "${lohman_json_file}" )

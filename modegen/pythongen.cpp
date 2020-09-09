@@ -27,8 +27,8 @@ modegen::generation::python_evaluator::python_evaluator(nlohmann::json data)
 const mg::python_evaluator& mg::python_evaluator::sys_path(const FS::path& dir)
 {
 	std::stringstream script;
-	script << u8"import sys"s << std::endl
-	       << u8"sys.path.append("s << std::quoted(dir.u8string()) << u8")"s << std::endl
+	script << "import sys"s << std::endl
+	       << "sys.path.append("s << std::quoted(dir.string()) << ")"s << std::endl
 	       ;
 	py::exec(script.str(), globals);
 	return *this;
@@ -37,8 +37,8 @@ const mg::python_evaluator& mg::python_evaluator::sys_path(const FS::path& dir)
 const mg::python_evaluator& mg::python_evaluator::tmpl(const FS::path& tfile, const std::optional<FS::path>& out) const
 {
 	using namespace py::literals;
-	globals["template_file"] = tfile.u8string();
-	if(out) globals["output_file"] = out->u8string();
+	globals["template_file"] = tfile.string();
+	if(out) globals["output_file"] = out->string();
 	else globals["output_file"] = "-"s;
 	globals["template_str_data"] = str_gen_data();
 	script(template_script);
@@ -52,7 +52,7 @@ const mg::python_evaluator& mg::python_evaluator::script(const mg::python_evalua
 	if(str) py::exec(*str, py::globals(), globals);
 	else if(file) {
 		std::stringstream code;
-		code << u8"exec(open(" << std::quoted(file->u8string()) << ").read())" ;
+		code << "exec(open(" << std::quoted(file->string()) << ").read())" ;
 		py::exec(code.str(), py::globals(), globals);
 	}
 	else {

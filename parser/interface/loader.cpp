@@ -49,8 +49,8 @@ void modegen::parser::interface::loader_impl::load(FS::path file)
 	std::unique_ptr<char,decltype(frem_fnc)> frem(nullptr,frem_fnc);
 	cur_dir.emplace_back(file.parent_path());
 
-	std::fstream file_stream(file.generic_u8string());
-	load(file_stream, file.generic_u8string());
+	std::fstream file_stream(file.generic_string());
+	load(file_stream, file.generic_string());
 }
 
 void modegen::parser::interface::loader_impl::finish_loads()
@@ -85,6 +85,6 @@ FS::path modegen::parser::interface::loader_impl::search_file(FS::path f) const
 		if(FS::exists(cur_file)) return cur_file;
 	}
 
-	throw errors::error("file " + f.generic_u8string() + " not found");
+	throw errors::error("file "s + f.generic_string() + " not found"s);
 }
 
