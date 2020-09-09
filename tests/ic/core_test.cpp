@@ -13,6 +13,7 @@
 
 #include "mocks.hp"
 #include "ic/abstract_part.hpp"
+#include "ic/algos/split.hpp"
 
 using namespace std::literals;
 
@@ -26,6 +27,8 @@ struct core_fixture {
 	std::shared_ptr<mic::input> in = std::make_shared<mic::input>();
 	std::shared_ptr<icmocks::output> out = std::make_shared<icmocks::output>();
 	std::shared_ptr<icmocks::configuration> config = std::make_shared<icmocks::configuration>();
+
+	std::vector<std::shared_ptr<icmocks::input_node>> nodes;
 
 	std::vector<std::shared_ptr<icmocks::generation_part>> parts;
 	std::vector<std::shared_ptr<mic::generation_part>> _parts; ///< simplify returns
@@ -54,6 +57,28 @@ struct core_fixture {
 		if(sv) MOCK_EXPECT(parts[id]->split_versions).once();
 		MOCK_EXPECT(config->naming).with(id).returns(n);
 		MOCK_EXPECT(parts[id]->rename).once().with(n);
+	}
+
+	std::shared_ptr<icmocks::input_node> create_node(std::uint64_t level, std::uint64_t ver)
+	{
+		auto ret = std::make_shared<icmocks::input_node>();
+		MOCK_EXPECT(ret->level).returns(level);
+		MOCK_EXPECT(ret->version).returns(ver);
+		nodes.emplace_back(ret);
+		return ret;
+	}
+
+	void create_nodes(std::uint64_t level, std::uint64_t ver, mic::input_node* par, std::size_t cnt)
+	{
+		std::vector<std::shared_ptr<mic::input_node>> list;
+		while(cnt--) list.emplace_back(create_node(level, ver));
+		if(par) in->add(par, list);
+		else in->add(list);
+	}
+
+	void check_input()
+	{
+		BOOST_TEST(in->check_tree_levels() == ""s);
 	}
 };
 
@@ -158,13 +183,37 @@ BOOST_FIXTURE_TEST_CASE(naming, core_fixture)
 BOOST_AUTO_TEST_SUITE(split_versions)
 BOOST_FIXTURE_TEST_CASE(simple, core_fixture)
 {
-	auto r1 = std::make_shared<icmocks::input_node>();
-	auto n1 = std::make_shared<icmocks::input_node>();
-	in->add({r1});
-	in->add(r1.get(), {n1});
+	create_nodes(0, 0, nullptr, 2);
+	create_nodes(1, 1, nodes[0].get(), 1);
+	create_nodes(1, 0, nodes[1].get(), 1);
+	create_nodes(1, 1, nodes[1].get(), 1);
+	check_input();
 	mic::abstract::part part(10, "test"s, in);
 	part.split_versions();
+	check_input();
+	BOOST_TEST(in->children(nullptr).size()==3);
 }
+BOOST_AUTO_TEST_SUITE(split)
+BOOST_FIXTURE_TEST_CASE(roots, core_fixture)
+{
+	mic::algos::split split;
+	BOOST_REQUIRE(split.roots() != nullptr);
+	BOOST_TEST(split.roots()->all().empty());
+}
+BOOST_FIXTURE_TEST_CASE(add_one, core_fixture)
+{
+	mic::algos::split split;
+
+	create_nodes(0, 0, nullptr, 2);
+	create_nodes(1, 1, nodes[0].get(), 1);
+	create_nodes(1, 0, nodes[1].get(), 1);
+	create_nodes(1, 1, nodes[1].get(), 1);
+	check_input();
+
+	split(nodes[0]);
+	BOOST_TEST(split.roots()->all().size() == 1);
+}
+BOOST_AUTO_TEST_SUITE_END() // split
 BOOST_AUTO_TEST_SUITE_END() // split_versions
 BOOST_AUTO_TEST_SUITE_END() // part
 

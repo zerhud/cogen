@@ -7,6 +7,7 @@
  *************************************************************************/
 
 #include "abstract_part.hpp"
+#include "algos/split.hpp"
 
 modegen::ic::abstract::part::part(
           std::size_t id
@@ -43,7 +44,9 @@ void modegen::ic::abstract::part::rename(gen_utils::name_conversion to)
 
 void modegen::ic::abstract::part::split_versions()
 {
-
+	algos::split split;
+	for(auto& r:data_->all()) split(r);
+	data_ = split.roots();
 }
 
 void modegen::ic::abstract::part::map_to(std::string_view tmpl)
