@@ -20,7 +20,18 @@ std::shared_ptr<modegen::ic::input> modegen::ic::algos::split::roots() const
 }
 
 void modegen::ic::algos::split::operator()(
-        std::shared_ptr<modegen::ic::input_node> root)
+        std::shared_ptr<modegen::ic::input_node> node)
 {
-	all_data->add({root});
+	if(node->level()==0)
+		all_data->add({node});
+	else add_to_root(std::move(node));
+}
+
+void modegen::ic::algos::split::add_to_root(std::shared_ptr<input_node> node)
+{
+	auto roots = all_data->children(nullptr);
+	for(auto& root:roots)
+		if(node->version() <= root->version()) {
+			all_data->add(root, {node});
+		}
 }

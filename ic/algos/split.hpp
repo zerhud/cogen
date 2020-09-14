@@ -15,10 +15,11 @@ namespace modegen::ic::algos {
 
 class split final {
 	std::shared_ptr<input> all_data;
+	void add_to_root(std::shared_ptr<input_node> node);
 public:
 	split();
 	std::shared_ptr<input> roots() const ;
-	void operator ()(std::shared_ptr<input_node> root);
+	void operator ()(std::shared_ptr<input_node> node);
 };
 
 } // namespace modegen::ic::algos

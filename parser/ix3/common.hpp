@@ -11,6 +11,7 @@
 #define BOOST_SPIRIT_X3_UNICODE
 
 #include <string>
+#include <variant>
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/support/utf8.hpp>
 

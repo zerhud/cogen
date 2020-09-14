@@ -78,7 +78,7 @@ struct core_fixture {
 
 	void check_input()
 	{
-		BOOST_TEST(in->check_tree_levels() == ""s);
+		//BOOST_TEST(in->check_tree_levels() == ""s);
 	}
 };
 
@@ -120,23 +120,23 @@ BOOST_FIXTURE_TEST_CASE(map_to, core_fixture)
 BOOST_AUTO_TEST_SUITE_END() // core
 
 BOOST_AUTO_TEST_SUITE(input)
-BOOST_AUTO_TEST_CASE(all)
+BOOST_FIXTURE_TEST_CASE(all, core_fixture)
 {
 	mic::input im;
-	auto n1 = std::make_shared<icmocks::input_node>();
-	auto n2 = std::make_shared<icmocks::input_node>();
+	auto n1 = create_node(0,0);
+	auto n2 = create_node(0,0);
 	im.add({n1, n2});
 	BOOST_REQUIRE(im.all().size()==2);
 	BOOST_TEST(im.all()[0]==n1);
 	BOOST_TEST(im.all()[1]==n2);
 	BOOST_CHECK_THROW(im.add({n1}), std::exception);
 }
-BOOST_AUTO_TEST_CASE(children)
+BOOST_FIXTURE_TEST_CASE(children, core_fixture)
 {
 	mic::input im;
-	auto n1 = std::make_shared<icmocks::input_node>();
-	auto n2 = std::make_shared<icmocks::input_node>();
-	auto n3 = std::make_shared<icmocks::input_node>();
+	auto n1 = create_node(0,0);
+	auto n2 = create_node(1,0);
+	auto n3 = create_node(1,0);
 	BOOST_CHECK_THROW(im.add(n1.get(), {n2}), std::exception);
 	im.add({n1});
 	im.add(n1.get(), {n2});
@@ -149,15 +149,28 @@ BOOST_AUTO_TEST_CASE(children)
 	im.add(n1.get(), {n3});
 	BOOST_REQUIRE(im.children(n1.get()).size()==2);
 	BOOST_TEST(im.children(n1.get())[1]==n3.get());
+	//BOOST_TEST(im.check_tree_levels() == ""s);
 }
-BOOST_AUTO_TEST_CASE(cannot_add_nullptr)
+BOOST_FIXTURE_TEST_CASE(cannot_add_nullptr, core_fixture)
 {
 	mic::input im;
-	auto n1 = std::make_shared<icmocks::input_node>();
-	auto n2 = std::make_shared<icmocks::input_node>();
+	auto n1 = create_node(0,0);
+	auto n2 = create_node(1,0);
 	BOOST_CHECK_THROW(im.add({nullptr}), std::exception);
 	im.add({n1});
 	BOOST_CHECK_THROW(im.add(n1.get(), {n2,nullptr}), std::exception);
+}
+BOOST_FIXTURE_TEST_CASE(cannot_add_wrong_level, core_fixture)
+{
+	mic::input im;
+
+	auto good_root = create_node(0, 0);
+	auto bad_root = create_node(1, 0);
+	auto bad_child = create_node(0, 0);
+
+	im.add({good_root});
+	BOOST_CHECK_THROW(im.add({bad_root}), std::exception);
+	BOOST_CHECK_THROW(im.add(good_root.get(), {bad_child}), std::exception);
 }
 BOOST_AUTO_TEST_SUITE_END() // input
 
@@ -205,13 +218,24 @@ BOOST_FIXTURE_TEST_CASE(add_one, core_fixture)
 	mic::algos::split split;
 
 	create_nodes(0, 0, nullptr, 2);
-	create_nodes(1, 1, nodes[0].get(), 1);
-	create_nodes(1, 0, nodes[1].get(), 1);
-	create_nodes(1, 1, nodes[1].get(), 1);
+	create_nodes(1, 0, nodes[0].get(), 1);
+	create_nodes(2, 0, nodes[2].get(), 1);
 	check_input();
 
 	split(nodes[0]);
 	BOOST_TEST(split.roots()->all().size() == 1);
+	split(nodes[1]);
+	BOOST_TEST(split.roots()->all().size() == 2);
+	split(nodes[2]);
+	BOOST_TEST(split.roots()->all().size() == 3);
+	BOOST_TEST(split.roots()->children(nullptr).size()==2);
+	BOOST_TEST(split.roots()->children(nullptr)[0] == nodes[0].get());
+	BOOST_TEST(split.roots()->children(nullptr)[1] == nodes[1].get());
+
+	BOOST_TEST(split.roots()->children(nodes[0].get()).size() == 1);
+	BOOST_TEST(split.roots()->children(nodes[1].get()).size() == 1);
+	split(nodes[3]);
+	BOOST_TEST(split.roots()->all().size() == 2);
 }
 BOOST_AUTO_TEST_SUITE_END() // split
 BOOST_AUTO_TEST_SUITE_END() // split_versions

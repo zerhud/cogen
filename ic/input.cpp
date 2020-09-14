@@ -9,6 +9,8 @@
 #include "input.hpp"
 
 #include <cassert>
+#include <algorithm>
+#include <ranges>
 
 using namespace std::literals;
 
@@ -28,19 +30,39 @@ std::vector<modegen::ic::input_node*> modegen::ic::input::children(const modegen
 	return {};
 }
 
-void modegen::ic::input::add(std::vector<std::shared_ptr<modegen::ic::input_node> > list)
+void modegen::ic::input::add(std::vector<std::shared_ptr<modegen::ic::input_node>> list)
 {
+	for(auto& r:list) {
+		if(!r)
+			throw std::runtime_error("cannot add nullptr"s);
+		if(r->level()!=0)
+			throw std::runtime_error("root level must to be zero"s);
+		if(node_exists(r.get())) {
+			auto pos = std::find(roots.begin(),roots.end(), r.get());
+			std::ranges::find(roots, r.get());
+		}
+	}
 	add(true, std::move(list));
 }
 
 void modegen::ic::input::add(
         modegen::ic::input_node* par,
-        std::vector<std::shared_ptr<modegen::ic::input_node> > list)
+        std::vector<std::shared_ptr<modegen::ic::input_node>> list)
 {
+	if(!par) throw std::runtime_error("cannot add to a nullptr"s);
 	if(!node_exists(par))
-		throw std::runtime_error("cannot find parent node");
+		throw std::runtime_error("cannot find parent node"s);
+	for(auto& child:list) {
+		if(!child)
+			throw std::runtime_error("cannot add nullptr"s);
+		if(child->level() <= par->level())
+			throw std::runtime_error("child level is less or equal pareet"s);
+	}
+
 	add_to_parent(par, to_pointers(list));
 	add(false, std::move(list));
+
+	assert(check_tree_levels().empty());
 }
 
 bool modegen::ic::input::node_exists(modegen::ic::input_node* node) const
@@ -73,6 +95,9 @@ void modegen::ic::input::add_to_parent(
 
 std::string modegen::ic::input::check_tree_levels() const
 {
+	for(auto& root:roots)
+		if(root->level() != 0)
+			return "root level is " + std::to_string(root->level());
 	for(auto& e:edges) {
 		for(auto& child:e.children)
 			if(child->level() <= e.parent->level()) {
@@ -94,4 +119,5 @@ void modegen::ic::input::add(bool is_root, std::vector<std::shared_ptr<modegen::
 			throw std::runtime_error("node already exists");
 		nodes.emplace_back(std::move(n));
 	}
+	assert(check_tree_levels().empty());
 }
