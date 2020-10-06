@@ -13,5 +13,9 @@ find_file(turtle turtle/mock.hpp)
 get_filename_component(turtle "${turtle}" DIRECTORY)
 get_filename_component(turtle "${turtle}" DIRECTORY)
 
+if(ENABLE_TESTS)
+	enable_testing()
+endif()
+
 add_subdirectory(common_utils)
 add_subdirectory(ic)
