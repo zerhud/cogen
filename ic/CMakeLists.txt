@@ -8,15 +8,19 @@ file(GLOB_RECURSE ic_src LIST_DIRECTORIES false RELATIVE "${CMAKE_CURRENT_LIST_D
 file(GLOB_RECURSE ic_hdr LIST_DIRECTORIES false RELATIVE "${CMAKE_CURRENT_LIST_DIR}" "${CMAKE_CURRENT_LIST_DIR}/*.hpp")
 list(FILTER ic_src EXCLUDE REGEX "tests/.*")
 list(FILTER ic_hdr EXCLUDE REGEX "tests/.*")
-add_library("${PROJECT_NAME}" STATIC ${ic_src} ${ic_hdr})# ${lohman_json_file})
-target_include_directories("${PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_LIST_DIR}")
+
+add_library("${PROJECT_NAME}" STATIC ${ic_src} ${ic_hdr} ${lohman_json_file})
+
+add_dependencies("${PROJECT_NAME}" generate_nlohman)
+set_source_files_properties(${lohman_json_file} PROPERTIES GENERATED TRUE)
+
+target_include_directories("${PROJECT_NAME}" PUBLIC "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_LIST_DIR}")
 target_link_libraries("${PROJECT_NAME}" PUBLIC generation_utils)
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/" FILES ${ic_src} ${ic_hdr})
 
 if(ENABLE_TESTS)
 	find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
-	message("in ic ${turtle}")
 	macro(add_unit_test tname path lib)
 		add_executable(ic_${tname}_test "${path}${tname}_test.cpp")
 		target_link_libraries(ic_${tname}_test PRIVATE ${PROJECT_NAME} ${lib} ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})

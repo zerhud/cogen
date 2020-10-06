@@ -10,7 +10,6 @@
 
 #include <cassert>
 #include <algorithm>
-#include <ranges>
 
 using namespace std::literals;
 
@@ -39,7 +38,6 @@ void modegen::ic::input::add(std::vector<std::shared_ptr<modegen::ic::input_node
 			throw std::runtime_error("root level must to be zero"s);
 		if(node_exists(r.get())) {
 			auto pos = std::find(roots.begin(),roots.end(), r.get());
-			std::ranges::find(roots, r.get());
 		}
 	}
 	add(true, std::move(list));

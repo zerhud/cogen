@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_library(${PROJECT_NAME} naming.cpp naming.hpp)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR})
 
-message("in common ${turtle}")
 if(ENABLE_TESTS)
 	find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 	add_executable(naming_test "tests/naming.cpp")
