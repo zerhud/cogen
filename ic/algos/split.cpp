@@ -9,29 +9,19 @@
 #include "split.hpp"
 
 
-modegen::ic::algos::split::split()
-    : all_data(std::make_shared<input>())
+modegen::ic::algos::split::split(const input_node* root)
 {
 }
 
-std::shared_ptr<modegen::ic::input> modegen::ic::algos::split::roots() const
+void modegen::ic::algos::split::operator()(const modegen::ic::input_node* node)
 {
-	return all_data;
 }
 
-void modegen::ic::algos::split::operator()(
-        std::shared_ptr<modegen::ic::input_node> node)
+void modegen::ic::algos::split::add_to_root(const input_node* node)
 {
-	if(node->level()==0)
-		all_data->add({node});
-	else add_to_root(std::move(node));
 }
 
-void modegen::ic::algos::split::add_to_root(std::shared_ptr<input_node> node)
+void modegen::ic::algos::split::clone_exactly_version_root(
+        std::optional<std::uint64_t> ver)
 {
-	auto roots = all_data->children(nullptr);
-	for(auto& root:roots)
-		if(node->version() <= root->version()) {
-			all_data->add(root, {node});
-		}
 }

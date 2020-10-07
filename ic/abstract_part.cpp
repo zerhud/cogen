@@ -38,15 +38,11 @@ modegen::ic::abstract::part::outputs() const
 
 void modegen::ic::abstract::part::rename(gen_utils::name_conversion to)
 {
-	auto renamer = [to](const std::string& n){return gen_utils::convert(n, to);};
-	for(auto n:data_->all()) n->rename(renamer);
+	//auto renamer = [to](const std::string& n){return gen_utils::convert(n, to);};
 }
 
 void modegen::ic::abstract::part::split_versions()
 {
-	algos::split split;
-	for(auto& r:data_->all()) split(r);
-	data_ = split.roots();
 }
 
 void modegen::ic::abstract::part::map_to(std::string_view tmpl)

@@ -13,12 +13,14 @@
 
 using namespace std::literals;
 
-std::vector<std::shared_ptr<modegen::ic::input_node> > modegen::ic::input::all() const
+std::vector<std::shared_ptr<modegen::ic::input_node>>
+modegen::ic::input::all() const
 {
 	return nodes;
 }
 
-std::vector<modegen::ic::input_node*> modegen::ic::input::children(const modegen::ic::input_node* n) const
+std::vector<modegen::ic::input_node*>
+modegen::ic::input::children(const modegen::ic::input_node* n) const
 {
 	for(auto& edge:edges) {
 		assert(node_exists(edge.parent));
@@ -29,7 +31,8 @@ std::vector<modegen::ic::input_node*> modegen::ic::input::children(const modegen
 	return {};
 }
 
-void modegen::ic::input::add(std::vector<std::shared_ptr<modegen::ic::input_node>> list)
+void modegen::ic::input::add(
+		std::vector<std::shared_ptr<modegen::ic::input_node>> list)
 {
 	for(auto& r:list) {
 		if(!r)
@@ -38,6 +41,7 @@ void modegen::ic::input::add(std::vector<std::shared_ptr<modegen::ic::input_node
 			throw std::runtime_error("root level must to be zero"s);
 		if(node_exists(r.get())) {
 			auto pos = std::find(roots.begin(),roots.end(), r.get());
+			if(pos!=roots.end()) throw std::runtime_error("root added twice"s);
 		}
 	}
 	add(true, std::move(list));
@@ -72,7 +76,7 @@ bool modegen::ic::input::node_exists(modegen::ic::input_node* node) const
 }
 
 std::vector<modegen::ic::input_node*> modegen::ic::input::to_pointers(
-        const std::vector<std::shared_ptr<modegen::ic::input_node> >& list) const
+        const std::vector<std::shared_ptr<modegen::ic::input_node>>& list) const
 {
 	std::vector<input_node*> pointers;
 	for(auto& n:list) pointers.emplace_back(n.get());
@@ -108,13 +112,15 @@ std::string modegen::ic::input::check_tree_levels() const
 	return ""s;
 }
 
-void modegen::ic::input::add(bool is_root, std::vector<std::shared_ptr<modegen::ic::input_node> > list)
+void modegen::ic::input::add(
+					 bool is_root,
+					 std::vector<std::shared_ptr<modegen::ic::input_node> > list)
 {
 	for(auto& n:list) if(!n) throw std::runtime_error("cannot add nullptr");
 	if(is_root) for(auto& n:list) roots.emplace_back(n.get());
 	for(auto& n:list) {
-		if(node_exists(n.get()))
-			throw std::runtime_error("node already exists");
+		if(!node_exists(n.get()))
+			//throw std::runtime_error("node already exists");
 		nodes.emplace_back(std::move(n));
 	}
 	assert(check_tree_levels().empty());

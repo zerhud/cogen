@@ -54,6 +54,8 @@ public:
 };
 
 class core {
+	void build(const configuration& config, generation_part& part) const ;
+	void gen(const configuration& config, const generation_part& part) const ;
 public:
 	core() ;
 	void gen(
