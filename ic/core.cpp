@@ -15,13 +15,13 @@ modegen::ic::core::core()
 }
 
 void modegen::ic::core::gen(
-					 std::shared_ptr<output> out,
-					 std::shared_ptr<configuration> config) const
+          std::shared_ptr<output> out
+        , std::shared_ptr<configuration> config) const
 {
 	if(!out || !config)
 		throw std::runtime_error(
-							 "cannot generate output without "
-							 "configuration or output provider"s);
+		     "cannot generate output without "
+		     "configuration or output provider"s);
 	auto parts = config->parts();
 	for(auto& part:parts) build(*config, *part);
 	for(auto& part:parts) gen(*config, *part);

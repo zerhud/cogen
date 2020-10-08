@@ -4,13 +4,33 @@ project(generation_utils VERSION 0.1.0.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(${PROJECT_NAME} naming.cpp naming.hpp)
+file(
+    GLOB_RECURSE src
+    LIST_DIRECTORIES false
+    RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
+    "${CMAKE_CURRENT_LIST_DIR}/*.cpp")
+file(
+    GLOB_RECURSE hdr
+    LIST_DIRECTORIES false
+    RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
+    "${CMAKE_CURRENT_LIST_DIR}/*.hpp")
+list(FILTER src EXCLUDE REGEX "tests/.*")
+list(FILTER hdr EXCLUDE REGEX "tests/.*")
+source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/" FILES ${src} ${hdr})
+
+add_library(${PROJECT_NAME} ${src} ${hdr})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR})
 
 if(ENABLE_TESTS)
 	find_package(Boost COMPONENTS unit_test_framework REQUIRED)
-	add_executable(naming_test "tests/naming.cpp")
-	target_link_libraries(naming_test PRIVATE ${PROJECT_NAME} ${Boost_LIBRARIES})
-	target_include_directories(naming_test PRIVATE ${turtle} ${Boost_INCLUDE_DIR})
-	add_test(NAME naming COMMAND naming_test)
+
+	macro(add_unit_test tname path lib)
+		add_executable(gu_${tname}_test "${path}${tname}.cpp")
+		target_link_libraries(gu_${tname}_test PRIVATE ${PROJECT_NAME} ${Boost_LIBRARIES})
+		target_include_directories(gu_${tname}_test PRIVATE ${turtle} ${Boost_INCLUDE_DIR})
+		add_test(NAME gu_${tname} COMMAND gu_${tname}_test)
+	endmacro()
+
+	add_unit_test(naming "tests/" "")
+	add_unit_test(input "tests/" "")
 endif()
