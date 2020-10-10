@@ -18,7 +18,7 @@ class part : public generation_part {
 	std::string name_;
 	std::shared_ptr<input> data_;
 public:
-	part(std::size_t number, std::string name_in_config, std::shared_ptr<input> all_input);
+	part(std::size_t id, std::string name_in_config, std::shared_ptr<input> all_input);
 
 	std::size_t id() const override;
 	std::string name() const override;

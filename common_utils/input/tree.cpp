@@ -13,7 +13,7 @@
 using namespace gen_utils;
 using namespace std::literals;
 
-tree::tree(node_ptr root, std::uint64_t id_) : id(id_)
+tree::tree(node_ptr root, std::string id_) : id(std::move(id_))
 {
 	if(!root) throw std::runtime_error("cannot create input tree without a root");
 	if(!root->version().has_value())
@@ -22,7 +22,7 @@ tree::tree(node_ptr root, std::uint64_t id_) : id(id_)
 	store.emplace_back(root);
 }
 
-std::uint64_t tree::data_id() const
+std::string tree::data_id() const
 {
 	return id;
 }

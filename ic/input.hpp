@@ -25,7 +25,8 @@ public:
 	virtual std::shared_ptr<input_node> clone() const =0 ;
 };
 
-class input final {
+class [[deprecated("use gen_utils::tree insteed")]]
+input final {
 	struct edge {
 		input_node* parent;
 		std::vector<input_node*> children;

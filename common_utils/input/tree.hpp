@@ -32,16 +32,16 @@ class tree final {
 
 	std::vector<node_ptr> store;
 	std::uint64_t root_ver;
-	std::uint64_t id;
+	std::string id;
 
 	std::vector<edge> edges;
 
 	bool node_exists(const data_node* n) const ;
 	node_ptr create_link(const data_node* p, node_ptr c);
 public:
-	tree(node_ptr root, std::uint64_t id_);
+	tree(node_ptr root, std::string id_);
 
-	std::uint64_t data_id() const ;
+	std::string data_id() const ;
 	const data_node& root() const ;
 
 	void add(const data_node& par, node_ptr child);

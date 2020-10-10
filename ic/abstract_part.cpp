@@ -9,6 +9,8 @@
 #include "abstract_part.hpp"
 #include "algos/split.hpp"
 
+using namespace std::literals;
+
 modegen::ic::abstract::part::part(
           std::size_t id
         , std::string name_in_config
@@ -17,7 +19,7 @@ modegen::ic::abstract::part::part(
     , name_(std::move(name_in_config))
     , data_(std::move(all_input))
 {
-	if(!data_) throw std::runtime_error("cannot create part wihtout data");
+	//if(!data_) throw std::runtime_error("cannot create part wihtout data");
 }
 
 std::size_t modegen::ic::abstract::part::id() const
@@ -33,6 +35,7 @@ std::string modegen::ic::abstract::part::name() const
 std::vector<std::shared_ptr<modegen::ic::output>>
 modegen::ic::abstract::part::outputs() const
 {
+	throw std::runtime_error("no outputs is ready"s);
 	return {};
 }
 

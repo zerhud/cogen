@@ -16,6 +16,8 @@
 #include "common_utils/input/tree.hpp"
 #include "mocks.hpp"
 
+using namespace std::literals;
+
 BOOST_AUTO_TEST_SUITE(input)
 BOOST_AUTO_TEST_SUITE(tree)
 struct fixture {
@@ -23,7 +25,7 @@ struct fixture {
 	        = std::make_shared<gen_utils_mocks::data_node>();
 	std::optional<gen_utils::tree> _tree;
 	gen_utils::tree& tree() {
-		if(!_tree) _tree.emplace(main_node, 111);
+		if(!_tree) _tree.emplace(main_node, "dataid"s);
 		return *_tree;
 	}
 
@@ -42,16 +44,16 @@ struct fixture {
 };
 BOOST_AUTO_TEST_CASE(getters)
 {
-	BOOST_CHECK_THROW(gen_utils::tree(nullptr, 10), std::exception);
+	BOOST_CHECK_THROW(gen_utils::tree(nullptr, "dataid"s), std::exception);
 
 	auto bad_node = std::make_shared<gen_utils_mocks::data_node>();
 	MOCK_EXPECT(bad_node->version).returns(std::nullopt);
-	BOOST_CHECK_THROW(gen_utils::tree(bad_node, 10), std::exception);
+	BOOST_CHECK_THROW(gen_utils::tree(bad_node, "dataid"s), std::exception);
 
 	auto node = std::make_shared<gen_utils_mocks::data_node>();
 	MOCK_EXPECT(node->version).returns(1102);
-	gen_utils::tree t(node, 10);
-	BOOST_TEST(t.data_id() == 10);
+	gen_utils::tree t(node, "dataid"s);
+	BOOST_TEST(t.data_id() == "dataid"s);
 	BOOST_TEST(&t.root() == node.get());
 
 	BOOST_TEST(t.root_version() == 1102);
