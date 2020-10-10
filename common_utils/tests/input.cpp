@@ -21,8 +21,7 @@ using namespace std::literals;
 BOOST_AUTO_TEST_SUITE(input)
 BOOST_AUTO_TEST_SUITE(tree)
 struct fixture {
-	std::shared_ptr<gen_utils_mocks::data_node> main_node
-	        = std::make_shared<gen_utils_mocks::data_node>();
+	std::shared_ptr<gen_utils_mocks::data_node> main_node;
 	std::optional<gen_utils::tree> _tree;
 	gen_utils::tree& tree() {
 		if(!_tree) _tree.emplace(main_node, "dataid"s);
@@ -31,15 +30,39 @@ struct fixture {
 
 	fixture()
 	{
-		MOCK_EXPECT(main_node->version).returns(100);
+		main_node = make_node(100);
 	}
 
 	std::shared_ptr<gen_utils_mocks::data_node> make_node(
-	            std::optional<std::uint64_t> v)
+	              std::optional<std::uint64_t> v
+	            , std::optional<std::string> name=std::nullopt
+	            , std::optional<std::string> value=std::nullopt
+	            )
 	{
+		assert(
+		            (name.has_value() && value.has_value())
+		         || (!name.has_value() && !value.has_value()) );
 		auto ret = std::make_shared<gen_utils_mocks::data_node>();
 		MOCK_EXPECT(ret->version).returns(v);
+		if(name) MOCK_EXPECT(ret->node_var)
+		            .returns(gen_utils::variable{*name, *value});
+		else MOCK_EXPECT(ret->node_var).returns(std::nullopt);
 		return ret;
+	}
+
+	template<typename T>
+	void check_vec(const std::vector<T>& vec, std::initializer_list<T> list) const
+	{
+		BOOST_TEST_REQUIRE(vec.size()==list.size());
+		auto contains = [&vec](const auto& v) {
+			auto pos = std::find(vec.begin(),vec.end(), v);
+			return pos != vec.end();
+		};
+		for(auto& lv:list) {
+			BOOST_TEST_CONTEXT("checking " << lv) {
+				BOOST_CHECK(contains(lv));
+			}
+		}
 	}
 };
 BOOST_AUTO_TEST_CASE(getters)
@@ -166,5 +189,26 @@ BOOST_FIXTURE_TEST_CASE(getters, fixture)
 	BOOST_TEST(tc2.root_version()==tree().root_version());
 }
 BOOST_AUTO_TEST_SUITE_END() // copy
+BOOST_FIXTURE_TEST_CASE(node_variables, fixture)
+{
+	auto n1 = make_node(std::nullopt, "vn1"s, "vv1"s);
+	auto n2 = make_node(std::nullopt, "vn2"s, "vv2"s);
+	auto n3 = make_node(std::nullopt, "vn3"s, "vv3_1"s);
+	auto n4 = make_node(std::nullopt);
+	auto n5 = make_node(std::nullopt, "vn3"s, "vv3_2"s);
+	tree().add(tree().root(), n1);
+	tree().add(tree().root(), n2);
+	tree().add(*n1, n3);
+	tree().add(*n2, n4);
+	tree().add(*n2, n5);
+	BOOST_TEST_CONTEXT("var name list")
+	check_vec(tree().var_name_list(), {"vn1"s, "vn2"s, "vn3"s});
+	BOOST_TEST_CONTEXT("var values list for vn1")
+	check_vec(tree().var_value_list("vn1"s), {"vv1"s});
+	BOOST_TEST_CONTEXT("var values list for vn2")
+	check_vec(tree().var_value_list("vn2"s), {"vv2"s});
+	BOOST_TEST_CONTEXT("var values list for vn3")
+	check_vec(tree().var_value_list("vn3"s), {"vv3_1"s, "vv3_2"s});
+}
 BOOST_AUTO_TEST_SUITE_END() // tree
 BOOST_AUTO_TEST_SUITE_END() // input

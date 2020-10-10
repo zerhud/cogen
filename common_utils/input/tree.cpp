@@ -90,6 +90,28 @@ std::uint64_t tree::next_min_version() const
 	return (*pos)->version().value_or(root_ver);
 }
 
+std::vector<std::string> tree::var_name_list() const
+{
+	std::vector<std::string> ret;
+	auto emp_unique = [&ret](auto&& v){
+		auto pos = std::find(ret.begin(), ret.end(), v);
+		if(pos==ret.end()) ret.emplace_back(v);
+	};
+	for(auto& n:store) if(n->node_var()) emp_unique(n->node_var()->name);
+	return ret;
+}
+
+std::vector<std::string> tree::var_value_list(const std::string& name) const
+{
+	std::vector<std::string> ret;
+	for(auto& n:store) {
+		auto nv = n->node_var();
+		if(nv && nv->name == name)
+			ret.emplace_back(std::move(nv->value));
+	}
+	return ret;
+}
+
 tree tree::copy(const std::function<bool(const data_node&)>& cond) const
 {
 	if(!cond) return *this;
