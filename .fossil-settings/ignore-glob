@@ -1,6 +1,7 @@
 compile_commands.json
 build/*
 build_/*
+cmake-*
 parser/ix3/build/*
 cbuild/*
 build-cov/*
