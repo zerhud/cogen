@@ -20,7 +20,7 @@ tree::tree(node_ptr root, std::string id_) : id(std::move(id_))
 	if(!root->version().has_value())
 		throw std::runtime_error("root must have a version");
 	root_ver = *root->version();
-	store.emplace_back(root);
+	store.emplace_back(std::move(root));
 }
 
 std::string tree::data_id() const
@@ -41,7 +41,7 @@ void tree::add(const data_node &par, node_ptr child)
 	if(node_exists(child.get()))
 		throw std::runtime_error("child already exists in this tree"s);
 	if(child->version() && *child->version() < root_version())
-		throw std::runtime_error("chlid version is less then root version"s);
+		throw std::runtime_error("child version is less then root version"s);
 	store.emplace_back(create_link(&par, std::move(child)));
 }
 

@@ -92,8 +92,7 @@ struct core_fixture {
 BOOST_AUTO_TEST_SUITE(core)
 BOOST_FIXTURE_TEST_CASE(errors, core_fixture)
 {
-	BOOST_CHECK_THROW(core.gen(nullptr, config), std::exception);
-	BOOST_CHECK_THROW(core.gen(out, nullptr), std::exception);
+	BOOST_CHECK_THROW(core.gen(nullptr), std::exception);
 }
 BOOST_FIXTURE_TEST_CASE(generation, core_fixture)
 {
@@ -124,7 +123,7 @@ BOOST_FIXTURE_TEST_CASE(generation, core_fixture)
 	MOCK_EXPECT(out2->gen).in(building).once().with("/test/dir/", "tmpl2");
 	MOCK_EXPECT(out22->gen).in(building).once().with("/test/dir/", "tmpl2");
 
-	core.gen(out, config);
+	core.gen(config);
 }
 BOOST_AUTO_TEST_SUITE_END() // core
 
