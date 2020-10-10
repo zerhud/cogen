@@ -9,6 +9,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <optional>
 #include <functional>
 

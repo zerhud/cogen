@@ -25,6 +25,7 @@ public:
 	virtual std::string name() const =0;
 };
 
+/// manages outputs (configrue input for output can use it)
 class generation_part {
 public:
 	virtual ~generation_part() noexcept =default;

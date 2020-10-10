@@ -9,6 +9,7 @@
 #include "tree.hpp"
 
 #include <cassert>
+#include <stdexcept>
 
 using namespace gen_utils;
 using namespace std::literals;
