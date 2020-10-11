@@ -14,7 +14,6 @@
 #include <nlohman/json.hpp>
 
 #include "common_utils/naming.hpp"
-#include "input.hpp"
 
 namespace modegen::ic {
 
@@ -30,8 +29,8 @@ class generation_part {
 public:
 	virtual ~generation_part() noexcept =default;
 
-	[[nodiscard]] virtual std::size_t id() const =0;
-	[[nodiscard]] virtual std::string name() const =0;
+	[[nodiscard]] virtual std::uint64_t id() const =0;
+	[[nodiscard]] virtual std::string_view name() const =0;
 	[[nodiscard]] virtual std::vector<std::shared_ptr<output>> outputs() const =0;
 
 	virtual void rename(gen_utils::name_conversion to) =0 ;

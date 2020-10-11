@@ -7,27 +7,26 @@
  *************************************************************************/
 
 #include "abstract_part.hpp"
-#include "algos/split.hpp"
 
 using namespace std::literals;
 
 modegen::ic::abstract::part::part(
-          std::size_t id
+          std::uint64_t id
         , std::string name_in_config
-        , std::shared_ptr<modegen::ic::input> all_input)
+        , std::shared_ptr<modegen::ic::configuration> all_input)
     : id_(id)
     , name_(std::move(name_in_config))
     , data_(std::move(all_input))
 {
-	//if(!data_) throw std::runtime_error("cannot create part wihtout data");
+	//if(!data_) throw std::runtime_error("cannot create part without data");
 }
 
-std::size_t modegen::ic::abstract::part::id() const
+std::uint64_t modegen::ic::abstract::part::id() const
 {
 	return id_;
 }
 
-std::string modegen::ic::abstract::part::name() const
+std::string_view modegen::ic::abstract::part::name() const
 {
 	return name_;
 }
@@ -41,7 +40,7 @@ modegen::ic::abstract::part::outputs() const
 
 void modegen::ic::abstract::part::rename(gen_utils::name_conversion to)
 {
-	//auto renamer = [to](const std::string& n){return gen_utils::convert(n, to);};
+	//auto rename_doer = [to](const std::string& n){return gen_utils::convert(n, to);};
 }
 
 void modegen::ic::abstract::part::split_versions()

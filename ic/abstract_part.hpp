@@ -10,18 +10,17 @@
 
 #include "core.hpp"
 
-
 namespace modegen::ic::abstract {
 
 class part : public generation_part {
-	std::size_t id_;
+	std::uint64_t id_;
 	std::string name_;
-	std::shared_ptr<input> data_;
+	std::shared_ptr<configuration> data_;
 public:
-	part(std::size_t id, std::string name_in_config, std::shared_ptr<input> all_input);
+	part(std::uint64_t id, std::string name_in_config, std::shared_ptr<configuration> all_input);
 
-	std::size_t id() const override;
-	std::string name() const override;
+	std::uint64_t id() const override;
+	std::string_view name() const override;
 	std::vector<std::shared_ptr<output>> outputs() const override;
 
 	void rename(gen_utils::name_conversion to) override ;

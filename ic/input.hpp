@@ -20,7 +20,7 @@ class input_node {
 public:
 	virtual ~input_node() noexcept =default ;
 	virtual void rename(std::function<std::string(const std::string&)> actor) =0 ;
-	virtual std::optional<std::uint64_t> version() const =0;
+	[[nodiscard]] virtual std::optional<std::uint64_t> version() const =0;
 	virtual std::uint64_t level() const =0 ; ///< level 0 is a root
 	virtual std::shared_ptr<input_node> clone() const =0 ;
 };
