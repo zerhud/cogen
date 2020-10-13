@@ -23,7 +23,6 @@ BOOST_AUTO_TEST_CASE(getters)
 	abs_part p(10, "name", nullptr);
 	BOOST_TEST(p.id()==10);
 	BOOST_TEST(p.name()=="name"s);
-	BOOST_CHECK_THROW(p.outputs(), std::exception);
 }
 BOOST_AUTO_TEST_SUITE(map_to)
 struct fixture {

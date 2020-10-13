@@ -113,7 +113,7 @@ std::vector<std::string> tree::var_value_list(const std::string& name) const
 	return ret;
 }
 
-tree tree::copy(const std::function<bool(const data_node&)>& cond) const
+tree tree::copy(const tree::copy_condition& cond) const
 {
 	if(!cond) return *this;
 

@@ -11,31 +11,32 @@
 #include <memory>
 #include <vector>
 #include <filesystem>
-#include <nlohman/json.hpp>
+#include <memory_resource>
 
 #include "common_utils/naming.hpp"
+#include "input.hpp"
 
 namespace modegen::ic {
 
-class output {
-public:
-	virtual ~output() noexcept =default;
-	virtual void gen(std::string dir, std::string tmpl) const =0 ;
-	[[nodiscard]] virtual std::string name() const =0;
+struct map_result {
+	std::pmr::string map;
+	std::pmr::vector<input> data;
 };
 
 /// manages outputs (configure input for output can use it)
 class generation_part {
 public:
+
 	virtual ~generation_part() noexcept =default;
 
 	[[nodiscard]] virtual std::uint64_t id() const =0;
 	[[nodiscard]] virtual std::string_view name() const =0;
-	[[nodiscard]] virtual std::vector<std::shared_ptr<output>> outputs() const =0;
 
 	virtual void rename(gen_utils::name_conversion to) =0 ;
 	virtual void split_versions() =0 ;
+
 	virtual void map_to(std::string_view tmpl) =0;
+	[[nodiscard]] virtual std::pmr::vector<map_result> build_result() const =0 ;
 };
 
 class configuration {
@@ -43,14 +44,23 @@ public:
 
 	virtual ~configuration() noexcept =default;
 
-	[[nodiscard]] virtual std::filesystem::path output_dir() const =0;
+	virtual void generate(std::size_t id, const map_result& data) const =0 ;
 
-	[[nodiscard]] virtual std::vector<std::shared_ptr<generation_part>> parts() const =0;
+	[[nodiscard]]
+	virtual std::pmr::vector<std::shared_ptr<generation_part>>
+	parts() const =0;
 
 	[[nodiscard]] virtual bool split_versions(std::size_t id) const =0 ;
-	[[nodiscard]] virtual gen_utils::name_conversion naming(std::size_t id) const =0 ;
-	[[nodiscard]] virtual std::string map_tmpl(std::size_t id) const =0 ;
-	[[nodiscard]] virtual std::string tmpl_information(std::size_t id) const =0;
+	[[nodiscard]] virtual gen_utils::name_conversion
+	naming(std::size_t id) const =0 ;
+	[[nodiscard]] virtual std::pmr::string map_tmpl(std::size_t id) const =0 ;
+};
+
+class generator {
+public:
+	virtual ~generator() noexcept =default ;
+	virtual std::string_view name() const =0 ;
+	virtual void gen(const map_result& data, const configration& conf) const =0 ;
 };
 
 class core {

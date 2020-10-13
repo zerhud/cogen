@@ -10,10 +10,11 @@
 #define BOOST_TEST_MODULE ic_core
 
 #include <boost/test/included/unit_test.hpp>
+#include <common_utils/tests/mocks.hpp>
 
 #include "mocks.hp"
 #include "ic/abstract_part.hpp"
-#include "ic/algos/split.hpp"
+#include "ic/input.hpp"
 
 using namespace std::literals;
 
@@ -24,11 +25,7 @@ BOOST_AUTO_TEST_SUITE(input_configurator)
 struct core_fixture {
 	mic::core core;
 
-	std::shared_ptr<mic::input> in = std::make_shared<mic::input>();
-	std::shared_ptr<icmocks::output> out = std::make_shared<icmocks::output>();
 	std::shared_ptr<icmocks::configuration> config = std::make_shared<icmocks::configuration>();
-
-	std::vector<std::shared_ptr<icmocks::input_node>> nodes;
 
 	std::vector<std::shared_ptr<icmocks::generation_part>> parts;
 	std::vector<std::shared_ptr<mic::generation_part>> _parts; ///< simplify returns
@@ -57,35 +54,6 @@ struct core_fixture {
 		if(sv) MOCK_EXPECT(parts[id]->split_versions).once();
 		MOCK_EXPECT(config->naming).with(id).returns(n);
 		MOCK_EXPECT(parts[id]->rename).once().with(n);
-	}
-
-	std::shared_ptr<icmocks::input_node> create_node(std::uint64_t level, std::uint64_t ver)
-	{
-		auto ret = std::make_shared<icmocks::input_node>();
-		MOCK_EXPECT(ret->level).returns(level);
-		MOCK_EXPECT(ret->version).returns(ver);
-		MOCK_EXPECT(ret->clone).calls([ret]{
-			auto cloned = std::make_shared<icmocks::input_node>();
-			MOCK_EXPECT(cloned->level).returns(ret->level());
-			MOCK_EXPECT(cloned->version).returns(ret->version());
-			MOCK_EXPECT(cloned->clone).returns(ret->clone());
-			return cloned;
-		});
-		nodes.emplace_back(ret);
-		return ret;
-	}
-
-	void create_nodes(std::uint64_t level, std::uint64_t ver, mic::input_node* par, std::size_t cnt)
-	{
-		std::vector<std::shared_ptr<mic::input_node>> list;
-		while(cnt--) list.emplace_back(create_node(level, ver));
-		if(par) in->add(par, list);
-		else in->add(list);
-	}
-
-	void check_input()
-	{
-		//BOOST_TEST(in->check_tree_levels() == ""s);
 	}
 };
 
@@ -128,57 +96,35 @@ BOOST_FIXTURE_TEST_CASE(generation, core_fixture)
 BOOST_AUTO_TEST_SUITE_END() // core
 
 BOOST_AUTO_TEST_SUITE(input)
-BOOST_FIXTURE_TEST_CASE(all, core_fixture)
+using ic_input = modegen::ic::input;
+BOOST_AUTO_TEST_CASE(getters)
 {
-	mic::input im;
-	auto n1 = create_node(0,0);
-	auto n2 = create_node(0,0);
-	im.add({n1, n2});
-	BOOST_REQUIRE(im.all().size()==2);
-	BOOST_TEST(im.all()[0]==n1);
-	BOOST_TEST(im.all()[1]==n2);
-	BOOST_CHECK_THROW(im.add({n1}), std::exception);
+	ic_input i;
+	BOOST_TEST(i.all().size() == 0);
+	BOOST_TEST(i.select("test"sv).size()==0);
 }
-BOOST_FIXTURE_TEST_CASE(children, core_fixture)
+BOOST_AUTO_TEST_CASE(adding)
 {
-	mic::input im;
-	auto n1 = create_node(0,0);
-	auto n2 = create_node(1,0);
-	auto n3 = create_node(1,0);
-	BOOST_CHECK_THROW(im.add(n1.get(), {n2}), std::exception);
-	im.add({n1});
-	im.add(n1.get(), {n2});
-	BOOST_REQUIRE(im.all().size()==2);
-	BOOST_TEST(im.children(n2.get()).size()==0);
-	BOOST_REQUIRE(im.children(n1.get()).size()==1);
-	BOOST_TEST(im.children(n1.get())[0]==n2.get());
-	BOOST_REQUIRE(im.children(nullptr).size()==1);
-	BOOST_TEST(im.children(nullptr)[0]==n1.get());
-	im.add(n1.get(), {n3});
-	BOOST_REQUIRE(im.children(n1.get()).size()==2);
-	BOOST_TEST(im.children(n1.get())[1]==n3.get());
-	//BOOST_TEST(im.check_tree_levels() == ""s);
-}
-BOOST_FIXTURE_TEST_CASE(cannot_add_nullptr, core_fixture)
-{
-	mic::input im;
-	auto n1 = create_node(0,0);
-	auto n2 = create_node(1,0);
-	BOOST_CHECK_THROW(im.add({nullptr}), std::exception);
-	im.add({n1});
-	BOOST_CHECK_THROW(im.add(n1.get(), {n2,nullptr}), std::exception);
-}
-BOOST_FIXTURE_TEST_CASE(cannot_add_wrong_level, core_fixture)
-{
-	mic::input im;
+	auto n1 = std::make_shared<gen_utils_mocks::data_node>();
+	MOCK_EXPECT(n1->version).returns(10);
+	gen_utils::tree t1(n1, "t1");
+	gen_utils::tree t2(n1, "t2");
+	gen_utils::tree t3(n1, "t1");
+	ic_input i;
+	i.add(t1);
+	BOOST_TEST_REQUIRE(i.all().size()==1);
+	BOOST_TEST(i.all()[0]->data_id()=="t1"sv);
+	BOOST_TEST(i.select("t1"sv).at(0)->data_id()=="t1"sv);
 
-	auto good_root = create_node(0, 0);
-	auto bad_root = create_node(1, 0);
-	auto bad_child = create_node(0, 0);
+	i.add(t2);
+	BOOST_TEST_REQUIRE(i.all().size()==2);
+	BOOST_TEST(i.select("t1"sv).at(0)->data_id()=="t1"sv);
+	BOOST_TEST(i.select("t2"sv).at(0)->data_id()=="t2"sv);
 
-	im.add({good_root});
-	BOOST_CHECK_THROW(im.add({bad_root}), std::exception);
-	BOOST_CHECK_THROW(im.add(good_root.get(), {bad_child}), std::exception);
+	i.add(t3);
+	BOOST_TEST_REQUIRE(i.all().size()==3);
+	BOOST_TEST(i.select("t1"sv).at(0)->data_id()=="t1"sv);
+	BOOST_TEST(i.select("t1"sv).at(1)->data_id()=="t1"sv);
 }
 BOOST_AUTO_TEST_SUITE_END() // input
 

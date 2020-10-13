@@ -31,13 +31,6 @@ std::string_view modegen::ic::abstract::part::name() const
 	return name_;
 }
 
-std::vector<std::shared_ptr<modegen::ic::output>>
-modegen::ic::abstract::part::outputs() const
-{
-	throw std::runtime_error("no outputs is ready"s);
-	return {};
-}
-
 void modegen::ic::abstract::part::rename(gen_utils::name_conversion to)
 {
 	//auto rename_doer = [to](const std::string& n){return gen_utils::convert(n, to);};
@@ -47,7 +40,8 @@ void modegen::ic::abstract::part::split_versions()
 {
 }
 
-void modegen::ic::abstract::part::map_to(std::string_view tmpl)
+std::pmr::vector<modegen::ic::generation_part::map_result>
+modegen::ic::abstract::part::map_to(std::string_view tmpl)
 {
-
+	return {};
 }

@@ -146,7 +146,7 @@ BOOST_FIXTURE_TEST_CASE(no_cond, fixture)
 	tree().add(tree().root(), child1);
 	tree().add(*child1, child11);
 
-	auto tcopy = tree().copy(std::function<bool(const gen_utils::data_node&)>{});
+	auto tcopy = tree().copy(gen_utils::tree::copy_condition{});
 	BOOST_TEST(&tcopy.root() == &tree().root());
 	BOOST_TEST(tcopy.children(tree().root()).at(0) == child1);
 	BOOST_TEST(tcopy.children(*child1).at(0) == child11);

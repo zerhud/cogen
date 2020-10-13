@@ -35,7 +35,6 @@ void modegen::ic::core::gen(
           const configuration& config
         , const generation_part& part) const
 {
-	auto outs = part.outputs();
-	for(auto& out:outs)
-		out->gen(config.output_dir(), config.tmpl_information(part.id()));
+	auto results = part.build_result();
+	for(auto& r:results) config.generate(part.id(), r);
 }

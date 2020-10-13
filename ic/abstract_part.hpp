@@ -8,24 +8,27 @@
 
 #pragma once
 
+#include <string_view>
 #include "core.hpp"
 
 namespace modegen::ic::abstract {
 
 class part : public generation_part {
-	std::uint64_t id_;
-	std::string name_;
-	std::shared_ptr<configuration> data_;
+	std::uint64_t id_{};
+	std::string name_{};
+	std::shared_ptr<configuration> data_{};
 public:
-	part(std::uint64_t id, std::string name_in_config, std::shared_ptr<configuration> all_input);
+	part(std::uint64_t id,
+		std::string name_in_config,
+		std::shared_ptr<configuration> all_input);
 
-	std::uint64_t id() const override;
-	std::string_view name() const override;
-	std::vector<std::shared_ptr<output>> outputs() const override;
+	[[nodiscard]] std::uint64_t id() const override;
+	[[nodiscard]] std::string_view name() const override;
 
 	void rename(gen_utils::name_conversion to) override ;
 	void split_versions() override ;
-	void map_to(std::string_view tmpl) override;
+	[[nodiscard]] std::pmr::vector<map_result> map_to(
+			std::string_view tmpl) override;
 };
 
 } // namespace modegen::ic
