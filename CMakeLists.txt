@@ -28,5 +28,7 @@ if(ENABLE_TESTS)
 	enable_testing()
 endif()
 
+# turtle uses auto_ptr if not defined
+add_compile_definitions(BOOST_NO_AUTO_PTR)
 add_subdirectory(common_utils)
 add_subdirectory(ic)
