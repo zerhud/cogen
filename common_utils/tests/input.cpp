@@ -14,12 +14,12 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include "common_utils/input/tree.hpp"
+#include "common_utils/input/map_to.hpp"
 #include "mocks.hpp"
 
 using namespace std::literals;
 
 BOOST_AUTO_TEST_SUITE(input)
-BOOST_AUTO_TEST_SUITE(tree)
 struct fixture {
 	std::shared_ptr<gen_utils_mocks::data_node> main_node;
 	std::optional<gen_utils::tree> _tree;
@@ -39,15 +39,7 @@ struct fixture {
 	            , std::optional<std::string> value=std::nullopt
 	            )
 	{
-		assert(
-		            (name.has_value() && value.has_value())
-		         || (!name.has_value() && !value.has_value()) );
-		auto ret = std::make_shared<gen_utils_mocks::data_node>();
-		MOCK_EXPECT(ret->version).returns(v);
-		if(name) MOCK_EXPECT(ret->node_var)
-		            .returns(gen_utils::variable{*name, *value});
-		else MOCK_EXPECT(ret->node_var).returns(std::nullopt);
-		return ret;
+		return gen_utils_mocks::make_node(v, std::move(name), std::move(value));
 	}
 
 	template<typename T>
@@ -65,6 +57,7 @@ struct fixture {
 		}
 	}
 };
+BOOST_AUTO_TEST_SUITE(tree)
 BOOST_AUTO_TEST_CASE(getters)
 {
 	BOOST_CHECK_THROW(gen_utils::tree(nullptr, "dataid"s), std::exception);
@@ -88,7 +81,7 @@ BOOST_FIXTURE_TEST_CASE(no_parent, fixture)
 {
 	auto bad_node = std::make_shared<gen_utils_mocks::data_node>();
 	auto bad_node2 = std::make_shared<gen_utils_mocks::data_node>();
-	BOOST_CHECK_THROW(tree().children(*bad_node), std::exception);
+	BOOST_CHECK_THROW((void)tree().children(*bad_node), std::exception);
 	BOOST_CHECK_THROW(tree().add(*bad_node, bad_node2), std::exception);
 }
 BOOST_FIXTURE_TEST_CASE(cannot_add_low_version, fixture)
@@ -211,4 +204,52 @@ BOOST_FIXTURE_TEST_CASE(node_variables, fixture)
 	check_vec(tree().var_value_list("vn3"s), {"vv3_1"s, "vv3_2"s});
 }
 BOOST_AUTO_TEST_SUITE_END() // tree
+BOOST_AUTO_TEST_SUITE(tree_map_to)
+using gen_utils::map_to;
+BOOST_FIXTURE_TEST_CASE(one_var, fixture)
+{
+	map_to mapper;
+	main_node = make_node(1, "var", "val");
+	auto r = mapper("_${var}_", tree());
+	BOOST_TEST(r.size()==1);
+	BOOST_CHECK(r.find("_val_")!=r.end());
+}
+BOOST_FIXTURE_TEST_CASE(few_vars, fixture)
+{
+	map_to mapper;
+	main_node = make_node(1, "var1", "val1");
+	auto node_2 = make_node(std::nullopt, "var2", "val2");
+	auto node_21 = make_node(std::nullopt, "var2", "val21");
+	auto node_3 = make_node(std::nullopt, "var3", "val3");
+	auto node_31 = make_node(std::nullopt, "var3", "val31");
+	tree().add(tree().root(), node_2);
+	tree().add(tree().root(), node_3);
+	tree().add(*node_3, node_31);
+	tree().add(*node_2, node_21);
+	auto r = mapper("_${var1}_${var2}_${var3}_${var1}_", tree());
+	BOOST_TEST(r.size()==4);
+	BOOST_CHECK(r.find("_val1_val2_val3_val1_")!=r.end());
+	BOOST_CHECK(r.find("_val1_val2_val31_val1_")!=r.end());
+	BOOST_CHECK(r.find("_val1_val21_val3_val1_")!=r.end());
+	BOOST_CHECK(r.find("_val1_val21_val31_val1_")!=r.end());
+}
+BOOST_FIXTURE_TEST_CASE(no_var, fixture)
+{
+	map_to mapper;
+	main_node = make_node(1, "var1", "val1");
+	auto r = mapper("_${var1}_${var2}_", tree());
+	BOOST_TEST(r.size()==1);
+	BOOST_CHECK(r.find("_val1_${var2}_")!=r.end());
+}
+BOOST_FIXTURE_TEST_CASE(empty_var, fixture)
+{
+	map_to mapper;
+	main_node = make_node(1, "var1", "val1");
+	auto node1 = make_node(std::nullopt, "var2", std::nullopt);
+	auto r = mapper("_${var1}_${var2}_", tree());
+	tree().add(tree().root(), node1);
+	BOOST_TEST(r.size()==1);
+	BOOST_CHECK(r.find("_val1__")!=r.end());
+}
+BOOST_AUTO_TEST_SUITE_END() // tree_map_to
 BOOST_AUTO_TEST_SUITE_END() // input

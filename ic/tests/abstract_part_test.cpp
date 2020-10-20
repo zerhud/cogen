@@ -12,29 +12,75 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include "abstract_part.hpp"
+#include "common_utils/tests/mocks.hpp"
 
 using namespace std::literals;
+
+namespace mic = modegen::ic;
 
 BOOST_AUTO_TEST_SUITE(input_configurator)
 BOOST_AUTO_TEST_SUITE(abstract_part)
 using abs_part = modegen::ic::abstract::part;
 BOOST_AUTO_TEST_CASE(getters)
 {
-	abs_part p(10, "name", nullptr);
+	abs_part p(10, "name", mic::input{});
 	BOOST_TEST(p.id()==10);
 	BOOST_TEST(p.name()=="name"s);
 }
 BOOST_AUTO_TEST_SUITE(map_to)
 struct fixture {
-	abs_part part;
-	fixture() : part(10, "name", nullptr)
+	mic::input data;
+	std::optional<abs_part> _part;
+	fixture() =default ;
+
+	abs_part& part() {
+		if(!_part) _part.emplace(10, "name", data);
+		return *_part;
+	}
+
+	std::shared_ptr<gen_utils_mocks::data_node> make_node(
+			  std::optional<std::uint64_t> v
+			, std::optional<std::string> name=std::nullopt
+			, std::optional<std::string> value=std::nullopt
+			) const
 	{
+		return gen_utils_mocks::make_node(v, std::move(name), std::move(value));
 	}
 };
 BOOST_FIXTURE_TEST_CASE(no_vars, fixture)
 {
-	part.map_to("no_vars"s);
-	//BOOST_TEST(part.outputs().size()==1);
+	part().map_to("no_vars"s);
+	BOOST_TEST(part().compiled_input().size()==1);
+	BOOST_TEST(part().compiled_input().at(0).map=="no_vars"sv);
+}
+BOOST_FIXTURE_TEST_CASE(one_variable, fixture)
+{
+	auto root = make_node(10);
+	gen_utils::tree mt(root, "mods");
+	auto mod = make_node(std::nullopt, "mod", "m1");
+	mt.add(mt.root(), mod);
+	data.add(mt);
+
+	part().map_to("${mod}_v"sv);
+	BOOST_TEST(part().compiled_input().size()==1);
+	BOOST_TEST(part().compiled_input().at(0).map=="m1_v"sv);
+}
+BOOST_FIXTURE_TEST_CASE(few_variables, fixture)
+{
+	auto root = make_node(10, "mod", "m1");
+	gen_utils::tree mt(root, "mods");
+	auto mod = make_node(std::nullopt, "int", "i1");
+	mt.add(mt.root(), mod);
+	data.add(mt);
+
+	part().map_to("${mod}_${int}_v"sv);
+	BOOST_TEST(part().compiled_input().size()==1);
+	BOOST_TEST(part().compiled_input().at(0).map=="m1_i1_v"sv);
+}
+BOOST_FIXTURE_TEST_CASE(twice_call, fixture)
+{
+	// that if call map_to twice?
+	BOOST_FAIL("not ready");
 }
 BOOST_AUTO_TEST_SUITE_END() // map_to
 BOOST_AUTO_TEST_SUITE_END() // abstract_part

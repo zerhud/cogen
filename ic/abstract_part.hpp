@@ -16,19 +16,26 @@ namespace modegen::ic::abstract {
 class part : public generation_part {
 	std::uint64_t id_{};
 	std::string name_{};
-	std::shared_ptr<configuration> data_{};
+	input data_{};
+	std::pmr::vector<map_result> compiled_{};
+
+	std::optional<std::pmr::string> replace(
+			std::string_view tmpl, std::string_view name, std::string_view value) const;
+	std::pmr::vector<map_result> create_input(
+			std::pmr::string tmpl, const gen_utils::tree* data) const ;
 public:
 	part(std::uint64_t id,
 		std::string name_in_config,
-		std::shared_ptr<configuration> all_input);
+		input all_input);
 
 	[[nodiscard]] std::uint64_t id() const override;
 	[[nodiscard]] std::string_view name() const override;
 
 	void rename(gen_utils::name_conversion to) override ;
 	void split_versions() override ;
-	[[nodiscard]] std::pmr::vector<map_result> map_to(
+	void map_to(
 			std::string_view tmpl) override;
+	[[nodiscard]] std::pmr::vector<map_result> compiled_input() const override;
 };
 
 } // namespace modegen::ic

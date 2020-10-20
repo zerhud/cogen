@@ -126,6 +126,10 @@ BOOST_AUTO_TEST_CASE(adding)
 	BOOST_TEST(i.select("t1"sv).at(0)->data_id()=="t1"sv);
 	BOOST_TEST(i.select("t1"sv).at(1)->data_id()=="t1"sv);
 }
+BOOST_AUTO_TEST_CASE(adding_other)
+{
+	BOOST_FAIL("not ready yet");
+}
 BOOST_AUTO_TEST_SUITE_END() // input
 
 BOOST_AUTO_TEST_SUITE_END() // input_configurator

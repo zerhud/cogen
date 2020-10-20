@@ -23,6 +23,7 @@ public:
 	input() =default ;
 	~input() noexcept =default;
 
+	void add(input&& other);
 	void add(gen_utils::tree data);
 	[[nodiscard]] std::vector<const gen_utils::tree*> select(
 			std::string_view id) const ;

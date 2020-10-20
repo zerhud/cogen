@@ -8,10 +8,14 @@
 
 #include "input.hpp"
 
-#include <cassert>
-
 using namespace std::literals;
 using modegen::ic::input;
+
+void input::add(input&& other)
+{
+	for(gen_utils::tree& oc:other.storage)
+		add(std::move(oc));
+}
 
 void input::add(gen_utils::tree data)
 {

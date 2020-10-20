@@ -102,7 +102,7 @@ std::vector<std::string> tree::var_name_list() const
 	return ret;
 }
 
-std::vector<std::string> tree::var_value_list(const std::string& name) const
+std::vector<std::string> tree::var_value_list(std::string_view name) const
 {
 	std::vector<std::string> ret;
 	for(auto& n:store) {

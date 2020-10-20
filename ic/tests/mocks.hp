@@ -24,7 +24,7 @@ MOCK_BASE_CLASS( generation_part, modegen::ic::generation_part )
 	MOCK_METHOD(split_versions, 0)
 
 	MOCK_METHOD(map_to, 1)
-	MOCK_METHOD(build_result, 0)
+	MOCK_METHOD(compiled_input, 0)
 };
 
 MOCK_BASE_CLASS( configuration, modegen::ic::configuration )
@@ -34,6 +34,7 @@ MOCK_BASE_CLASS( configuration, modegen::ic::configuration )
 
 	MOCK_METHOD(split_versions, 1)
 	MOCK_METHOD(naming, 1)
+	MOCK_METHOD(tmpl_file, 1)
 	MOCK_METHOD(map_tmpl, 1)
 };
 

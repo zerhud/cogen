@@ -15,7 +15,7 @@ modegen::ic::core::core() = default ;
 void modegen::ic::core::gen(std::shared_ptr<configuration> config) const
 {
 	if(!config)
-		throw std::runtime_error( "cannot generate output without configuration"s);
+		throw std::runtime_error("cannot generate output without configuration"s);
 	auto parts = config->parts();
 	for(auto& part:parts) build(*config, *part);
 	for(auto& part:parts) gen(*config, *part);
@@ -35,6 +35,7 @@ void modegen::ic::core::gen(
           const configuration& config
         , const generation_part& part) const
 {
-	auto results = part.build_result();
-	for(auto& r:results) config.generate(part.id(), r);
+	auto results = part.compiled_input();
+	for(auto& r:results)
+		config.generate(config.tmpl_file(part.id()), r);
 }

@@ -61,7 +61,7 @@ public:
 	[[nodiscard]] std::uint64_t next_min_version() const ;
 
 	[[nodiscard]] std::vector<std::string> var_name_list() const ;
-	[[nodiscard]] std::vector<std::string> var_value_list(const std::string& name) const ;
+	[[nodiscard]] std::vector<std::string> var_value_list(std::string_view name) const ;
 
 	[[nodiscard]] tree copy(const copy_condition& cond) const ;
 };

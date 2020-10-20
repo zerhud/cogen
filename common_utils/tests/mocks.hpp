@@ -20,4 +20,18 @@ MOCK_BASE_CLASS(data_node, gen_utils::data_node)
 	MOCK_METHOD(node_var, 0)
 };
 
+std::shared_ptr<gen_utils_mocks::data_node> make_node(
+		std::optional<std::uint64_t> v
+		, std::optional<std::string> name=std::nullopt
+		, std::optional<std::string> value=std::nullopt
+)
+{
+	auto ret = std::make_shared<gen_utils_mocks::data_node>();
+	MOCK_EXPECT(ret->version).returns(v);
+	if(name) MOCK_EXPECT(ret->node_var)
+				.returns(gen_utils::variable{*name, *value});
+	else MOCK_EXPECT(ret->node_var).returns(std::nullopt);
+	return ret;
+}
+
 } // namespace gen_utils_mocks
