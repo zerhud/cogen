@@ -8,12 +8,15 @@
 
 #include "map_to.hpp"
 
+#include <cassert>
+
 void gen_utils::map_to::make_for_name(std::string_view name)
 {
 	result_t cur_data;
 	cur_data.swap(result);
 	for(auto& item:cur_data) {
 		auto val_list = item.second.var_value_list(name);
+		assert(!val_list.empty());
 		for(auto& val:val_list) {
 			auto tmpl = replace(item.first, name, val);
 			if(!tmpl) {

@@ -241,15 +241,5 @@ BOOST_FIXTURE_TEST_CASE(no_var, fixture)
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.find("_val1_${var2}_")!=r.end());
 }
-BOOST_FIXTURE_TEST_CASE(empty_var, fixture)
-{
-	map_to mapper;
-	main_node = make_node(1, "var1", "val1");
-	auto node1 = make_node(std::nullopt, "var2", std::nullopt);
-	auto r = mapper("_${var1}_${var2}_", tree());
-	tree().add(tree().root(), node1);
-	BOOST_TEST(r.size()==1);
-	BOOST_CHECK(r.find("_val1__")!=r.end());
-}
 BOOST_AUTO_TEST_SUITE_END() // tree_map_to
 BOOST_AUTO_TEST_SUITE_END() // input

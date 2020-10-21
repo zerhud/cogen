@@ -9,6 +9,7 @@
 #pragma once
 
 #include <string_view>
+#include <unordered_map>
 #include "core.hpp"
 
 namespace modegen::ic::abstract {
@@ -17,12 +18,7 @@ class part : public generation_part {
 	std::uint64_t id_{};
 	std::string name_{};
 	input data_{};
-	std::pmr::vector<map_result> compiled_{};
-
-	std::optional<std::pmr::string> replace(
-			std::string_view tmpl, std::string_view name, std::string_view value) const;
-	std::pmr::vector<map_result> create_input(
-			std::pmr::string tmpl, const gen_utils::tree* data) const ;
+	std::pmr::unordered_map<std::pmr::string, input> compiled_;
 public:
 	part(std::uint64_t id,
 		std::string name_in_config,

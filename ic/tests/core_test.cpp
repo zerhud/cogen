@@ -134,7 +134,21 @@ BOOST_AUTO_TEST_CASE(adding)
 }
 BOOST_AUTO_TEST_CASE(adding_other)
 {
-	BOOST_FAIL("not ready yet");
+	auto n1 = std::make_shared<gen_utils_mocks::data_node>();
+	MOCK_EXPECT(n1->version).returns(10);
+	gen_utils::tree t1(n1, "t1");
+	gen_utils::tree t2(n1, "t2");
+	gen_utils::tree t3(n1, "t1");
+
+	ic_input i1, i2;
+	i1.add(t1);
+	i1.add(t2);
+
+	BOOST_TEST(i1.all().size()==2);
+	BOOST_TEST(i2.all().size()==0);
+
+	i2.add(std::move(i1));
+	BOOST_TEST(i2.all().size()==2);
 }
 BOOST_AUTO_TEST_SUITE_END() // input
 

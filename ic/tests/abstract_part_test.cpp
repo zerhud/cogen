@@ -49,6 +49,8 @@ struct fixture {
 };
 BOOST_FIXTURE_TEST_CASE(no_vars, fixture)
 {
+	auto root = make_node(10);
+	data.add(gen_utils::tree(root, "mods"));
 	part().map_to("no_vars"s);
 	BOOST_TEST(part().compiled_input().size()==1);
 	BOOST_TEST(part().compiled_input().at(0).map=="no_vars"sv);
@@ -65,22 +67,12 @@ BOOST_FIXTURE_TEST_CASE(one_variable, fixture)
 	BOOST_TEST(part().compiled_input().size()==1);
 	BOOST_TEST(part().compiled_input().at(0).map=="m1_v"sv);
 }
-BOOST_FIXTURE_TEST_CASE(few_variables, fixture)
-{
-	auto root = make_node(10, "mod", "m1");
-	gen_utils::tree mt(root, "mods");
-	auto mod = make_node(std::nullopt, "int", "i1");
-	mt.add(mt.root(), mod);
-	data.add(mt);
-
-	part().map_to("${mod}_${int}_v"sv);
-	BOOST_TEST(part().compiled_input().size()==1);
-	BOOST_TEST(part().compiled_input().at(0).map=="m1_i1_v"sv);
-}
 BOOST_FIXTURE_TEST_CASE(twice_call, fixture)
 {
-	// that if call map_to twice?
-	BOOST_FAIL("not ready");
+	auto root = make_node(10);
+	data.add(gen_utils::tree(root, "mods"));
+	part().map_to("no_vars"s);
+	BOOST_CHECK_THROW(part().map_to("no_vars"), std::exception);
 }
 BOOST_AUTO_TEST_SUITE_END() // map_to
 BOOST_AUTO_TEST_SUITE_END() // abstract_part

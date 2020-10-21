@@ -26,6 +26,7 @@ std::shared_ptr<gen_utils_mocks::data_node> make_node(
 		, std::optional<std::string> value=std::nullopt
 )
 {
+	assert( (!name && !value) || (name && value) );
 	auto ret = std::make_shared<gen_utils_mocks::data_node>();
 	MOCK_EXPECT(ret->version).returns(v);
 	if(name) MOCK_EXPECT(ret->node_var)
