@@ -18,8 +18,6 @@
 
 using namespace std::literals;
 
-using mic_outputs_t = std::vector<std::shared_ptr<mic::output>>;
-
 BOOST_AUTO_TEST_SUITE(input_configurator)
 
 struct core_fixture {
@@ -27,8 +25,8 @@ struct core_fixture {
 
 	std::shared_ptr<icmocks::configuration> config = std::make_shared<icmocks::configuration>();
 
-	std::vector<std::shared_ptr<icmocks::generation_part>> parts;
-	std::vector<std::shared_ptr<mic::generation_part>> _parts; ///< simplify returns
+	std::pmr::vector<std::shared_ptr<icmocks::generation_part>> parts;
+	std::pmr::vector<std::shared_ptr<mic::generation_part>> _parts; ///< simplify returns
 	void create_parts(std::size_t cnt)
 	{
 		while(cnt--) create_part();
@@ -42,10 +40,10 @@ struct core_fixture {
 		return parts.emplace_back(p);
 	}
 
-	void set_config(std::size_t id, std::string tmpl, std::string mt)
+	void set_config(std::size_t id, std::pmr::string tmpl, std::pmr::string mt)
 	{
 		MOCK_EXPECT(config->map_tmpl).with(id).returns(mt);
-		MOCK_EXPECT(config->tmpl_information).with(id).returns(tmpl);
+		MOCK_EXPECT(config->tmpl_file).with(id).returns(tmpl);
 	}
 
 	void expect_mods(std::size_t id, bool sv, gen_utils::name_conversion n)
@@ -70,26 +68,34 @@ BOOST_FIXTURE_TEST_CASE(generation, core_fixture)
 
 	set_config(0, "tmpl1", "p0");
 	set_config(1, "tmpl2", "p1");
-	MOCK_EXPECT(config->output_dir).returns("/test/dir/"s);
 	expect_mods(0, true, gen_utils::name_conversion::as_is);
 	expect_mods(1, false, gen_utils::name_conversion::underscore);
-
-	auto out1 = std::make_shared<icmocks::output>();
-	auto out2 = std::make_shared<icmocks::output>();
-	auto out22 = std::make_shared<icmocks::output>();
 
 	mock::sequence building;
 	MOCK_EXPECT(parts[0]->map_to).in(building).once().with("p0"s);
 	MOCK_EXPECT(parts[1]->map_to).in(building).once().with("p1"s);
 
-	MOCK_EXPECT(parts[0]->outputs)
-	        .once().in(building).returns(mic_outputs_t{out1});
-	MOCK_EXPECT(out1->gen).in(building).once().with("/test/dir/", "tmpl1");
+	using modegen::ic::map_result;
+	std::pmr::vector<map_result> part_0_compiled;
+	part_0_compiled.emplace_back(map_result{"name", modegen::ic::input()});
+	std::pmr::vector<map_result> part_1_compiled;
+	part_1_compiled.emplace_back(map_result{"name11", modegen::ic::input()});
+	part_1_compiled.emplace_back(map_result{"name12", modegen::ic::input()});
+	MOCK_EXPECT(parts[0]->compiled_input).returns(part_0_compiled);
+	MOCK_EXPECT(parts[1]->compiled_input).returns(part_1_compiled);
 
-	MOCK_EXPECT(parts[1]->outputs)
-	        .once().in(building).returns(mic_outputs_t{out2,out22});
-	MOCK_EXPECT(out2->gen).in(building).once().with("/test/dir/", "tmpl2");
-	MOCK_EXPECT(out22->gen).in(building).once().with("/test/dir/", "tmpl2");
+	MOCK_EXPECT(config->generate).once().in(building).calls([](auto f, const auto& d){
+		BOOST_TEST(f=="tmpl1"s);
+		BOOST_TEST(d.map=="name");
+	});
+	MOCK_EXPECT(config->generate).once().in(building).calls([](auto f, const auto& d){
+		BOOST_TEST(f=="tmpl2"s);
+		BOOST_TEST(d.map=="name11");
+	});
+	MOCK_EXPECT(config->generate).once().in(building).calls([](auto f, const auto& d){
+		BOOST_TEST(f=="tmpl2"s);
+		BOOST_TEST(d.map=="name12");
+	});
 
 	core.gen(config);
 }
