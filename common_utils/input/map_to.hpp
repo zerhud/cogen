@@ -18,7 +18,7 @@ namespace gen_utils {
 
 class map_to {
 public:
-	typedef std::map<std::pmr::string, tree> result_t;
+	typedef std::pmr::map<std::pmr::string, tree> result_t;
 	[[nodiscard]] result_t operator()(std::pmr::string tmpl, const tree& data);
 private:
 	[[nodiscard]] std::optional<std::pmr::string> replace(
