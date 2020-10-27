@@ -53,7 +53,7 @@ node_ptr tree::create_link(const data_node *p, node_ptr c)
 	return edges.emplace_back(edge{p, {std::move(c)}}).children[0];
 }
 
-std::vector<node_ptr> tree::children(const data_node& par) const
+std::pmr::vector<node_ptr> tree::children(const data_node& par) const
 {
 	if(!node_exists(&par))
 		throw std::runtime_error("no such node found"s);

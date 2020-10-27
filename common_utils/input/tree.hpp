@@ -12,6 +12,7 @@
 #include <string>
 #include <optional>
 #include <functional>
+#include <memory_resource>
 
 namespace gen_utils {
 
@@ -34,14 +35,14 @@ public:
 class tree final {
 	struct edge {
 		const data_node* parent;
-		std::vector<node_ptr> children;
+		std::pmr::vector<node_ptr> children;
 	};
 
-	std::vector<node_ptr> store;
+	std::pmr::vector<node_ptr> store;
 	std::uint64_t root_ver;
 	std::string id;
 
-	std::vector<edge> edges;
+	std::pmr::vector<edge> edges;
 
 	bool node_exists(const data_node* n) const ;
 	node_ptr create_link(const data_node* p, node_ptr c);
@@ -54,7 +55,7 @@ public:
 	[[nodiscard]] const data_node& root() const ;
 
 	void add(const data_node& par, node_ptr child);
-	[[nodiscard]] std::vector<node_ptr> children(const data_node& par) const ;
+	[[nodiscard]] std::pmr::vector<node_ptr> children(const data_node& par) const ;
 
 	[[nodiscard]] std::uint64_t root_version() const ;
 	void root_version(std::uint64_t v) ;
