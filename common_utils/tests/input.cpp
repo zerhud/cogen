@@ -42,8 +42,8 @@ struct fixture {
 		return gen_utils_mocks::make_node(v, std::move(name), std::move(value));
 	}
 
-	template<typename T>
-	void check_vec(const std::pmr::vector<T>& vec, std::initializer_list<T> list) const
+	template<typename T, typename L>
+	void check_vec(const std::pmr::vector<T>& vec, std::initializer_list<L> list) const
 	{
 		BOOST_TEST_REQUIRE(vec.size()==list.size());
 		auto contains = [&vec](const auto& v) {
@@ -195,18 +195,14 @@ BOOST_FIXTURE_TEST_CASE(node_variables, fixture)
 	tree().add(*n2, n4);
 	tree().add(*n2, n5);
 
-    std::initializer_list<std::pmr::string> string_list({"vn1", "vn2", "vn3"}) ;
 	BOOST_TEST_CONTEXT("var name list")
-	check_vec(tree().var_name_list(), string_list);
-    string_list = {"vv1"} ;
+	check_vec(tree().var_name_list(), {"vn1"sv, "vn2"sv, "vn3"sv});
 	BOOST_TEST_CONTEXT("var values list for vn1")
-	check_vec(tree().var_value_list("vn1"), string_list);
-	string_list = {"vv2"} ;
+	check_vec(tree().var_value_list("vn1"), {"vv1"sv});
 	BOOST_TEST_CONTEXT("var values list for vn2")
-	check_vec(tree().var_value_list("vn2"), string_list);
-	string_list = {"vv3_1", "vv3_2"} ;
+	check_vec(tree().var_value_list("vn2"), {"vv2"sv});
 	BOOST_TEST_CONTEXT("var values list for vn3")
-	check_vec(tree().var_value_list("vn3"), string_list);
+	check_vec(tree().var_value_list("vn3"), {"vv3_1"sv, "vv3_2"sv});
 }
 BOOST_AUTO_TEST_SUITE_END() // tree
 BOOST_AUTO_TEST_SUITE(tree_map_to)
