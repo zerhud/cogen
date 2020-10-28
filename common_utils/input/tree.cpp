@@ -14,7 +14,7 @@
 using namespace gen_utils;
 using namespace std::literals;
 
-tree::tree(node_ptr root, std::string id_) : id(std::move(id_))
+tree::tree(node_ptr root, std::pmr::string id_) : id(std::move(id_))
 {
 	if(!root) throw std::runtime_error("cannot create input tree without a root");
 	if(!root->version().has_value())
@@ -23,7 +23,7 @@ tree::tree(node_ptr root, std::string id_) : id(std::move(id_))
 	store.emplace_back(std::move(root));
 }
 
-std::string tree::data_id() const
+std::pmr::string tree::data_id() const
 {
 	return id;
 }
@@ -91,9 +91,9 @@ std::uint64_t tree::next_min_version() const
 	return (*pos)->version().value_or(root_ver);
 }
 
-std::vector<std::string> tree::var_name_list() const
+std::pmr::vector<std::pmr::string> tree::var_name_list() const
 {
-	std::vector<std::string> ret;
+	std::pmr::vector<std::pmr::string> ret;
 	auto emp_unique = [&ret](auto&& v){
 		auto pos = std::find(ret.begin(), ret.end(), v);
 		if(pos==ret.end()) ret.emplace_back(v);
@@ -102,9 +102,9 @@ std::vector<std::string> tree::var_name_list() const
 	return ret;
 }
 
-std::vector<std::string> tree::var_value_list(std::string_view name) const
+std::pmr::vector<std::pmr::string> tree::var_value_list(std::string_view name) const
 {
-	std::vector<std::string> ret;
+	std::pmr::vector<std::pmr::string> ret;
 	for(auto& n:store) {
 		auto nv = n->node_var();
 		if(nv && nv->name == name)

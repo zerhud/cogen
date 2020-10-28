@@ -24,7 +24,7 @@ struct fixture {
 	std::shared_ptr<gen_utils_mocks::data_node> main_node;
 	std::optional<gen_utils::tree> _tree;
 	gen_utils::tree& tree() {
-		if(!_tree) _tree.emplace(main_node, "dataid"s);
+		if(!_tree) _tree.emplace(main_node, (std::pmr::string)"dataid");
 		return *_tree;
 	}
 
@@ -35,15 +35,15 @@ struct fixture {
 
 	std::shared_ptr<gen_utils_mocks::data_node> make_node(
 	              std::optional<std::uint64_t> v
-	            , std::optional<std::string> name=std::nullopt
-	            , std::optional<std::string> value=std::nullopt
+	            , std::optional<std::pmr::string> name=std::nullopt
+	            , std::optional<std::pmr::string> value=std::nullopt
 	            )
 	{
 		return gen_utils_mocks::make_node(v, std::move(name), std::move(value));
 	}
 
 	template<typename T>
-	void check_vec(const std::vector<T>& vec, std::initializer_list<T> list) const
+	void check_vec(const std::pmr::vector<T>& vec, std::initializer_list<T> list) const
 	{
 		BOOST_TEST_REQUIRE(vec.size()==list.size());
 		auto contains = [&vec](const auto& v) {
@@ -60,16 +60,16 @@ struct fixture {
 BOOST_AUTO_TEST_SUITE(tree)
 BOOST_AUTO_TEST_CASE(getters)
 {
-	BOOST_CHECK_THROW(gen_utils::tree(nullptr, "dataid"s), std::exception);
+	BOOST_CHECK_THROW(gen_utils::tree(nullptr, "dataid"), std::exception);
 
 	auto bad_node = std::make_shared<gen_utils_mocks::data_node>();
 	MOCK_EXPECT(bad_node->version).returns(std::nullopt);
-	BOOST_CHECK_THROW(gen_utils::tree(bad_node, "dataid"s), std::exception);
+	BOOST_CHECK_THROW(gen_utils::tree(bad_node, "dataid"), std::exception);
 
 	auto node = std::make_shared<gen_utils_mocks::data_node>();
 	MOCK_EXPECT(node->version).returns(1102);
-	gen_utils::tree t(node, "dataid"s);
-	BOOST_TEST(t.data_id() == "dataid"s);
+	gen_utils::tree t(node, "dataid");
+	BOOST_TEST(t.data_id() == "dataid"sv);
 	BOOST_TEST(&t.root() == node.get());
 
 	BOOST_TEST(t.root_version() == 1102);
@@ -184,24 +184,29 @@ BOOST_FIXTURE_TEST_CASE(getters, fixture)
 BOOST_AUTO_TEST_SUITE_END() // copy
 BOOST_FIXTURE_TEST_CASE(node_variables, fixture)
 {
-	auto n1 = make_node(std::nullopt, "vn1"s, "vv1"s);
-	auto n2 = make_node(std::nullopt, "vn2"s, "vv2"s);
-	auto n3 = make_node(std::nullopt, "vn3"s, "vv3_1"s);
+	auto n1 = make_node(std::nullopt, "vn1", "vv1");
+	auto n2 = make_node(std::nullopt, "vn2", "vv2");
+	auto n3 = make_node(std::nullopt, "vn3", "vv3_1");
 	auto n4 = make_node(std::nullopt);
-	auto n5 = make_node(std::nullopt, "vn3"s, "vv3_2"s);
+	auto n5 = make_node(std::nullopt, "vn3", "vv3_2");
 	tree().add(tree().root(), n1);
 	tree().add(tree().root(), n2);
 	tree().add(*n1, n3);
 	tree().add(*n2, n4);
 	tree().add(*n2, n5);
+
+    std::initializer_list<std::pmr::string> string_list({"vn1", "vn2", "vn3"}) ;
 	BOOST_TEST_CONTEXT("var name list")
-	check_vec(tree().var_name_list(), {"vn1"s, "vn2"s, "vn3"s});
+	check_vec(tree().var_name_list(), string_list);
+    string_list = {"vv1"} ;
 	BOOST_TEST_CONTEXT("var values list for vn1")
-	check_vec(tree().var_value_list("vn1"s), {"vv1"s});
+	check_vec(tree().var_value_list("vn1"), string_list);
+	string_list = {"vv2"} ;
 	BOOST_TEST_CONTEXT("var values list for vn2")
-	check_vec(tree().var_value_list("vn2"s), {"vv2"s});
+	check_vec(tree().var_value_list("vn2"), string_list);
+	string_list = {"vv3_1", "vv3_2"} ;
 	BOOST_TEST_CONTEXT("var values list for vn3")
-	check_vec(tree().var_value_list("vn3"s), {"vv3_1"s, "vv3_2"s});
+	check_vec(tree().var_value_list("vn3"), string_list);
 }
 BOOST_AUTO_TEST_SUITE_END() // tree
 BOOST_AUTO_TEST_SUITE(tree_map_to)

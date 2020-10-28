@@ -20,8 +20,8 @@ class data_node;
 using node_ptr = std::shared_ptr<data_node>;
 
 struct variable {
-	std::string name;
-	std::string value;
+	std::pmr::string name;
+	std::pmr::string value;
 };
 
 class data_node {
@@ -40,7 +40,7 @@ class tree final {
 
 	std::pmr::vector<node_ptr> store;
 	std::uint64_t root_ver;
-	std::string id;
+	std::pmr::string id;
 
 	std::pmr::vector<edge> edges;
 
@@ -49,9 +49,9 @@ class tree final {
 public:
 	typedef std::function<bool(const data_node&)> copy_condition;
 	tree() =delete;
-	tree(node_ptr root, std::string id_);
+	tree(node_ptr root, std::pmr::string id_);
 
-	[[nodiscard]] std::string data_id() const ;
+	[[nodiscard]] std::pmr::string data_id() const ;
 	[[nodiscard]] const data_node& root() const ;
 
 	void add(const data_node& par, node_ptr child);
@@ -61,8 +61,8 @@ public:
 	void root_version(std::uint64_t v) ;
 	[[nodiscard]] std::uint64_t next_min_version() const ;
 
-	[[nodiscard]] std::vector<std::string> var_name_list() const ;
-	[[nodiscard]] std::vector<std::string> var_value_list(std::string_view name) const ;
+	[[nodiscard]] std::pmr::vector<std::pmr::string> var_name_list() const ;
+	[[nodiscard]] std::pmr::vector<std::pmr::string> var_value_list(std::string_view name) const ;
 
 	[[nodiscard]] tree copy(const copy_condition& cond) const ;
 };
