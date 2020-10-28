@@ -39,6 +39,21 @@ public:
 	[[nodiscard]] virtual std::pmr::vector<map_result> compiled_input() const =0 ;
 };
 
+class dsl_loader {
+public:
+	virtual ~dsl_loader() noexcept =default ;
+	virtual void add_search_path(std::filesystem::path dir) =0 ;
+	virtual void load_input(std::filesystem::path file) =0 ;
+	virtual input result() const =0 ;
+};
+
+class output_generator {
+public:
+	virtual ~output_generator() noexcept =default ;
+	virtual void add_search_path(std::filesystem::path dir) =0 ;
+	virtual void generate(std::filesystem::path tmpl, const input& data) =0 ;
+};
+
 class configuration {
 public:
 
