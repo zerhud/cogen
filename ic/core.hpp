@@ -54,6 +54,20 @@ public:
 	virtual void generate(std::filesystem::path tmpl, const input& data) =0 ;
 };
 
+class factory {
+public:
+	virtual ~factory() noexcept =default ;
+
+	[[nodiscard]] virtual std::unique_ptr<dsl_loader>
+	create_dsl_loader(std::string_view name) const =0 ;
+
+	[[nodiscard]] virtual std::unique_ptr<output_generator>
+	create_generator(std::string_view name) const =0 ;
+
+	[[nodiscard]] virtual std::unique_ptr<generation_part>
+	create_part() const =0 ;
+};
+
 class configuration {
 public:
 
@@ -73,11 +87,12 @@ public:
 };
 
 class core {
+	std::shared_ptr<factory> gen_system;
 	void build(const configuration& config, generation_part& part) const ;
 	void gen(const configuration& config, const generation_part& part) const ;
 public:
-	core() ;
-	void gen(std::shared_ptr<configuration> config) const ;
+	core(std::shared_ptr<factory> gs) ;
+	void gen(const configuration& config) const ;
 };
 
 } // namespace modegen::ic
