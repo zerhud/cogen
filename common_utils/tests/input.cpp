@@ -172,14 +172,14 @@ BOOST_FIXTURE_TEST_CASE(getters, fixture)
 {
 	auto child1 = make_node(std::nullopt);
 	tree().add(tree().root(), child1);
-	auto tc1 = tree().copy( [](auto&){ return true; } );
-	BOOST_TEST(tc1.data_id()==tree().data_id());
-	BOOST_TEST(tc1.root_version()==tree().root_version());
+	auto tc_1 = tree().copy( [](auto&){ return true; } );
+	BOOST_TEST(tc_1.data_id()==tree().data_id());
+	BOOST_TEST(tc_1.root_version()==tree().root_version());
 
 	tree().root_version(10);
-	BOOST_TEST(tc1.root_version()!=tree().root_version());
-	auto tc2 = tree().copy( [](auto&){ return true; } );
-	BOOST_TEST(tc2.root_version()==tree().root_version());
+	BOOST_TEST(tc_1.root_version()!=tree().root_version());
+	auto tc_2 = tree().copy([](auto&){ return true; } );
+	BOOST_TEST(tc_2.root_version() == tree().root_version());
 }
 BOOST_AUTO_TEST_SUITE_END() // copy
 BOOST_FIXTURE_TEST_CASE(node_variables, fixture)

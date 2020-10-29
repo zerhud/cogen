@@ -29,6 +29,7 @@ if(ENABLE_TESTS)
 endif()
 
 # turtle uses auto_ptr if not defined
-add_compile_definitions(BOOST_NO_AUTO_PTR)
+# BOOST_BIND_GLOBAL_PLACEHOLDERS for boost warging about bind placehodlers
+add_compile_definitions(BOOST_NO_AUTO_PTR BOOST_BIND_GLOBAL_PLACEHOLDERS)
 add_subdirectory(common_utils)
 add_subdirectory(ic)

@@ -39,6 +39,35 @@ public:
 	[[nodiscard]] virtual std::pmr::vector<map_result> compiled_input() const =0 ;
 };
 
+class dsl_loader {
+public:
+	virtual ~dsl_loader() noexcept =default ;
+	virtual void add_search_path(std::filesystem::path dir) =0 ;
+	virtual void load_input(std::filesystem::path file) =0 ;
+	virtual input result() const =0 ;
+};
+
+class output_generator {
+public:
+	virtual ~output_generator() noexcept =default ;
+	virtual void add_search_path(std::filesystem::path dir) =0 ;
+	virtual void generate(std::filesystem::path tmpl, const input& data) =0 ;
+};
+
+class factory {
+public:
+	virtual ~factory() noexcept =default ;
+
+	[[nodiscard]] virtual std::unique_ptr<dsl_loader>
+	create_dsl_loader(std::string_view name) const =0 ;
+
+	[[nodiscard]] virtual std::unique_ptr<output_generator>
+	create_generator(std::string_view name) const =0 ;
+
+	[[nodiscard]] virtual std::unique_ptr<generation_part>
+	create_part() const =0 ;
+};
+
 class configuration {
 public:
 
@@ -58,11 +87,12 @@ public:
 };
 
 class core {
+	std::shared_ptr<factory> gen_system;
 	void build(const configuration& config, generation_part& part) const ;
 	void gen(const configuration& config, const generation_part& part) const ;
 public:
-	core() ;
-	void gen(std::shared_ptr<configuration> config) const ;
+	core(std::shared_ptr<factory> gs) ;
+	void gen(const configuration& config) const ;
 };
 
 } // namespace modegen::ic

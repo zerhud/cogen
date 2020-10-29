@@ -21,12 +21,17 @@ using namespace std::literals;
 BOOST_AUTO_TEST_SUITE(input_configurator)
 
 struct core_fixture {
-	mic::core core;
-
 	std::shared_ptr<icmocks::configuration> config = std::make_shared<icmocks::configuration>();
 
 	std::pmr::vector<std::shared_ptr<icmocks::generation_part>> parts;
 	std::pmr::vector<std::shared_ptr<mic::generation_part>> _parts; ///< simplify returns
+
+	mic::core core;
+
+	core_fixture() : core(nullptr)
+	{
+	}
+
 	void create_parts(std::size_t cnt)
 	{
 		while(cnt--) create_part();
@@ -56,10 +61,6 @@ struct core_fixture {
 };
 
 BOOST_AUTO_TEST_SUITE(core)
-BOOST_FIXTURE_TEST_CASE(errors, core_fixture)
-{
-	BOOST_CHECK_THROW(core.gen(nullptr), std::exception);
-}
 BOOST_FIXTURE_TEST_CASE(generation, core_fixture)
 {
 	create_parts(2);
@@ -97,7 +98,7 @@ BOOST_FIXTURE_TEST_CASE(generation, core_fixture)
 		BOOST_TEST(d.map=="name12");
 	});
 
-	core.gen(config);
+	core.gen(*config);
 }
 BOOST_AUTO_TEST_SUITE_END() // core
 

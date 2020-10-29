@@ -10,15 +10,16 @@
 
 using namespace std::literals;
 
-modegen::ic::core::core() = default ;
-
-void modegen::ic::core::gen(std::shared_ptr<configuration> config) const
+modegen::ic::core::core(std::shared_ptr<factory> gs)
+    : gen_system(std::move(gs))
 {
-	if(!config)
-		throw std::runtime_error("cannot generate output without configuration"s);
-	auto parts = config->parts();
-	for(auto& part:parts) build(*config, *part);
-	for(auto& part:parts) gen(*config, *part);
+}
+
+void modegen::ic::core::gen(const configuration& config) const
+{
+	auto parts = config.parts();
+	for(auto& part:parts) build(config, *part);
+	for(auto& part:parts) gen(config, *part);
 }
 
 void modegen::ic::core::build(
