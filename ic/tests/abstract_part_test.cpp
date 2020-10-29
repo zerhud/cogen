@@ -40,8 +40,8 @@ struct fixture {
 
 	std::shared_ptr<gen_utils_mocks::data_node> make_node(
 			  std::optional<std::uint64_t> v
-			, std::optional<std::string> name=std::nullopt
-			, std::optional<std::string> value=std::nullopt
+			, std::optional<std::pmr::string> name=std::nullopt
+			, std::optional<std::pmr::string> value=std::nullopt
 			) const
 	{
 		return gen_utils_mocks::make_node(v, std::move(name), std::move(value));

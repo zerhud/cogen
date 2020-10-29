@@ -22,13 +22,14 @@ BOOST_AUTO_TEST_SUITE(input_configurator)
 
 struct core_fixture {
 	std::shared_ptr<icmocks::configuration> config = std::make_shared<icmocks::configuration>();
+	std::shared_ptr<icmocks::factory> factory = std::make_shared<icmocks::factory>() ;
 
 	std::pmr::vector<std::shared_ptr<icmocks::generation_part>> parts;
 	std::pmr::vector<std::shared_ptr<mic::generation_part>> _parts; ///< simplify returns
 
 	mic::core core;
 
-	core_fixture() : core(nullptr)
+	core_fixture() : core(factory)
 	{
 	}
 
@@ -61,6 +62,11 @@ struct core_fixture {
 };
 
 BOOST_AUTO_TEST_SUITE(core)
+BOOST_AUTO_TEST_CASE(errors)
+{
+	BOOST_CHECK_THROW(mic::core(nullptr), std::exception);
+}
+
 BOOST_FIXTURE_TEST_CASE(generation, core_fixture)
 {
 	create_parts(2);

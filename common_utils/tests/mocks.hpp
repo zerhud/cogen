@@ -22,8 +22,8 @@ MOCK_BASE_CLASS(data_node, gen_utils::data_node)
 
 std::shared_ptr<gen_utils_mocks::data_node> make_node(
 		std::optional<std::uint64_t> v
-		, std::optional<std::string> name=std::nullopt
-		, std::optional<std::string> value=std::nullopt
+		, std::optional<std::pmr::string> name=std::nullopt
+		, std::optional<std::pmr::string> value=std::nullopt
 )
 {
 	assert( (!name && !value) || (name && value) );
