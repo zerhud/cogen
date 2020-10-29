@@ -64,7 +64,7 @@ struct core_fixture {
 BOOST_AUTO_TEST_SUITE(core)
 BOOST_AUTO_TEST_CASE(errors)
 {
-	BOOST_CHECK_THROW(mic::core x(nullptr), std::exception);
+	BOOST_CHECK_THROW(mic::core(nullptr), std::exception);
 }
 
 BOOST_FIXTURE_TEST_CASE(generation, core_fixture)
@@ -74,7 +74,7 @@ BOOST_FIXTURE_TEST_CASE(generation, core_fixture)
 	MOCK_EXPECT(config->parts).at_least(1).returns(_parts);
 
 	set_config(0, "tmpl1", "p0");
-	set_config(1, "tmpl2", "p1");BOOST_CHECK_THROW(mic::core x(nullptr), std::exception);
+	set_config(1, "tmpl2", "p1");
 	expect_mods(0, true, gen_utils::name_conversion::as_is);
 	expect_mods(1, false, gen_utils::name_conversion::underscore);
 
