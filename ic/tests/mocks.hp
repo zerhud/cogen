@@ -38,4 +38,11 @@ MOCK_BASE_CLASS( configuration, modegen::ic::configuration )
 	MOCK_METHOD(map_tmpl, 1)
 };
 
+MOCK_BASE_CLASS( factory, mic::factory)
+{
+	MOCK_METHOD( create_dsl_loader, 1)
+	MOCK_METHOD( create_generator, 1)
+	MOCK_METHOD( create_part, 0)
+};
+
 } // namespace icmocks
