@@ -65,6 +65,7 @@ BOOST_AUTO_TEST_SUITE(core)
 BOOST_AUTO_TEST_CASE(errors)
 {
 	BOOST_CHECK_THROW(mic::core(nullptr), std::exception);
+	BOOST_CHECK_NO_THROW(mic::core{ std::make_shared<icmocks::factory>()}) ;
 }
 BOOST_FIXTURE_TEST_CASE(load_dsl, core_fixture)
 {
