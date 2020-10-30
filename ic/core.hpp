@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
 #include <vector>
 #include <filesystem>
@@ -58,13 +59,13 @@ class factory {
 public:
 	virtual ~factory() noexcept =default ;
 
-	[[nodiscard]] virtual std::unique_ptr<dsl_loader>
+	[[nodiscard]] virtual std::shared_ptr<dsl_loader>
 	create_dsl_loader(std::string_view name) const =0 ;
 
-	[[nodiscard]] virtual std::unique_ptr<output_generator>
+	[[nodiscard]] virtual std::shared_ptr<output_generator>
 	create_generator(std::string_view name) const =0 ;
 
-	[[nodiscard]] virtual std::unique_ptr<generation_part>
+	[[nodiscard]] virtual std::shared_ptr<generation_part>
 	create_part() const =0 ;
 };
 
@@ -74,6 +75,9 @@ public:
 	virtual ~configuration() noexcept =default;
 
 	virtual void generate(std::filesystem::path tmpl_file, const map_result& data) const =0 ;
+
+	[[nodiscard]]
+	virtual std::pmr::multimap<std::string_view, std::filesystem::path> dsl_files() const =0 ;
 
 	[[nodiscard]]
 	virtual std::pmr::vector<std::shared_ptr<generation_part>>
