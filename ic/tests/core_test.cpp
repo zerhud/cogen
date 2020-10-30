@@ -66,7 +66,21 @@ BOOST_AUTO_TEST_CASE(errors)
 {
 	BOOST_CHECK_THROW(mic::core(nullptr), std::exception);
 }
+BOOST_FIXTURE_TEST_CASE(load_dsl, core_fixture)
+{
+	std::pmr::multimap<std::string_view, std::filesystem::path> dsls;
+	dsls.insert(decltype(dsls)::value_type("idl"sv, "test1"));
+	dsls.insert(decltype(dsls)::value_type("idl"sv, "test2"));
+	dsls.insert(decltype(dsls)::value_type("data"sv, "test3"));
+	MOCK_EXPECT(config->dsl_files).once().returns(dsls);
 
+	auto dsl_idl = std::make_shared<icmocks::dsl_loader>();
+	auto dsl_data = std::make_shared<icmocks::dsl_loader>();
+	MOCK_EXPECT(factory->create_dsl_loader).exactly(2).with("idl").returns(dsl_idl);
+	MOCK_EXPECT(factory->create_dsl_loader).exactly(1).with("data").returns(dsl_data);
+
+	core.gen(*config);
+}
 BOOST_FIXTURE_TEST_CASE(generation, core_fixture)
 {
 	create_parts(2);
