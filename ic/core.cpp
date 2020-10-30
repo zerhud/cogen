@@ -13,6 +13,7 @@ using namespace std::literals;
 modegen::ic::core::core(std::shared_ptr<factory> gs)
     : gen_system(std::move(gs))
 {
+	if(! gs) throw std::runtime_error("could not create core without factory"s);
 }
 
 void modegen::ic::core::gen(const configuration& config) const
