@@ -56,6 +56,12 @@ struct fixture {
 			}
 		}
 	}
+
+	template<typename Map, typename Key>
+	bool map_contains(const Map& map, const Key& key)
+	{
+		return map.find(key) != map.end();
+	}
 };
 BOOST_AUTO_TEST_SUITE(tree)
 BOOST_AUTO_TEST_CASE(getters)
@@ -213,7 +219,7 @@ BOOST_FIXTURE_TEST_CASE(one_var, fixture)
 	main_node = make_node(1, "var", "val");
 	auto r = mapper("_${var}_", tree());
 	BOOST_TEST(r.size()==1);
-	BOOST_CHECK(r.find("_val_")!=r.end());
+	BOOST_CHECK(map_contains(r, "_val_"));
 }
 BOOST_FIXTURE_TEST_CASE(tmpl_diff_from_var_name, fixture)
 {
@@ -221,7 +227,7 @@ BOOST_FIXTURE_TEST_CASE(tmpl_diff_from_var_name, fixture)
 	main_node = make_node(1, "var", "val");
 	auto r = mapper("_${var1}_", tree());
 	BOOST_TEST(r.size()==1);
-	BOOST_CHECK(r.find("_${var1}_")!=r.end());
+	BOOST_CHECK(map_contains(r, "_${var1}_")) ;
 }
 BOOST_FIXTURE_TEST_CASE(few_vars, fixture)
 {
@@ -237,10 +243,10 @@ BOOST_FIXTURE_TEST_CASE(few_vars, fixture)
 	tree().add(*node_2, node_21);
 	auto r = mapper("_${var1}_${var2}_${var3}_${var1}_", tree());
 	BOOST_TEST(r.size()==4);
-	BOOST_CHECK(r.find("_val1_val2_val3_val1_")!=r.end());
-	BOOST_CHECK(r.find("_val1_val2_val31_val1_")!=r.end());
-	BOOST_CHECK(r.find("_val1_val21_val3_val1_")!=r.end());
-	BOOST_CHECK(r.find("_val1_val21_val31_val1_")!=r.end());
+	BOOST_CHECK(map_contains(r, "_val1_val2_val3_val1_"));
+	BOOST_CHECK(map_contains(r, "_val1_val2_val31_val1_"));
+	BOOST_CHECK(map_contains(r, "_val1_val21_val3_val1_"));
+	BOOST_CHECK(map_contains(r, "_val1_val21_val31_val1_"));
 }
 BOOST_FIXTURE_TEST_CASE(no_var, fixture)
 {
@@ -248,7 +254,7 @@ BOOST_FIXTURE_TEST_CASE(no_var, fixture)
 	main_node = make_node(1, "var1", "val1");
 	auto r = mapper("_${var1}_${var2}_", tree());
 	BOOST_TEST(r.size()==1);
-	BOOST_CHECK(r.find("_val1_${var2}_")!=r.end());
+	BOOST_CHECK(map_contains(r, "_val1_${var2}_"));
 }
 BOOST_AUTO_TEST_SUITE_END() // tree_map_to
 BOOST_AUTO_TEST_SUITE_END() // input
