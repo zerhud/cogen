@@ -215,6 +215,14 @@ BOOST_FIXTURE_TEST_CASE(one_var, fixture)
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.find("_val_")!=r.end());
 }
+BOOST_FIXTURE_TEST_CASE(tmpl_diff_from_var_name, fixture)
+{
+ 	map_to mapper;
+	main_node = make_node(1, "var", "val");
+	auto r = mapper("_${var1}_", tree());
+	BOOST_TEST(r.size()==1);
+	BOOST_CHECK(r.find("_${var1}_")!=r.end());
+}
 BOOST_FIXTURE_TEST_CASE(few_vars, fixture)
 {
 	map_to mapper;
