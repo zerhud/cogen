@@ -229,6 +229,20 @@ BOOST_FIXTURE_TEST_CASE(tmpl_diff_from_var_name, fixture)
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(map_contains(r, "_${var1}_")) ;
 }
+
+BOOST_FIXTURE_TEST_CASE(_3_node_1_tmpl, fixture)
+{
+	map_to mapper;
+	main_node = make_node(1, "var1", "val1");
+	auto node2 = make_node(std::nullopt, "var2", "val2");
+	auto node3 = make_node(std::nullopt, "var3", "val3");
+	tree().add(tree().root(), node2);
+	tree().add(tree().root(), node3);
+	auto r = mapper("_${var1}_", tree());
+	BOOST_TEST(r.size() == 1) ;
+	BOOST_CHECK( map_contains(r,"_val1_")) ;
+}
+
 BOOST_FIXTURE_TEST_CASE(few_vars, fixture)
 {
 	map_to mapper;
