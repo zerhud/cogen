@@ -20,7 +20,7 @@ void gen_utils::map_to::make_for_name(std::string_view name)
 		for(auto& val:val_list) {
 			auto tmpl = replace(item.first, name, val);
 			if( tmpl ) result.emplace(*tmpl, copy_for(item.second, name, val));
-				else result.emplace(std::move(item));
+			      else result.emplace(std::move(item));
 		}
 	}
 }
