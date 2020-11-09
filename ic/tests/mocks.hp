@@ -32,7 +32,7 @@ MOCK_BASE_CLASS( configuration, modegen::ic::configuration )
 	MOCK_METHOD(generate, 2)
 	MOCK_METHOD(parts, 0)
 
-	MOCK_METHOD(dsl_files, 0)
+	MOCK_METHOD(all_dsl, 0)
 
 	MOCK_METHOD(split_versions, 1)
 	MOCK_METHOD(naming, 1)
@@ -40,16 +40,8 @@ MOCK_BASE_CLASS( configuration, modegen::ic::configuration )
 	MOCK_METHOD(map_tmpl, 1)
 };
 
-MOCK_BASE_CLASS(dsl_loader, mic::dsl_loader)
-{
-	MOCK_METHOD( add_search_path, 1)
-	MOCK_METHOD( load_input, 1)
-	MOCK_METHOD( result, 0)
-};
-
 MOCK_BASE_CLASS( factory, mic::factory)
 {
-	MOCK_METHOD( create_dsl_loader, 1)
 	MOCK_METHOD( create_generator, 1)
 	MOCK_METHOD( create_part, 0)
 };

@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <map>
 #include <memory>
 #include <vector>
 #include <filesystem>
@@ -40,14 +39,6 @@ public:
 	[[nodiscard]] virtual std::pmr::vector<map_result> compiled_input() const =0 ;
 };
 
-class dsl_loader {
-public:
-	virtual ~dsl_loader() noexcept =default ;
-	virtual void add_search_path(std::filesystem::path dir) =0 ;
-	virtual void load_input(std::filesystem::path file) =0 ;
-	virtual input result() const =0 ;
-};
-
 class output_generator {
 public:
 	virtual ~output_generator() noexcept =default ;
@@ -58,9 +49,6 @@ public:
 class factory {
 public:
 	virtual ~factory() noexcept =default ;
-
-	[[nodiscard]] virtual std::shared_ptr<dsl_loader>
-	create_dsl_loader(std::string_view name) const =0 ;
 
 	[[nodiscard]] virtual std::shared_ptr<output_generator>
 	create_generator(std::string_view name) const =0 ;
@@ -76,8 +64,7 @@ public:
 
 	virtual void generate(std::filesystem::path tmpl_file, const map_result& data) const =0 ;
 
-	[[nodiscard]]
-	virtual std::pmr::multimap<std::string_view, std::filesystem::path> dsl_files() const =0 ;
+	[[nodiscard]] virtual input all_dsl() const =0 ;
 
 	[[nodiscard]]
 	virtual std::pmr::vector<std::shared_ptr<generation_part>>
