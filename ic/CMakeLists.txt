@@ -37,5 +37,4 @@ if(ENABLE_TESTS)
 	endmacro()
 
 	add_unit_test(core "tests/" "")
-	add_unit_test(abstract_part "tests/" "")
 endif()

@@ -15,21 +15,14 @@ namespace mic = modegen::ic;
 
 namespace icmocks {
 
-MOCK_BASE_CLASS( generation_part, modegen::ic::generation_part )
+MOCK_BASE_CLASS( provider, modegen::ic::provider )
 {
-	MOCK_METHOD(id, 0)
-	MOCK_METHOD(name, 0)
-
-	MOCK_METHOD(rename, 1)
-	MOCK_METHOD(split_versions, 0)
-
-	MOCK_METHOD(map_to, 1)
-	MOCK_METHOD(compiled_input, 0)
+	MOCK_METHOD(generate, 3)
+	MOCK_METHOD(to_json, 2)
 };
 
 MOCK_BASE_CLASS( configuration, modegen::ic::configuration )
 {
-	MOCK_METHOD(generate, 2)
 	MOCK_METHOD(parts, 0)
 
 	MOCK_METHOD(all_dsl, 0)
@@ -38,12 +31,7 @@ MOCK_BASE_CLASS( configuration, modegen::ic::configuration )
 	MOCK_METHOD(naming, 1)
 	MOCK_METHOD(tmpl_file, 1)
 	MOCK_METHOD(map_tmpl, 1)
-};
-
-MOCK_BASE_CLASS( factory, mic::factory)
-{
-	MOCK_METHOD( create_generator, 1)
-	MOCK_METHOD( create_part, 0)
+	MOCK_METHOD(lang, 1)
 };
 
 } // namespace icmocks

@@ -22,17 +22,17 @@ void input::add(gen_utils::tree data)
 	storage.emplace_back(std::move(data));
 }
 
-std::vector<const gen_utils::tree*> input::select(std::string_view id) const
+std::pmr::vector<const gen_utils::tree*> input::select(std::string_view id) const
 {
-	std::vector<const gen_utils::tree*> ret;
+	std::pmr::vector<const gen_utils::tree*> ret;
 	ret.reserve(storage.size());
 	for(auto& t:storage) if(t.data_id()==id) ret.emplace_back(&t);
 	return ret;
 }
 
-std::vector<const gen_utils::tree*> input::all() const
+std::pmr::vector<const gen_utils::tree*> input::all() const
 {
-	std::vector<const gen_utils::tree*> ret;
+	std::pmr::vector<const gen_utils::tree*> ret;
 	ret.reserve(storage.size());
 	for(auto& t:storage) ret.emplace_back(&t);
 	return ret;

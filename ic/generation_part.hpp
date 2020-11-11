@@ -8,27 +8,10 @@
 
 #pragma once
 
-#include <vector>
-#include <memory>
-#include <string>
-#include <optional>
-#include <functional>
-#include "common_utils/input/tree.hpp"
-
 namespace modegen::ic {
 
-class input final {
-	std::pmr::vector<gen_utils::tree> storage;
+class generation_part final {
 public:
-	input() =default ;
-	~input() noexcept =default;
-
-	void add(input&& other);
-	void add(gen_utils::tree data);
-	[[nodiscard]] std::pmr::vector<const gen_utils::tree*> select(
-			std::string_view id) const ;
-	[[nodiscard]] std::pmr::vector<const gen_utils::tree*> all() const ;
 };
-
 
 } // namespace modegen::ic
