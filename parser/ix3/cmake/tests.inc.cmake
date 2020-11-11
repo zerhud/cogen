@@ -21,7 +21,7 @@ set(tests_parser
 	rules_entity
 	rules_file
 	utils_checker
-	utils_selector
+	#utils_selector
 	utils_remove_empty
 	utils_filter
 	utils_split_by_version

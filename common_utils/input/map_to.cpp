@@ -19,11 +19,8 @@ void gen_utils::map_to::make_for_name(std::string_view name)
 		assert(!val_list.empty());
 		for(auto& val:val_list) {
 			auto tmpl = replace(item.first, name, val);
-			if(!tmpl) {
-				result.emplace(std::move(item));
-				continue;
-			}
-			result.emplace(*tmpl, copy_for(item.second, name, val));
+			if( tmpl ) result.emplace(*tmpl, copy_for(item.second, name, val));
+			      else result.emplace(std::move(item));
 		}
 	}
 }
@@ -41,10 +38,10 @@ gen_utils::tree gen_utils::map_to::copy_for(
 gen_utils::map_to::result_t gen_utils::map_to::operator()
 (std::pmr::string tmpl, const tree& data)
 {
-	auto variables = data.var_name_list();
+	auto names_list = data.var_name_list();
 	result.emplace(tmpl, data);
-	for(auto& var:variables) {
-		make_for_name(var);
+	for(auto& name:names_list) {
+		make_for_name(name);
 	}
 	return result;
 }

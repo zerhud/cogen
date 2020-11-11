@@ -53,8 +53,10 @@ namespace meta {
 		std::string value() const override ;
 	};
 
-	struct set {
+	struct set : x3::position_tagged {
 		typedef variant_t<version, depricated, documentation, oapi> parameter_t;
+		set& operator = (std::vector<parameter_t> v) noexcept ;
+
 		std::vector<parameter_t> cnt;
 	};
 } // namespace meta
