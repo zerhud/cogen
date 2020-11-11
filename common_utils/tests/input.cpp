@@ -270,5 +270,33 @@ BOOST_FIXTURE_TEST_CASE(no_var, fixture)
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(map_contains(r, "_val1_${var2}_"));
 }
+BOOST_FIXTURE_TEST_CASE(no_any_var, fixture)
+{
+	map_to mapper;
+	main_node = make_node(1);
+	auto r = mapper("_${var1}_${var2}_", tree());
+	BOOST_TEST(r.size()==1);
+	BOOST_CHECK(map_contains(r, "_${var1}_${var2}_"));
+}
+BOOST_FIXTURE_TEST_CASE(no_var_no_ref, fixture)
+{
+	map_to mapper;
+	main_node = make_node(1);
+	auto r = mapper("_xxx_", tree());
+	BOOST_TEST(r.size()==1);
+	BOOST_CHECK(map_contains(r, "_xxx_"));
+}
+BOOST_FIXTURE_TEST_CASE(double_use, fixture)
+{
+	map_to mapper;
+	main_node = make_node(1, "var", "val");
+	auto r = mapper("_xxx_", tree());
+	BOOST_TEST(r.size()==1);
+	BOOST_CHECK(map_contains(r, "_xxx_"));
+
+	r = mapper("_${var}_", tree());
+	BOOST_TEST(r.size()==1);
+	BOOST_CHECK(map_contains(r, "_val_"));
+}
 BOOST_AUTO_TEST_SUITE_END() // tree_map_to
 BOOST_AUTO_TEST_SUITE_END() // input
