@@ -110,9 +110,12 @@ BOOST_FIXTURE_TEST_CASE(mapping, core_fixture)
 	all_dsl.add(std::move(dsl_tree));
 	MOCK_EXPECT(config->all_dsl).returns(all_dsl);
 
+	auto check_input = [](const ic_input& d){ return d.all().size() == 1; };
 	mock::sequence gen_seq;
-	MOCK_EXPECT(prov->to_json).once().in(gen_seq).returns(pj1);
-	MOCK_EXPECT(prov->to_json).once().in(gen_seq).returns(pj2);
+	MOCK_EXPECT(prov->to_json).once().in(gen_seq)
+	        .with(json_generator::cpp, mock::call(check_input)).returns(pj1);
+	MOCK_EXPECT(prov->to_json).once().in(gen_seq)
+	        .with(json_generator::cpp, mock::call(check_input)).returns(pj2);
 
 	core.gen(*config);
 }

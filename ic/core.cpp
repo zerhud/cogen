@@ -20,10 +20,9 @@ modegen::ic::core::core(std::shared_ptr<provider> p)
 void modegen::ic::core::gen(const configuration& config) const
 {
 	assert(prov);
-	auto parts = config.parts();
 	gen_utils::map_to mapper;
 	auto all_dsl = config.all_dsl();
-	for(auto& p:parts) {
+	for(auto& p:config.parts()) {
 
 		auto map_tmpl = config.map_tmpl(p);
 		std::map<std::pmr::string, input> part_outputs;
