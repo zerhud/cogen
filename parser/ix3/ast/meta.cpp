@@ -41,3 +41,10 @@ std::string ix3::ast::meta::oapi::value() const
 {
 	return key + ": " + val;
 }
+
+ix3::ast::meta::set& ix3::ast::meta::set::operator =
+(std::vector<ix3::ast::meta::set::parameter_t> v) noexcept
+{
+	cnt = std::move(v);
+	return *this;
+}

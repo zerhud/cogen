@@ -105,6 +105,7 @@ BOOST_AUTO_TEST_CASE(unite)
 	BOOST_TEST( ast::get<ast::meta::documentation>(mods[0].meta_params).has_value() );
 }
 
+#if 0
 BOOST_DATA_TEST_CASE(
 	  selector
 	, udt::make(
@@ -126,3 +127,4 @@ BOOST_DATA_TEST_CASE(
 {
 	BOOST_TEST( ix3::utils::is_selected(content, selector) == result );
 }
+#endif

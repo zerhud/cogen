@@ -21,6 +21,8 @@ namespace ast = ix3::ast;
 namespace udt = boost::unit_test::data;
 using namespace std::literals;
 
+#if 0
+
 BOOST_DATA_TEST_CASE(
 	  selector
 	, udt::make(
@@ -43,3 +45,4 @@ BOOST_DATA_TEST_CASE(
 	BOOST_TEST( ix3::utils::is_selected(content, selector) == result );
 }
 
+#endif
