@@ -4,7 +4,7 @@ find_package(Boost 1.69 COMPONENTS unit_test_framework REQUIRED)
 enable_testing()
 macro(add_unit_test tname path lib)
 	add_executable(${tname}_test "${path}ix3_${tname}_test.cpp")
-	target_link_libraries(${tname}_test PRIVATE ${lib} ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
+	target_link_libraries(${tname}_test PRIVATE ${lib} ${Boost_LIBRARIES} ${CMAKE_DL_LIBS} generation_utils)
 	target_include_directories(${tname}_test SYSTEM PRIVATE
 		"${Boost_INCLUDE_DIR}"
 		"${turtle}"
@@ -26,6 +26,7 @@ set(tests_parser
 	utils_filter
 	utils_split_by_version
 	utils_naming
+	parser_tree
 	)
 foreach(tname ${tests_parser})
 	add_unit_test(${tname} "tests/" "${PROJECT_NAME}")

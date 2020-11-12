@@ -11,6 +11,7 @@
 #include <filesystem>
 #include "ast/file.hpp"
 #include "utils/checker.hpp"
+#include "common_utils/input/tree.hpp"
 
 namespace ix3 {
 
@@ -30,6 +31,9 @@ public:
 	void parse(std::filesystem::path file) ;
 	void finish_loads() ;
 
+	void create_tree() ;
+	std::vector<gen_utils::tree> get_tree() const ;
+
 	std::vector<ix3::ast::module> result() const ;
 private:
 	ast::file_content parse_stream(std::istream& input) const ;
@@ -42,6 +46,7 @@ private:
 
 	utils::checker checker;
 	std::vector<ast::module> finished_ast;
+	std::vector<gen_utils::tree> tree ;
 };
 
 } // namespace ix3
