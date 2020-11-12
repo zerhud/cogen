@@ -44,21 +44,54 @@ struct core_fixture {
 		= std::make_shared<icmocks::provider>();
 	mic::core core;
 
+	struct output_info {
+		std::string_view file;
+		nlohmann::json compiled_result;
+		std::function<bool(const ic_input&)> checker;
+	};
+
+	struct part_info {
+		std::string_view name;
+		std::pmr::string map_tmpl;
+		std::pmr::string tmpl_file;
+		std::vector<output_info> outputs;
+	};
+
+	std::vector<part_info> parts;
+
 	core_fixture() : core(prov)
 	{
-	}
-
-	void set_config(std::string_view id, std::pmr::string tmpl, std::pmr::string mt)
-	{
-		MOCK_EXPECT(config->map_tmpl).with(id).returns(mt);
-		MOCK_EXPECT(config->tmpl_file).with(id).returns(tmpl);
-		MOCK_EXPECT(config->lang).with(id).returns(mic::json_generator::cpp);
 	}
 
 	void expect_mods(std::string_view id, bool sv, gen_utils::name_conversion n)
 	{
 		MOCK_EXPECT(config->split_versions).with(id).returns(sv);
 		MOCK_EXPECT(config->naming).with(id).returns(n);
+	}
+
+	void create_parts()
+	{
+		std::pmr::vector<std::string_view> names;
+		for(auto& p:parts) {
+			names.emplace_back(p.name);
+			MOCK_EXPECT(config->map_tmpl)
+			        .with(p.name).returns(p.map_tmpl);
+			MOCK_EXPECT(config->tmpl_file)
+			        .with(p.name).returns(p.tmpl_file);
+			MOCK_EXPECT(config->lang)
+			        .with(p.name).returns(mic::json_generator::cpp);
+
+			mock::sequence json_seq;
+			for(auto& o:p.outputs) {
+				MOCK_EXPECT(prov->to_json)
+				    .once() .in(json_seq)
+				    .with(mic::json_generator::cpp, mock::call(o.checker))
+				    .returns(o.compiled_result);
+				MOCK_EXPECT(prov->generate).once()
+				    .with(p.tmpl_file, o.compiled_result, o.file);
+			}
+		}
+		MOCK_EXPECT(config->parts).returns(names);
 	}
 };
 
@@ -70,52 +103,41 @@ BOOST_AUTO_TEST_CASE(check_json)
 }
 BOOST_FIXTURE_TEST_CASE(generation, core_fixture)
 {
-	auto p1j = R"({"pj":1})"_json;
-	auto p2j = R"({"pj":2})"_json;
-	MOCK_EXPECT(config->parts).returns(make_vector("p1"sv, "p2"sv));
-	MOCK_EXPECT(prov->generate).once().with("p1t", p1j, "p1f"sv);
-	MOCK_EXPECT(prov->generate).once().with("p2t", p2j, "p2f"sv);
-	set_config("p1"sv, "p1t"_s, "p1f"_s);
-	set_config("p2"sv, "p2t"_s, "p2f"_s);
+	auto check_input = [](const ic_input& d){ return d.all().size()==2 ; };
+
+	parts.emplace_back(
+	            part_info{"p1"sv, "p1f"_s, "p1t"_s, {
+	                          {"p1f"sv, R"({"pj":1})"_json, check_input}
+	                      }});
+	parts.emplace_back(
+	            part_info{"p2"sv, "p2f"_s, "p2t"_s, {
+	                          {"p2f"sv, R"({"pj":2})"_json, check_input}
+	                      }});
+	create_parts();
 
 	ic_input all_dsl;
 	mock::sequence gen_seq;
-	auto check_input = [](const ic_input& d){ return d.all().size()==2 ; };
 	all_dsl.add(gen_utils::tree{gen_utils_mocks::make_node(1), "p1"_s});
 	all_dsl.add(gen_utils::tree{gen_utils_mocks::make_node(2), "p2"_s});
 	MOCK_EXPECT(config->all_dsl).returns(all_dsl);
-	MOCK_EXPECT(prov->to_json)
-	        .once() .in(gen_seq)
-	        .with(json_generator::cpp, mock::call(check_input))
-	        .returns(p1j);
-	MOCK_EXPECT(prov->to_json)
-	        .once() .in(gen_seq)
-	        .with(json_generator::cpp, mock::call(check_input))
-	        .returns(p2j);
 
 	core.gen(*config);
 }
 BOOST_FIXTURE_TEST_CASE(mapping, core_fixture)
 {
-	auto pj1 = R"({"pj":1})"_json;
-	auto pj2 = R"({"pj":2})"_json;
-	MOCK_EXPECT(config->parts).returns(make_vector("p1"sv));
-	MOCK_EXPECT(prov->generate).once().with("pt", pj1, "pfv1"sv);
-	MOCK_EXPECT(prov->generate).once().with("pt", pj2, "pfv2"sv);
-	set_config("p1"sv, "pt"_s, "pf${var}"_s);
+	auto check_input = [](const ic_input& d){ return d.all().size() == 1; };
+	parts.emplace_back(
+	            part_info{"p1"sv, "pf${var}"_s, "pt"_s, {
+	                          {"pfv1"sv, R"({"pj":1})"_json, check_input},
+	                          {"pfv2"sv, R"({"pj":2})"_json, check_input}
+	                      }});
+	create_parts();
 
 	ic_input all_dsl;
 	gen_utils::tree dsl_tree{gen_utils_mocks::make_node(1, "var"_s, "v1"_s), "p1"_s};
 	dsl_tree.add(dsl_tree.root(), gen_utils_mocks::make_node(1, "var"_s, "v2"_s));
 	all_dsl.add(std::move(dsl_tree));
 	MOCK_EXPECT(config->all_dsl).returns(all_dsl);
-
-	auto check_input = [](const ic_input& d){ return d.all().size() == 1; };
-	mock::sequence gen_seq;
-	MOCK_EXPECT(prov->to_json).once().in(gen_seq)
-	        .with(json_generator::cpp, mock::call(check_input)).returns(pj1);
-	MOCK_EXPECT(prov->to_json).once().in(gen_seq)
-	        .with(json_generator::cpp, mock::call(check_input)).returns(pj2);
 
 	core.gen(*config);
 }
