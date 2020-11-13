@@ -50,15 +50,7 @@ public:
 	typedef std::function<bool(const data_node&)> copy_condition;
 	tree() =delete;
 	tree(node_ptr root, std::pmr::string id_);
-	template <class T0, class... Ts>
-	auto make_vector(T0&& first, Ts&&... args)
-	{
-		using first_type = std::decay_t<T0>;
-		return std::vector<first_type>{
-				std::forward<T0>(first),
-				std::forward<Ts>(args)...
-		};
-	}
+
 	[[nodiscard]] std::pmr::string data_id() const ;
 	[[nodiscard]] const data_node& root() const ;
 
