@@ -187,6 +187,33 @@ BOOST_FIXTURE_TEST_CASE(getters, fixture)
 	auto tc_2 = tree().copy([](auto&){ return true; } );
 	BOOST_TEST(tc_2.root_version() == tree().root_version());
 }
+
+BOOST_FIXTURE_TEST_CASE(uncond_parent_not_copying_children, fixture)
+{
+	auto child1   = make_node(std::nullopt, "child1", "1");
+	auto child11  = make_node(std::nullopt, "child11", "1");
+	auto child111 = make_node(std::nullopt, "child111", "1");
+	auto child12  = make_node(std::nullopt, "child12", "1");
+	auto child2   = make_node(std::nullopt, "child2", "1");
+	auto child21  = make_node(std::nullopt, "child21", "1");
+	auto child211 = make_node(std::nullopt, "child211", "1");
+
+	tree().add(tree().root(), child1);
+	tree().add(tree().root(), child2);
+	tree().add(*child1, child11);
+	tree().add(*child11, child111);
+	tree().add(*child1, child12);
+	tree().add(*child2, child21);
+	tree().add(*child2, child211);
+
+	auto cond = tree().copy([child2,child11](auto& node){
+			return &node != child2.get() && &node != child11.get();});
+	auto names = cond.var_name_list() ;
+
+	BOOST_TEST( names.size() == 2) ;
+	for( auto name :names) BOOST_CHECK( name != "child2"sv && name != "child11"sv);
+}
+
 BOOST_AUTO_TEST_SUITE_END() // copy
 BOOST_FIXTURE_TEST_CASE(node_variables, fixture)
 {
