@@ -16,8 +16,6 @@
 #include "parser.hpp"
 #include "common_utils/input/tree.hpp"
 
-
-
 BOOST_AUTO_TEST_CASE(tree)
 {
 	ix3::parser parser ;
@@ -25,6 +23,7 @@ BOOST_AUTO_TEST_CASE(tree)
 	str << "module mod v1.0:" << std::endl << "string foo();" ;
 
 	parser.parse(str, "file.txt") ;
+	parser.finish_loads() ;
 
 	auto result = parser.result() ;
 	std::cout << std::endl << result.size() << std::endl ;
