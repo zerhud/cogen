@@ -127,16 +127,16 @@ BOOST_FIXTURE_TEST_CASE(mapping, core_fixture)
 {
 	auto check_input = [](const ic_input& d){ return d.all().size() == 1; };
 	parts.emplace_back(
-	            part_info{"p1"sv, "pf${var}"_s, "pt"_s, {
+	            part_info{"p1"sv, "pf${vn}"_s, "pt"_s, {
 	                          {"pfv1"sv, R"({"pj":1})"_json, check_input},
 	                          {"pfv2"sv, R"({"pj":2})"_json, check_input}
 	                      }});
 	create_parts();
 
 	ic_input all_dsl;
-	gen_utils::tree dsl_tree{gen_utils_mocks::make_node(1, "var"_s, "v1"_s), "p1"_s};
-	dsl_tree.add(dsl_tree.root(), gen_utils_mocks::make_node(1, "var"_s, "v2"_s));
-	all_dsl.add(std::move(dsl_tree));
+	gen_utils::tree dsl{gen_utils_mocks::make_node(1, "vn"_s, "v1"_s), "p1"_s};
+	dsl.add(dsl.root(), gen_utils_mocks::make_node(1, "vn"_s, "v2"_s));
+	all_dsl.add(std::move(dsl));
 	MOCK_EXPECT(config->all_dsl).returns(all_dsl);
 
 	core.gen(*config);
