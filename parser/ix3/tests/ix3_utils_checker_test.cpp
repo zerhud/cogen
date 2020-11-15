@@ -17,7 +17,6 @@
 #include "grammar/all.hpp"
 #include "utils/checker.hpp"
 #include "utils/meta.hpp"
-#include "utils/selector.hpp"
 
 namespace ast = ix3::ast;
 namespace txt = ix3::text;
@@ -104,27 +103,3 @@ BOOST_AUTO_TEST_CASE(unite)
 	BOOST_TEST( ast::get<ast::meta::version>(mods[0].meta_params).has_value() );
 	BOOST_TEST( ast::get<ast::meta::documentation>(mods[0].meta_params).has_value() );
 }
-
-#if 0
-BOOST_DATA_TEST_CASE(
-	  selector
-	, udt::make(
-		 ast::module_content(ast::function{})
-		,ast::enumeration{}
-		,ast::record{}
-		,ast::interface{}
-		,ast::record{}
-		)
-	^ udt::make(
-		 ix3::utils::selector::function
-		,ix3::utils::selector::enumeration
-		,ix3::utils::selector::record
-		,ix3::utils::selector::interface
-		,ix3::utils::selector::interface
-		)
-	^ udt::make(true, true, true, true, false)
-	, content, selector, result)
-{
-	BOOST_TEST( ix3::utils::is_selected(content, selector) == result );
-}
-#endif

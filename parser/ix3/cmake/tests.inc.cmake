@@ -21,11 +21,6 @@ set(tests_parser
 	rules_entity
 	rules_file
 	utils_checker
-	#utils_selector
-	utils_remove_empty
-	utils_filter
-	utils_split_by_version
-	utils_naming
 	)
 foreach(tname ${tests_parser})
 	add_unit_test(${tname} "tests/" "${PROJECT_NAME}")
