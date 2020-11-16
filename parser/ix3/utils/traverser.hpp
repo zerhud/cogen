@@ -27,10 +27,17 @@ public:
 	virtual ~traverser() noexcept =default ;
 protected:
 	enum class trav_direction { paret_first, child_first } ;
-	typedef std::variant<ast::module*, ast::record*, ast::interface*, ast::function*, ast::enumeration*> parent_t;
+	typedef std::variant<
+	   ast::module*,
+	   ast::record*,
+	   ast::interface*,
+	   ast::function*,
+	   ast::enumeration*> parent_t;
 
 	ast::module& module() ;
-	void trav_module(const ast::module& mod, trav_direction direction = trav_direction::child_first) ;
+	void trav_module(
+	        const ast::module& mod,
+	        trav_direction direction = trav_direction::child_first) ;
 
 	std::string path() const ;
 
