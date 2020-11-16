@@ -33,7 +33,6 @@ protected:
 	void trav_module(const ast::module& mod, trav_direction direction = trav_direction::child_first) ;
 
 	std::string path() const ;
-	std::vector<ast::meta::set> meta_stack() const ;
 
 	template<typename P>
 	P* parent(std::size_t ind)

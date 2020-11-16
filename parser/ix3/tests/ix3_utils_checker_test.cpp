@@ -24,6 +24,10 @@ namespace udt = boost::unit_test::data;
 using namespace std::literals;
 using ix3::utils::checker;
 
+BOOST_AUTO_TEST_SUITE(ix3)
+BOOST_AUTO_TEST_SUITE(utils)
+BOOST_AUTO_TEST_SUITE(gain_ast_checker)
+
 BOOST_AUTO_TEST_CASE(few_modules)
 {
 	ast::file_content result;
@@ -103,3 +107,7 @@ BOOST_AUTO_TEST_CASE(unite)
 	BOOST_TEST( ast::get<ast::meta::version>(mods[0].meta_params).has_value() );
 	BOOST_TEST( ast::get<ast::meta::documentation>(mods[0].meta_params).has_value() );
 }
+
+BOOST_AUTO_TEST_SUITE_END() // gain_ast_checker
+BOOST_AUTO_TEST_SUITE_END() // utils
+BOOST_AUTO_TEST_SUITE_END() // ix3
