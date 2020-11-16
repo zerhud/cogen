@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(interface_diff_exi,
 	//      in ast we can mix order in flags.
 	ast::interface result;
 
-	std::string data = "interface i +ex +i { type foo(); }"s;
+	std::string data = "interface ii +ex +i { type foo(); }"s;
 	BOOST_CHECK_NO_THROW( result = txt::parse(txt::interface, data) );
 	BOOST_TEST( result.name == "i"s );
 	BOOST_TEST( result.use_as_exception );
