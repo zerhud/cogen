@@ -27,7 +27,7 @@ private:
 			std::string_view value
 			) const ;
 	void make_for_name(std::string_view name) ;
-	tree copy_for(tree& data, std::string_view name, std::string_view value) const ;
+	std::optional<tree> copy_for(tree& data, std::string_view name, std::string_view value) const ;
 
 	result_t result;
 };

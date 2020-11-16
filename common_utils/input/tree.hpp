@@ -64,7 +64,7 @@ public:
 	[[nodiscard]] std::pmr::vector<std::pmr::string> var_name_list() const ;
 	[[nodiscard]] std::pmr::vector<std::pmr::string> var_value_list(std::string_view name) const ;
 
-	[[nodiscard]] tree copy(const copy_condition& cond) const ;
+	[[nodiscard]] std::optional<tree> copy_if(const copy_condition& cond) const ;
 };
 
 } // namesapce gen_utils

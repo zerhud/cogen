@@ -145,16 +145,13 @@ BOOST_FIXTURE_TEST_CASE(no_cond, fixture)
 	tree().add(tree().root(), child1);
 	tree().add(*child1, child11);
 
-	auto tcopy = tree().copy(gen_utils::tree::copy_condition{});
-	BOOST_TEST(&tcopy.root() == &tree().root());
-	BOOST_TEST(tcopy.children(tree().root()).at(0) == child1);
-	BOOST_TEST(tcopy.children(*child1).at(0) == child11);
+	auto tcopy = tree().copy_if(gen_utils::tree::copy_condition{});
+	BOOST_CHECK( !tcopy.has_value()) ;
 }
 BOOST_FIXTURE_TEST_CASE(empty_tree, fixture)
 {
-	auto tc = tree().copy([](auto&){return false;});
-	BOOST_TEST(&tc.root() == &tree().root());
-	BOOST_TEST(tc.children(tree().root()).size()==0);
+	auto tc = tree().copy_if([](auto &) { return false; });
+	BOOST_CHECK( !tc);
 }
 BOOST_FIXTURE_TEST_CASE(few_childs, fixture)
 {
@@ -167,25 +164,29 @@ BOOST_FIXTURE_TEST_CASE(few_childs, fixture)
 	tree().add(*child1, child11);
 	tree().add(*child1, child12);
 
-	auto tc = tree().copy( [child2, child12](auto& n){
-		return !(&n==child2.get() || &n==child12.get());});
-	BOOST_TEST_REQUIRE(tc.children(tc.root()).size()==1);
-	BOOST_TEST(tc.children(tc.root())[0] == child1);
-	BOOST_TEST(tc.children(*child1).size() == 1);
-	BOOST_TEST(tc.children(*child1).at(0) == child11);
+	auto tc = tree().copy_if([child2, child12](auto &n) {
+		return !(&n == child2.get() || &n == child12.get());
+	});
+	BOOST_CHECK( tc.has_value()) ;
+	BOOST_TEST_REQUIRE(tc.value().children(tc->root()).size()==1);
+	BOOST_TEST(tc.value().children(tc->root())[0] == child1);
+	BOOST_TEST(tc.value().children(*child1).size() == 1);
+	BOOST_TEST(tc.value().children(*child1).at(0) == child11);
 }
 BOOST_FIXTURE_TEST_CASE(getters, fixture)
 {
 	auto child1 = make_node(std::nullopt);
 	tree().add(tree().root(), child1);
-	auto tc_1 = tree().copy( [](auto&){ return true; } );
-	BOOST_TEST(tc_1.data_id()==tree().data_id());
-	BOOST_TEST(tc_1.root_version()==tree().root_version());
+	auto tc_1 = tree().copy_if([](auto &) { return true; });
+	BOOST_CHECK( tc_1.has_value()) ;
+	BOOST_TEST(tc_1.value().data_id()==tree().data_id());
+	BOOST_TEST(tc_1.value().root_version()==tree().root_version());
 
 	tree().root_version(10);
-	BOOST_TEST(tc_1.root_version()!=tree().root_version());
-	auto tc_2 = tree().copy([](auto&){ return true; } );
-	BOOST_TEST(tc_2.root_version() == tree().root_version());
+	BOOST_TEST(tc_1.value().root_version()!=tree().root_version());
+	auto tc_2 = tree().copy_if([](auto &) { return true; });
+	BOOST_CHECK( tc_2.has_value()) ;
+	BOOST_TEST(tc_2.value().root_version() == tree().root_version());
 }
 
 BOOST_FIXTURE_TEST_CASE(uncond_parent_not_copying_children, fixture)
@@ -206,9 +207,11 @@ BOOST_FIXTURE_TEST_CASE(uncond_parent_not_copying_children, fixture)
 	tree().add(*child2, child21);
 	tree().add(*child2, child211);
 
-	auto cond = tree().copy([child2,child11](auto& node){
-			return &node != child2.get() && &node != child11.get();});
-	auto names = cond.var_name_list() ;
+	auto cp = tree().copy_if([child2, child11](auto &node) {
+		return &node != child2.get() && &node != child11.get();
+	});
+	BOOST_CHECK( cp.has_value()) ;
+	auto names = cp.value().var_name_list() ;
 
 	BOOST_TEST( names.size() == 2) ;
 	for( auto name :names) BOOST_CHECK( name != "child2"sv && name != "child11"sv);
