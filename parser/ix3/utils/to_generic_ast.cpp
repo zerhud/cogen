@@ -34,8 +34,15 @@ public:
 		return ast.name;
 	}
 
-	[[nodiscard]] std::optional<std::uint64_t> version() const override {return std::nullopt; }
 	std::optional<gen_utils::variable> node_var() const override {return std::nullopt; }
+	std::optional<std::uint64_t> version() const override
+	{
+		if constexpr (requires{Ast::meta_params;}) {
+			auto ver = ast::get<ast::meta::version>(original_node().meta_params);
+			if(ver) return splash_version(*ver);
+		}
+		return std::nullopt;
+	}
 };
 
 struct ix3_root_node : gen_utils::data_node {
@@ -75,16 +82,18 @@ struct module_version_node : gen_utils::data_node {
 struct function_node : ast_node<ast::function> {
 	function_node(ast::function n) : ast_node(std::move(n)) {}
 
-	std::optional<std::uint64_t> version() const override
-	{
-		auto ver = ast::get<ast::meta::version>(original_node().meta_params);
-		if(ver) return splash_version(*ver);
-		return std::nullopt;
-	}
 };
 
 struct fnc_param_node : ast_node<ast::function_parameter> {
 	fnc_param_node(ast::function_parameter fp) : ast_node(std::move(fp)) {}
+};
+
+struct record_node : ast_node<ast::record> {
+	record_node(ast::record r) : ast_node(std::move(r)) {}
+};
+
+struct record_field : ast_node<ast::record_item> {
+	record_field(ast::record_item i) : ast_node(std::move(i)) {}
 };
 
 } // namespace ix3::utils::details
@@ -122,6 +131,20 @@ void to_generic_ast::on_obj(ast::module &obj)
 			return;
 		}
 	new_mod(obj);
+}
+
+void to_generic_ast::on_obj(ast::record& obj)
+{
+	assert(parents.size()<=2);
+	if(parents.size()!=2) parents.resize(2);
+	auto par = parents.back();
+	parents.emplace_back(std::make_shared<details::record_node>(obj));
+	result.add(*par, parents.back());
+}
+
+void to_generic_ast::on_obj(ast::record_item& obj)
+{
+	result.add(*parents.back(), std::make_shared<details::record_field>(obj));
 }
 
 void to_generic_ast::on_obj(ast::function& obj)

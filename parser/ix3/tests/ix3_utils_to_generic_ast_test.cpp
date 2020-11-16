@@ -49,6 +49,25 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 	BOOST_TEST(vers.at(1)->node_var().value().name == "ver");
 	BOOST_TEST(vers.at(1)->node_var().value().value == "1.2");
 }
+BOOST_AUTO_TEST_CASE(records)
+{
+	to_generic_ast maker;
+	auto ast = txt::parse(txt::file_content,
+	                      "module mod1 v1.1:"
+	                      "@v1.1 record rec { +int f1; @v1.2 +int f2;}"sv);
+	gen_utils::tree tree = maker(ast.modules);
+	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	BOOST_TEST(tree.children(*mod).size()==1);
+
+	auto rec = tree.children(*mod).at(0);
+	BOOST_TEST(rec->name()=="rec");
+	BOOST_CHECK(rec->version().value() == mod->version().value());
+
+	auto rec_fields = tree.children(*rec);
+	BOOST_TEST(rec_fields.size() == 2);
+	BOOST_TEST(rec_fields.at(0)->name() == "f1");
+	BOOST_TEST(mod->version().value() < rec_fields.at(1)->version().value());
+}
 BOOST_AUTO_TEST_CASE(functions)
 {
 	to_generic_ast maker;

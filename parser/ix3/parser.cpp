@@ -63,8 +63,8 @@ void ix3::parser::parse(std::filesystem::path file)
 
 	if(already_loaded(file)) return;
 
-	std::fstream file_stream(file.generic_u8string());
-	parse(file_stream, file.generic_u8string());
+	std::fstream file_stream(file.generic_string());
+	parse(file_stream, file.generic_string());
 }
 
 void ix3::parser::finish_loads()
@@ -100,6 +100,6 @@ std::filesystem::path ix3::parser::search_file(const std::filesystem::path& f) c
 		if(std::filesystem::exists(cur_file)) return cur_file;
 	}
 
-	throw std::runtime_error("file " + f.generic_u8string() + " not found");
+	throw std::runtime_error("file " + f.string() + " not found");
 }
 

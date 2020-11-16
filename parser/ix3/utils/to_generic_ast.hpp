@@ -25,6 +25,8 @@ class to_generic_ast : protected traverser {
 	void new_mod_ver(ast::module& v);
 
 	void on_obj(ast::module& obj) override ;
+	void on_obj(ast::record& obj) override;
+	void on_obj(ast::record_item& obj) override;
 	void on_obj(ast::function& obj) override ;
 	void on_obj(ast::function_parameter &obj) override;
 public:
