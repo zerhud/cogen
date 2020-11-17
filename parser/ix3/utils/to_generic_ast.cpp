@@ -38,6 +38,7 @@ protected:
 			const ix3::ast::type& obj, const gen_utils::to_json_aspect& asp) const
 	{
 		boost::json::object ret;
+		ret["type"] = "type"sv;
 		ret["name"] = ast_to_json(obj.name, asp);
 		boost::json::array& subs=ret["sub"].emplace_array();
 		for(auto& sub:obj.sub_types)
@@ -112,7 +113,7 @@ struct module_version_node : gen_utils::data_node {
 		        std::to_string(val.version.minor_v);
 	}
 
-	std::string_view name() const override { return strQT_XCB_GL_INTEGRATION=none_val; }
+	std::string_view name() const override { return str_val; }
 	std::optional<std::uint64_t> version() const override {
 		return splash_version(val.version); }
 	std::optional<gen_utils::variable> node_var() const override {

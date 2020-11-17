@@ -24,6 +24,13 @@ using ix3::utils::to_generic_ast;
 BOOST_AUTO_TEST_SUITE(ix3)
 BOOST_AUTO_TEST_SUITE(utils)
 BOOST_AUTO_TEST_SUITE(gain_to_generic_ast)
+BOOST_AUTO_TEST_CASE(json_compare)
+{
+	BOOST_TEST(
+		boost::json::parse(R"({"a":1,"b":2})"sv) ==
+		boost::json::parse(R"({"b":2,"a":1})"sv)
+		);
+}
 BOOST_AUTO_TEST_CASE(empty_modules)
 {
 	to_generic_ast maker;
