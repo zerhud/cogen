@@ -14,6 +14,7 @@
 #include "parse.hpp"
 #include "grammar/all.hpp"
 #include "utils/to_generic_ast.hpp"
+#include "common_utils/tests/mocks.hpp"
 
 namespace ast = ix3::ast;
 namespace txt = ix3::text;
@@ -93,6 +94,12 @@ BOOST_AUTO_TEST_CASE(functions)
 	BOOST_TEST(foo_params.size() == 2);
 	BOOST_TEST(foo_params.at(0)->name() == "bar");
 	BOOST_CHECK(!foo_params.at(0)->version().has_value());
+
+	gen_utils_mocks::to_json_aspect json_asp;
+	MOCK_EXPECT(json_asp.children)
+		.calls([&tree](const gen_utils::data_node& v){return tree.children(v);});
+	auto json = mod->to_json(json_asp);
+	std::cout << json << std::endl;
 }
 BOOST_AUTO_TEST_SUITE_END() // gain_to_generic_ast
 BOOST_AUTO_TEST_SUITE_END() // utils

@@ -13,6 +13,7 @@
 #include <optional>
 #include <functional>
 #include <memory_resource>
+#include <boost/json.hpp>
 
 namespace gen_utils {
 
@@ -24,12 +25,20 @@ struct variable {
 	std::pmr::string value;
 };
 
+class to_json_aspect {
+public:
+	virtual ~to_json_aspect() noexcept =default;
+	[[nodiscard]]
+	virtual std::pmr::vector<node_ptr> children(const data_node& p) const =0 ;
+};
+
 class data_node {
 public:
 	virtual ~data_node() noexcept =default ;
 	[[nodiscard]] virtual std::string_view name() const =0 ;
 	[[nodiscard]] virtual std::optional<std::uint64_t> version() const =0 ;
 	[[nodiscard]] virtual std::optional<variable> node_var() const =0 ;
+	[[nodiscard]] virtual boost::json::object to_json(const to_json_aspect& asp) const =0 ;
 };
 
 class tree final {

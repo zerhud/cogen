@@ -13,11 +13,17 @@
 
 namespace gen_utils_mocks {
 
+	MOCK_BASE_CLASS(to_json_aspect, gen_utils::to_json_aspect)
+	{
+		MOCK_METHOD(children, 1)
+	};
+
 MOCK_BASE_CLASS(data_node, gen_utils::data_node)
 {
 	MOCK_METHOD(name, 0)
 	MOCK_METHOD(version, 0)
 	MOCK_METHOD(node_var, 0)
+	MOCK_METHOD(to_json, 1)
 };
 
 std::shared_ptr<gen_utils_mocks::data_node> make_node(
