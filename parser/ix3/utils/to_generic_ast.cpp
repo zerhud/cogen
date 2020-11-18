@@ -40,7 +40,7 @@ protected:
 		boost::json::object ret;
 		ret["type"] = "type"sv;
 		ret["name"] = ast_to_json(obj.name, asp);
-		boost::json::array& subs=ret["sub"].emplace_array();
+		boost::json::array& subs=ret["subs"].emplace_array();
 		for(auto& sub:obj.sub_types)
 			subs.emplace_back(ast_to_json(sub, asp));
 		return ret;
@@ -79,8 +79,12 @@ struct ix3_root_node : gen_utils::data_node {
 	std::optional<gen_utils::variable> node_var() const override {return std::nullopt; }
 	boost::json::object to_json(const gen_utils::to_json_aspect& asp) const override
 	{
-		(void)asp;
-		return boost::json::object{};
+		boost::json::object ret;
+		ret["name"] = "ix3";
+		boost::json::array& cnt = ret["mods"].emplace_array();
+		for(auto& child:asp.children(*this))
+			cnt.emplace_back(child->to_json(asp));
+		return ret;
 	}
 };
 

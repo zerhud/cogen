@@ -56,13 +56,22 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 	BOOST_TEST(vers.at(0)->node_var().value().value == "1.1");
 	BOOST_TEST(vers.at(1)->node_var().value().name == "ver");
 	BOOST_TEST(vers.at(1)->node_var().value().value == "1.2");
+
+	gen_utils_mocks::to_json_aspect json_asp;
+	MOCK_EXPECT(json_asp.children)
+	    .calls([&tree](const gen_utils::data_node& v){return tree.children(v);});
+	BOOST_TEST(tree.root().to_json(json_asp) == boost::json::parse(
+	               R"({"name":"ix3","mods":[ {"name":"mod1","content":[
+	                 {"type":"version","value":"1.1","content":[]},
+	                 {"type":"version","value":"1.2","content":[]}
+	               ]} ]})"sv));
 }
 BOOST_AUTO_TEST_CASE(records)
 {
 	to_generic_ast maker;
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
-	                      "@v1.1 record rec { +int f1; @v1.2 +int f2;}"sv);
+	                      "@v1.1 record rec { -int f1; @v1.2 +int f2;}"sv);
 	gen_utils::tree tree = maker(ast.modules);
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
 	BOOST_TEST(tree.children(*mod).size()==1);
@@ -75,13 +84,28 @@ BOOST_AUTO_TEST_CASE(records)
 	BOOST_TEST(rec_fields.size() == 2);
 	BOOST_TEST(rec_fields.at(0)->name() == "f1");
 	BOOST_TEST(mod->version().value() < rec_fields.at(1)->version().value());
+
+	gen_utils_mocks::to_json_aspect json_asp;
+	MOCK_EXPECT(json_asp.children)
+	    .calls([&tree](const gen_utils::data_node& v){return tree.children(v);});
+	BOOST_TEST(rec->to_json(json_asp) == boost::json::parse(
+	               R"({
+	               "name":"rec",
+	               "type":"record",
+	               "is_exception":false,
+	               "fields":[
+	                 {"name":"f1","type":"record_item","req":false,"param_t":
+	                   {"type":"type","name":["int"],"subs":[]}},
+	                 {"name":"f2","type":"record_item","req":true,"param_t":
+	                   {"type":"type","name":["int"],"subs":[]}}
+	               ]})"sv));
 }
 BOOST_AUTO_TEST_CASE(functions)
 {
 	to_generic_ast maker;
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
-	                      "int foo(+string bar, +list<string> baz);"
+	                      "int foo(-string bar, +list<string> baz);"
 	                      "@v1.2 int bar();"sv);
 	gen_utils::tree tree = maker(ast.modules);
 	BOOST_TEST(tree.children(tree.root()).size()==1);
@@ -105,8 +129,29 @@ BOOST_AUTO_TEST_CASE(functions)
 	gen_utils_mocks::to_json_aspect json_asp;
 	MOCK_EXPECT(json_asp.children)
 		.calls([&tree](const gen_utils::data_node& v){return tree.children(v);});
-	auto json = mod->to_json(json_asp);
-	std::cout << json << std::endl;
+	BOOST_TEST(bar->to_json(json_asp) == boost::json::parse(
+	               R"({
+	               "name":"bar",
+	               "type":"function",
+	               "params":[],
+	               "return":{"type":"type", "name":["int"], "subs":[]}
+	               })"sv));
+	BOOST_TEST(foo_params.at(0)->to_json(json_asp) == boost::json::parse(
+	               R"({
+	                 "name":"bar",
+	                 "param_t":{"type":"type", "name":["string"], "subs":[]},
+	                 "type":"function_parameter",
+	                 "req":false
+	               })"sv));
+	BOOST_TEST(foo_params.at(1)->to_json(json_asp) == boost::json::parse(
+	               R"({
+	                 "name":"baz",
+	                 "param_t":{"type":"type", "name":["list"], "subs":[
+	                    {"type":"type", "name":["string"], "subs":[]}
+	                 ]},
+	                 "type":"function_parameter",
+	                 "req":true
+	               })"sv));
 }
 BOOST_AUTO_TEST_SUITE_END() // gain_to_generic_ast
 BOOST_AUTO_TEST_SUITE_END() // utils
