@@ -33,8 +33,8 @@ void modegen::ic::core::gen(const configuration& config) const
 		}
 
 		for(auto& out:part_outputs) {
-			auto result = prov->to_json(config.lang(p), out.second);
-			prov->generate(config.tmpl_file(p), result, out.first);
+			//auto result = prov->to_json(config.lang(p), out.second);
+			//prov->generate(config.tmpl_file(p), result, out.first);
 		}
 	}
 }

@@ -18,7 +18,6 @@ namespace icmocks {
 MOCK_BASE_CLASS( provider, modegen::ic::provider )
 {
 	MOCK_METHOD(generate, 3)
-	MOCK_METHOD(to_json, 2)
 };
 
 MOCK_BASE_CLASS( configuration, modegen::ic::configuration )

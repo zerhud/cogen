@@ -13,7 +13,7 @@
 #include <filesystem>
 #include <memory_resource>
 
-#include <nlohman/json.hpp>
+#include <boost/json.hpp>
 
 #include "common_utils/naming.hpp"
 #include "input.hpp"
@@ -27,10 +27,9 @@ public:
 	virtual ~provider() noexcept =default;
 
 	virtual void generate(
-			std::filesystem::path tmpl_file,
-			const nlohmann::json& data,
-			std::string_view out_file) const =0 ;
-	virtual nlohmann::json to_json(json_generator jg, const input& data) const =0 ;
+	        std::filesystem::path tmpl_file,
+	        const boost::json::value& data,
+	        std::string_view out_file) const =0 ;
 };
 
 class configuration {
