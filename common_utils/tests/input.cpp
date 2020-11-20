@@ -21,15 +21,18 @@ using namespace std::literals;
 
 BOOST_AUTO_TEST_SUITE(input)
 struct fixture {
+	std::shared_ptr<gen_utils_mocks::dsl_manager> dmanager=
+			std::make_shared<gen_utils_mocks::dsl_manager>();
 	std::shared_ptr<gen_utils_mocks::data_node> main_node;
 	std::optional<gen_utils::tree> _tree;
 	gen_utils::tree& tree() {
-		if(!_tree) _tree.emplace(main_node, "data_id");
+		if(!_tree) _tree.emplace(main_node, dmanager);
 		return *_tree;
 	}
 
 	fixture()
 	{
+		MOCK_EXPECT(dmanager->id).returns("data_id"sv);
 		main_node = make_node(100);
 	}
 
@@ -66,21 +69,33 @@ struct fixture {
 BOOST_AUTO_TEST_SUITE(tree)
 BOOST_AUTO_TEST_CASE(getters)
 {
-	BOOST_CHECK_THROW(gen_utils::tree(nullptr, "data_id"), std::exception);
+	auto dm = std::make_shared<gen_utils_mocks::dsl_manager>();
+	MOCK_EXPECT(dm->id).returns("data_id"sv);
+
+	BOOST_CHECK_THROW(gen_utils::tree(nullptr, dm), std::exception);
+	BOOST_CHECK_THROW(gen_utils::tree(nullptr, nullptr), std::exception);
 
 	auto bad_node = std::make_shared<gen_utils_mocks::data_node>();
 	MOCK_EXPECT(bad_node->version).returns(std::nullopt);
-	BOOST_CHECK_THROW(gen_utils::tree(bad_node, "data_id"), std::exception);
+	BOOST_CHECK_THROW(gen_utils::tree(bad_node, dm), std::exception);
 
 	auto node = std::make_shared<gen_utils_mocks::data_node>();
+	BOOST_CHECK_THROW(gen_utils::tree(node, nullptr), std::exception);
 	MOCK_EXPECT(node->version).returns(1102);
-	gen_utils::tree t(node, "data_id");
+	gen_utils::tree t(node, dm);
 	BOOST_TEST(t.data_id() == "data_id"sv);
 	BOOST_TEST(&t.root() == node.get());
 
 	BOOST_TEST(t.root_version() == 1102);
 	t.root_version(10);
 	BOOST_TEST(t.root_version() == 10);
+
+	MOCK_EXPECT(dm->to_json).calls([&t](const gen_utils::tree& gt){
+		BOOST_CHECK(&gt == &t);
+		boost::json::object ret;
+		ret["test"] = "ok";
+		return ret; });
+	BOOST_TEST(t.to_json() == boost::json::parse(R"({"test":"ok"})"));
 }
 BOOST_AUTO_TEST_SUITE(add_children)
 BOOST_FIXTURE_TEST_CASE(no_parent, fixture)

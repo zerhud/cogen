@@ -17,6 +17,7 @@
 
 namespace gen_utils {
 
+class tree;
 class data_node;
 using node_ptr = std::shared_ptr<data_node>;
 
@@ -25,11 +26,12 @@ struct variable {
 	std::pmr::string value;
 };
 
-class to_json_aspect {
+class dsl_manager {
 public:
-	virtual ~to_json_aspect() noexcept =default;
-	[[nodiscard]]
-	virtual std::pmr::vector<node_ptr> children(const data_node& p) const =0 ;
+	virtual ~dsl_manager() noexcept =default ;
+
+	[[nodiscard]] virtual std::string_view id() const =0 ;
+	[[nodiscard]] virtual boost::json::value to_json(const tree& container) const =0 ;
 };
 
 class data_node {
@@ -38,7 +40,6 @@ public:
 	[[nodiscard]] virtual std::string_view name() const =0 ;
 	[[nodiscard]] virtual std::optional<std::uint64_t> version() const =0 ;
 	[[nodiscard]] virtual std::optional<variable> node_var() const =0 ;
-	[[nodiscard]] virtual boost::json::object to_json(const to_json_aspect& asp) const =0 ;
 };
 
 class tree final {
@@ -49,7 +50,7 @@ class tree final {
 
 	std::pmr::vector<node_ptr> store;
 	std::uint64_t root_ver;
-	std::pmr::string id;
+	std::shared_ptr<dsl_manager> dmanager;
 
 	std::pmr::vector<edge> edges;
 
@@ -58,9 +59,10 @@ class tree final {
 public:
 	typedef std::function<bool(const data_node&)> copy_condition;
 	tree() =delete;
-	tree(node_ptr root, std::pmr::string id_);
+	tree(node_ptr root, std::shared_ptr<dsl_manager> dm);
 
-	[[nodiscard]] std::pmr::string data_id() const ;
+	[[nodiscard]] boost::json::value to_json() const ;
+	[[nodiscard]] std::string_view data_id() const ;
 	[[nodiscard]] const data_node& root() const ;
 
 	void add(const data_node& par, node_ptr child);

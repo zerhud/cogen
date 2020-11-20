@@ -14,8 +14,9 @@
 using namespace gen_utils;
 using namespace std::literals;
 
-tree::tree(node_ptr root, std::pmr::string id_) : id(std::move(id_))
+tree::tree(node_ptr root, std::shared_ptr<dsl_manager> dm) : dmanager(std::move(dm))
 {
+	if(!dmanager) throw std::runtime_error("cannot create input tree without dsl manager");
 	if(!root) throw std::runtime_error("cannot create input tree without a root");
 	if(!root->version().has_value())
 		throw std::runtime_error("root must have a version");
@@ -23,9 +24,16 @@ tree::tree(node_ptr root, std::pmr::string id_) : id(std::move(id_))
 	store.emplace_back(std::move(root));
 }
 
-std::pmr::string tree::data_id() const
+boost::json::value tree::to_json() const
 {
-	return id;
+	assert(dmanager);
+	return dmanager->to_json(*this);
+}
+
+std::string_view tree::data_id() const
+{
+	assert(dmanager);
+	return dmanager->id();
 }
 
 const data_node& tree::root() const
@@ -117,7 +125,7 @@ tree tree::copy(const tree::copy_condition& cond) const
 {
 	if(!cond) return *this;
 
-	tree ret(store[0], data_id());
+	tree ret(store[0], dmanager);
 	ret.root_ver = root_ver;
 	for(auto& e:edges) if(cond(*e.parent)) {
 		auto& ce = ret.edges.emplace_back(edge{e.parent, {}});

@@ -11,6 +11,7 @@
 
 using namespace std::literals;
 using ix3::utils::to_generic_ast;
+using ix3::utils::ix3_manager;
 
 namespace ix3::utils::details {
 
@@ -21,28 +22,36 @@ std::int64_t splash_version(const ast::meta::version& v)
 	return a >= b ? a * a + a + b : a + b * b;
 }
 
+std::vector<const ix3_node_base *> ix3_node_base::children(
+        const ix3_node_base& par, const gen_utils::tree& con) const
+{
+	std::vector<const ix3_node_base*> ret;
+	for(auto& c:con.children(par)) {
+		assert(dynamic_cast<const ix3_node_base*>(c.get()));
+		ret.emplace_back(static_cast<const ix3_node_base*>(c.get()));
+	}
+	return ret;
+}
+
 template<typename Ast>
-class ast_node : public gen_utils::data_node {
+class ast_node : public ix3_node_base {
 	Ast ast;
 protected:
-	boost::json::value ast_to_json(
-			const ix3::ast::variable_name& obj, const gen_utils::to_json_aspect& asp) const
+	boost::json::value ast_to_json(const ix3::ast::variable_name& obj) const
 	{
-		(void)asp;
 		boost::json::array ret;
 		for(auto& n:obj) ret.emplace_back(n);
 		return ret;
 	}
 
-	boost::json::object ast_to_json(
-			const ix3::ast::type& obj, const gen_utils::to_json_aspect& asp) const
+	boost::json::object ast_to_json(const ix3::ast::type& obj) const
 	{
 		boost::json::object ret;
 		ret["type"] = "type"sv;
-		ret["name"] = ast_to_json(obj.name, asp);
+		ret["name"] = ast_to_json(obj.name);
 		boost::json::array& subs=ret["subs"].emplace_array();
 		for(auto& sub:obj.sub_types)
-			subs.emplace_back(ast_to_json(sub, asp));
+			subs.emplace_back(ast_to_json(sub));
 		return ret;
 	}
 public:
@@ -73,41 +82,46 @@ public:
 	}
 };
 
-struct ix3_root_node : gen_utils::data_node {
+struct ix3_root_node : ix3_node_base {
 	std::string_view name() const override { return "ix3_root"sv; }
 	std::optional<std::uint64_t> version() const override { return 0; }
 	std::optional<gen_utils::variable> node_var() const override {return std::nullopt; }
-	boost::json::object to_json(const gen_utils::to_json_aspect& asp) const override
+	boost::json::object make_json(const gen_utils::tree& con) const override
 	{
 		boost::json::object ret;
 		ret["name"] = "ix3";
 		boost::json::array& cnt = ret["mods"].emplace_array();
-		for(auto& child:asp.children(*this))
-			cnt.emplace_back(child->to_json(asp));
+		for(auto& child:children(*this, con))
+			cnt.emplace_back(child->make_json(con));
 		return ret;
 	}
 };
 
-struct module_node : gen_utils::data_node {
+struct module_node : ix3_node_base {
 	std::string mod_name;
+
 	module_node(std::string n) : mod_name(std::move(n)) {}
 
 	std::string_view name() const override { return mod_name; }
+
 	std::optional<std::uint64_t> version() const override { return std::nullopt; }
+
 	std::optional<gen_utils::variable> node_var() const override {
-		return gen_utils::variable{"name", std::pmr::string(mod_name)}; }
-	boost::json::object to_json(const gen_utils::to_json_aspect& asp) const override
+		return gen_utils::variable{"name", std::pmr::string(mod_name)};
+	}
+
+	boost::json::object make_json(const gen_utils::tree& con) const override
 	{
 		boost::json::object ret;
 		ret["name"] = name();
 		boost::json::array& content=ret["content"].emplace_array();
-		for(auto& child:asp.children(*this))
-			content.emplace_back(child->to_json(asp));
+		for(auto& child:children(*this, con))
+			content.emplace_back(child->make_json(con));
 		return ret;
 	}
 };
 
-struct module_version_node : gen_utils::data_node {
+struct module_version_node : ix3_node_base {
 	ast::module val;
 	std::pmr::string str_val;
 	module_version_node(ast::module v) : val(v)
@@ -123,41 +137,42 @@ struct module_version_node : gen_utils::data_node {
 	std::optional<gen_utils::variable> node_var() const override {
 		return gen_utils::variable{"ver", str_val};
 	}
-	boost::json::object to_json(const gen_utils::to_json_aspect& asp) const override
+	boost::json::object make_json(const gen_utils::tree& con) const override
 	{
 		boost::json::object ret;
 		ret["type"] = "version"sv;
 		ret["value"] = str_val;
 		boost::json::array& content=ret["content"].emplace_array();
-		for(auto& child:asp.children(*this))
-			content.emplace_back(child->to_json(asp));
+		for(auto& child:children(*this,con))
+			content.emplace_back(child->make_json(con));
 		return ret;
 	}
 };
 
 struct function_node : ast_node<ast::function> {
 	function_node(ast::function n) : ast_node(std::move(n)) {}
-	boost::json::object to_json(const gen_utils::to_json_aspect& asp) const override
+	boost::json::object make_json(const gen_utils::tree& con) const override
 	{
 		boost::json::object ret;
 		ret["name"] = name();
 		ret["type"] = "function"sv;
-		ret["return"] = ast_to_json(original_node().return_type, asp);
+		ret["return"] = ast_to_json(original_node().return_type);
 		boost::json::array& params=ret["params"].emplace_array();
-		for(auto& child:asp.children(*this))
-			params.emplace_back(child->to_json(asp));
+		for(auto& child:children(*this,con))
+			params.emplace_back(child->make_json(con));
 		return ret;
 	}
 };
 
 struct fnc_param_node : ast_node<ast::function_parameter> {
 	fnc_param_node(ast::function_parameter fp) : ast_node(std::move(fp)) {}
-	boost::json::object to_json(const gen_utils::to_json_aspect& asp) const override
+	boost::json::object make_json(const gen_utils::tree& con) const override
 	{
+		(void)con;
 		boost::json::object ret;
 		ret["name"] = name();
 		ret["type"] = "function_parameter"sv;
-		ret["param_t"] = ast_to_json(original_node().param_type, asp);
+		ret["param_t"] = ast_to_json(original_node().param_type);
 		ret["req"] = original_node().required;
 		return ret;
 	}
@@ -165,36 +180,47 @@ struct fnc_param_node : ast_node<ast::function_parameter> {
 
 struct record_node : ast_node<ast::record> {
 	record_node(ast::record r) : ast_node(std::move(r)) {}
-	boost::json::object to_json(const gen_utils::to_json_aspect& asp) const override
+	boost::json::object make_json(const gen_utils::tree& con) const override
 	{
 		boost::json::object ret;
 		ret["name"] = name();
 		ret["type"] = "record"sv;
 		ret["is_exception"] = original_node().use_as_exception;
 		boost::json::array& fields=ret["fields"].emplace_array();
-		for(auto& f:asp.children(*this))
-			fields.emplace_back(f->to_json(asp));
+		for(auto& f:children(*this, con))
+			fields.emplace_back(f->make_json(con));
 		return ret;
 	}
 };
 
 struct record_field : ast_node<ast::record_item> {
 	record_field(ast::record_item i) : ast_node(std::move(i)) {}
-	boost::json::object to_json(const gen_utils::to_json_aspect& asp) const override
+	boost::json::object make_json(const gen_utils::tree& con) const override
 	{
+		(void)con;
 		boost::json::object ret;
 		ret["name"] = name();
 		ret["type"] = "record_item"sv;
 		ret["req"] = original_node().is_required;
-		ret["param_t"] = ast_to_json(original_node().param_type, asp);
+		ret["param_t"] = ast_to_json(original_node().param_type);
 		return ret;
 	}
 };
 
 } // namespace ix3::utils::details
 
+std::string_view ix3_manager::id() const { return "ix3"sv; }
+boost::json::value ix3_manager::to_json(const gen_utils::tree& container) const
+{
+	using details::ix3_root_node;
+	assert(dynamic_cast<const ix3_root_node*>(&container.root()) != nullptr);
+	const auto* root = static_cast<const ix3_root_node*>(&container.root());
+	return root->make_json(container);
+}
+
 to_generic_ast::to_generic_ast()
-    : result(std::make_shared<details::ix3_root_node>(), "ix3")
+    : ix3_owner(std::make_shared<ix3_manager>())
+    , result(std::make_shared<details::ix3_root_node>(), ix3_owner)
 {
 }
 

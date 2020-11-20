@@ -41,6 +41,8 @@ boost::json::value operator "" _json (const char* d, std::size_t l)
 BOOST_AUTO_TEST_SUITE(input_configurator)
 
 struct core_fixture {
+	std::shared_ptr<gen_utils_mocks::dsl_manager> dmanager =
+			std::make_shared<gen_utils_mocks::dsl_manager>();
 	std::shared_ptr<icmocks::configuration> config
 		= std::make_shared<icmocks::configuration>();
 	std::shared_ptr<icmocks::provider> prov
@@ -64,6 +66,7 @@ struct core_fixture {
 
 	core_fixture() : core(prov)
 	{
+		MOCK_EXPECT(dmanager->id).returns("data_id"sv);
 	}
 
 	void expect_mods(std::string_view id, bool sv, gen_utils::name_conversion n)
@@ -122,8 +125,8 @@ BOOST_FIXTURE_TEST_CASE(generation, core_fixture)
 
 	ic_input all_dsl;
 	mock::sequence gen_seq;
-	all_dsl.add(gen_utils::tree{gen_utils_mocks::make_node(1), "p1"_s});
-	all_dsl.add(gen_utils::tree{gen_utils_mocks::make_node(2), "p2"_s});
+	all_dsl.add(gen_utils::tree{gen_utils_mocks::make_node(1), dmanager});
+	all_dsl.add(gen_utils::tree{gen_utils_mocks::make_node(2), dmanager});
 	MOCK_EXPECT(config->all_dsl).returns(all_dsl);
 
 	core.gen(*config);
@@ -139,7 +142,7 @@ BOOST_FIXTURE_TEST_CASE(mapping, core_fixture)
 	create_parts();
 
 	ic_input all_dsl;
-	gen_utils::tree dsl{gen_utils_mocks::make_node(1, "vn"_s, "v1"_s), "p1"_s};
+	gen_utils::tree dsl{gen_utils_mocks::make_node(1, "vn"_s, "v1"_s), dmanager};
 	dsl.add(dsl.root(), gen_utils_mocks::make_node(1, "vn"_s, "v2"_s));
 	all_dsl.add(std::move(dsl));
 	MOCK_EXPECT(config->all_dsl).returns(all_dsl);
@@ -157,11 +160,17 @@ BOOST_AUTO_TEST_CASE(getters)
 }
 BOOST_AUTO_TEST_CASE(adding)
 {
+	auto m1 = std::make_shared<gen_utils_mocks::dsl_manager>();
+	auto m2 = std::make_shared<gen_utils_mocks::dsl_manager>();
+	auto m3 = std::make_shared<gen_utils_mocks::dsl_manager>();
+	MOCK_EXPECT(m1->id).returns("t1");
+	MOCK_EXPECT(m2->id).returns("t2");
+	MOCK_EXPECT(m3->id).returns("t3");
 	auto n1 = std::make_shared<gen_utils_mocks::data_node>();
 	MOCK_EXPECT(n1->version).returns(10);
-	gen_utils::tree t1(n1, "t1");
-	gen_utils::tree t2(n1, "t2");
-	gen_utils::tree t3(n1, "t1");
+	gen_utils::tree t1(n1, m1);
+	gen_utils::tree t2(n1, m2);
+	gen_utils::tree t3(n1, m3);
 	ic_input i;
 	i.add(t1);
 	BOOST_TEST_REQUIRE(i.all().size()==1);
@@ -180,11 +189,12 @@ BOOST_AUTO_TEST_CASE(adding)
 }
 BOOST_AUTO_TEST_CASE(adding_other)
 {
+	auto m1 = std::make_shared<gen_utils_mocks::dsl_manager>();
 	auto n1 = std::make_shared<gen_utils_mocks::data_node>();
 	MOCK_EXPECT(n1->version).returns(10);
-	gen_utils::tree t1(n1, "t1");
-	gen_utils::tree t2(n1, "t2");
-	gen_utils::tree t3(n1, "t1");
+	gen_utils::tree t1(n1, m1);
+	gen_utils::tree t2(n1, m1);
+	gen_utils::tree t3(n1, m1);
 
 	ic_input i1, i2;
 	i1.add(t1);
