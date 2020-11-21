@@ -33,8 +33,22 @@ void modegen::ic::core::gen(const configuration& config) const
 		}
 
 		for(auto& out:part_outputs) {
-			//auto result = prov->to_json(config.lang(p), out.second);
-			//prov->generate(config.tmpl_file(p), result, out.first);
+			auto result = make_json(config, out.second);
+			prov->generate(config.tmpl_file(p), result, out.first);
 		}
 	}
+}
+
+boost::json::value modegen::ic::core::make_json(
+		const configuration& config, const input& dsl) const
+{
+	struct compilconfig : gen_utils::compilation_config {
+		gen_utils::compiler compiler_name () const override {return gen_utils::compiler::cpp;}
+		std::string_view value(std::string_view key) const override {return ""sv;} ;
+	};
+	compilconfig cfg;
+	boost::json::array ret;
+	for(auto& t:dsl.all())
+		ret.emplace_back(t->to_json(cfg));
+	return ret;
 }

@@ -52,6 +52,8 @@ public:
 
 class core {
 	std::shared_ptr<provider> prov;
+	boost::json::value make_json(
+			const configuration& config, const input& dsl) const ;
 public:
 	core(std::shared_ptr<provider> p) ;
 	void gen(const configuration& config) const ;
