@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <variant>
 #include "ix3/ast/file.hpp"
 
 namespace ix3::utils {
