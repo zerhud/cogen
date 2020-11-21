@@ -25,10 +25,19 @@ using ix3::utils::to_generic_ast;
 BOOST_AUTO_TEST_SUITE(ix3)
 BOOST_AUTO_TEST_SUITE(utils)
 BOOST_AUTO_TEST_SUITE(gain_to_generic_ast)
+struct fake_compiler : ix3::utils::details::ix3_compiler {
+	void aspect(const ix3::utils::details::ix3_node_base&, boost::json::object&) const override {}
+	void aspect(const ix3::utils::details::module_node&, boost::json::object&) const override {}
+	void aspect(const ix3::utils::details::module_version_node&, boost::json::object&) const override {}
+	void aspect(const ix3::utils::details::function_node&, boost::json::object&) const override {}
+	void aspect(const ix3::utils::details::record_node&, boost::json::object&) const override {}
+};
+
 boost::json::value make_json(const gen_utils::data_node& root, const gen_utils::tree& cnt)
 {
 	assert(dynamic_cast<const ix3::utils::details::ix3_node_base*>(&root));
-	ix3::utils::details::compilation_context ctx(&cnt);
+	fake_compiler fc;
+	ix3::utils::details::compilation_context ctx(&cnt, &fc);
 	return static_cast<const ix3::utils::details::ix3_node_base&>(root).make_json(ctx);
 }
 BOOST_AUTO_TEST_CASE(json_compare)
@@ -65,11 +74,11 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 	BOOST_TEST(vers.at(1)->node_var().value().value == "1.2");
 
 	gen_utils_mocks::compilation_config cfg;
-	//MOCK_EXPECT(cfg.compiler_name).once().returns(gen_utils::compiler::cpp);
+	MOCK_EXPECT(cfg.compiler_name).at_least(1).returns(gen_utils::compiler::cpp);
 	BOOST_TEST(tree.to_json(cfg) == boost::json::parse(
 	               R"({"name":"ix3","mods":[ {"name":"mod1","content":[
-	                 {"type":"version","value":"1.1","content":[]},
-	                 {"type":"version","value":"1.2","content":[]}
+	                 {"type":"version","value":"1.1","name":"mod1_v1_1","content":[]},
+	                 {"type":"version","value":"1.2","name":"mod1_v1_2","content":[]}
 	               ]} ]})"sv));
 }
 BOOST_AUTO_TEST_CASE(records)
@@ -93,13 +102,13 @@ BOOST_AUTO_TEST_CASE(records)
 
 	BOOST_TEST(make_json(*rec, tree) == boost::json::parse(
 	               R"({
-	               "name":"rec",
+	               "orig_name":"rec",
 	               "type":"record",
 	               "is_exception":false,
 	               "fields":[
-	                 {"name":"f1","type":"record_item","req":false,"param_t":
+	                 {"orig_name":"f1","type":"record_item","req":false,"param_t":
 	                   {"type":"type","name":["int"],"subs":[]}},
-	                 {"name":"f2","type":"record_item","req":true,"param_t":
+	                 {"orig_name":"f2","type":"record_item","req":true,"param_t":
 	                   {"type":"type","name":["int"],"subs":[]}}
 	               ]})"sv));
 }
@@ -131,21 +140,21 @@ BOOST_AUTO_TEST_CASE(functions)
 
 	BOOST_TEST(make_json(*bar, tree) == boost::json::parse(
 	               R"({
-	               "name":"bar",
+	               "orig_name":"bar",
 	               "type":"function",
 	               "params":[],
 	               "return":{"type":"type", "name":["int"], "subs":[]}
 	               })"sv));
 	BOOST_TEST(make_json(*foo_params.at(0), tree) == boost::json::parse(
 	               R"({
-	                 "name":"bar",
+	                 "orig_name":"bar",
 	                 "param_t":{"type":"type", "name":["string"], "subs":[]},
 	                 "type":"function_parameter",
 	                 "req":false
 	               })"sv));
 	BOOST_TEST(make_json(*foo_params.at(1), tree) == boost::json::parse(
 	               R"({
-	                 "name":"baz",
+	                 "orig_name":"baz",
 	                 "param_t":{"type":"type", "name":["list"], "subs":[
 	                    {"type":"type", "name":["string"], "subs":[]}
 	                 ]},

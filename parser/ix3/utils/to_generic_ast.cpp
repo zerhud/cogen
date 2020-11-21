@@ -71,7 +71,7 @@ public:
 	boost::json::object make_json(const compilation_context& ctx) const override
 	{
 		boost::json::object ret;
-		ret["name"] = name();
+		ret["orig_name"] = name();
 		return ret;
 	}
 };
@@ -86,7 +86,7 @@ struct ix3_root_node : ix3_node_base {
 		boost::json::array& cnt = ret["mods"].emplace_array();
 		for(auto& child:ctx.children(*this))
 			cnt.emplace_back(child->make_json(ctx));
-		ctx.aspect(*this, ret);
+		ctx.compiling_aspect().aspect(*this, ret);
 		return ret;
 	}
 };
@@ -111,7 +111,7 @@ struct module_node : ix3_node_base {
 		boost::json::array& content=ret["content"].emplace_array();
 		for(auto& child:ctx.children(*this))
 			content.emplace_back(child->make_json(ctx));
-		ctx.aspect(*this, ret);
+		ctx.compiling_aspect().aspect(*this, ret);
 		return ret;
 	}
 };
@@ -119,7 +119,7 @@ struct module_node : ix3_node_base {
 struct module_version_node : ix3_node_base {
 	ast::module val;
 	std::pmr::string str_val;
-	module_version_node(ast::module v) : val(v)
+	module_version_node(ast::module v) : val(std::move(v))
 	{
 		str_val =
 		        std::to_string(val.version.major_v) + '.' +
@@ -140,6 +140,7 @@ struct module_version_node : ix3_node_base {
 		boost::json::array& content=ret["content"].emplace_array();
 		for(auto& child:ctx.children(*this))
 			content.emplace_back(child->make_json(ctx));
+		ctx.compiling_aspect().aspect(*this, ret);
 		return ret;
 	}
 };
@@ -196,6 +197,24 @@ struct record_field : ast_node<ast::record_item> {
 	}
 };
 
+struct cpp_compiler : ix3_compiler {
+	const gen_utils::compilation_config* config;
+
+	cpp_compiler(const gen_utils::compilation_config* c) : config(c) {}
+
+	void aspect(const ix3_node_base& node, boost::json::object& res) const override{}
+	void aspect(const module_node& node, boost::json::object& res) const override {}
+	void aspect(const module_version_node& node, boost::json::object& res) const override
+	{
+		res["name"] =
+				node.val.name + "_v" +
+				std::to_string(node.val.version.major_v) + '_' +
+				std::to_string(node.val.version.minor_v);
+	}
+	void aspect(const function_node& node, boost::json::object& res) const override {}
+	void aspect(const record_node& node, boost::json::object& res) const override {}
+};
+
 } // namespace ix3::utils::details
 
 std::string_view ix3_manager::id() const { return "ix3"sv; }
@@ -206,7 +225,9 @@ boost::json::value ix3_manager::to_json(
 	using details::ix3_root_node;
 	assert(dynamic_cast<const ix3_root_node*>(&container.root()) != nullptr);
 	const auto* root = static_cast<const ix3_root_node*>(&container.root());
-	details::compilation_context ctx(&container);
+	assert(cfg.compiler_name()==gen_utils::compiler::cpp);
+	details::cpp_compiler compiler{&cfg};
+	details::compilation_context ctx( &container, &compiler );
 	return root->make_json(ctx);
 }
 
@@ -219,7 +240,7 @@ to_generic_ast::to_generic_ast()
 void to_generic_ast::new_mod(ast::module& obj)
 {
 	using namespace details;
-	auto mod_node = std::make_shared<module_node>(std::move(obj.name));
+	auto mod_node = std::make_shared<module_node>(obj.name);
 	result.add(result.root(), mod_node);
 	parents.emplace_back(mod_node);
 	new_mod_ver(obj);
