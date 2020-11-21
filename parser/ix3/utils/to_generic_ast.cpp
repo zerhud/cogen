@@ -11,101 +11,12 @@
 
 #include "details/ix3_node_base.hpp"
 #include "details/ast_nodes.hpp"
+#include "details/sep_nodes.hpp"
+#include "details/cpp_compiler.hpp"
 
 using namespace std::literals;
 using ix3::utils::to_generic_ast;
 using ix3::utils::ix3_manager;
-
-namespace ix3::utils::details {
-
-struct ix3_root_node : ix3_node_base {
-	std::string_view name() const override { return "ix3_root"sv; }
-	std::optional<std::uint64_t> version() const override { return 0; }
-	boost::json::object make_json(const compilation_context& ctx) const override
-	{
-		boost::json::object ret;
-		ret["name"] = "ix3";
-		boost::json::array& cnt = ret["mods"].emplace_array();
-		for(auto& child:ctx.children(*this))
-			cnt.emplace_back(child->make_json(ctx));
-		ctx.compiling_aspect().aspect(*this, ret);
-		return ret;
-	}
-};
-
-struct module_node : ix3_node_base {
-	std::string mod_name;
-
-	module_node(std::string n) : mod_name(std::move(n)) {}
-
-	std::string_view name() const override { return mod_name; }
-
-	std::optional<std::uint64_t> version() const override { return std::nullopt; }
-
-	std::optional<gen_utils::variable> node_var() const override {
-		return gen_utils::variable{"mod", std::pmr::string(mod_name)};
-	}
-
-	boost::json::object make_json(const compilation_context& ctx) const override
-	{
-		boost::json::object ret;
-		ret["name"] = name();
-		boost::json::array& content=ret["content"].emplace_array();
-		for(auto& child:ctx.children(*this))
-			content.emplace_back(child->make_json(ctx));
-		ctx.compiling_aspect().aspect(*this, ret);
-		return ret;
-	}
-};
-
-struct module_version_node : ix3_node_base {
-	ast::module val;
-	std::pmr::string str_val;
-	module_version_node(ast::module v) : val(std::move(v))
-	{
-		str_val =
-		        std::to_string(val.version.major_v) + '.' +
-		        std::to_string(val.version.minor_v);
-	}
-
-	std::string_view name() const override { return str_val; }
-	std::optional<std::uint64_t> version() const override {
-		return splash_version(val.version); }
-	std::optional<gen_utils::variable> node_var() const override {
-		return gen_utils::variable{"ver", str_val};
-	}
-	boost::json::object make_json(const compilation_context& ctx) const override
-	{
-		boost::json::object ret;
-		ret["type"] = "version"sv;
-		ret["value"] = str_val;
-		boost::json::array& content=ret["content"].emplace_array();
-		for(auto& child:ctx.children(*this))
-			content.emplace_back(child->make_json(ctx));
-		ctx.compiling_aspect().aspect(*this, ret);
-		return ret;
-	}
-};
-
-struct cpp_compiler : ix3_compiler {
-	const gen_utils::compilation_config* config;
-
-	cpp_compiler(const gen_utils::compilation_config* c) : config(c) {}
-
-	void aspect(const ix3_node_base& node, boost::json::object& res) const override{}
-	void aspect(const module_node& node, boost::json::object& res) const override {}
-	void aspect(const module_version_node& node, boost::json::object& res) const override
-	{
-		res["name"] =
-				node.val.name + "_v" +
-				std::to_string(node.val.version.major_v) + '_' +
-				std::to_string(node.val.version.minor_v);
-	}
-	void aspect(const function_node& node, boost::json::object& res) const override {}
-	void aspect(const record_node& node, boost::json::object& res) const override {}
-};
-
-} // namespace ix3::utils::details
 
 std::string_view ix3_manager::id() const { return "ix3"sv; }
 boost::json::value ix3_manager::to_json(
