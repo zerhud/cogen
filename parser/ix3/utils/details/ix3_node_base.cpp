@@ -9,19 +9,27 @@
 #include "ix3_node_base.hpp"
 
 using ix3::utils::details::ix3_node_base;
+using ix3::utils::details::compilation_context;
 
-std::optional<gen_utils::variable> ix3_node_base::node_var() const
+compilation_context::compilation_context(const gen_utils::tree* c)
+    : container(c)
 {
-	return std::nullopt;
+	assert(container);
 }
 
-std::vector<const ix3_node_base *> ix3_node_base::children(
-		const ix3_node_base& par, const gen_utils::tree& con) const
+std::pmr::vector<const ix3_node_base *> compilation_context::children(
+		const ix3_node_base& par) const
 {
-	std::vector<const ix3_node_base*> ret;
-	for(auto& c:con.children(par)) {
+	assert(container);
+	std::pmr::vector<const ix3_node_base *> ret;
+	for(auto& c:container->children(par)) {
 		assert(dynamic_cast<const ix3_node_base*>(c.get()));
 		ret.emplace_back(static_cast<const ix3_node_base*>(c.get()));
 	}
 	return ret;
+}
+
+std::optional<gen_utils::variable> ix3_node_base::node_var() const
+{
+	return std::nullopt;
 }

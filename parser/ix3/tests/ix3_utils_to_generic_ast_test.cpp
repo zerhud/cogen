@@ -28,7 +28,8 @@ BOOST_AUTO_TEST_SUITE(gain_to_generic_ast)
 boost::json::value make_json(const gen_utils::data_node& root, const gen_utils::tree& cnt)
 {
 	assert(dynamic_cast<const ix3::utils::details::ix3_node_base*>(&root));
-	return static_cast<const ix3::utils::details::ix3_node_base&>(root).make_json(cnt);
+	ix3::utils::details::compilation_context ctx(&cnt);
+	return static_cast<const ix3::utils::details::ix3_node_base&>(root).make_json(ctx);
 }
 BOOST_AUTO_TEST_CASE(json_compare)
 {
