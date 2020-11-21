@@ -18,8 +18,11 @@ class compilation_context  {
 	const gen_utils::tree* container;
 public:
 	compilation_context(const gen_utils::tree* c);
+
 	[[nodiscard]] std::pmr::vector<const ix3_node_base*> children(
 			const ix3_node_base& par) const ;
+
+	void aspect(const ix3_node_base& node, boost::json::object& res) const ;
 };
 
 class ix3_node_base : public gen_utils::data_node {

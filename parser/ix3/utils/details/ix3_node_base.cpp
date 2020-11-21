@@ -29,6 +29,12 @@ std::pmr::vector<const ix3_node_base *> compilation_context::children(
 	return ret;
 }
 
+void compilation_context::aspect(const ix3_node_base& node, boost::json::object& res) const
+{
+	(void)node;
+	(void)res;
+}
+
 std::optional<gen_utils::variable> ix3_node_base::node_var() const
 {
 	return std::nullopt;

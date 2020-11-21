@@ -90,12 +90,15 @@ BOOST_AUTO_TEST_CASE(getters)
 	t.root_version(10);
 	BOOST_TEST(t.root_version() == 10);
 
-	MOCK_EXPECT(dm->to_json).calls([&t](const gen_utils::tree& gt){
+	gen_utils_mocks::compilation_config cfg;
+	MOCK_EXPECT(dm->to_json).calls([&t,&cfg](
+			const gen_utils::compilation_config& c, const gen_utils::tree& gt){
+		BOOST_TEST(&c == &cfg);
 		BOOST_CHECK(&gt == &t);
 		boost::json::object ret;
 		ret["test"] = "ok";
 		return ret; });
-	BOOST_TEST(t.to_json() == boost::json::parse(R"({"test":"ok"})"));
+	BOOST_TEST(t.to_json(cfg) == boost::json::parse(R"({"test":"ok"})"));
 }
 BOOST_AUTO_TEST_SUITE(add_children)
 BOOST_FIXTURE_TEST_CASE(no_parent, fixture)

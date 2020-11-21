@@ -64,7 +64,9 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 	BOOST_TEST(vers.at(1)->node_var().value().name == "ver");
 	BOOST_TEST(vers.at(1)->node_var().value().value == "1.2");
 
-	BOOST_TEST(tree.to_json() == boost::json::parse(
+	gen_utils_mocks::compilation_config cfg;
+	//MOCK_EXPECT(cfg.compiler_name).once().returns(gen_utils::compiler::cpp);
+	BOOST_TEST(tree.to_json(cfg) == boost::json::parse(
 	               R"({"name":"ix3","mods":[ {"name":"mod1","content":[
 	                 {"type":"version","value":"1.1","content":[]},
 	                 {"type":"version","value":"1.2","content":[]}

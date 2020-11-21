@@ -13,10 +13,16 @@
 
 namespace gen_utils_mocks {
 
+MOCK_BASE_CLASS(compilation_config, gen_utils::compilation_config)
+{
+	MOCK_METHOD(compiler_name, 0)
+	MOCK_METHOD(value, 1)
+};
+
 MOCK_BASE_CLASS(dsl_manager, gen_utils::dsl_manager)
 {
 	MOCK_METHOD(id, 0)
-	MOCK_METHOD(to_json, 1)
+	MOCK_METHOD(to_json, 2)
 };
 
 MOCK_BASE_CLASS(data_node, gen_utils::data_node)

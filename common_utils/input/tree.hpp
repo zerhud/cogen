@@ -17,6 +17,19 @@
 
 namespace gen_utils {
 
+enum class compiler { cpp } ;
+
+class compilation_config {
+public:
+	virtual ~compilation_config() noexcept =default ;
+
+	[[nodiscard]]
+	virtual compiler compiler_name () const =0 ;
+
+	[[nodiscard]]
+	virtual std::string_view value(std::string_view key) const =0 ;
+};
+
 class tree;
 class data_node;
 using node_ptr = std::shared_ptr<data_node>;
@@ -31,7 +44,8 @@ public:
 	virtual ~dsl_manager() noexcept =default ;
 
 	[[nodiscard]] virtual std::string_view id() const =0 ;
-	[[nodiscard]] virtual boost::json::value to_json(const tree& container) const =0 ;
+	[[nodiscard]] virtual boost::json::value to_json(
+			const compilation_config& cfg, const tree& container) const =0 ;
 };
 
 class data_node {
@@ -61,7 +75,7 @@ public:
 	tree() =delete;
 	tree(node_ptr root, std::shared_ptr<dsl_manager> dm);
 
-	[[nodiscard]] boost::json::value to_json() const ;
+	[[nodiscard]] boost::json::value to_json(const compilation_config& cfg) const ;
 	[[nodiscard]] std::string_view data_id() const ;
 	[[nodiscard]] const data_node& root() const ;
 

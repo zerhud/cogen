@@ -17,7 +17,9 @@ namespace ix3::utils {
 class ix3_manager : public gen_utils::dsl_manager {
 public:
 	std::string_view id() const override ;
-	boost::json::value to_json(const gen_utils::tree& container) const override ;
+	boost::json::value to_json(
+			const gen_utils::compilation_config& cfg,
+			const gen_utils::tree& container) const override ;
 };
 
 class to_generic_ast : protected traverser {
