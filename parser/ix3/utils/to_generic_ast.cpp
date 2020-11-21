@@ -9,6 +9,8 @@
 #include "to_generic_ast.hpp"
 #include "meta.hpp"
 
+#include "details/ix3_node_base.hpp"
+
 using namespace std::literals;
 using ix3::utils::to_generic_ast;
 using ix3::utils::ix3_manager;
@@ -20,17 +22,6 @@ std::int64_t splash_version(const ast::meta::version& v)
 	const auto& a = v.major_v;
 	const auto& b = v.minor_v;
 	return a >= b ? a * a + a + b : a + b * b;
-}
-
-std::vector<const ix3_node_base *> ix3_node_base::children(
-        const ix3_node_base& par, const gen_utils::tree& con) const
-{
-	std::vector<const ix3_node_base*> ret;
-	for(auto& c:con.children(par)) {
-		assert(dynamic_cast<const ix3_node_base*>(c.get()));
-		ret.emplace_back(static_cast<const ix3_node_base*>(c.get()));
-	}
-	return ret;
 }
 
 template<typename Ast>
@@ -85,7 +76,6 @@ public:
 struct ix3_root_node : ix3_node_base {
 	std::string_view name() const override { return "ix3_root"sv; }
 	std::optional<std::uint64_t> version() const override { return 0; }
-	std::optional<gen_utils::variable> node_var() const override {return std::nullopt; }
 	boost::json::object make_json(const gen_utils::tree& con) const override
 	{
 		boost::json::object ret;
@@ -107,7 +97,7 @@ struct module_node : ix3_node_base {
 	std::optional<std::uint64_t> version() const override { return std::nullopt; }
 
 	std::optional<gen_utils::variable> node_var() const override {
-		return gen_utils::variable{"name", std::pmr::string(mod_name)};
+		return gen_utils::variable{"mod", std::pmr::string(mod_name)};
 	}
 
 	boost::json::object make_json(const gen_utils::tree& con) const override

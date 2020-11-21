@@ -14,20 +14,6 @@
 
 namespace ix3::utils {
 
-namespace details {
-
-class ix3_node_base : public gen_utils::data_node {
-protected:
-	[[nodiscard]]
-	std::vector<const ix3_node_base*> children(
-			const ix3_node_base& par, const gen_utils::tree& con) const;
-public:
-	[[nodiscard]]
-	virtual boost::json::object make_json(const gen_utils::tree& con) const =0 ;
-};
-
-} // namespace details
-
 class ix3_manager : public gen_utils::dsl_manager {
 public:
 	std::string_view id() const override ;

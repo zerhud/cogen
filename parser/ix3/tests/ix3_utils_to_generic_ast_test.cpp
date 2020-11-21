@@ -14,6 +14,7 @@
 #include "parse.hpp"
 #include "grammar/all.hpp"
 #include "utils/to_generic_ast.hpp"
+#include "utils/details/ix3_node_base.hpp"
 #include "common_utils/tests/mocks.hpp"
 
 namespace ast = ix3::ast;
@@ -48,7 +49,7 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 	BOOST_TEST(tree.children(tree.root()).size()==1);
 	auto mod = tree.children(tree.root()).at(0);
 	BOOST_CHECK(!mod->version().has_value());
-	BOOST_TEST(mod->node_var().value().name == "name");
+	BOOST_TEST(mod->node_var().value().name == "mod");
 	BOOST_TEST(mod->node_var().value().value == "mod1");
 
 	auto vers = tree.children(*mod);
