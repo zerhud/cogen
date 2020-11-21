@@ -10,71 +10,13 @@
 #include "meta.hpp"
 
 #include "details/ix3_node_base.hpp"
+#include "details/ast_nodes.hpp"
 
 using namespace std::literals;
 using ix3::utils::to_generic_ast;
 using ix3::utils::ix3_manager;
 
 namespace ix3::utils::details {
-
-std::int64_t splash_version(const ast::meta::version& v)
-{
-	const auto& a = v.major_v;
-	const auto& b = v.minor_v;
-	return a >= b ? a * a + a + b : a + b * b;
-}
-
-template<typename Ast>
-class ast_node : public ix3_node_base {
-	Ast ast;
-protected:
-	boost::json::value ast_to_json(const ix3::ast::variable_name& obj) const {
-		boost::json::array ret;
-		for (auto& n:obj) ret.emplace_back(n);
-		return ret;
-	}
-
-	boost::json::object ast_to_json(const ix3::ast::type& obj) const {
-		boost::json::object ret;
-		ret["type"] = "type"sv;
-		ret["name"] = ast_to_json(obj.name);
-		boost::json::array& subs = ret["subs"].emplace_array();
-		for (auto& sub:obj.sub_types)
-			subs.emplace_back(ast_to_json(sub));
-		return ret;
-	}
-
-public:
-	explicit ast_node(Ast n) : ast(std::move(n)) {}
-
-	[[nodiscard]]
-	const Ast& original_node() const { return ast; }
-
-	[[nodiscard]] std::string_view name() const override {
-		return ast.name;
-	}
-
-	[[nodiscard]]
-	std::optional<gen_utils::variable> node_var() const override {
-		return std::nullopt;
-	}
-
-	[[nodiscard]]
-	std::optional<std::uint64_t> version() const override {
-		if constexpr (requires{ Ast::meta_params; }) {
-			auto ver = ast::get<ast::meta::version>(original_node().meta_params);
-			if (ver) return splash_version(*ver);
-		}
-		return std::nullopt;
-	}
-
-	boost::json::object make_json(const compilation_context& ctx) const override
-	{
-		boost::json::object ret;
-		ret["orig_name"] = name();
-		return ret;
-	}
-};
 
 struct ix3_root_node : ix3_node_base {
 	std::string_view name() const override { return "ix3_root"sv; }
@@ -141,58 +83,6 @@ struct module_version_node : ix3_node_base {
 		for(auto& child:ctx.children(*this))
 			content.emplace_back(child->make_json(ctx));
 		ctx.compiling_aspect().aspect(*this, ret);
-		return ret;
-	}
-};
-
-struct function_node : ast_node<ast::function> {
-	function_node(ast::function n) : ast_node(std::move(n)) {}
-	boost::json::object make_json(const compilation_context& ctx) const override
-	{
-		boost::json::object ret = ast_node::make_json(ctx);
-		ret["type"] = "function"sv;
-		ret["return"] = ast_to_json(original_node().return_type);
-		boost::json::array& params=ret["params"].emplace_array();
-		for(auto& child:ctx.children(*this))
-			params.emplace_back(child->make_json(ctx));
-		return ret;
-	}
-};
-
-struct fnc_param_node : ast_node<ast::function_parameter> {
-	fnc_param_node(ast::function_parameter fp) : ast_node(std::move(fp)) {}
-	boost::json::object make_json(const compilation_context& ctx) const override
-	{
-		boost::json::object ret = ast_node::make_json(ctx);
-		ret["type"] = "function_parameter"sv;
-		ret["param_t"] = ast_to_json(original_node().param_type);
-		ret["req"] = original_node().required;
-		return ret;
-	}
-};
-
-struct record_node : ast_node<ast::record> {
-	record_node(ast::record r) : ast_node(std::move(r)) {}
-	boost::json::object make_json(const compilation_context& ctx) const override
-	{
-		boost::json::object ret = ast_node::make_json(ctx);
-		ret["type"] = "record"sv;
-		ret["is_exception"] = original_node().use_as_exception;
-		boost::json::array& fields=ret["fields"].emplace_array();
-		for(auto& f:ctx.children(*this))
-			fields.emplace_back(f->make_json(ctx));
-		return ret;
-	}
-};
-
-struct record_field : ast_node<ast::record_item> {
-	record_field(ast::record_item i) : ast_node(std::move(i)) {}
-	boost::json::object make_json(const compilation_context& ctx) const override
-	{
-		boost::json::object ret = ast_node::make_json(ctx);
-		ret["type"] = "record_item"sv;
-		ret["req"] = original_node().is_required;
-		ret["param_t"] = ast_to_json(original_node().param_type);
 		return ret;
 	}
 };
