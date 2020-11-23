@@ -13,15 +13,39 @@
 #include <optional>
 #include <functional>
 #include <memory_resource>
+#include <boost/json.hpp>
 
 namespace gen_utils {
 
+enum class compiler { cpp } ;
+
+class compilation_config {
+public:
+	virtual ~compilation_config() noexcept =default ;
+
+	[[nodiscard]]
+	virtual compiler compiler_name () const =0 ;
+
+	[[nodiscard]]
+	virtual std::string_view value(std::string_view key) const =0 ;
+};
+
+class tree;
 class data_node;
 using node_ptr = std::shared_ptr<data_node>;
 
 struct variable {
 	std::pmr::string name;
 	std::pmr::string value;
+};
+
+class dsl_manager {
+public:
+	virtual ~dsl_manager() noexcept =default ;
+
+	[[nodiscard]] virtual std::string_view id() const =0 ;
+	[[nodiscard]] virtual boost::json::value to_json(
+			const compilation_config& cfg, const tree& container) const =0 ;
 };
 
 class data_node {
@@ -40,7 +64,7 @@ class tree final {
 
 	std::pmr::vector<node_ptr> store;
 	std::uint64_t root_ver;
-	std::pmr::string id;
+	std::shared_ptr<dsl_manager> dmanager;
 
 	std::pmr::vector<edge> edges;
 
@@ -49,9 +73,10 @@ class tree final {
 public:
 	typedef std::function<bool(const data_node&)> copy_condition;
 	tree() =delete;
-	tree(node_ptr root, std::pmr::string id_);
+	tree(node_ptr root, std::shared_ptr<dsl_manager> dm);
 
-	[[nodiscard]] std::pmr::string data_id() const ;
+	[[nodiscard]] boost::json::value to_json(const compilation_config& cfg) const ;
+	[[nodiscard]] std::string_view data_id() const ;
 	[[nodiscard]] const data_node& root() const ;
 
 	void add(const data_node& par, node_ptr child);

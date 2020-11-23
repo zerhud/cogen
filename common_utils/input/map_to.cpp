@@ -42,11 +42,10 @@ std::optional<gen_utils::tree> gen_utils::map_to::copy_for(
 gen_utils::map_to::result_t gen_utils::map_to::operator()
 (std::pmr::string tmpl, const tree& data)
 {
-	auto names_list = data.var_name_list();
+	result.clear();
 	result.emplace(tmpl, data);
-	for(auto& name:names_list) {
+	for(auto& name:data.var_name_list())
 		make_for_name(name);
-	}
 	return result;
 }
 

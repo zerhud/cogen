@@ -18,16 +18,17 @@
 namespace modegen::ic {
 
 class input final {
-	std::vector<gen_utils::tree> storage;
+	std::pmr::vector<gen_utils::tree> storage;
 public:
 	input() =default ;
 	~input() noexcept =default;
 
 	void add(input&& other);
 	void add(gen_utils::tree data);
-	[[nodiscard]] std::vector<const gen_utils::tree*> select(
+	[[nodiscard]] std::pmr::vector<const gen_utils::tree*> select(
 			std::string_view id) const ;
-	[[nodiscard]] std::vector<const gen_utils::tree*> all() const ;
+	[[nodiscard]] std::pmr::vector<const gen_utils::tree*> all() const ;
 };
+
 
 } // namespace modegen::ic

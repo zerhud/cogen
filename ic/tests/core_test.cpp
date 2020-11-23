@@ -13,103 +13,141 @@
 #include <common_utils/tests/mocks.hpp>
 
 #include "mocks.hp"
-#include "ic/abstract_part.hpp"
 #include "ic/input.hpp"
 
 using namespace std::literals;
+using ic_input = modegen::ic::input;
+
+template <class T0, class... Ts>
+auto make_vector(T0&& first, Ts&&... args)
+{
+	using first_type = std::decay_t<T0>;
+	return std::pmr::vector<first_type>{
+			std::forward<T0>(first),
+			std::forward<Ts>(args)...
+	};
+}
+
+std::pmr::string operator "" _s (const char* d, std::size_t l)
+{
+	return std::pmr::string(d, l);
+}
+
+boost::json::value operator "" _json (const char* d, std::size_t l)
+{
+	return boost::json::parse(std::string_view(d,l));
+}
 
 BOOST_AUTO_TEST_SUITE(input_configurator)
 
 struct core_fixture {
-	std::shared_ptr<icmocks::configuration> config = std::make_shared<icmocks::configuration>();
-	std::shared_ptr<icmocks::factory> factory = std::make_shared<icmocks::factory>() ;
-
-	std::pmr::vector<std::shared_ptr<icmocks::generation_part>> parts;
-	std::pmr::vector<std::shared_ptr<mic::generation_part>> _parts; ///< simplify returns
-
+	std::shared_ptr<gen_utils_mocks::dsl_manager> dmanager =
+			std::make_shared<gen_utils_mocks::dsl_manager>();
+	std::shared_ptr<icmocks::configuration> config
+		= std::make_shared<icmocks::configuration>();
+	std::shared_ptr<icmocks::provider> prov
+		= std::make_shared<icmocks::provider>();
 	mic::core core;
 
-	core_fixture() : core(factory)
+	struct output_info {
+		std::string_view file;
+		boost::json::value compiled_result;
+	};
+
+	struct part_info {
+		std::string_view name;
+		std::pmr::string map_tmpl;
+		std::pmr::string tmpl_file;
+		std::vector<output_info> outputs;
+	};
+
+	std::vector<part_info> parts;
+
+	core_fixture() : core(prov)
 	{
+		MOCK_EXPECT(dmanager->id).returns("data_id"sv);
 	}
 
-	void create_parts(std::size_t cnt)
-	{
-		while(cnt--) create_part();
-	}
-
-	std::shared_ptr<icmocks::generation_part> create_part()
-	{
-		auto p = std::make_shared<icmocks::generation_part>();
-		MOCK_EXPECT(p->id).returns(parts.size());
-		_parts.emplace_back(p);
-		return parts.emplace_back(p);
-	}
-
-	void set_config(std::size_t id, std::pmr::string tmpl, std::pmr::string mt)
-	{
-		MOCK_EXPECT(config->map_tmpl).with(id).returns(mt);
-		MOCK_EXPECT(config->tmpl_file).with(id).returns(tmpl);
-	}
-
-	void expect_mods(std::size_t id, bool sv, gen_utils::name_conversion n)
+	void expect_mods(std::string_view id, bool sv, gen_utils::name_conversion n)
 	{
 		MOCK_EXPECT(config->split_versions).with(id).returns(sv);
-		if(sv) MOCK_EXPECT(parts[id]->split_versions).once();
 		MOCK_EXPECT(config->naming).with(id).returns(n);
-		MOCK_EXPECT(parts[id]->rename).once().with(n);
+	}
+
+	void create_parts()
+	{
+		std::pmr::vector<std::string_view> names;
+		for(auto& p:parts) {
+			names.emplace_back(p.name);
+			MOCK_EXPECT(config->map_tmpl)
+			        .with(p.name).returns(p.map_tmpl);
+			MOCK_EXPECT(config->tmpl_file)
+			        .with(p.name).returns(p.tmpl_file);
+			MOCK_EXPECT(config->lang)
+			        .with(p.name).returns(mic::json_generator::cpp);
+
+			mock::sequence json_seq;
+			for(auto& o:p.outputs) {
+				MOCK_EXPECT(dmanager->to_json)
+				    .once() .in(json_seq)
+				    .with(mock::any, mock::any)
+				    .returns(o.compiled_result);
+				boost::json::array cr;
+				cr.emplace_back(o.compiled_result);
+				MOCK_EXPECT(prov->generate).once()
+				    .with(p.tmpl_file, cr, o.file);
+			}
+		}
+		MOCK_EXPECT(config->parts).returns(names);
 	}
 };
 
 BOOST_AUTO_TEST_SUITE(core)
-BOOST_AUTO_TEST_CASE(errors)
+using mic::json_generator;
+BOOST_AUTO_TEST_CASE(check_json)
 {
-	BOOST_CHECK_THROW(mic::core(nullptr), std::exception);
-	BOOST_CHECK_NO_THROW(mic::core{ std::make_shared<icmocks::factory>()}) ;
+	BOOST_TEST(R"({"a":1,"b":2})"_json == R"({"b":2,"a":1})"_json);
 }
 BOOST_FIXTURE_TEST_CASE(generation, core_fixture)
 {
-	create_parts(2);
-	assert(parts.size()==2);
-	MOCK_EXPECT(config->parts).at_least(1).returns(_parts);
+	parts.emplace_back(
+	            part_info{"p1"sv, "p1f"_s, "p1t"_s, {
+	                          {"p1f"sv, R"({"pj":1})"_json}
+	                      }});
+	parts.emplace_back(
+	            part_info{"p2"sv, "p2f"_s, "p2t"_s, {
+	                          {"p2f"sv, R"({"pj":2})"_json}
+	                      }});
+	create_parts();
 
-	set_config(0, "tmpl1", "p0");
-	set_config(1, "tmpl2", "p1");
-	expect_mods(0, true, gen_utils::name_conversion::as_is);
-	expect_mods(1, false, gen_utils::name_conversion::underscore);
+	ic_input all_dsl;
+	gen_utils::tree dsl{gen_utils_mocks::make_node(1), dmanager};
+	dsl.add(dsl.root(), gen_utils_mocks::make_node(2));
+	all_dsl.add(std::move(dsl));
+	MOCK_EXPECT(config->all_dsl).returns(all_dsl);
 
-	mock::sequence building;
-	MOCK_EXPECT(parts[0]->map_to).in(building).once().with("p0"s);
-	MOCK_EXPECT(parts[1]->map_to).in(building).once().with("p1"s);
+	core.gen(*config);
+}
+BOOST_FIXTURE_TEST_CASE(mapping, core_fixture)
+{
+	parts.emplace_back(
+	            part_info{"p1"sv, "pf${vn}"_s, "pt"_s, {
+	                          {"pfv1"sv, R"({"pj":1})"_json},
+	                          {"pfv2"sv, R"({"pj":2})"_json}
+	                      }});
+	create_parts();
 
-	using modegen::ic::map_result;
-	std::pmr::vector<map_result> part_0_compiled;
-	part_0_compiled.emplace_back(map_result{"name", modegen::ic::input()});
-	std::pmr::vector<map_result> part_1_compiled;
-	part_1_compiled.emplace_back(map_result{"name11", modegen::ic::input()});
-	part_1_compiled.emplace_back(map_result{"name12", modegen::ic::input()});
-	MOCK_EXPECT(parts[0]->compiled_input).returns(part_0_compiled);
-	MOCK_EXPECT(parts[1]->compiled_input).returns(part_1_compiled);
-
-	MOCK_EXPECT(config->generate).once().in(building).calls([](auto f, const auto& d){
-		BOOST_TEST(f=="tmpl1"s);
-		BOOST_TEST(d.map=="name");
-	});
-	MOCK_EXPECT(config->generate).once().in(building).calls([](auto f, const auto& d){
-		BOOST_TEST(f=="tmpl2"s);
-		BOOST_TEST(d.map=="name11");
-	});
-	MOCK_EXPECT(config->generate).once().in(building).calls([](auto f, const auto& d){
-		BOOST_TEST(f=="tmpl2"s);
-		BOOST_TEST(d.map=="name12");
-	});
+	ic_input all_dsl;
+	gen_utils::tree dsl{gen_utils_mocks::make_node(1, "vn"_s, "v1"_s), dmanager};
+	dsl.add(dsl.root(), gen_utils_mocks::make_node(1, "vn"_s, "v2"_s));
+	all_dsl.add(std::move(dsl));
+	MOCK_EXPECT(config->all_dsl).returns(all_dsl);
 
 	core.gen(*config);
 }
 BOOST_AUTO_TEST_SUITE_END() // core
 
 BOOST_AUTO_TEST_SUITE(input)
-using ic_input = modegen::ic::input;
 BOOST_AUTO_TEST_CASE(getters)
 {
 	ic_input i;
@@ -118,12 +156,16 @@ BOOST_AUTO_TEST_CASE(getters)
 }
 BOOST_AUTO_TEST_CASE(adding)
 {
+	auto m1 = std::make_shared<gen_utils_mocks::dsl_manager>();
+	auto m2 = std::make_shared<gen_utils_mocks::dsl_manager>();
+	MOCK_EXPECT(m1->id).returns("t1");
+	MOCK_EXPECT(m2->id).returns("t2");
 	auto n1 = std::make_shared<gen_utils_mocks::data_node>();
 	MOCK_EXPECT(n1->version).returns(10);
-	gen_utils::tree t1(n1, "t1");
-	gen_utils::tree t2(n1, "t2");
-	gen_utils::tree t3(n1, "t1");
+	gen_utils::tree t1(n1, m1);
+	gen_utils::tree t2(n1, m2);
 	ic_input i;
+
 	i.add(t1);
 	BOOST_TEST_REQUIRE(i.all().size()==1);
 	BOOST_TEST(i.all()[0]->data_id()=="t1"sv);
@@ -134,6 +176,9 @@ BOOST_AUTO_TEST_CASE(adding)
 	BOOST_TEST(i.select("t1"sv).at(0)->data_id()=="t1"sv);
 	BOOST_TEST(i.select("t2"sv).at(0)->data_id()=="t2"sv);
 
+	auto m3 = std::make_shared<gen_utils_mocks::dsl_manager>();
+	MOCK_EXPECT(m3->id).returns("t1");
+	gen_utils::tree t3(n1, m3);
 	i.add(t3);
 	BOOST_TEST_REQUIRE(i.all().size()==3);
 	BOOST_TEST(i.select("t1"sv).at(0)->data_id()=="t1"sv);
@@ -141,11 +186,12 @@ BOOST_AUTO_TEST_CASE(adding)
 }
 BOOST_AUTO_TEST_CASE(adding_other)
 {
+	auto m1 = std::make_shared<gen_utils_mocks::dsl_manager>();
 	auto n1 = std::make_shared<gen_utils_mocks::data_node>();
 	MOCK_EXPECT(n1->version).returns(10);
-	gen_utils::tree t1(n1, "t1");
-	gen_utils::tree t2(n1, "t2");
-	gen_utils::tree t3(n1, "t1");
+	gen_utils::tree t1(n1, m1);
+	gen_utils::tree t2(n1, m1);
+	gen_utils::tree t3(n1, m1);
 
 	ic_input i1, i2;
 	i1.add(t1);

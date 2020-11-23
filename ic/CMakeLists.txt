@@ -18,10 +18,7 @@ list(FILTER ic_src EXCLUDE REGEX "tests/.*")
 list(FILTER ic_hdr EXCLUDE REGEX "tests/.*")
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/" FILES ${ic_src} ${ic_hdr})
 
-add_library("${PROJECT_NAME}" STATIC ${ic_src} ${ic_hdr} ${lohman_json_file})
-
-add_dependencies("${PROJECT_NAME}" generate_nlohman)
-set_source_files_properties(${lohman_json_file} PROPERTIES GENERATED TRUE)
+add_library("${PROJECT_NAME}" STATIC ${ic_src} ${ic_hdr})
 
 target_include_directories("${PROJECT_NAME}" PUBLIC "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_LIST_DIR}")
 target_link_libraries("${PROJECT_NAME}" PUBLIC generation_utils)
@@ -37,5 +34,4 @@ if(ENABLE_TESTS)
 	endmacro()
 
 	add_unit_test(core "tests/" "")
-	add_unit_test(abstract_part "tests/" "")
 endif()

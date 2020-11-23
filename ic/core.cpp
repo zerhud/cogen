@@ -8,36 +8,47 @@
 
 #include "core.hpp"
 
+#include <common_utils/input/map_to.hpp>
+
 using namespace std::literals;
 
-modegen::ic::core::core(std::shared_ptr<factory> gs)
-    : gen_system(std::move(gs))
+modegen::ic::core::core(std::shared_ptr<provider> p)
+    : prov(std::move(p))
 {
-	if(! gen_system) throw std::runtime_error("could not create core without factory"s);
 }
 
 void modegen::ic::core::gen(const configuration& config) const
 {
-	auto parts = config.parts();
-	for(auto& part:parts) build(config, *part);
-	for(auto& part:parts) gen(config, *part);
+	assert(prov);
+	gen_utils::map_to mapper;
+	auto all_dsl = config.all_dsl();
+	for(auto& p:config.parts()) {
+
+		auto map_tmpl = config.map_tmpl(p);
+		std::map<std::pmr::string, input> part_outputs;
+		for(auto& t:all_dsl.all()) {
+			auto result = mapper(map_tmpl, *t);
+			for(auto& r:result)
+				part_outputs[r.first].add(std::move(r.second));
+		}
+
+		for(auto& out:part_outputs) {
+			auto result = make_json(config, out.second);
+			prov->generate(config.tmpl_file(p), result, out.first);
+		}
+	}
 }
 
-void modegen::ic::core::build(
-          const configuration& config
-        , generation_part& part) const
+boost::json::value modegen::ic::core::make_json(
+		const configuration& config, const input& dsl) const
 {
-	part.rename(config.naming(part.id()));
-	if(config.split_versions(part.id()))
-		part.split_versions();
-	part.map_to(config.map_tmpl(part.id()));
-}
-
-void modegen::ic::core::gen(
-          const configuration& config
-        , const generation_part& part) const
-{
-	auto results = part.compiled_input();
-	for(auto& r:results)
-		config.generate(config.tmpl_file(part.id()), r);
+	struct compilconfig : gen_utils::compilation_config {
+		gen_utils::compiler compiler_name () const override {return gen_utils::compiler::cpp;}
+		std::string_view value(std::string_view key) const override {return ""sv;} ;
+	};
+	compilconfig cfg;
+	boost::json::array ret;
+	for(auto& t:dsl.all())
+		ret.emplace_back(t->to_json(cfg));
+	return ret;
 }

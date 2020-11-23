@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <variant>
 #include "ix3/ast/file.hpp"
 
 namespace ix3::utils {
@@ -27,13 +28,19 @@ public:
 	virtual ~traverser() noexcept =default ;
 protected:
 	enum class trav_direction { paret_first, child_first } ;
-	typedef std::variant<ast::module*, ast::record*, ast::interface*, ast::function*, ast::enumeration*> parent_t;
+	typedef std::variant<
+	   ast::module*,
+	   ast::record*,
+	   ast::interface*,
+	   ast::function*,
+	   ast::enumeration*> parent_t;
 
 	ast::module& module() ;
-	void trav_module(const ast::module& mod, trav_direction direction = trav_direction::child_first) ;
+	void trav_module(
+	        const ast::module& mod,
+	        trav_direction direction = trav_direction::child_first) ;
 
 	std::string path() const ;
-	std::vector<ast::meta::set> meta_stack() const ;
 
 	template<typename P>
 	P* parent(std::size_t ind)
