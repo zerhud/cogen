@@ -17,6 +17,7 @@ MOCK_BASE_CLASS(compilation_config, gen_utils::compilation_config)
 {
 	MOCK_METHOD(compiler_name, 0)
 	MOCK_METHOD(value, 1)
+	MOCK_METHOD(naming, 0)
 };
 
 MOCK_BASE_CLASS(dsl_manager, gen_utils::dsl_manager)

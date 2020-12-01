@@ -15,6 +15,8 @@
 #include <memory_resource>
 #include <boost/json.hpp>
 
+#include "naming.hpp"
+
 namespace gen_utils {
 
 enum class compiler { cpp } ;
@@ -28,6 +30,8 @@ public:
 
 	[[nodiscard]]
 	virtual std::string_view value(std::string_view key) const =0 ;
+	
+	[[nodiscard]] virtual  name_conversion naming() const =0 ;
 };
 
 class tree;

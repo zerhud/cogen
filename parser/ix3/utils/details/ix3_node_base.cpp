@@ -28,6 +28,12 @@ const ix3_compiler & compilation_context::compiling_aspect() const
 	return *asp;
 }
 
+std::pmr::vector<std::pmr::string> compilation_context::naming(std::string_view orig) const
+{
+	auto first_name = gen_utils::convert(std::string(orig), asp->config().naming());
+	return {std::pmr::string(std::move(first_name))};
+}
+
 std::pmr::vector<const ix3_node_base *> compilation_context::children(
 		const ix3_node_base& par) const
 {

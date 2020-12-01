@@ -12,7 +12,12 @@
 using namespace std::literals;
 using ix3::utils::details::cpp_compiler;
 
-cpp_compiler::cpp_compiler(const gen_utils::compilation_config* c) : config(c) {}
+cpp_compiler::cpp_compiler(const gen_utils::compilation_config* c) : cfg(c) {}
+
+const gen_utils::compilation_config& cpp_compiler::config() const
+{
+	return *cfg;
+}
 
 void cpp_compiler::aspect(const ix3_node_base& node, boost::json::object& res) const {}
 void cpp_compiler::aspect(const module_node& node, boost::json::object& res) const {}

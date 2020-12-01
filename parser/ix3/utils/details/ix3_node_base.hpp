@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <vector>
 #include "common_utils/input/tree.hpp"
 
 namespace ix3::utils::details {
@@ -21,6 +22,8 @@ struct record_node;
 class ix3_compiler {
 public:
 	virtual ~ix3_compiler() noexcept =default ;
+
+	virtual const gen_utils::compilation_config& config() const =0 ;
 
 	virtual void aspect(const ix3_node_base& node, boost::json::object& res) const =0 ;
 	virtual void aspect(const module_node& node, boost::json::object& res) const =0 ;
@@ -39,6 +42,9 @@ public:
 			const ix3_node_base& par) const ;
 
 	const ix3_compiler& compiling_aspect() const ;
+
+	[[nodiscard]]
+	std::pmr::vector<std::pmr::string> naming(std::string_view orig) const ;
 };
 
 class ix3_node_base : public gen_utils::data_node {

@@ -21,7 +21,7 @@ list(FILTER ic_src EXCLUDE REGEX "tests/.*")
 list(FILTER ic_hdr EXCLUDE REGEX "tests/.*")
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/" FILES ${ic_src} ${ic_hdr})
 
-add_library(${PROJECT_NAME} SHARED ${ic_src} ${ic_hdr})
+add_library(${PROJECT_NAME} STATIC ${ic_src} ${ic_hdr})
 target_link_libraries(${PROJECT_NAME} PRIVATE stdc++fs PUBLIC generation_utils)
 target_include_directories( ${PROJECT_NAME}
 	PRIVATE

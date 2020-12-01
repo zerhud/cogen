@@ -13,9 +13,11 @@
 namespace ix3::utils::details {
 
 struct cpp_compiler : ix3_compiler {
-	const gen_utils::compilation_config* config;
+	const gen_utils::compilation_config* cfg;
 
 	explicit cpp_compiler(const gen_utils::compilation_config* c);
+
+	const gen_utils::compilation_config& config() const override ;
 
 	void aspect(const ix3_node_base& node, boost::json::object& res) const override;
 	void aspect(const module_node& node, boost::json::object& res) const override ;

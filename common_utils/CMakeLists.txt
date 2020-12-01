@@ -21,7 +21,8 @@ list(FILTER hdr EXCLUDE REGEX "tests/.*")
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/" FILES ${src} ${hdr})
 
 add_library(${PROJECT_NAME} ${src} ${hdr})
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME}
+    PUBLIC ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} PUBLIC Boost::json)
 
 if(ENABLE_TESTS)

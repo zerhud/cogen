@@ -64,6 +64,13 @@ public:
 	{
 		boost::json::object ret;
 		ret["orig_name"] = name();
+		auto list = ctx.naming(name());
+		if(list.size()==1) ret["name"] = list[0];
+		else {
+			auto& nl = ret["name"].emplace_array();
+			for(auto& n:list)
+				nl.emplace_back(n);
+		}
 		return ret;
 	}
 };

@@ -45,6 +45,7 @@ boost::json::value modegen::ic::core::make_json(
 	struct compilconfig : gen_utils::compilation_config {
 		gen_utils::compiler compiler_name () const override {return gen_utils::compiler::cpp;}
 		std::string_view value(std::string_view key) const override {return ""sv;} ;
+		gen_utils::name_conversion naming() const override {return gen_utils::name_conversion::as_is;}
 	};
 	compilconfig cfg;
 	boost::json::array ret;

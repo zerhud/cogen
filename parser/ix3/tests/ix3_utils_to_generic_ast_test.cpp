@@ -26,6 +26,12 @@ BOOST_AUTO_TEST_SUITE(ix3)
 BOOST_AUTO_TEST_SUITE(utils)
 BOOST_AUTO_TEST_SUITE(gain_to_generic_ast)
 struct fake_compiler : ix3::utils::details::ix3_compiler {
+
+	fake_compiler(const gen_utils::compilation_config& c) : cfg(c) {}
+	const gen_utils::compilation_config& cfg;
+
+	const gen_utils::compilation_config& config() const override {return cfg; }
+
 	void aspect(const ix3::utils::details::ix3_node_base&, boost::json::object&) const override {}
 	void aspect(const ix3::utils::details::module_node&, boost::json::object&) const override {}
 	void aspect(const ix3::utils::details::module_version_node&, boost::json::object&) const override {}
@@ -36,7 +42,9 @@ struct fake_compiler : ix3::utils::details::ix3_compiler {
 boost::json::value make_json(const gen_utils::data_node& root, const gen_utils::tree& cnt)
 {
 	assert(dynamic_cast<const ix3::utils::details::ix3_node_base*>(&root));
-	fake_compiler fc;
+	gen_utils_mocks::compilation_config cfg;
+	MOCK_EXPECT(cfg.naming).returns(gen_utils::name_conversion::camel_case);
+	fake_compiler fc{cfg};
 	ix3::utils::details::compilation_context ctx(&cnt, &fc);
 	return static_cast<const ix3::utils::details::ix3_node_base&>(root).make_json(ctx);
 }
@@ -102,13 +110,13 @@ BOOST_AUTO_TEST_CASE(records)
 
 	BOOST_TEST(make_json(*rec, tree) == boost::json::parse(
 	               R"({
-	               "orig_name":"rec",
+	               "orig_name":"rec","name":"rec",
 	               "type":"record",
 	               "is_exception":false,
 	               "fields":[
-	                 {"orig_name":"f1","type":"record_item","req":false,"param_t":
+	                 {"orig_name":"f1","name":"f1","type":"record_item","req":false,"param_t":
 	                   {"type":"type","name":["int"],"subs":[]}},
-	                 {"orig_name":"f2","type":"record_item","req":true,"param_t":
+	                 {"orig_name":"f2","name":"f2","type":"record_item","req":true,"param_t":
 	                   {"type":"type","name":["int"],"subs":[]}}
 	               ]})"sv));
 }
@@ -118,7 +126,7 @@ BOOST_AUTO_TEST_CASE(functions)
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
 	                      "int foo(-string bar, +list<string> baz);"
-	                      "@v1.2 int bar();"sv);
+	                      "@v1.2 int bar(+u8 b);"sv);
 	gen_utils::tree tree = maker(ast.modules);
 	BOOST_TEST(tree.children(tree.root()).size()==1);
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
@@ -140,21 +148,26 @@ BOOST_AUTO_TEST_CASE(functions)
 
 	BOOST_TEST(make_json(*bar, tree) == boost::json::parse(
 	               R"({
-	               "orig_name":"bar",
+	               "orig_name":"bar","name":"bar",
 	               "type":"function",
-	               "params":[],
+	               "params":[ {
+	                 "orig_name":"b","name":"b",
+	                 "param_t":{"type":"type", "name":["u8"], "subs":[]},
+	                 "type":"function_parameter",
+	                 "req":true
+	               } ],
 	               "return":{"type":"type", "name":["int"], "subs":[]}
 	               })"sv));
 	BOOST_TEST(make_json(*foo_params.at(0), tree) == boost::json::parse(
 	               R"({
-	                 "orig_name":"bar",
+	                 "orig_name":"bar","name":"bar",
 	                 "param_t":{"type":"type", "name":["string"], "subs":[]},
 	                 "type":"function_parameter",
 	                 "req":false
 	               })"sv));
 	BOOST_TEST(make_json(*foo_params.at(1), tree) == boost::json::parse(
 	               R"({
-	                 "orig_name":"baz",
+	                 "orig_name":"baz","name":"baz",
 	                 "param_t":{"type":"type", "name":["list"], "subs":[
 	                    {"type":"type", "name":["string"], "subs":[]}
 	                 ]},
@@ -163,5 +176,9 @@ BOOST_AUTO_TEST_CASE(functions)
 	               })"sv));
 }
 BOOST_AUTO_TEST_SUITE_END() // gain_to_generic_ast
+
+BOOST_AUTO_TEST_SUITE(cpp_compiler) // cpp_compiler
+BOOST_AUTO_TEST_SUITE_END() // cpp_compiler
+
 BOOST_AUTO_TEST_SUITE_END() // utils
 BOOST_AUTO_TEST_SUITE_END() // ix3
