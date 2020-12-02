@@ -22,3 +22,12 @@ add_compile_definitions(BOOST_NO_AUTO_PTR BOOST_BIND_GLOBAL_PLACEHOLDERS)
 add_subdirectory(common_utils)
 add_subdirectory(ic)
 add_subdirectory(parser/ix3)
+
+find_package(Boost REQUIRED)
+
+add_executable(modegen modegen/main.cpp)
+target_link_libraries(modegen PRIVATE
+		generation_utils input_configurator ix3
+		${Boost_LIBRARIES}
+		${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
+		)
