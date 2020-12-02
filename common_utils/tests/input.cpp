@@ -15,6 +15,7 @@
 
 #include "common_utils/input/tree.hpp"
 #include "common_utils/input/map_to.hpp"
+#include "common_utils/input/complilation_config.hpp"
 #include "mocks.hpp"
 
 using namespace std::literals;
@@ -347,4 +348,14 @@ BOOST_FIXTURE_TEST_CASE(double_use, fixture)
 	BOOST_CHECK(map_contains(r, "_val_"));
 }
 BOOST_AUTO_TEST_SUITE_END() // tree_map_to
+
+BOOST_AUTO_TEST_SUITE(compilation_config)
+std::shared_ptr<gen_utils::compilation_config> config =
+	  std::make_shared<gen_utils::compilation_config_impl::compilation_config>() ;
+BOOST_AUTO_TEST_CASE(compliller_name)
+{
+	BOOST_CHECK( gen_utils::compiler::cpp == config->compiler_name()) ;
+
+}
+BOOST_AUTO_TEST_SUITE_END() // compilation_config
 BOOST_AUTO_TEST_SUITE_END() // input
