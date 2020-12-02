@@ -23,11 +23,18 @@ add_subdirectory(common_utils)
 add_subdirectory(ic)
 add_subdirectory(parser/ix3)
 
-find_package(Boost REQUIRED)
+find_package(Boost 1.74 COMPONENTS program_options REQUIRED)
 
 add_executable(modegen modegen/main.cpp)
 target_link_libraries(modegen PRIVATE
 		generation_utils input_configurator ix3
 		${Boost_LIBRARIES}
 		${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS}
+		)
+target_include_directories(modegen
+		PRIVATE
+		${Boost_INCLUDE_DIRS}
+		"${CMAKE_CURRENT_SOURCE_DIR}"
+		PUBLIC
+		"${CMAKE_CURRENT_SOURCE_DIR}/.."
 		)

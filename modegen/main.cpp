@@ -50,7 +50,7 @@ auto parse_command_line(int argc, char** argv, std::vector<std::string> fglist, 
 
 	auto opts = po::command_line_parser(argc,argv).options(desc).run();
 	po::variables_map vm;
-	po::store(opts, vm);
+	store(opts, vm);
 
 	if(vm.count("help")) {
 		std::cout << "use this program to prepare module data." << std::endl << desc << std::endl
