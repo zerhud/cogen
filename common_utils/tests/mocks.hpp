@@ -31,6 +31,7 @@ MOCK_BASE_CLASS(data_node, gen_utils::data_node)
 	MOCK_METHOD(name, 0)
 	MOCK_METHOD(version, 0)
 	MOCK_METHOD(node_var, 0)
+	MOCK_METHOD(links, 0)
 };
 
 std::shared_ptr<gen_utils_mocks::data_node> make_node(

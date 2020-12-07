@@ -247,7 +247,6 @@ BOOST_FIXTURE_TEST_CASE(tmpl_diff_from_var_name, fixture)
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(map_contains(r, "_${var1}_")) ;
 }
-
 BOOST_FIXTURE_TEST_CASE(_3_node_1_tmpl, fixture)
 {
 	map_to mapper;
@@ -260,7 +259,6 @@ BOOST_FIXTURE_TEST_CASE(_3_node_1_tmpl, fixture)
 	BOOST_TEST(r.size() == 1) ;
 	BOOST_CHECK( map_contains(r,"_val1_")) ;
 }
-
 BOOST_FIXTURE_TEST_CASE(few_vars, fixture)
 {
 	map_to mapper;
@@ -317,4 +315,11 @@ BOOST_FIXTURE_TEST_CASE(double_use, fixture)
 	BOOST_CHECK(map_contains(r, "_val_"));
 }
 BOOST_AUTO_TEST_SUITE_END() // tree_map_to
+BOOST_AUTO_TEST_SUITE(link_with)
+BOOST_FIXTURE_TESET_CASE(types, fixture)
+{
+	main_node = make_node(1);
+	MOCK_EXPECT(main_node->links).returns({"a"sv, "b"sv});
+}
+BOOST_AUTO_TEST_SUITE_END() // link_with
 BOOST_AUTO_TEST_SUITE_END() // input

@@ -43,6 +43,13 @@ struct variable {
 	std::pmr::string value;
 };
 
+struct link {
+	/// refers to dsl_manager::id
+	std::string_view tree;
+	/// refers to tree node
+	std::vector<std::string_view> value;
+};
+
 class dsl_manager {
 public:
 	virtual ~dsl_manager() noexcept =default ;
@@ -58,6 +65,7 @@ public:
 	[[nodiscard]] virtual std::string_view name() const =0 ;
 	[[nodiscard]] virtual std::optional<std::uint64_t> version() const =0 ;
 	[[nodiscard]] virtual std::optional<variable> node_var() const =0 ;
+	[[nodiscard]] virtual std::pmr::vector<link> links() const =0;
 };
 
 class tree final {
