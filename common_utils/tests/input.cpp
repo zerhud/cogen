@@ -15,9 +15,15 @@
 
 #include "common_utils/input/tree.hpp"
 #include "common_utils/input/map_to.hpp"
+#include "common_utils/input/links.hpp"
 #include "mocks.hpp"
 
 using namespace std::literals;
+
+std::pmr::string operator "" _s (const char* d, std::size_t l)
+{
+	return std::pmr::string(d, l);
+}
 
 BOOST_AUTO_TEST_SUITE(input)
 struct fixture {
@@ -315,11 +321,82 @@ BOOST_FIXTURE_TEST_CASE(double_use, fixture)
 	BOOST_CHECK(map_contains(r, "_val_"));
 }
 BOOST_AUTO_TEST_SUITE_END() // tree_map_to
+
 BOOST_AUTO_TEST_SUITE(link_with)
-BOOST_FIXTURE_TESET_CASE(types, fixture)
+BOOST_AUTO_TEST_SUITE(links_manager)
+using gen_utils::links_manager;
+using gen_utils::name_t;
+BOOST_FIXTURE_TEST_CASE(top_level, fixture)
 {
 	main_node = make_node(1);
-	MOCK_EXPECT(main_node->links).returns({"a"sv, "b"sv});
+	MOCK_EXPECT(main_node->required_links)
+	        .returns(std::pmr::vector<name_t>{{"o"_s,"a"_s}});
+
+	auto other_node = make_node(1);
+	auto other_dmng = std::make_shared<gen_utils_mocks::dsl_manager>();
+	MOCK_EXPECT(other_dmng->id).returns("o"sv);
+	MOCK_EXPECT(other_node->name).returns("a"sv);
+	MOCK_EXPECT(other_node->required_links).returns(std::pmr::vector<name_t>{});
+
+	MOCK_EXPECT(other_node->name).returns("a"sv);
+	gen_utils::tree other_tree(other_node, other_dmng);
+
+	links_manager mng({&tree(),&other_tree});
+	BOOST_TEST(mng.links(*main_node).size()==1);
+}
+BOOST_FIXTURE_TEST_CASE(name_is_too_small, fixture)
+{
+	main_node = make_node(1);
+	MOCK_EXPECT(main_node->required_links)
+	        .returns(std::pmr::vector<name_t>{{"a"_s}});
+	BOOST_CHECK_THROW((links_manager({&tree()})), std::exception);
+	BOOST_CHECK_THROW((links_manager({&tree(),&tree()})), std::exception);
+}
+BOOST_FIXTURE_TEST_CASE(search_in_children, fixture)
+{
+	main_node = make_node(1);
+	auto main_child = make_node(11);
+	auto main_child2 = make_node(12);
+	MOCK_EXPECT(main_node->name).returns("main_node"sv);
+	MOCK_EXPECT(main_child->name).returns("b"sv);
+	MOCK_EXPECT(main_child2->name).returns("not_in_search"sv);
+	tree().add(*main_node, main_child);
+	tree().add(*main_node, main_child2);
+	MOCK_EXPECT(main_node->required_links)
+	        .returns(std::pmr::vector<name_t>{{"o"_s,"a"_s},{"data_id"_s,"b"_s}});
+	MOCK_EXPECT(main_child->required_links).returns(std::pmr::vector<name_t>{});
+	MOCK_EXPECT(main_child2->required_links).returns(std::pmr::vector<name_t>{});
+
+	auto other_root = make_node(2);
+	auto other_node = make_node(22);
+	auto other_dmng = std::make_shared<gen_utils_mocks::dsl_manager>();
+	MOCK_EXPECT(other_dmng->id).returns("o"sv);
+	MOCK_EXPECT(other_node->name).returns("a"sv);
+	MOCK_EXPECT(other_root->name).returns("other_root"sv);
+	MOCK_EXPECT(other_root->required_links).returns(std::pmr::vector<name_t>{});
+	MOCK_EXPECT(other_node->required_links).returns(std::pmr::vector<name_t>{});
+
+	MOCK_EXPECT(other_node->name).returns("a"sv);
+	gen_utils::tree other_tree(other_root, other_dmng);
+	other_tree.add(other_tree.root(), other_node);
+
+	links_manager mng({&tree(),&other_tree});
+	BOOST_TEST(mng.links(*main_node).size()==2);
+	for(auto& l:mng.links(*main_node)) {
+		BOOST_REQUIRE(l.node != nullptr);
+		if(l.dsl_id=="data_id")
+			BOOST_TEST(l.node == main_child.get());
+		else if(l.dsl_id=="o")
+			BOOST_TEST(l.node == other_node.get());
+		else BOOST_FAIL("unknown node in links: " << l.node->name());
+	}
 }
 BOOST_AUTO_TEST_SUITE_END() // link_with
+BOOST_FIXTURE_TEST_CASE(types, fixture)
+{
+	//main_node = make_node(1);
+	//MOCK_EXPECT(main_node->links).returns({"a"sv, "b"sv});
+}
+BOOST_AUTO_TEST_SUITE_END() // link_with
+
 BOOST_AUTO_TEST_SUITE_END() // input

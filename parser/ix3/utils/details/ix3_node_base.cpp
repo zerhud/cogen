@@ -50,3 +50,8 @@ std::optional<gen_utils::variable> ix3_node_base::node_var() const
 {
 	return std::nullopt;
 }
+
+std::pmr::vector<gen_utils::name_t> ix3_node_base::required_links() const
+{
+	return {};
+}
