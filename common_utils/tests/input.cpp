@@ -401,4 +401,11 @@ BOOST_FIXTURE_TEST_CASE(types, fixture)
 }
 BOOST_AUTO_TEST_SUITE_END() // link_with
 
+BOOST_AUTO_TEST_SUITE(map_from)
+BOOST_FIXTURE_TEST_CASE(all_in_one, fixture)
+{
+	;
+}
+BOOST_AUTO_TEST_SUITE_END() // map_from
+
 BOOST_AUTO_TEST_SUITE_END() // input
