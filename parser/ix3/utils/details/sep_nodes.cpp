@@ -14,7 +14,7 @@ using ix3::utils::details::ix3_root_node;
 using ix3::utils::details::module_node;
 using ix3::utils::details::module_version_node;
 
-std::string_view ix3_root_node::name() const { return "ix3_root"sv; }
+std::string_view ix3_root_node::name() const { return "ix3"sv; }
 
 std::optional<std::uint64_t> ix3_root_node::version() const { return 0; }
 

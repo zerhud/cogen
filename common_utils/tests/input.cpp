@@ -329,12 +329,13 @@ using gen_utils::name_t;
 BOOST_FIXTURE_TEST_CASE(top_level, fixture)
 {
 	main_node = make_node(1);
+	MOCK_EXPECT(main_node->name).returns("main_node"sv);
 	MOCK_EXPECT(main_node->required_links)
-	        .returns(std::pmr::vector<name_t>{{"o"_s,"a"_s}});
+	        .returns(std::pmr::vector<name_t>{{"a"_s}});
 
 	auto other_node = make_node(1);
 	auto other_dmng = std::make_shared<gen_utils_mocks::dsl_manager>();
-	MOCK_EXPECT(other_dmng->id).returns("o"sv);
+	MOCK_EXPECT(other_dmng->id).returns("other"sv);
 	MOCK_EXPECT(other_node->name).returns("a"sv);
 	MOCK_EXPECT(other_node->required_links).returns(std::pmr::vector<name_t>{});
 
@@ -343,14 +344,6 @@ BOOST_FIXTURE_TEST_CASE(top_level, fixture)
 
 	links_manager mng({&tree(),&other_tree});
 	BOOST_TEST(mng.links(*main_node).size()==1);
-}
-BOOST_FIXTURE_TEST_CASE(name_is_too_small, fixture)
-{
-	main_node = make_node(1);
-	MOCK_EXPECT(main_node->required_links)
-	        .returns(std::pmr::vector<name_t>{{"a"_s}});
-	BOOST_CHECK_THROW((links_manager({&tree()})), std::exception);
-	BOOST_CHECK_THROW((links_manager({&tree(),&tree()})), std::exception);
 }
 BOOST_FIXTURE_TEST_CASE(search_in_children, fixture)
 {

@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 	to_generic_ast maker;
 	auto ast = txt::parse(txt::file_content, "module mod1 v1.1: module mod1 v1.2:"sv);
 	auto tree = maker(ast.modules);
-	BOOST_TEST(tree.root().name() == "ix3_root"sv);
+	BOOST_TEST(tree.root().name() == "ix3"sv);
 	BOOST_TEST(tree.root().version().value() == 0);
 	BOOST_CHECK(!tree.root().node_var().has_value());
 

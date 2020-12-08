@@ -30,9 +30,9 @@ class links_manager final {
 	std::vector<link_info> storage;
 	std::pmr::vector<const tree*> src_list;
 
-	std::optional<node_links_info> serach_for(
+	std::optional<node_links_info> search_for(
 	        const tree& src, const data_node& par, name_t& n) const ;
-	std::optional<node_links_info> serach_for(name_t& n) const ;
+	std::optional<node_links_info> search_for(name_t& n) const ;
 	void rscan(const tree& src, const data_node& dn) ;
 public:
 	links_manager(std::pmr::vector<const tree*> src);

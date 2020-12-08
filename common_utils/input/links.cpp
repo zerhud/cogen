@@ -20,10 +20,7 @@ links_manager::links_manager(std::pmr::vector<const gen_utils::tree*> src)
 void links_manager::rscan(const tree& src, const data_node& dn)
 {
 	for(name_t& link:dn.required_links()) {
-		if(link.size() < 2)
-			throw std::runtime_error("name must contains at least data_id and name");
-
-		auto to = serach_for(link);
+		auto to = search_for(link);
 		if(to) storage.emplace_back(
 		            link_info{
 		                node_links_info{src.data_id(), &dn},
@@ -33,26 +30,25 @@ void links_manager::rscan(const tree& src, const data_node& dn)
 	for(auto& c:src.children(dn)) rscan(src, *c);
 }
 
-std::optional<node_links_info> links_manager::serach_for(name_t& n) const
+std::optional<node_links_info> links_manager::search_for(name_t& n) const
 {
 	assert(!n.empty());
 	for(auto& src:src_list) {
-		if(src->data_id() != n.front()) continue;
-		n.erase(n.begin());
-		return serach_for(*src, src->root(), n);
+		auto found = search_for(*src, src->root(), n);
+		if(found) return found;
 	}
 	return std::nullopt;
 }
 
-std::optional<node_links_info> links_manager::serach_for(
+std::optional<node_links_info> links_manager::search_for(
         const tree& src, const data_node& par, name_t& n) const
 {
-	if(n.empty()) return std::nullopt;
+	assert(!n.empty());
 	if(par.name()==n.front() && n.size()==1)
 		return node_links_info{src.data_id(), &par};
 	name_t nn(++(n.begin()),n.end());
-	for(auto& c:src.children(par)) {
-		auto result = serach_for(src, *c, nn);
+	if(!nn.empty()) for(auto& c:src.children(par)) {
+		auto result = search_for(src, *c, nn);
 		if(result) return result;
 	}
 	return std::nullopt;
