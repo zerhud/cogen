@@ -384,6 +384,15 @@ BOOST_FIXTURE_TEST_CASE(search_in_children, fixture)
 		else BOOST_FAIL("unknown node in links: " << l.node->name());
 	}
 }
+BOOST_FIXTURE_TEST_CASE(not_found, fixture)
+{
+	main_node = make_node(1);
+	MOCK_EXPECT(main_node->name).returns("main_node"sv);
+	MOCK_EXPECT(main_node->required_links)
+	        .returns(std::pmr::vector<name_t>{{"o"_s,"a"_s},{"data_id"_s,"b"_s}});
+	links_manager mng({&tree()});
+	BOOST_TEST(mng.links(*main_node).size()==0);
+}
 BOOST_AUTO_TEST_SUITE_END() // link_with
 BOOST_FIXTURE_TEST_CASE(types, fixture)
 {
