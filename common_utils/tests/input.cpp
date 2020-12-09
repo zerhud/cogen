@@ -351,7 +351,7 @@ BOOST_AUTO_TEST_SUITE_END() // tree_map_to
 
 BOOST_AUTO_TEST_SUITE(compilation_config)
 std::shared_ptr<gen_utils::compilation_config> config =
-	  std::make_shared<gen_utils::compilation_config_impl::compilation_config>() ;
+	  std::make_shared<gen_utils::compilation_config_impl::compilation_config>(gen_utils::compiler::cpp) ;
 BOOST_AUTO_TEST_CASE(compliller_name)
 {
 	BOOST_CHECK( gen_utils::compiler::cpp == config->compiler_name()) ;

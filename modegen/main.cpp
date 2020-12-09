@@ -18,6 +18,7 @@
 #include "ic/core.hpp"
 #include "ix3/parser.hpp"
 #include "ix3/utils/to_generic_ast.hpp"
+#include "common_utils/input/complilation_config.hpp"
 
 namespace po = boost::program_options;
 
@@ -83,6 +84,8 @@ int main(int argc, char** argv)
 	ps.finish_loads() ;
 	auto ast = ps.result() ;
 	auto tree = tga(ast) ;
+	auto json = manger.to_json(gen_utils::compilation_config_impl::compilation_config(gen_utils::compiler::cpp),tree) ;
+//	json.to
 
 	return 0;
 }
