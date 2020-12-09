@@ -393,19 +393,7 @@ BOOST_FIXTURE_TEST_CASE(not_found, fixture)
 	links_manager mng({&tree()});
 	BOOST_TEST(mng.links(*main_node).size()==0);
 }
+BOOST_AUTO_TEST_SUITE_END() // links_manager
 BOOST_AUTO_TEST_SUITE_END() // link_with
-BOOST_FIXTURE_TEST_CASE(types, fixture)
-{
-	//main_node = make_node(1);
-	//MOCK_EXPECT(main_node->links).returns({"a"sv, "b"sv});
-}
-BOOST_AUTO_TEST_SUITE_END() // link_with
-
-BOOST_AUTO_TEST_SUITE(map_from)
-BOOST_FIXTURE_TEST_CASE(all_in_one, fixture)
-{
-	;
-}
-BOOST_AUTO_TEST_SUITE_END() // map_from
 
 BOOST_AUTO_TEST_SUITE_END() // input
