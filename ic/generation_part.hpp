@@ -7,11 +7,16 @@
  *************************************************************************/
 
 #pragma once
+#include <boost/property_tree/ptree.hpp>
+#include "core.hpp"
 
 namespace modegen::ic {
 
-class generation_part final {
+class single_gen_part final {
+	std::shared_ptr<provider> outside;
 public:
+	single_gen_part(std::shared_ptr<provider> p);
+	void operator()(boost::property_tree::ptree setts, input alli) const ;
 };
 
 } // namespace modegen::ic

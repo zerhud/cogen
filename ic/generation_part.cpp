@@ -8,3 +8,14 @@
 
 #include "generation_part.hpp"
 
+using modegen::ic::single_gen_part;
+
+single_gen_part::single_gen_part(std::shared_ptr<provider> p)
+	: outside(std::move(p))
+{
+}
+
+void single_gen_part::operator()(boost::property_tree::ptree setts, input alli) const
+{
+}
+

@@ -12,7 +12,7 @@
 #include <boost/test/included/unit_test.hpp>
 #include <common_utils/tests/mocks.hpp>
 
-#include "mocks.hp"
+#include "mocks.hpp"
 #include "ic/input.hpp"
 
 using namespace std::literals;

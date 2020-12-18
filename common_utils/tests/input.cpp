@@ -26,22 +26,7 @@ std::pmr::string operator "" _s (const char* d, std::size_t l)
 }
 
 BOOST_AUTO_TEST_SUITE(input)
-struct fixture {
-	std::shared_ptr<gen_utils_mocks::dsl_manager> dmanager=
-			std::make_shared<gen_utils_mocks::dsl_manager>();
-	std::shared_ptr<gen_utils_mocks::data_node> main_node;
-	std::optional<gen_utils::tree> _tree;
-	gen_utils::tree& tree() {
-		if(!_tree) _tree.emplace(main_node, dmanager);
-		return *_tree;
-	}
-
-	fixture()
-	{
-		MOCK_EXPECT(dmanager->id).returns("data_id"sv);
-		main_node = make_node(100);
-	}
-
+struct fixture : gen_utils_mocks::base_tree_fixture {
 	std::shared_ptr<gen_utils_mocks::data_node> make_node(
 	              std::optional<std::uint64_t> v
 	            , std::optional<std::pmr::string> name=std::nullopt
