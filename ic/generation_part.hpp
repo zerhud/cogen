@@ -12,11 +12,17 @@
 
 namespace modegen::ic {
 
+struct gen_settings {
+	std::string_view map_tmpl;
+	std::string_view generator;
+	std::string_view tmpl_file;
+};
+
 class single_gen_part final {
 	std::shared_ptr<provider> outside;
 public:
 	single_gen_part(std::shared_ptr<provider> p);
-	void operator()(boost::property_tree::ptree setts, input alli) const ;
+	void operator()(gen_settings cur_part, input alli) const ;
 };
 
 } // namespace modegen::ic

@@ -15,7 +15,10 @@ single_gen_part::single_gen_part(std::shared_ptr<provider> p)
 {
 }
 
-void single_gen_part::operator()(boost::property_tree::ptree setts, input alli) const
+void single_gen_part::operator()(gen_settings cur_part, input alli) const
 {
+	assert(outside);
+	boost::json::value data;
+	outside->generate(cur_part.tmpl_file, data, cur_part.map_tmpl);
 }
 
