@@ -17,7 +17,7 @@
 
 using namespace std::literals;
 
-boost::json::value operator "" _bjson (const char* d, std::size_t l)
+boost::json::value operator "" _bj(const char* d, std::size_t l)
 {
 	return boost::json::parse(std::string_view(d,l));
 }
@@ -57,11 +57,11 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 		BOOST_TEST(&src != &t1);
 		BOOST_TEST(&cfg == compile_cfg.get());
 		boost::json::object ret;
-		return ((ret["a"] = src.children(src.root()).at(0)->node_var()->value), ret);
+		return ret["a"] = src.children(src.root()).at(0)->node_var()->value, ret;
 	});
-	MOCK_EXPECT(prov->generate).once().with("tmpl", R"([{"a":"v1"}])"_bjson, "file_v1.cpp");
-	MOCK_EXPECT(prov->generate).once().with("tmpl", R"([{"a":"v2"}])"_bjson, "file_v2.cpp");
-	sg(gen_settings{"file_${n}.cpp"sv, "tmpl"sv, compile_cfg.get()}, all_data);
+	MOCK_EXPECT(prov->generate).once().with("t", R"([{"a":"v1"}])"_bj, "v1.cpp");
+	MOCK_EXPECT(prov->generate).once().with("t", R"([{"a":"v2"}])"_bj, "v2.cpp");
+	sg(gen_settings{"${n}.cpp"sv, "t"sv, compile_cfg.get()}, all_data);
 }
 BOOST_AUTO_TEST_SUITE_END() // ic
 
