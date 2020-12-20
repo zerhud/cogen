@@ -28,9 +28,10 @@ void single_gen_part::operator()(gen_settings cur_part, input alli) const
 
 	for(auto& [n,d]:data) {
 		boost::json::value data;
-		//boost::json::array& data_ar = data.as_array();
-		//for(auto& it:d.all()) {
-		//}
+		boost::json::array& data_ar = data.emplace_array();
+		for(auto& it:d.all()) {
+			data_ar.emplace_back(it->to_json(*cur_part.gen_cfg));
+		}
 		outside->generate(cur_part.tmpl_file, data, n);
 	}
 }

@@ -27,7 +27,7 @@ if(ENABLE_TESTS)
 	find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 	macro(add_unit_test tname path lib)
-		add_executable(ic_${tname}_test "${path}${tname}_test.cpp")
+		add_executable(ic_${tname}_test "${path}${tname}_test.cpp" "${path}mocks.hpp")
 		target_link_libraries(ic_${tname}_test PRIVATE ${PROJECT_NAME} ${lib} ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
 		target_include_directories(ic_${tname}_test SYSTEM PRIVATE ${turtle} ${Boost_INCLUDE_DIR} "${CMAKE_CURRENT_LIST_DIR}/${path}")
 		add_test(NAME ic_${tname} COMMAND ic_${tname}_test)
