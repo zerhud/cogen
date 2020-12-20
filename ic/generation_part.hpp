@@ -14,8 +14,8 @@ namespace modegen::ic {
 
 struct gen_settings {
 	std::string_view map_tmpl;
-	std::string_view generator;
 	std::string_view tmpl_file;
+	gen_utils::compilation_config* gen_cfg;
 };
 
 class single_gen_part final {

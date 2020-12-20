@@ -17,11 +17,18 @@
 
 using namespace std::literals;
 
+boost::json::value operator "" _bjson (const char* d, std::size_t l)
+{
+	return boost::json::parse(std::string_view(d,l));
+}
+
 struct single_gen_part_fixture {
 	std::shared_ptr<gen_utils_mocks::dsl_manager> tdsl = std::make_shared<gen_utils_mocks::dsl_manager>();
 	std::shared_ptr<gen_utils_mocks::data_node> main_node = gen_utils_mocks::make_node(0);
 	gen_utils::tree t1;
 
+	std::unique_ptr<gen_utils_mocks::compilation_config> compile_cfg
+		= std::make_unique<gen_utils_mocks::compilation_config>();
 	std::shared_ptr<icmocks::provider> prov = std::make_shared<icmocks::provider>();
 
 	modegen::ic::input all_data;
@@ -46,9 +53,10 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 	t1.add(t1.root(), make_node(1, "n", "v1"));
 	t1.add(t1.root(), make_node(1, "n", "v2"));
 	all_data.add(t1);
+	MOCK_EXPECT(tdsl->to_json).with(compile_cfg.get(), &t1).returns("{\"a\":1}"_bjson);
 	MOCK_EXPECT(prov->generate).once().with("tmpl", mock::any, "file_v1.cpp");
 	MOCK_EXPECT(prov->generate).once().with("tmpl", mock::any, "file_v2.cpp");
-	sg(gen_settings{"file_${n}.cpp"sv, "cpp"sv, "tmpl"sv}, all_data);
+	sg(gen_settings{"file_${n}.cpp"sv, "tmpl"sv, compile_cfg.get()}, all_data);
 }
 BOOST_AUTO_TEST_SUITE_END() // ic
 
