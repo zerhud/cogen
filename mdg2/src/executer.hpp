@@ -9,6 +9,9 @@
 #include <filesystem>
 #include <boost/program_options.hpp>
 
+#include "searcher.hpp"
+#include "parser/ix3/parser.hpp"
+
 namespace mdg2 {
 
 class executer {
@@ -17,6 +20,10 @@ class executer {
 
 	std::filesystem::path self_path;
 	std::filesystem::path program_name;
+
+	searcher data_pathes;
+
+	ix3::parser ix3_loader;
 
 	void set_pathes(std::filesystem::path cur_file);
 	void set_options();
@@ -27,9 +34,10 @@ class executer {
 	void print_help() const ;
 	void dir_mode() const ;
 	void json_mode() const ;
+	void load_inputs() ;
 public:
 	executer(int argc, char** argv);
-	int operator()() const ;
+	int operator()() ;
 };
 
 } // namespace mdg2

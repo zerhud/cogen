@@ -22,13 +22,14 @@ list(FILTER mdg_hdr EXCLUDE REGEX "tests/.*")
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/" FILES ${mdg_src} ${mdg_hdr})
 
 add_executable(${PROJECT_NAME} ${mdg_src} ${mdg_hdr})
-if("${CMAKE_BUILD_TYPE} " EQUAL "Debug ")
+if("${CMAKE_BUILD_TYPE} " STREQUAL "Debug ")
+	message("== build in debug mode")
 	target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG)
 endif()
 
 # generate ix3 example file
-set(build_examples_dir "${CMAKE_CURRENT_BINARY_DIR}/etc/examples")
-set(build_templates_dir "${CMAKE_CURRENT_BINARY_DIR}/etc/tmpls")
+set(build_examples_dir "${CMAKE_CURRENT_BINARY_DIR}/etc/${PROJECT_NAME}/examples")
+set(build_templates_dir "${CMAKE_CURRENT_BINARY_DIR}/etc/${PROJECT_NAME}/tmpls")
 add_custom_command(
 	OUTPUT "${build_examples_dir}/ix3_example"
 	COMMAND "${CMAKE_COMMAND}" -E copy_if_different
@@ -40,7 +41,7 @@ target_sources(${PROJECT_NAME} PRIVATE  "${build_examples_dir}/ix3_example")
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE
 		${Boost_LIBRARIES}
-		input_configurator
+		input_configurator ix3
 		#cppjinja::evaluator
 	)
 

@@ -7,14 +7,16 @@
  *************************************************************************/
 
 #include "executer.hpp"
-#include "searcher.hpp"
 
+#include <regex>
 #include <cassert>
 #include <iostream>
 
 using namespace mdg2;
+using namespace std::literals;
 namespace fs = std::filesystem;
 namespace po = boost::program_options;
+
 
 //boost::program_options::options_description executer::desc("mdg2 options");
 
@@ -33,6 +35,7 @@ void executer::set_pathes(fs::path cur_file)
 {
 	program_name = cur_file.stem();
 	self_path = fs::absolute(cur_file.parent_path()).lexically_normal();
+	data_pathes.add(".").add(xmpl_dir());
 }
 
 void executer::set_options()
@@ -64,11 +67,12 @@ std::filesystem::path executer::xmpl_dir() const
 	return etc_dir() / "examples";
 }
 
-int executer::operator()() const
+int executer::operator()()
 {
 	if(opt_vars.count("help"))
 		print_help();
-	else if(opt_vars["gmode"].as<std::string>()=="json")
+	load_inputs();
+	if(opt_vars["gmode"].as<std::string>()=="json")
 		json_mode();
 	else if(opt_vars["gmode"].as<std::string>()=="dir")
 		dir_mode();
@@ -81,6 +85,18 @@ int executer::operator()() const
 	}
 
 	return 0;
+}
+
+void executer::load_inputs()
+{
+	std::regex key_val_parser("([0-9a-zA-Z_.]+)(=(.+))?", std::regex::egrep);
+	for(auto& input:opt_vars["input"].as<std::vector<std::string>>()) {
+		std::cmatch m;
+		std::regex_match(input.data(), m, key_val_parser);
+		if(m[1] == "ix3") ix3_loader.parse(data_pathes(m[3].str()));
+		else throw std::runtime_error("parser "s + m[1].str() + " are not found"s);
+	}
+	ix3_loader.finish_loads();
 }
 
 void executer::dir_mode() const
