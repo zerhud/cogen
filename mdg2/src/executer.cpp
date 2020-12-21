@@ -7,6 +7,7 @@
  *************************************************************************/
 
 #include "executer.hpp"
+#include "searcher.hpp"
 
 #include <cassert>
 #include <iostream>
