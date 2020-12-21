@@ -23,6 +23,7 @@ class executer {
 
 	std::filesystem::path etc_dir() const ;
 	std::filesystem::path tmpl_dir() const ;
+	std::filesystem::path xmpl_dir() const ;
 	void print_help() const ;
 	void dir_mode() const ;
 	void json_mode() const ;

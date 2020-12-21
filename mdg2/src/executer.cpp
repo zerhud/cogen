@@ -58,6 +58,11 @@ std::filesystem::path executer::tmpl_dir() const
 	return etc_dir() / "tmpls";
 }
 
+std::filesystem::path executer::xmpl_dir() const
+{
+	return etc_dir() / "examples";
+}
+
 int executer::operator()() const
 {
 	if(opt_vars.count("help"))

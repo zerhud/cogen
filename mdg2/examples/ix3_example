@@ -1,0 +1,3 @@
+module mod v1.0:
+
+string foo();
