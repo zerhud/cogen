@@ -6,10 +6,25 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(cppjinja REQUIRED)
 
-add_executable(${PROJECT_NAME} main.cpp)
+file(
+    GLOB_RECURSE mdg_src
+    LIST_DIRECTORIES false
+    RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
+    "${CMAKE_CURRENT_LIST_DIR}/*.cpp")
+file(
+    GLOB_RECURSE mdg_hdr
+    LIST_DIRECTORIES false
+    RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
+    "${CMAKE_CURRENT_LIST_DIR}/*.hpp")
+list(FILTER mdg_src EXCLUDE REGEX "tests/.*")
+list(FILTER mdg_hdr EXCLUDE REGEX "tests/.*")
+source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/" FILES ${mdg_src} ${mdg_hdr})
+
+add_executable(${PROJECT_NAME} ${mdg_src} ${mdg_hdr})
+
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE
 		input_configurator
-		cppjinja::evaluator
+		#cppjinja::evaluator
 	)
 
