@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(cppjinja REQUIRED)
+find_package(Boost COMPONENTS program_options REQUIRED)
 
 file(
     GLOB_RECURSE mdg_src
@@ -27,6 +28,7 @@ endif()
 
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE
+		${Boost_LIBRARIES}
 		input_configurator
 		#cppjinja::evaluator
 	)
