@@ -25,9 +25,6 @@ class executer {
 	boost::program_options::options_description desc;
 	boost::program_options::variables_map opt_vars;
 
-	std::filesystem::path self_path;
-	std::filesystem::path program_name;
-
 	path_config pathes;
 
 	ix3::parser ix3_loader;
