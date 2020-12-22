@@ -47,7 +47,6 @@ int executer::operator()()
 	if(opt_vars.count("help"))
 		print_help();
 	load_inputs();
-	user_data.add( ix3::utils::to_generic_ast()(ix3_loader.result()) );
 	if(opt_vars["gmode"].as<std::string>()=="json")
 		json_mode();
 	else if(opt_vars["gmode"].as<std::string>()=="dir")
@@ -65,6 +64,7 @@ int executer::operator()()
 
 void executer::load_inputs()
 {
+	ix3::parser ix3_loader;
 	std::regex key_val_parser("([0-9a-zA-Z_.]+)(=(.+))?", std::regex::egrep);
 	for(auto& input:opt_vars["input"].as<std::vector<std::string>>()) {
 		std::cmatch m;
@@ -73,6 +73,7 @@ void executer::load_inputs()
 		else throw std::runtime_error("parser "s + m[1].str() + " are not found"s);
 	}
 	ix3_loader.finish_loads();
+	user_data.add( ix3::utils::to_generic_ast()(ix3_loader.result()) );
 }
 
 void executer::dir_mode() const

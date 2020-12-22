@@ -27,7 +27,6 @@ class executer {
 
 	path_config pathes;
 
-	ix3::parser ix3_loader;
 	modegen::ic::input user_data;
 	std::shared_ptr<json_provider> json_out;
 
