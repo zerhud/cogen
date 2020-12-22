@@ -15,30 +15,21 @@
 #include "ix3/utils/to_generic_ast.hpp"
 
 using namespace mdg2;
+using mdg2::path_config;
 using namespace std::literals;
 namespace fs = std::filesystem;
 namespace po = boost::program_options;
 
-
-//boost::program_options::options_description executer::desc("mdg2 options");
-
-executer::executer(int argc, char** argv)
+executer::executer(path_config pc, int argc, char** argv)
 	: desc("mdg2 options")
 	, json_out(std::make_shared<json_provider>())
+	, pathes(std::move(pc))
 {
 	assert(0 < argc);
-	set_pathes(argv[0]);
 	set_options();
 
 	auto opts = po::command_line_parser(argc, argv).options(desc).run();
 	po::store(opts, opt_vars);
-}
-
-void executer::set_pathes(fs::path cur_file)
-{
-	program_name = cur_file.stem();
-	self_path = fs::absolute(cur_file.parent_path()).lexically_normal();
-	data_pathes.add(".").add(xmpl_dir());
 }
 
 void executer::set_options()
@@ -49,25 +40,6 @@ void executer::set_options()
 		("gmode,m", po::value<std::string>()->default_value("json"), "generation mode (\"json\" for generate json and \"dir\" to generate files)")
 		("input,i", po::value<std::vector<std::string>>(), "input (foramt like -Iinterface=some_file). use - for read from std input")
 		;
-}
-
-std::filesystem::path executer::etc_dir() const
-{
-#ifdef DEBUG
-	return self_path / "etc" / program_name;
-#else
-	return (self_path / ".." / "etc" / program_name).lexically_normal();
-#endif
-}
-
-std::filesystem::path executer::tmpl_dir() const
-{
-	return etc_dir() / "tmpls";
-}
-
-std::filesystem::path executer::xmpl_dir() const
-{
-	return etc_dir() / "examples";
 }
 
 int executer::operator()()
@@ -97,7 +69,7 @@ void executer::load_inputs()
 	for(auto& input:opt_vars["input"].as<std::vector<std::string>>()) {
 		std::cmatch m;
 		std::regex_match(input.data(), m, key_val_parser);
-		if(m[1] == "ix3") ix3_loader.parse(data_pathes(m[3].str()));
+		if(m[1] == "ix3") ix3_loader.parse(pathes.input_data(m[3].str()));
 		else throw std::runtime_error("parser "s + m[1].str() + " are not found"s);
 	}
 	ix3_loader.finish_loads();

@@ -13,7 +13,9 @@
 
 int main(int argc,char** argv)
 {
-	mdg2::executer exe(argc, argv);
+	assert(0 < argc);
+	mdg2::path_config pcfg(argv[0]);
+	mdg2::executer exe(std::move(pcfg), argc, argv);
 	return exe();
 	//cppjinja::evtree ev;
 	//return 0;
