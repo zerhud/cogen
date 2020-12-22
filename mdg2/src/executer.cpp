@@ -82,8 +82,8 @@ int executer::operator()()
 		dir_mode();
 	else {
 		std::cerr
-			<< "wront generation mode "
-			<< opt_vars["gmode"].as<std::string>()
+			<< "wrong generation mode "
+			<< std::quoted(opt_vars["gmode"].as<std::string>())
 			<< std::endl;
 		return 1;
 	}
