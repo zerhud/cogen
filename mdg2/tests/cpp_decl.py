@@ -28,3 +28,10 @@ def test_no_config():
     assert len(result) == 1
     check_example_json(result, '', '')
 
+def test_simple_config():
+    r=sp.run(['./mdg2', '-m', 'json', '-o', 'outdir', '-iix3=ix3_example', '-gsimple_example'], stdout=sp.PIPE, stderr=sp.PIPE)
+    assert r.stderr == b''
+    result = json.loads(r.stdout)
+    assert len(result) == 1
+    check_example_json(result, 'template_file.in', 'outdir/output_file.h')
+
