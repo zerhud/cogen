@@ -27,9 +27,11 @@ if("${CMAKE_BUILD_TYPE} " STREQUAL "Debug ")
 	target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG)
 endif()
 
-# generate ix3 example file
 set(build_examples_dir "${CMAKE_CURRENT_BINARY_DIR}/etc/${PROJECT_NAME}/examples")
 set(build_templates_dir "${CMAKE_CURRENT_BINARY_DIR}/etc/${PROJECT_NAME}/tmpls")
+set(build_generators_dir "${CMAKE_CURRENT_BINARY_DIR}/etc/${PROJECT_NAME}/generators")
+
+# generate ix3 example file
 add_custom_command(
 	OUTPUT "${build_examples_dir}/ix3_example"
 	COMMAND "${CMAKE_COMMAND}" -E copy_if_different
@@ -37,6 +39,15 @@ add_custom_command(
 		"${build_examples_dir}/ix3_example"
 	DEPENDS "examples/ix3_example" )
 target_sources(${PROJECT_NAME} PRIVATE  "${build_examples_dir}/ix3_example")
+
+# generators
+add_custom_command(
+	OUTPUT "${build_generators_dir}/cpp_decl.info"
+	COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+		"${CMAKE_CURRENT_LIST_DIR}/generators/cpp_decl.info"
+		"${build_generators_dir}/cpp_decl.info"
+	DEPENDS "generators/cpp_decl.info" )
+target_sources(${PROJECT_NAME} PRIVATE  "${build_generators_dir}/cpp_decl.info")
 
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE

@@ -19,14 +19,17 @@ class path_config final {
 	std::filesystem::path program_name;
 
 	searcher data_pathes;
+	searcher gens_pathes;
 
 	std::filesystem::path etc_dir() const ;
 	std::filesystem::path xmpl_dir() const ;
 	std::filesystem::path tmpl_dir() const ;
+	std::filesystem::path gens_dir() const ;
 public:
 	path_config(const std::filesystem::path& exe_path);
 
 	std::filesystem::path input_data(const std::filesystem::path& fn) const ;
+	std::filesystem::path generator(const std::filesystem::path& fn) const ;
 };
 
 } // namespace mdg2
