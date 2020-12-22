@@ -20,6 +20,7 @@ single_gen_part::single_gen_part(std::shared_ptr<provider> p)
 void single_gen_part::operator()(gen_settings cur_part, input alli) const
 {
 	assert(outside);
+	if(!cur_part.gen_cfg) throw std::runtime_error("no gen configuration in settings");
 	for(auto& [n,d]:compile(cur_part, alli))
 		outside->generate(cur_part.tmpl_file, make_json(cur_part, d), n);
 }

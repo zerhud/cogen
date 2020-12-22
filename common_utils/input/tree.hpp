@@ -21,6 +21,7 @@ namespace gen_utils {
 
 enum class compiler { cpp } ;
 
+//TODO: is it interface or sruct?
 class compilation_config {
 public:
 	virtual ~compilation_config() noexcept =default ;

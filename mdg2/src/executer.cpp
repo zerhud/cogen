@@ -12,6 +12,8 @@
 #include <cassert>
 #include <iostream>
 
+#include "ix3/utils/to_generic_ast.hpp"
+
 using namespace mdg2;
 using namespace std::literals;
 namespace fs = std::filesystem;
@@ -22,6 +24,7 @@ namespace po = boost::program_options;
 
 executer::executer(int argc, char** argv)
 	: desc("mdg2 options")
+	, json_out(std::make_shared<json_provider>())
 {
 	assert(0 < argc);
 	set_pathes(argv[0]);
@@ -72,6 +75,7 @@ int executer::operator()()
 	if(opt_vars.count("help"))
 		print_help();
 	load_inputs();
+	user_data.add( ix3::utils::to_generic_ast()(ix3_loader.result()) );
 	if(opt_vars["gmode"].as<std::string>()=="json")
 		json_mode();
 	else if(opt_vars["gmode"].as<std::string>()=="dir")
@@ -106,7 +110,12 @@ void executer::dir_mode() const
 
 void executer::json_mode() const
 {
-	std::cerr << "json mode are not ready yet" << std::endl;
+	modegen::ic::single_gen_part part(json_out);
+	modegen::ic::gen_settings setts;
+	default_config compil_config;
+	setts.gen_cfg = &compil_config;
+	part(setts, user_data);
+	std::cout << json_out->result() << std::endl;
 }
 
 void executer::print_help() const
