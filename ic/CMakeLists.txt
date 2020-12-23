@@ -35,4 +35,5 @@ if(ENABLE_TESTS)
 
 	add_unit_test(core "tests/" "")
 	add_unit_test(single_gen_part "tests/" "")
+	add_unit_test(ptsetts "tests/" "")
 endif()

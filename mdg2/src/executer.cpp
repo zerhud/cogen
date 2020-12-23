@@ -37,6 +37,7 @@ void executer::set_options()
 	desc.add_options()
 		("help,h", "produce this help message")
 		("outdir,o", po::value<std::string>(), "directory or file where to output")
+		("generator,g", po::value<std::string>(), "generator (info file)")
 		("gmode,m", po::value<std::string>()->default_value("json"), "generation mode (\"json\" for generate json and \"dir\" to generate files)")
 		("input,i", po::value<std::vector<std::string>>(), "input (foramt like -Iinterface=some_file). use - for read from std input")
 		;

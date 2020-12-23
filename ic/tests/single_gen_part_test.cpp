@@ -17,6 +17,11 @@
 
 using namespace std::literals;
 
+std::pmr::string operator "" _s (const char* d, std::size_t l)
+{
+	return std::pmr::string(d, l);
+}
+
 boost::json::value operator "" _bj(const char* d, std::size_t l)
 {
 	return boost::json::parse(std::string_view(d,l));
@@ -61,7 +66,7 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 	});
 	MOCK_EXPECT(prov->generate).once().with("t", R"([{"a":"v1"}])"_bj, "v1.cpp");
 	MOCK_EXPECT(prov->generate).once().with("t", R"([{"a":"v2"}])"_bj, "v2.cpp");
-	sg(gen_settings{"${n}.cpp"sv, "t"sv, compile_cfg.get()}, all_data);
+	sg(gen_settings{"${n}.cpp"_s, "t"_s, compile_cfg.get()}, all_data);
 }
 BOOST_AUTO_TEST_SUITE_END() // ic
 
