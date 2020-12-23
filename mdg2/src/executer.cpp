@@ -50,10 +50,7 @@ int executer::operator()()
 		print_help();
 	load_inputs();
 	json_out->output_dir(opt_vars["outdir"].as<std::string>());
-	auto file = pathes.generator(opt_vars["generator"].as<std::string>()+".info"s);
-	boost::property_tree::ptree setts_tree;
-	boost::property_tree::read_info(file.string(), setts_tree);
-	mdg::ic::ptsetts setts(setts_tree);
+	mdg::ic::ptsetts setts(load_settings());
 	if(opt_vars["gmode"].as<std::string>()=="json")
 		json_mode(setts);
 	else if(opt_vars["gmode"].as<std::string>()=="dir")
@@ -67,6 +64,14 @@ int executer::operator()()
 	}
 
 	return 0;
+}
+
+boost::property_tree::ptree executer::load_settings() const
+{
+	auto file = pathes.generator(opt_vars["generator"].as<std::string>()+".info"s);
+	boost::property_tree::ptree setts_tree;
+	boost::property_tree::read_info(file.string(), setts_tree);
+	return setts_tree;
 }
 
 void executer::load_inputs()
