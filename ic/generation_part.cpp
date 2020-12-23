@@ -12,9 +12,11 @@
 using modegen::ic::input;
 using modegen::ic::single_gen_part;
 
-single_gen_part::single_gen_part(std::shared_ptr<provider> p)
+single_gen_part::single_gen_part(const provider* p)
 	: outside(std::move(p))
 {
+	if(!outside)
+		throw std::runtime_error("cannot create single generation part without provider");
 }
 
 void single_gen_part::operator()(gen_settings cur_part, input alli) const

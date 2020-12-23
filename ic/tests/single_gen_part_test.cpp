@@ -52,9 +52,14 @@ using gen_utils_mocks::make_node;
 using modegen::ic::gen_settings;
 using modegen::ic::single_gen_part;
 
+BOOST_AUTO_TEST_CASE(no_provider)
+{
+	BOOST_CHECK_THROW(single_gen_part(nullptr), std::exception);
+}
+
 BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 {
-	single_gen_part sg(prov);
+	single_gen_part sg(prov.get());
 	t1.add(t1.root(), make_node(1, "n", "v1"));
 	t1.add(t1.root(), make_node(1, "n", "v2"));
 	all_data.add(t1);

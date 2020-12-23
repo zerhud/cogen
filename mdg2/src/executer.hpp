@@ -29,7 +29,6 @@ class executer {
 	path_config pathes;
 
 	modegen::ic::input user_data;
-	std::shared_ptr<json_provider> json_out;
 
 	void set_options();
 

@@ -20,13 +20,13 @@ struct gen_settings {
 };
 
 class single_gen_part final {
-	std::shared_ptr<provider> outside;
+	const provider* outside;
 	boost::json::value make_json(
 	        const gen_settings& setts, const input& data) const ;
 	std::pmr::map<std::pmr::string, input> compile(
 	        const gen_settings& setts, const input& data) const ;
 public:
-	single_gen_part(std::shared_ptr<provider> p);
+	single_gen_part(const provider* p);
 	void operator()(gen_settings cur_part, input alli) const ;
 };
 

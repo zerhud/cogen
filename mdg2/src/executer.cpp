@@ -23,7 +23,6 @@ namespace po = boost::program_options;
 
 executer::executer(path_config pc, int argc, char** argv)
 	: desc("mdg2 options")
-	, json_out(std::make_shared<json_provider>())
 	, pathes(std::move(pc))
 {
 	assert(0 < argc);
@@ -49,7 +48,6 @@ int executer::operator()()
 	if(opt_vars.count("help"))
 		print_help();
 	load_inputs();
-	json_out->output_dir(opt_vars["outdir"].as<std::string>());
 	mdg::ic::ptsetts setts(load_settings());
 	if(opt_vars["gmode"].as<std::string>()=="json")
 		json_mode(setts);
@@ -95,14 +93,16 @@ void executer::dir_mode() const
 
 void executer::json_mode(const mdg::ic::ptsetts& setts) const
 {
-	modegen::ic::single_gen_part part(json_out);
+	json_provider json_out;
+	json_out.output_dir(opt_vars["outdir"].as<std::string>());
+	modegen::ic::single_gen_part part(&json_out);
 	default_config compil_config;
 	for(auto& pname:setts.parts()) {
 		auto ps = setts.part_setts(pname);
 		ps.gen_cfg = &compil_config;
 		part(ps, user_data);
 	}
-	std::cout << json_out->result() << std::endl;
+	std::cout << json_out.result() << std::endl;
 }
 
 void executer::print_help() const
