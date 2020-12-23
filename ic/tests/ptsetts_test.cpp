@@ -25,9 +25,9 @@ BOOST_AUTO_TEST_SUITE(ptsetts)
 BOOST_AUTO_TEST_CASE(map_tmpl)
 {
 	ptree setts;
-	setts.put("parts.a.file", "v_file");
-	setts.put("parts.a.tmpl", "v_tmpl");
-	setts.put("parts.b.tmpl", "v_tmpl2");
+	setts.put("part.a.file", "v_file");
+	setts.put("part.a.tmpl", "v_tmpl");
+	setts.put("part.b.tmpl", "v_tmpl2");
 	ic_ptsetts obj(setts);
 	BOOST_TEST(obj.parts().size() == 2);
 	auto a_setts = obj.part_setts("a"sv);

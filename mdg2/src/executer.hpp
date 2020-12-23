@@ -12,6 +12,7 @@
 #include "json_provider.hpp"
 #include "parser/ix3/parser.hpp"
 #include "ic/generation_part.hpp"
+#include "ic/ptsetts.hpp"
 
 namespace mdg2 {
 
@@ -34,7 +35,7 @@ class executer {
 
 	void print_help() const ;
 	void dir_mode() const ;
-	void json_mode() const ;
+	void json_mode(const mdg::ic::ptsetts& setts) const ;
 	void load_inputs() ;
 public:
 	executer(path_config pc, int argc, char** argv);

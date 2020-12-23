@@ -10,6 +10,11 @@
 
 using mdg2::json_provider;
 
+void json_provider::output_dir(const std::filesystem::path& dir)
+{
+	outdir = dir;
+}
+
 void json_provider::generate(
 	        std::filesystem::path tmpl_file,
 	        const boost::json::value& data,
@@ -18,7 +23,7 @@ void json_provider::generate(
 	boost::json::object result;
 	result["file"] = tmpl_file.string();
 	result["data"] = data;
-	result["out_file"] = out_file;
+	result["out_file"] = outdir.empty() ? out_file : (outdir / out_file).string();
 
 	all_data.emplace_back(result);
 }

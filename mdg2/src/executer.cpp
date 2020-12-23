@@ -11,6 +11,7 @@
 #include <regex>
 #include <cassert>
 #include <iostream>
+#include <boost/property_tree/info_parser.hpp>
 
 #include "ix3/utils/to_generic_ast.hpp"
 
@@ -36,7 +37,7 @@ void executer::set_options()
 {
 	desc.add_options()
 		("help,h", "produce this help message")
-		("outdir,o", po::value<std::string>(), "directory or file where to output")
+		("outdir,o", po::value<std::string>()->default_value(""), "directory or file where to output")
 		("generator,g", po::value<std::string>(), "generator (info file)")
 		("gmode,m", po::value<std::string>()->default_value("json"), "generation mode (\"json\" for generate json and \"dir\" to generate files)")
 		("input,i", po::value<std::vector<std::string>>(), "input (foramt like -Iinterface=some_file). use - for read from std input")
@@ -48,8 +49,13 @@ int executer::operator()()
 	if(opt_vars.count("help"))
 		print_help();
 	load_inputs();
+	json_out->output_dir(opt_vars["outdir"].as<std::string>());
+	auto file = pathes.generator(opt_vars["generator"].as<std::string>()+".info"s);
+	boost::property_tree::ptree setts_tree;
+	boost::property_tree::read_info(file.string(), setts_tree);
+	mdg::ic::ptsetts setts(setts_tree);
 	if(opt_vars["gmode"].as<std::string>()=="json")
-		json_mode();
+		json_mode(setts);
 	else if(opt_vars["gmode"].as<std::string>()=="dir")
 		dir_mode();
 	else {
@@ -82,13 +88,15 @@ void executer::dir_mode() const
 	std::cerr << "dir mode are not ready yet" << std::endl;
 }
 
-void executer::json_mode() const
+void executer::json_mode(const mdg::ic::ptsetts& setts) const
 {
 	modegen::ic::single_gen_part part(json_out);
-	modegen::ic::gen_settings setts;
 	default_config compil_config;
-	setts.gen_cfg = &compil_config;
-	part(setts, user_data);
+	for(auto& pname:setts.parts()) {
+		auto ps = setts.part_setts(pname);
+		ps.gen_cfg = &compil_config;
+		part(ps, user_data);
+	}
 	std::cout << json_out->result() << std::endl;
 }
 

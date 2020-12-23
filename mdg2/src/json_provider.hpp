@@ -14,7 +14,9 @@ namespace mdg2 {
 
 class json_provider : public modegen::ic::provider {
 	mutable boost::json::array all_data;
+	std::filesystem::path outdir;
 public:
+	void output_dir(const std::filesystem::path& dir);
 	void generate(
 	        std::filesystem::path tmpl_file,
 	        const boost::json::value& data,

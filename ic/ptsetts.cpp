@@ -19,7 +19,7 @@ ptsetts::ptsetts(boost::property_tree::ptree s)
 std::pmr::vector<std::pmr::string> ptsetts::parts() const
 {
 	std::pmr::vector<std::pmr::string> ret;
-	for(auto& p:setts.get_child("parts"))
+	for(auto& p:setts.get_child("part"))
 		ret.emplace_back(p.first);
 	return ret;
 }
@@ -27,7 +27,7 @@ std::pmr::vector<std::pmr::string> ptsetts::parts() const
 modegen::ic::gen_settings ptsetts::part_setts(std::string_view p) const
 {
 	modegen::ic::gen_settings ret;
-	ret.map_tmpl = setts.get<std::pmr::string>("parts."s+std::string(p)+".file"s);
-	ret.tmpl_file = setts.get<std::pmr::string>("parts."s+std::string(p)+".tmpl"s);
+	ret.map_tmpl = setts.get<std::pmr::string>("part."s+std::string(p)+".file"s);
+	ret.tmpl_file = setts.get<std::pmr::string>("part."s+std::string(p)+".tmpl"s);
 	return ret;
 }
