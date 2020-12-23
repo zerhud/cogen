@@ -53,7 +53,7 @@ target_link_libraries( ${PROJECT_NAME}
 	PRIVATE
 		${Boost_LIBRARIES}
 		input_configurator ix3
-		#cppjinja::evaluator
+		cppjinja::evaluator cppjinja::loader
 	)
 
 if(ENABLE_TESTS)
