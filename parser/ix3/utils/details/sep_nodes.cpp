@@ -21,7 +21,7 @@ std::optional<std::uint64_t> ix3_root_node::version() const { return 0; }
 boost::json::object ix3_root_node::make_json(const compilation_context& ctx) const
 {
 	boost::json::object ret;
-	ret["name"] = "ix3";
+	ret["name"] = name();
 	boost::json::array& cnt = ret["mods"].emplace_array();
 	for(auto& child:ctx.children(*this))
 		cnt.emplace_back(child->make_json(ctx));

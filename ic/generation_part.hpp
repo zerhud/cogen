@@ -22,6 +22,9 @@ struct gen_settings {
 class single_gen_part final {
 	const provider* outside;
 	boost::json::value make_json(
+			const gen_settings& setts,
+			const gen_utils::tree& data) const ;
+	boost::json::value make_json(
 	        const gen_settings& setts, const input& data) const ;
 	std::pmr::map<std::pmr::string, input> compile(
 	        const gen_settings& setts, const input& data) const ;

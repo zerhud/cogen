@@ -44,6 +44,14 @@ boost::json::value single_gen_part::make_json(
 {
 	boost::json::array data_ar;
 	for(auto& it:data.all())
-		data_ar.emplace_back(it->to_json(*setts.gen_cfg));
+		data_ar.emplace_back(make_json(setts, *it));
 	return data_ar;
+}
+
+boost::json::value single_gen_part::make_json(
+		const gen_settings& setts,
+		const gen_utils::tree& data) const
+{
+	auto ret = data.to_json(*setts.gen_cfg);
+	return ret;
 }
