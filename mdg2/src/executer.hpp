@@ -25,7 +25,6 @@ struct default_config : gen_utils::compilation_config {
 class executer {
 	boost::program_options::options_description desc;
 	boost::program_options::variables_map opt_vars;
-
 	path_config pathes;
 
 	modegen::ic::input user_data;

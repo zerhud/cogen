@@ -7,7 +7,9 @@ def check_example_json(result, tmpl, out):
     assert 'data' in result[0]
     assert result[0]['file'] == tmpl
     assert result[0]['out_file'] == out
-    assert len(result[0]['data']) == 1
+
+def check_example_data(result, count=1):
+    assert len(result[0]['data']) == count
     assert result[0]['data'][0]['name']=='ix3'
     assert len(result[0]['data'][0]['mods'])==1
 
@@ -27,4 +29,5 @@ def test_simple_config():
     result = json.loads(r.stdout)
     assert len(result) == 4
     check_example_json(result, 'declarations.jinja', 'outdir/declarations.hpp')
+    check_example_data(result)
 
