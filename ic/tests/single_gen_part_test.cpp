@@ -13,7 +13,7 @@
 #include <common_utils/tests/mocks.hpp>
 
 #include "mocks.hpp"
-#include "generation_part.hpp"
+#include "single_gen_part.hpp"
 
 using namespace std::literals;
 

@@ -11,7 +11,7 @@
 #include "path_config.hpp"
 #include "json_provider.hpp"
 #include "parser/ix3/parser.hpp"
-#include "ic/generation_part.hpp"
+#include "ic/single_gen_part.hpp"
 #include "ic/ptsetts.hpp"
 
 namespace mdg2 {

@@ -12,7 +12,7 @@
 #include <memory_resource>
 #include <boost/property_tree/ptree.hpp>
 
-#include "generation_part.hpp"
+#include "single_gen_part.hpp"
 
 namespace mdg::ic {
 

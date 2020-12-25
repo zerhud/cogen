@@ -6,7 +6,7 @@
  * or <http://www.gnu.org/licenses/> for details
  *************************************************************************/
 
-#include "generation_part.hpp"
+#include "single_gen_part.hpp"
 #include "common_utils/input/map_to.hpp"
 
 using modegen::ic::input;
