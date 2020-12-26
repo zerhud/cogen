@@ -13,25 +13,29 @@
 void gen_utils::map_to::make_for_name(std::string_view name)
 {
 	result_t cur_data;
-	cur_data.swap(result);
+	result.swap(cur_data);
 	for(auto& item:cur_data) {
 		auto val_list = item.second.var_value_list(name);
 		assert(!val_list.empty());
 		for(auto& val:val_list) {
 			auto tmpl = replace(item.first, name, val);
-			if( tmpl ) result.emplace(*tmpl, copy_for(item.second, name, val));
-			      else result.emplace(std::move(item));
+			if( tmpl ) {
+				auto tree = copy_for(item.second, name, val);
+				assert( tree) ;
+				result.emplace(*tmpl, *tree);
+			}
+			else result.emplace(std::move(item));
 		}
 	}
 }
 
-gen_utils::tree gen_utils::map_to::copy_for(
+std::optional<gen_utils::tree> gen_utils::map_to::copy_for(
 		tree& data, std::string_view name, std::string_view value) const
 {
-	return data.copy([&name,&value](const data_node& n){
+	return data.copy_if([&name, &value](const data_node &n) {
 		auto var = n.node_var();
 		if(!var || var->name!=name) return true;
-		return var->value==value;
+		return var->value == value;
 	});
 }
 

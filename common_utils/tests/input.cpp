@@ -15,6 +15,7 @@
 
 #include "common_utils/input/tree.hpp"
 #include "common_utils/input/map_to.hpp"
+#include "common_utils/input/complilation_config.hpp"
 #include "mocks.hpp"
 
 using namespace std::literals;
@@ -153,16 +154,13 @@ BOOST_FIXTURE_TEST_CASE(no_cond, fixture)
 	tree().add(tree().root(), child1);
 	tree().add(*child1, child11);
 
-	auto tcopy = tree().copy(gen_utils::tree::copy_condition{});
-	BOOST_TEST(&tcopy.root() == &tree().root());
-	BOOST_TEST(tcopy.children(tree().root()).at(0) == child1);
-	BOOST_TEST(tcopy.children(*child1).at(0) == child11);
+	auto tcopy = tree().copy_if(gen_utils::tree::copy_condition{});
+	BOOST_CHECK( !tcopy.has_value()) ;
 }
 BOOST_FIXTURE_TEST_CASE(empty_tree, fixture)
 {
-	auto tc = tree().copy([](auto&){return false;});
-	BOOST_TEST(&tc.root() == &tree().root());
-	BOOST_TEST(tc.children(tree().root()).size()==0);
+	auto tc = tree().copy_if([](auto &) { return false; });
+	BOOST_CHECK( !tc);
 }
 BOOST_FIXTURE_TEST_CASE(few_childs, fixture)
 {
@@ -175,26 +173,59 @@ BOOST_FIXTURE_TEST_CASE(few_childs, fixture)
 	tree().add(*child1, child11);
 	tree().add(*child1, child12);
 
-	auto tc = tree().copy( [child2, child12](auto& n){
-		return !(&n==child2.get() || &n==child12.get());});
-	BOOST_TEST_REQUIRE(tc.children(tc.root()).size()==1);
-	BOOST_TEST(tc.children(tc.root())[0] == child1);
-	BOOST_TEST(tc.children(*child1).size() == 1);
-	BOOST_TEST(tc.children(*child1).at(0) == child11);
+	auto tc = tree().copy_if([child2, child12](auto &n) {
+		return !(&n == child2.get() || &n == child12.get());
+	});
+	BOOST_CHECK( tc.has_value()) ;
+	BOOST_TEST_REQUIRE(tc.value().children(tc->root()).size()==1);
+	BOOST_TEST(tc.value().children(tc->root())[0] == child1);
+	BOOST_TEST(tc.value().children(*child1).size() == 1);
+	BOOST_TEST(tc.value().children(*child1).at(0) == child11);
 }
 BOOST_FIXTURE_TEST_CASE(getters, fixture)
 {
 	auto child1 = make_node(std::nullopt);
 	tree().add(tree().root(), child1);
-	auto tc_1 = tree().copy( [](auto&){ return true; } );
-	BOOST_TEST(tc_1.data_id()==tree().data_id());
-	BOOST_TEST(tc_1.root_version()==tree().root_version());
+	auto tc_1 = tree().copy_if([](auto &) { return true; });
+	BOOST_CHECK( tc_1.has_value()) ;
+	BOOST_TEST(tc_1.value().data_id()==tree().data_id());
+	BOOST_TEST(tc_1.value().root_version()==tree().root_version());
 
 	tree().root_version(10);
-	BOOST_TEST(tc_1.root_version()!=tree().root_version());
-	auto tc_2 = tree().copy([](auto&){ return true; } );
-	BOOST_TEST(tc_2.root_version() == tree().root_version());
+	BOOST_TEST(tc_1.value().root_version()!=tree().root_version());
+	auto tc_2 = tree().copy_if([](auto &) { return true; });
+	BOOST_CHECK( tc_2.has_value()) ;
+	BOOST_TEST(tc_2.value().root_version() == tree().root_version());
 }
+
+BOOST_FIXTURE_TEST_CASE(uncond_parent_not_copying_children, fixture)
+{
+	auto child1   = make_node(std::nullopt, "child1", "1");
+	auto child11  = make_node(std::nullopt, "child11", "1");
+	auto child111 = make_node(std::nullopt, "child111", "1");
+	auto child12  = make_node(std::nullopt, "child12", "1");
+	auto child2   = make_node(std::nullopt, "child2", "1");
+	auto child21  = make_node(std::nullopt, "child21", "1");
+	auto child211 = make_node(std::nullopt, "child211", "1");
+
+	tree().add(tree().root(), child1);
+	tree().add(tree().root(), child2);
+	tree().add(*child1, child11);
+	tree().add(*child11, child111);
+	tree().add(*child1, child12);
+	tree().add(*child2, child21);
+	tree().add(*child2, child211);
+
+	auto cp = tree().copy_if([child2, child11](auto &node) {
+		return &node != child2.get() && &node != child11.get();
+	});
+	BOOST_CHECK( cp.has_value()) ;
+	auto names = cp.value().var_name_list() ;
+
+	BOOST_TEST( names.size() == 2) ;
+	for( auto name :names) BOOST_CHECK( name != "child2"sv && name != "child11"sv);
+}
+
 BOOST_AUTO_TEST_SUITE_END() // copy
 BOOST_FIXTURE_TEST_CASE(node_variables, fixture)
 {
@@ -306,4 +337,13 @@ BOOST_FIXTURE_TEST_CASE(double_use, fixture)
 }
 BOOST_AUTO_TEST_SUITE_END() // tree_map_to
 
+BOOST_AUTO_TEST_SUITE(compilation_config)
+std::shared_ptr<gen_utils::compilation_config> config =
+	  std::make_shared<gen_utils::compilation_config_impl::compilation_config>(gen_utils::compiler::cpp) ;
+BOOST_AUTO_TEST_CASE(compliller_name)
+{
+	BOOST_CHECK( gen_utils::compiler::cpp == config->compiler_name()) ;
+
+}
+BOOST_AUTO_TEST_SUITE_END() // compilation_config
 BOOST_AUTO_TEST_SUITE_END() // input

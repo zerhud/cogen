@@ -121,16 +121,18 @@ std::pmr::vector<std::pmr::string> tree::var_value_list(std::string_view name) c
 	return ret;
 }
 
-tree tree::copy(const tree::copy_condition& cond) const
+std::optional<tree> tree::copy_if(const tree::copy_condition& cond) const
 {
-	if(!cond) return *this;
+	std::optional<tree> ret ;
 
-	tree ret(store[0], dmanager);
-	ret.root_ver = root_ver;
+	if( !cond || !cond(root()) ) return ret ;
+
+	ret.emplace(store[0], dmanager);
+	ret->root_ver = root_ver;
 	for(auto& e:edges) if(cond(*e.parent)) {
-		auto& ce = ret.edges.emplace_back(edge{e.parent, {}});
+		auto& ce = ret->edges.emplace_back(edge{e.parent, {}});
 		for(auto& c:e.children) if(cond(*c)) {
-			ret.store.emplace_back(c);
+			ret->store.emplace_back(c);
 			ce.children.emplace_back(c);
 		}
 	}
