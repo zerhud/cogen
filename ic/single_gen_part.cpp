@@ -21,7 +21,7 @@ single_gen_part::single_gen_part(const provider* p)
 				"part without provider");
 }
 
-void single_gen_part::operator()(gen_settings cur_part, input alli) const
+void single_gen_part::operator()(const gen_settings& cur_part, input alli) const
 {
 	assert(outside);
 	if(!cur_part.gen_cfg)
@@ -58,6 +58,8 @@ boost::json::value single_gen_part::make_json(
 		const gen_settings& setts,
 		const gen_utils::tree& data) const
 {
-	auto ret = data.to_json(*setts.gen_cfg);
+	auto ret = data.to_json(*setts.gen_cfg).as_object();
+	//auto& incs = ret["includes"].emplace_array();
+	//incs.emplace_back().as_object();
 	return ret;
 }

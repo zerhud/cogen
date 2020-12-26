@@ -13,11 +13,7 @@
 
 namespace modegen::ic {
 
-struct gen_settings {
-	std::pmr::string map_tmpl;
-	std::pmr::string tmpl_file;
-	gen_utils::compilation_config* gen_cfg;
-};
+struct gen_settings;
 
 class single_gen_part final {
 	const provider* outside;
@@ -30,7 +26,15 @@ class single_gen_part final {
 	        const gen_settings& setts, const input& data) const ;
 public:
 	single_gen_part(const provider* p);
-	void operator()(gen_settings cur_part, input alli) const ;
+	void operator()(const gen_settings& cur_part, input alli) const ;
+};
+
+struct gen_settings {
+	std::pmr::string map_tmpl;
+	std::pmr::string tmpl_file;
+	gen_utils::compilation_config* gen_cfg;
+	std::pmr::vector<std::pmr::string> links;
+	std::pmr::map<std::pmr::string, single_gen_part> generated;
 };
 
 } // namespace modegen::ic
