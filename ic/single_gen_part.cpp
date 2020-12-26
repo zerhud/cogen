@@ -16,15 +16,21 @@ single_gen_part::single_gen_part(const provider* p)
 	: outside(std::move(p))
 {
 	if(!outside)
-		throw std::runtime_error("cannot create single generation part without provider");
+		throw std::runtime_error(
+				"cannot create single generation "
+				"part without provider");
 }
 
 void single_gen_part::operator()(gen_settings cur_part, input alli) const
 {
 	assert(outside);
-	if(!cur_part.gen_cfg) throw std::runtime_error("no gen configuration in settings");
+	if(!cur_part.gen_cfg)
+		throw std::runtime_error("no gen configuration in settings");
 	for(auto& [n,d]:compile(cur_part, alli))
-		outside->generate(cur_part.tmpl_file, make_json(cur_part, d), n);
+		outside->generate(
+				cur_part.tmpl_file,
+				make_json(cur_part, d),
+				n);
 }
 
 std::pmr::map<std::pmr::string, input> single_gen_part::compile(

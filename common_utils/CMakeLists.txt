@@ -39,4 +39,5 @@ if(ENABLE_TESTS)
 
 	add_unit_test(naming "tests/" "")
 	add_unit_test(input "tests/" "")
+	add_unit_test(links_manager "tests/" "")
 endif()
