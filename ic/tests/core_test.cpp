@@ -138,7 +138,8 @@ BOOST_FIXTURE_TEST_CASE(mapping, core_fixture)
 	create_parts();
 
 	ic_input all_dsl;
-	gen_utils::tree dsl{gen_utils_mocks::make_node(1, "vn"_s, "v1"_s), dmanager};
+	gen_utils::tree dsl{gen_utils_mocks::make_node(1), dmanager};
+	dsl.add(dsl.root(), gen_utils_mocks::make_node(1, "vn"_s, "v1"_s));
 	dsl.add(dsl.root(), gen_utils_mocks::make_node(1, "vn"_s, "v2"_s));
 	all_dsl.add(std::move(dsl));
 	MOCK_EXPECT(config->all_dsl).returns(all_dsl);

@@ -13,7 +13,7 @@
 void gen_utils::map_to::make_for_name(std::string_view name)
 {
 	result_t cur_data;
-	cur_data.swap(result);
+	result.swap(cur_data);
 	for(auto& item:cur_data) {
 		auto val_list = item.second.var_value_list(name);
 		assert(!val_list.empty());
