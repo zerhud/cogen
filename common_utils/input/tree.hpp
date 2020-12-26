@@ -88,6 +88,7 @@ public:
 
 	void add(const data_node& par, node_ptr child);
 	[[nodiscard]] std::pmr::vector<node_ptr> children(const data_node& par) const ;
+	[[nodiscard]] bool contains(const node_ptr& n) const ;
 
 	[[nodiscard]] std::uint64_t root_version() const ;
 	void root_version(std::uint64_t v) ;

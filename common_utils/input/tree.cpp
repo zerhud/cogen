@@ -69,6 +69,11 @@ std::pmr::vector<node_ptr> tree::children(const data_node& par) const
 	return {};
 }
 
+bool tree::contains(const node_ptr& n) const
+{
+	return n && node_exists(n.get());
+}
+
 bool tree::node_exists(const data_node *n) const
 {
 	auto pos = std::find_if(

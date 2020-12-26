@@ -249,6 +249,19 @@ BOOST_FIXTURE_TEST_CASE(node_variables, fixture)
 	BOOST_TEST_CONTEXT("var values list for vn3")
 	check_vec(tree().var_value_list("vn3"), {"vv3_1"sv, "vv3_2"sv});
 }
+BOOST_FIXTURE_TEST_CASE(contains, fixture)
+{
+	auto c1 = make_node(std::nullopt);
+	auto c2 = make_node(std::nullopt);
+	auto c11 = make_node(std::nullopt);
+	tree().add(tree().root(), c1);
+	tree().add(tree().root(), c2);
+	BOOST_CHECK( tree().contains(c1) );
+	BOOST_CHECK( tree().contains(c2) );
+	BOOST_CHECK( !tree().contains(c11) );
+	tree().add(*c1, c11);
+	BOOST_CHECK( tree().contains(c11) );
+}
 BOOST_AUTO_TEST_SUITE_END() // tree
 BOOST_AUTO_TEST_SUITE(tree_map_to)
 using gen_utils::map_to;
