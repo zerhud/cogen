@@ -28,6 +28,7 @@ private:
 			) const ;
 	void make_for_name(std::string_view name) ;
 	std::optional<tree> copy_for(tree& data, std::string_view name, std::string_view value) const ;
+	void build_item(std::string_view name, result_t::value_type item);
 
 	result_t result;
 };

@@ -14,18 +14,22 @@ void gen_utils::map_to::make_for_name(std::string_view name)
 {
 	result_t cur_data;
 	result.swap(cur_data);
-	for(auto& item:cur_data) {
-		auto val_list = item.second.var_value_list(name);
-		assert(!val_list.empty());
-		for(auto& val:val_list) {
-			auto tmpl = replace(item.first, name, val);
-			if( tmpl ) {
-				auto tree = copy_for(item.second, name, val);
-				assert( tree) ;
-				result.emplace(*tmpl, *tree);
-			}
-			else result.emplace(std::move(item));
+	for(auto& item:cur_data) build_item(name, std::move(item));
+}
+
+void gen_utils::map_to::build_item(
+		std::string_view name, result_t::value_type item)
+{
+	auto val_list = item.second.var_value_list(name);
+	assert(!val_list.empty());
+	for(auto& val:val_list) {
+		auto tmpl = replace(item.first, name, val);
+		if( tmpl ) {
+			auto tree = copy_for(item.second, name, val);
+			assert( tree) ;
+			result.emplace(*tmpl, *tree);
 		}
+		else result.emplace(std::move(item));
 	}
 }
 
