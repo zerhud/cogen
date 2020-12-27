@@ -24,9 +24,9 @@ std::pmr::vector<std::pmr::string> ptsetts::parts() const
 	return ret;
 }
 
-modegen::ic::gen_settings ptsetts::part_setts(std::string_view p) const
+modegen::ic::gen_context ptsetts::part_setts(std::string_view p) const
 {
-	modegen::ic::gen_settings ret;
+	modegen::ic::gen_context ret;
 	ret.map_tmpl = setts.get<std::pmr::string>("part."s+std::string(p)+".file"s);
 	ret.tmpl_file = setts.get<std::pmr::string>("part."s+std::string(p)+".tmpl"s);
 	return ret;

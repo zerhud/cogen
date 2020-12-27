@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_SUITE(ic)
 
 using gen_utils_mocks::make_node;
 
-using modegen::ic::gen_settings;
+using modegen::ic::gen_context;
 using modegen::ic::single_gen_part;
 
 BOOST_AUTO_TEST_CASE(no_provider)
@@ -71,7 +71,7 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 	});
 	MOCK_EXPECT(prov->generate).once().with("t", R"([{"a":"v1"}])"_bj, "v1.cpp");
 	MOCK_EXPECT(prov->generate).once().with("t", R"([{"a":"v2"}])"_bj, "v2.cpp");
-	sg(gen_settings{"${n}.cpp"_s, "t"_s, compile_cfg.get()}, all_data);
+	sg(gen_context{"${n}.cpp"_s, "t"_s, compile_cfg.get()}, all_data);
 }
 BOOST_AUTO_TEST_SUITE_END() // ic
 

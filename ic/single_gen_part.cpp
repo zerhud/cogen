@@ -21,7 +21,7 @@ single_gen_part::single_gen_part(const provider* p)
 				"part without provider");
 }
 
-void single_gen_part::operator()(const gen_settings& cur_part, input alli) const
+void single_gen_part::operator()(const gen_context& cur_part, input alli) const
 {
 	assert(outside);
 	if(!cur_part.gen_cfg)
@@ -34,7 +34,7 @@ void single_gen_part::operator()(const gen_settings& cur_part, input alli) const
 }
 
 std::pmr::map<std::pmr::string, input> single_gen_part::compile(
-    const gen_settings& setts, const input& data) const
+    const gen_context& setts, const input& data) const
 {
 	gen_utils::map_to mapper;
 	std::pmr::map<std::pmr::string, input> ret;
@@ -46,7 +46,7 @@ std::pmr::map<std::pmr::string, input> single_gen_part::compile(
 }
 
 boost::json::value single_gen_part::make_json(
-        const gen_settings& setts, const input& data) const
+        const gen_context& setts, const input& data) const
 {
 	boost::json::array data_ar;
 	for(auto& it:data.all())
@@ -55,7 +55,7 @@ boost::json::value single_gen_part::make_json(
 }
 
 boost::json::value single_gen_part::make_json(
-		const gen_settings& setts,
+        const gen_context& setts,
 		const gen_utils::tree& data) const
 {
 	auto ret = data.to_json(*setts.gen_cfg).as_object();

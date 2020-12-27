@@ -13,23 +13,23 @@
 
 namespace modegen::ic {
 
-struct gen_settings;
+struct gen_context;
 
 class single_gen_part final {
 	const provider* outside;
 	boost::json::value make_json(
-			const gen_settings& setts,
+	        const gen_context& setts,
 			const gen_utils::tree& data) const ;
 	boost::json::value make_json(
-	        const gen_settings& setts, const input& data) const ;
+	        const gen_context& setts, const input& data) const ;
 	std::pmr::map<std::pmr::string, input> compile(
-	        const gen_settings& setts, const input& data) const ;
+	        const gen_context& setts, const input& data) const ;
 public:
 	single_gen_part(const provider* p);
-	void operator()(const gen_settings& cur_part, input alli) const ;
+	void operator()(const gen_context& cur_part, input alli) const ;
 };
 
-struct gen_settings {
+struct gen_context {
 	std::pmr::string map_tmpl;
 	std::pmr::string tmpl_file;
 	gen_utils::compilation_config* gen_cfg;

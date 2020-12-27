@@ -22,7 +22,7 @@ public:
 	ptsetts(boost::property_tree::ptree s);
 
 	std::pmr::vector<std::pmr::string> parts() const ;
-	modegen::ic::gen_settings part_setts(std::string_view p) const ;
+	modegen::ic::gen_context part_setts(std::string_view p) const ;
 };
 
 } // namespace mdg::ic
