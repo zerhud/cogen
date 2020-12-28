@@ -262,6 +262,27 @@ BOOST_FIXTURE_TEST_CASE(contains, fixture)
 	tree().add(*c1, c11);
 	BOOST_CHECK( tree().contains(c11) );
 }
+BOOST_FIXTURE_TEST_CASE(contains_tree, fixture)
+{
+	auto c1 = make_node(200);
+	auto c11 = make_node(std::nullopt);
+	tree().add(tree().root(), c1);
+	tree().add(*c1, c11);
+	gen_utils::tree t2(main_node, dmanager);
+	BOOST_CHECK(tree().contains(t2) == gen_utils::tree_compare_result::partial);
+	t2.add(t2.root(), c1);
+	BOOST_CHECK(tree().contains(t2) == gen_utils::tree_compare_result::partial);
+	t2.add(*c1, c11);
+	BOOST_CHECK(tree().contains(t2) == gen_utils::tree_compare_result::total);
+
+	gen_utils::tree t3(c1, dmanager);
+	BOOST_CHECK(tree().contains(t3) == gen_utils::tree_compare_result::none);
+
+	auto t4dm = std::make_shared<gen_utils_mocks::dsl_manager>();
+	MOCK_EXPECT(t4dm->id).returns("tt");
+	gen_utils::tree t4(c1, t4dm);
+	BOOST_CHECK(tree().contains(t4) == gen_utils::tree_compare_result::not_comparable);
+}
 BOOST_AUTO_TEST_SUITE_END() // tree
 BOOST_AUTO_TEST_SUITE(tree_map_to)
 using gen_utils::map_to;

@@ -11,6 +11,7 @@
 
 using modegen::ic::input;
 using modegen::ic::single_gen_part;
+using modegen::ic::compiled_output;
 
 single_gen_part::single_gen_part(const provider* p)
 	: outside(std::move(p))
@@ -21,20 +22,22 @@ single_gen_part::single_gen_part(const provider* p)
 				"part without provider");
 }
 
-void single_gen_part::operator()(const gen_context& cur_part, input alli) const
+compiled_output single_gen_part::operator()(const gen_context& cur_part, input alli) const
 {
 	assert(outside);
 	if(!cur_part.gen_cfg)
 		throw std::runtime_error("no gen configuration in settings");
-	for(auto& [n,d]:compile(cur_part, alli))
+	auto compiled = compile(cur_part, alli);
+	for(auto& [n,d]:compiled)
 		outside->generate(
 				cur_part.tmpl_file,
 				make_json(cur_part, d),
 				n);
+	return compiled;
 }
 
-std::pmr::map<std::pmr::string, input> single_gen_part::compile(
-    const gen_context& setts, const input& data) const
+compiled_output single_gen_part::compile(
+        const gen_context& setts, const input& data) const
 {
 	gen_utils::map_to mapper;
 	std::pmr::map<std::pmr::string, input> ret;
@@ -49,17 +52,24 @@ boost::json::value single_gen_part::make_json(
         const gen_context& setts, const input& data) const
 {
 	boost::json::array data_ar;
-	for(auto& it:data.all())
-		data_ar.emplace_back(make_json(setts, *it));
+	for(auto& it:data.all()) {
+		auto& dobj = data_ar.emplace_back(make_json(setts, *it)).as_object();
+		auto& incs = dobj["includes"].emplace_array();
+	}
 	return data_ar;
 }
 
 boost::json::value single_gen_part::make_json(
         const gen_context& setts,
-		const gen_utils::tree& data) const
+        const gen_utils::tree& data) const
 {
 	auto ret = data.to_json(*setts.gen_cfg).as_object();
 	//auto& incs = ret["includes"].emplace_array();
-	//incs.emplace_back().as_object();
+	//for(auto& link:setts.links) {
+	    //const compiled_output& ldata = setts.generated.at(link);
+	    //for(auto& [dn, dt]:ldata) {
+	        //incs.emplace_back().as_object();
+	    //}
+	//}
 	return ret;
 }

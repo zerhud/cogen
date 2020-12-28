@@ -74,6 +74,21 @@ bool tree::contains(const node_ptr& n) const
 	return n && node_exists(n.get());
 }
 
+tree_compare_result tree::contains(const tree& other) const
+{
+	if(data_id() != other.data_id())
+		return tree_compare_result::not_comparable;
+	if(&root() != &other.root())
+		return tree_compare_result::none;
+	auto beg = store.begin();
+	for(;beg!=store.end();++beg)
+		if(!other.node_exists(beg->get()))
+			break;
+	return beg==store.end()
+	          ? tree_compare_result::total
+	          : tree_compare_result::partial;
+}
+
 bool tree::node_exists(const data_node *n) const
 {
 	auto pos = std::find_if(
