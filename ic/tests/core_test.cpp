@@ -204,6 +204,40 @@ BOOST_AUTO_TEST_CASE(adding_other)
 	i2.add(std::move(i1));
 	BOOST_TEST(i2.all().size()==2);
 }
+BOOST_AUTO_TEST_CASE(contains)
+{
+	auto m1 = std::make_shared<gen_utils_mocks::dsl_manager>();
+	auto m2 = std::make_shared<gen_utils_mocks::dsl_manager>();
+	auto m3 = std::make_shared<gen_utils_mocks::dsl_manager>();
+	MOCK_EXPECT(m1->id).returns("id1");
+	MOCK_EXPECT(m2->id).returns("id2");
+	MOCK_EXPECT(m3->id).returns("id3");
+	auto t1_r = gen_utils_mocks::make_node(1);
+	auto t2_r = gen_utils_mocks::make_node(2);
+	auto t3_r = gen_utils_mocks::make_node(3);
+	auto t3_n = gen_utils_mocks::make_node(31);
+	gen_utils::tree t1(t1_r, m1);
+	gen_utils::tree t2(t2_r, m2);
+	gen_utils::tree t3(t3_r, m3);
+	gen_utils::tree t4(t3_r, m3);
+	t3.add(t3.root(), t3_n);
+
+	ic_input i1, i2, i3;
+	BOOST_CHECK( i1.contains(i2) == gen_utils::tree_compare_result::total );
+
+	i1.add(t1);
+	i2.add(t3);
+	i3.add(t4);
+
+	BOOST_CHECK( i1.contains(i2) == gen_utils::tree_compare_result::none );
+
+	i1.add(t3); // i1 - t1, t3
+	BOOST_CHECK( i1.contains(i2) == gen_utils::tree_compare_result::partial );
+	BOOST_CHECK( i2.contains(i3) == gen_utils::tree_compare_result::partial );
+
+	i2.add(t1); // t2 - t3, t1
+	BOOST_CHECK( i1.contains(i2) == gen_utils::tree_compare_result::total );
+}
 BOOST_AUTO_TEST_SUITE_END() // input
 
 BOOST_AUTO_TEST_SUITE_END() // input_configurator

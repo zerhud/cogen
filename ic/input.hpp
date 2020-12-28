@@ -25,9 +25,14 @@ public:
 
 	void add(input&& other);
 	void add(gen_utils::tree data);
+
 	[[nodiscard]] std::pmr::vector<const gen_utils::tree*> select(
 			std::string_view id) const ;
+
 	[[nodiscard]] std::pmr::vector<const gen_utils::tree*> all() const ;
+
+	[[nodiscard]]
+	gen_utils::tree_compare_result contains(const input& other) const ;
 };
 
 
