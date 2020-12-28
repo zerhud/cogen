@@ -55,6 +55,20 @@ boost::json::value single_gen_part::make_json(
 	for(auto& it:data.all()) {
 		auto& dobj = data_ar.emplace_back(make_json(setts, *it)).as_object();
 		auto& incs = dobj["includes"].emplace_array();
+		for(auto& link:setts.links) {
+			const compiled_output& ldata = setts.generated.at(link);
+			for(auto& [dn, dt]:ldata) {
+				auto rc = data.contains(dt);
+				if(rc==gen_utils::tree_compare_result::total) {
+					incs.clear();
+					incs.emplace_back(dn);
+					break;
+				}
+				if(rc==gen_utils::tree_compare_result::partial) {
+					incs.emplace_back(dn);
+				}
+			}
+		}
 	}
 	return data_ar;
 }

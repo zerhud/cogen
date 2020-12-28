@@ -101,11 +101,23 @@ BOOST_FIXTURE_TEST_CASE(includes, single_gen_part_fixture)
 	        .once().with("t", R"([{"includes":[]}])"_bj, "v2");
 	gen_context ctx{"${n}"_s, "t"_s, compile_cfg.get()};
 	ctx.generated["a"] = sg(ctx, all_data);
-	ctx.links.emplace_back("a");
+
 	ctx.map_tmpl = "f.cpp";
-	//MOCK_EXPECT(prov->generate)
-	        //.once().with("t", R"([{"includes":["v1","v2"]}])"_bj, "f.cpp");
-	//ctx.generated["b"] = sg(ctx, all_data);
+	MOCK_EXPECT(prov->generate)
+	        .once().with("t", R"([{"includes":[]}])"_bj, "f.cpp");
+	sg(ctx, all_data);
+
+	ctx.links.emplace_back("a");
+	MOCK_EXPECT(prov->generate)
+	        .once().with("t", R"([{"includes":["v1","v2"]}])"_bj, "f.cpp");
+	ctx.generated["b"] = sg(ctx, all_data);
+
+	ctx.map_tmpl = "${n}";
+	MOCK_EXPECT(prov->generate)
+	        .once().with("t", R"([{"includes":["v1"]}])"_bj, "v1");
+	MOCK_EXPECT(prov->generate)
+	        .once().with("t", R"([{"includes":["v2"]}])"_bj, "v2");
+	ctx.generated["c"] = sg(ctx, all_data);
 }
 BOOST_AUTO_TEST_SUITE_END() // single_gen_part
 BOOST_AUTO_TEST_SUITE_END() // input_configurator
