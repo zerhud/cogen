@@ -251,19 +251,6 @@ BOOST_FIXTURE_TEST_CASE(node_variables, fixture)
 }
 BOOST_FIXTURE_TEST_CASE(contains, fixture)
 {
-	auto c1 = make_node(std::nullopt);
-	auto c2 = make_node(std::nullopt);
-	auto c11 = make_node(std::nullopt);
-	tree().add(tree().root(), c1);
-	tree().add(tree().root(), c2);
-	BOOST_CHECK( tree().contains(c1) );
-	BOOST_CHECK( tree().contains(c2) );
-	BOOST_CHECK( !tree().contains(c11) );
-	tree().add(*c1, c11);
-	BOOST_CHECK( tree().contains(c11) );
-}
-BOOST_FIXTURE_TEST_CASE(contains_tree, fixture)
-{
 	auto c1 = make_node(200);
 	auto c11 = make_node(std::nullopt);
 	tree().add(tree().root(), c1);

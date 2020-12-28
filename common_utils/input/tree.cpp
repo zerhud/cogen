@@ -69,11 +69,6 @@ std::pmr::vector<node_ptr> tree::children(const data_node& par) const
 	return {};
 }
 
-bool tree::contains(const node_ptr& n) const
-{
-	return n && node_exists(n.get());
-}
-
 tree_compare_result tree::contains(const tree& other) const
 {
 	if(data_id() != other.data_id())
