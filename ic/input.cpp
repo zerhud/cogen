@@ -42,18 +42,19 @@ gen_utils::tree_compare_result input::contains(const input& other) const
 {
 	using gen_utils::tree_compare_result;
 	tree_compare_result result = tree_compare_result::none;
-	if(all().empty() && other.all().empty())
+	if(storage.empty() && other.storage.empty())
 		return tree_compare_result::total;
-	for(auto ot:other.all()) {
-		for(auto st:all()) {
-			auto r = st->contains(*ot);
+	for(auto& ot:other.storage) {
+		for(auto& st:storage) {
+			auto r = st.contains(ot);
 			if( r == tree_compare_result::partial )
 				return tree_compare_result::partial;
 			if( r == tree_compare_result::total )
 				result = tree_compare_result::total;
 		}
 	}
-	if(result == tree_compare_result::total && other.all().size() != all().size())
+	if(result == tree_compare_result::total
+	        && other.storage.size() != storage.size())
 		result = tree_compare_result::partial;
 	return result;
 }
