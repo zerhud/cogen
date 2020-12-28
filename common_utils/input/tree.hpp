@@ -20,7 +20,7 @@
 namespace gen_utils {
 
 enum class compiler { cpp } ;
-enum class tree_compare_result { not_comparable, none, partial, total };
+enum class tree_compare_result { not_comparable, none, only_root, partial, total };
 
 //TODO: is it interface or sruct?
 class compilation_config {

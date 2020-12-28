@@ -256,7 +256,7 @@ BOOST_FIXTURE_TEST_CASE(contains, fixture)
 	tree().add(tree().root(), c1);
 	tree().add(*c1, c11);
 	gen_utils::tree t2(main_node, dmanager);
-	BOOST_CHECK(tree().contains(t2) == gen_utils::tree_compare_result::partial);
+	BOOST_CHECK(tree().contains(t2) == gen_utils::tree_compare_result::only_root);
 	t2.add(t2.root(), c1);
 	BOOST_CHECK(tree().contains(t2) == gen_utils::tree_compare_result::partial);
 	t2.add(*c1, c11);

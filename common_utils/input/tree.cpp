@@ -76,10 +76,13 @@ tree_compare_result tree::contains(const tree& other) const
 	if(&root() != &other.root())
 		return tree_compare_result::none;
 	auto beg = store.begin();
-	for(;beg!=store.end();++beg)
-		if(!other.node_exists(beg->get()))
-			break;
-	return beg==store.end()
+	std::size_t match_count = 0;
+	for(;beg!=store.end();++beg) {
+		if(other.node_exists(beg->get())) ++match_count;
+		else break;
+	}
+	if(match_count == 1) return tree_compare_result::only_root;
+	return match_count == store.size()
 	          ? tree_compare_result::total
 	          : tree_compare_result::partial;
 }

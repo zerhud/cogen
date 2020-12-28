@@ -51,6 +51,8 @@ gen_utils::tree_compare_result input::contains(const input& other) const
 				return tree_compare_result::partial;
 			if( r == tree_compare_result::total )
 				result = tree_compare_result::total;
+			else if( r== tree_compare_result::only_root )
+				result = tree_compare_result::only_root;
 		}
 	}
 	if(result == tree_compare_result::total

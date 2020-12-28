@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE(contains)
 
 	i1.add(t3); // i1 - t1, t3
 	BOOST_CHECK( i1.contains(i2) == gen_utils::tree_compare_result::partial );
-	BOOST_CHECK( i2.contains(i3) == gen_utils::tree_compare_result::partial );
+	BOOST_CHECK( i2.contains(i3) == gen_utils::tree_compare_result::only_root );
 
 	i2.add(t1); // t2 - t3, t1
 	BOOST_CHECK( i1.contains(i2) == gen_utils::tree_compare_result::total );
