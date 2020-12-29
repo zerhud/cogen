@@ -220,20 +220,20 @@ BOOST_AUTO_TEST_CASE(contains)
 	t3.add(t3.root(), gen_utils_mocks::make_node(31));
 
 	ic_input i1, i2, i3;
-	BOOST_CHECK( i1.contains(i2) == gen_utils::tree_compare_result::total );
+	BOOST_CHECK( i1.match_with(i2) == gen_utils::tree_compare_result::total );
 
 	i1.add(t1);
 	i2.add(t3);
 	i3.add(t4);
 
-	BOOST_CHECK( i1.contains(i2) == gen_utils::tree_compare_result::none );
+	BOOST_CHECK( i1.match_with(i2) == gen_utils::tree_compare_result::none );
 
 	i1.add(t3); // i1 - t1, t3
-	BOOST_CHECK( i1.contains(i2) == gen_utils::tree_compare_result::partial );
-	BOOST_CHECK( i2.contains(i3) == gen_utils::tree_compare_result::only_root );
+	BOOST_CHECK( i1.match_with(i2) == gen_utils::tree_compare_result::partial );
+	BOOST_CHECK( i2.match_with(i3) == gen_utils::tree_compare_result::only_root );
 
 	i2.add(t1); // t2 - t3, t1
-	BOOST_CHECK( i1.contains(i2) == gen_utils::tree_compare_result::total );
+	BOOST_CHECK( i1.match_with(i2) == gen_utils::tree_compare_result::total );
 }
 BOOST_AUTO_TEST_SUITE_END() // input
 

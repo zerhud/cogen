@@ -38,7 +38,7 @@ std::pmr::vector<const gen_utils::tree*> input::all() const
 	return ret;
 }
 
-gen_utils::tree_compare_result input::contains(const input& other) const
+gen_utils::tree_compare_result input::match_with(const input& other) const
 {
 	using gen_utils::tree_compare_result;
 	tree_compare_result result = tree_compare_result::none;

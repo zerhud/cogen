@@ -32,7 +32,7 @@ public:
 	[[nodiscard]] std::pmr::vector<const gen_utils::tree*> all() const ;
 
 	[[nodiscard]]
-	gen_utils::tree_compare_result contains(const input& other) const ;
+	gen_utils::tree_compare_result match_with(const input& other) const ;
 };
 
 

@@ -69,7 +69,7 @@ std::pmr::vector<std::pmr::string> single_gen_part::matched_includes(
 	std::pmr::vector<std::pmr::string> ret;
 	const compiled_output& ldata = setts.generated.at(link);
 	for(auto& [dn, dt]:ldata) {
-		auto rc = dt.contains(data);
+		auto rc = dt.match_with(data);
 		if(rc==gen_utils::tree_compare_result::total)
 			ret.emplace_back(dn);
 		else if(rc==gen_utils::tree_compare_result::partial)
