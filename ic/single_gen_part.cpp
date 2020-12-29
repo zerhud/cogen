@@ -56,21 +56,26 @@ boost::json::value single_gen_part::make_json(
 		auto& dobj = data_ar.emplace_back(make_json(setts, *it)).as_object();
 		auto& incs = dobj["includes"].emplace_array();
 		for(auto& link:setts.links) {
-			const compiled_output& ldata = setts.generated.at(link);
-			for(auto& [dn, dt]:ldata) {
-				auto rc = data.contains(dt);
-				if(rc==gen_utils::tree_compare_result::total) {
-					incs.clear();
-					incs.emplace_back(dn);
-					break;
-				}
-				if(rc==gen_utils::tree_compare_result::partial) {
-					incs.emplace_back(dn);
-				}
-			}
+			for(auto& l:matched_includes(setts, link, data))
+				incs.emplace_back(l);
 		}
 	}
 	return data_ar;
+}
+
+std::pmr::vector<std::pmr::string> single_gen_part::matched_includes(
+    const gen_context& setts, const std::pmr::string& link, const input& data) const
+{
+	std::pmr::vector<std::pmr::string> ret;
+	const compiled_output& ldata = setts.generated.at(link);
+	for(auto& [dn, dt]:ldata) {
+		auto rc = dt.contains(data);
+		if(rc==gen_utils::tree_compare_result::total)
+			ret.emplace_back(dn);
+		else if(rc==gen_utils::tree_compare_result::partial)
+			ret.emplace_back(dn);
+	}
+	return ret;
 }
 
 boost::json::value single_gen_part::make_json(
