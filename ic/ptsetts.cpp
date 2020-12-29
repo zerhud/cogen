@@ -32,13 +32,9 @@ void ptsetts::part_setts(std::string_view p, modegen::ic::gen_context& ctx) cons
 	ctx.tmpl_file = setts.get<std::pmr::string>(path+".tmpl"s);
 
 	ctx.links.clear();
-	auto incs = setts.equal_range(path+".inc_part"s);
-	for(;incs.first!=incs.second;++incs.first) {
-		std::cout << incs.first->first << std::endl;
+	auto incs = setts.get_child_optional(path);
+	if(incs) for(auto& ip:*incs) {
+		if(ip.first == "inc_part") // cannot access the last key
+			ctx.links.emplace_back(ip.second.get_value<std::string>());
 	}
-	//auto incs = setts.get_value() .get_child_optional(path+".inc_part");
-	//if(incs) for(auto& ip:*incs) {
-	    //std::cout << ip.first << std::endl;
-	    //ctx.links.emplace_back(ip.second.get_value<std::string>());
-	//}
 }
