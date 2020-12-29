@@ -7,6 +7,7 @@
  *************************************************************************/
 
 #include "ptsetts.hpp"
+#include <iostream>
 
 using mdg::ic::ptsetts;
 using namespace std::literals;
@@ -24,10 +25,20 @@ std::pmr::vector<std::pmr::string> ptsetts::parts() const
 	return ret;
 }
 
-modegen::ic::gen_context ptsetts::part_setts(std::string_view p) const
+void ptsetts::part_setts(std::string_view p, modegen::ic::gen_context& ctx) const
 {
-	modegen::ic::gen_context ret;
-	ret.map_tmpl = setts.get<std::pmr::string>("part."s+std::string(p)+".file"s);
-	ret.tmpl_file = setts.get<std::pmr::string>("part."s+std::string(p)+".tmpl"s);
-	return ret;
+	auto path = "part."s+std::string(p);
+	ctx.map_tmpl = setts.get<std::pmr::string>(path+".file"s);
+	ctx.tmpl_file = setts.get<std::pmr::string>(path+".tmpl"s);
+
+	ctx.links.clear();
+	auto incs = setts.equal_range(path+".inc_part"s);
+	for(;incs.first!=incs.second;++incs.first) {
+		std::cout << incs.first->first << std::endl;
+	}
+	//auto incs = setts.get_value() .get_child_optional(path+".inc_part");
+	//if(incs) for(auto& ip:*incs) {
+	    //std::cout << ip.first << std::endl;
+	    //ctx.links.emplace_back(ip.second.get_value<std::string>());
+	//}
 }
