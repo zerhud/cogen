@@ -20,8 +20,7 @@ tree::tree(node_ptr root, std::shared_ptr<dsl_manager> dm) : dmanager(std::move(
 	if(!root) throw std::runtime_error("cannot create input tree without a root");
 	if(!root->version().has_value())
 		throw std::runtime_error("root must have a version");
-	root_ver = *root->version();
-	store.emplace_back(std::move(root));
+	root_ver = *store.emplace_back(std::move(root))->version();
 }
 
 boost::json::value tree::to_json(const compilation_config& cfg) const
@@ -81,7 +80,10 @@ tree_compare_result tree::contains(const tree& other) const
 		if(other.node_exists(beg->get())) ++match_count;
 		else break;
 	}
-	if(match_count == 1) return tree_compare_result::only_root;
+	if(match_count == 1)
+		return store.size() == 1
+		        ? tree_compare_result::total
+		        : tree_compare_result::only_root;
 	return match_count == store.size()
 	          ? tree_compare_result::total
 	          : tree_compare_result::partial;

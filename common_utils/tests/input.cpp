@@ -263,7 +263,10 @@ BOOST_FIXTURE_TEST_CASE(contains, fixture)
 	BOOST_CHECK(tree().contains(t2) == gen_utils::tree_compare_result::total);
 
 	gen_utils::tree t3(c1, dmanager);
+	gen_utils::tree t3_eq(c1, dmanager);
 	BOOST_CHECK(tree().contains(t3) == gen_utils::tree_compare_result::none);
+	BOOST_CHECK(t3.contains(t3) == gen_utils::tree_compare_result::total);
+	BOOST_CHECK(t3.contains(t3_eq) == gen_utils::tree_compare_result::total);
 
 	auto t4dm = std::make_shared<gen_utils_mocks::dsl_manager>();
 	MOCK_EXPECT(t4dm->id).returns("tt");
