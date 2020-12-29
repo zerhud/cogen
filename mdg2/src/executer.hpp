@@ -16,12 +16,6 @@
 
 namespace mdg2 {
 
-struct default_config : gen_utils::compilation_config {
-	gen_utils::compiler compiler_name () const { return gen_utils::compiler::cpp; }
-	std::string_view value(std::string_view key) const { return ""; }
-	gen_utils::name_conversion naming() const { return gen_utils::name_conversion::as_is; }
-};
-
 class executer {
 	boost::program_options::options_description desc;
 	boost::program_options::variables_map opt_vars;

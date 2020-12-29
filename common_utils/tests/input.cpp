@@ -15,7 +15,6 @@
 
 #include "common_utils/input/tree.hpp"
 #include "common_utils/input/map_to.hpp"
-#include "common_utils/input/complilation_config.hpp"
 #include "mocks.hpp"
 
 using namespace std::literals;
@@ -81,7 +80,7 @@ BOOST_AUTO_TEST_CASE(getters)
 	t.root_version(10);
 	BOOST_TEST(t.root_version() == 10);
 
-	gen_utils_mocks::compilation_config cfg;
+	gen_utils::compilation_config cfg;
 	MOCK_EXPECT(dm->to_json).calls([&t,&cfg](
 			const gen_utils::compilation_config& c, const gen_utils::tree& gt){
 		BOOST_TEST(&c == &cfg);
@@ -361,13 +360,4 @@ BOOST_FIXTURE_TEST_CASE(double_use, fixture)
 }
 BOOST_AUTO_TEST_SUITE_END() // tree_map_to
 
-BOOST_AUTO_TEST_SUITE(compilation_config)
-using gen_utils::compilation_config_impl::compilation_config;
-BOOST_AUTO_TEST_CASE(compliller_name)
-{
-	auto config = std::make_shared<compilation_config>(gen_utils::compiler::cpp);
-	BOOST_CHECK( gen_utils::compiler::cpp == config->compiler_name() );
-
-}
-BOOST_AUTO_TEST_SUITE_END() // compilation_config
 BOOST_AUTO_TEST_SUITE_END() // input

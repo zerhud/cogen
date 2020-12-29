@@ -26,7 +26,7 @@ boost::json::value ix3_manager::to_json(
 	using details::ix3_root_node;
 	assert(dynamic_cast<const ix3_root_node*>(&container.root()) != nullptr);
 	const auto* root = static_cast<const ix3_root_node*>(&container.root());
-	assert(cfg.compiler_name()==gen_utils::compiler::cpp);
+	assert(cfg.name==gen_utils::compiler::cpp);
 	details::cpp_compiler compiler{&cfg};
 	details::compilation_context ctx( &container, &compiler );
 	return root->make_json(ctx);

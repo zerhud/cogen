@@ -22,18 +22,9 @@ namespace gen_utils {
 enum class compiler { cpp } ;
 enum class tree_compare_result { not_comparable, none, only_root, partial, total };
 
-//TODO: is it interface or sruct?
-class compilation_config {
-public:
-	virtual ~compilation_config() noexcept =default ;
-
-	[[nodiscard]]
-	virtual compiler compiler_name () const =0 ;
-
-	[[nodiscard]]
-	virtual std::string_view value(std::string_view key) const =0 ;
-	
-	[[nodiscard]] virtual  name_conversion naming() const =0 ;
+struct compilation_config final {
+	compiler name=compiler::cpp;
+	name_conversion naming=name_conversion::as_is;
 };
 
 class tree;

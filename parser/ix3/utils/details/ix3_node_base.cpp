@@ -30,7 +30,7 @@ const ix3_compiler & compilation_context::compiling_aspect() const
 
 std::pmr::vector<std::pmr::string> compilation_context::naming(std::string_view orig) const
 {
-	auto first_name = gen_utils::convert(std::string(orig), asp->config().naming());
+	auto first_name = gen_utils::convert(std::string(orig), asp->config().naming);
 	return {std::pmr::string(std::move(first_name))};
 }
 

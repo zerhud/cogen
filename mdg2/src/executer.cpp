@@ -96,7 +96,7 @@ void executer::json_mode(const mdg::ic::ptsetts& setts) const
 	json_provider json_out;
 	json_out.output_dir(opt_vars["outdir"].as<std::string>());
 	modegen::ic::single_gen_part part(&json_out);
-	default_config compil_config;
+	gen_utils::compilation_config compil_config;
 	modegen::ic::gen_context ctx;
 	ctx.gen_cfg = &compil_config;
 	for(auto& pname:setts.parts()) {

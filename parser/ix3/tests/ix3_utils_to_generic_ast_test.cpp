@@ -42,8 +42,8 @@ struct fake_compiler : ix3::utils::details::ix3_compiler {
 boost::json::value make_json(const gen_utils::data_node& root, const gen_utils::tree& cnt)
 {
 	assert(dynamic_cast<const ix3::utils::details::ix3_node_base*>(&root));
-	gen_utils_mocks::compilation_config cfg;
-	MOCK_EXPECT(cfg.naming).returns(gen_utils::name_conversion::camel_case);
+	gen_utils::compilation_config cfg;
+	cfg.naming = gen_utils::name_conversion::camel_case;
 	fake_compiler fc{cfg};
 	ix3::utils::details::compilation_context ctx(&cnt, &fc);
 	return static_cast<const ix3::utils::details::ix3_node_base&>(root).make_json(ctx);
@@ -81,8 +81,8 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 	BOOST_TEST(vers.at(1)->node_var().value().name == "ver");
 	BOOST_TEST(vers.at(1)->node_var().value().value == "1.2");
 
-	gen_utils_mocks::compilation_config cfg;
-	MOCK_EXPECT(cfg.compiler_name).at_least(1).returns(gen_utils::compiler::cpp);
+	gen_utils::compilation_config cfg;
+	cfg.name = gen_utils::compiler::cpp;
 	BOOST_TEST(tree.to_json(cfg) == boost::json::parse(
 	               R"({"name":"ix3","mods":[ {"name":"mod1","content":[
 	                 {"type":"version","value":"1.1","name":"mod1_v1_1","content":[]},

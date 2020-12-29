@@ -36,8 +36,8 @@ struct single_gen_part_fixture {
 	std::shared_ptr<gen_utils_mocks::data_node> t3_root_node = gen_utils_mocks::make_node(0);
 	gen_utils::tree t1, t2, t3;
 
-	std::unique_ptr<gen_utils_mocks::compilation_config> compile_cfg
-		= std::make_unique<gen_utils_mocks::compilation_config>();
+	std::unique_ptr<gen_utils::compilation_config> compile_cfg
+	    = std::make_unique<gen_utils::compilation_config>();
 	std::shared_ptr<icmocks::provider> prov = std::make_shared<icmocks::provider>();
 
 	modegen::ic::input all_data;
