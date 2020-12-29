@@ -20,9 +20,6 @@ class single_gen_part final {
 	const provider* outside;
 	compiled_output compile(const gen_context& setts, const input& data) const ;
 	boost::json::value make_json(
-	        const gen_context& setts,
-	        const gen_utils::tree& data) const ;
-	boost::json::value make_json(
 	        const gen_context& setts, const input& data) const ;
 	std::pmr::vector<std::pmr::string> matched_includes(
 	        const gen_context& setts, const std::pmr::string& link, const input& data) const ;

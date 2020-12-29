@@ -85,7 +85,7 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 	        .once().with("t", R"([{"a":"v2","includes":[]}])"_bj, "v2.cpp");
 	sg(gen_context{"${n}.cpp"_s, "t"_s, compile_cfg.get()}, all_data);
 }
-BOOST_FIXTURE_TEST_CASE(includes, single_gen_part_fixture)
+BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 {
 	single_gen_part sg(prov.get());
 	t1.add(t1.root(), make_node(1, "n", "v1"));
