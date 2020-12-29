@@ -18,6 +18,7 @@ namespace mdg::ic {
 
 class ptsetts final {
 	boost::property_tree::ptree setts;
+	void conf_links(const std::string& path, modegen::ic::gen_context& ctx) const ;
 public:
 	ptsetts(boost::property_tree::ptree s);
 

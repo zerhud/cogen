@@ -30,7 +30,11 @@ void ptsetts::part_setts(std::string_view p, modegen::ic::gen_context& ctx) cons
 	auto path = "part."s+std::string(p);
 	ctx.map_tmpl = setts.get<std::pmr::string>(path+".file"s);
 	ctx.tmpl_file = setts.get<std::pmr::string>(path+".tmpl"s);
+	conf_links(path, ctx);
+}
 
+void ptsetts::conf_links(const std::string& path, modegen::ic::gen_context& ctx) const
+{
 	ctx.links.clear();
 	auto incs = setts.get_child_optional(path);
 	if(incs) for(auto& ip:*incs) {
