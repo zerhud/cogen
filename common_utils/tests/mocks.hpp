@@ -38,6 +38,8 @@ std::shared_ptr<gen_utils_mocks::data_node> make_node(
 		std::optional<std::uint64_t> v
 		, std::optional<std::pmr::string> name=std::nullopt
 		, std::optional<std::pmr::string> value=std::nullopt
+		, std::optional<std::pmr::string> node_name=std::nullopt
+		, std::pmr::vector<gen_utils::name_t> links={}
 )
 {
 	assert( (!name && !value) || (name && value) );
@@ -46,6 +48,8 @@ std::shared_ptr<gen_utils_mocks::data_node> make_node(
 	if(name) MOCK_EXPECT(ret->node_var)
 				.returns(gen_utils::variable{*name, *value});
 	else MOCK_EXPECT(ret->node_var).returns(std::nullopt);
+	MOCK_EXPECT(ret->required_links).returns(links);
+	if(node_name) MOCK_EXPECT(ret->name).returns(*node_name);
 	return ret;
 }
 

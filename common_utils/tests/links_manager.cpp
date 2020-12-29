@@ -39,9 +39,6 @@ struct fixture : gen_utils_mocks::base_tree_fixture
 
 	fixture()
 	{
-		main_node = gen_utils_mocks::make_node(1);
-		MOCK_EXPECT(main_node->name).returns("main_node"sv);
-
 		other_node = gen_utils_mocks::make_node(2);
 	}
 };
@@ -51,35 +48,28 @@ using gen_utils::name_t;
 using gen_utils_mocks::make_node;
 BOOST_FIXTURE_TEST_CASE(top_level, fixture)
 {
-	MOCK_EXPECT(main_node->required_links)
-	        .returns(std::pmr::vector<name_t>{{"a"_s}});
+	main_node = make_node(
+	            1, std::nullopt, std::nullopt,
+	            "main_node", {{"a"_s}});
 	MOCK_EXPECT(other_dmng->id).returns("other"sv);
 	MOCK_EXPECT(other_node->name).returns("a"sv);
-	MOCK_EXPECT(other_node->required_links)
-		.returns(std::pmr::vector<name_t>{});
 
 	links_manager mng({&tree(),&other_tree()});
 	BOOST_TEST(mng.links(*main_node).size()==1);
 }
 BOOST_FIXTURE_TEST_CASE(search_in_children, fixture)
 {
-	auto main_child = make_node(11);
-	auto main_child2 = make_node(12);
-	MOCK_EXPECT(main_child->name).returns("b"sv);
-	MOCK_EXPECT(main_child2->name).returns("not_in_search"sv);
+	auto main_child = make_node(11, std::nullopt, std::nullopt, "b");
+	auto main_child2 = make_node(12, std::nullopt, std::nullopt, "not_in_search");
+	main_node = make_node(
+	            1, std::nullopt, std::nullopt,
+	            "main_node", {{"o"_s,"a"_s},{"data_id"_s,"b"_s}});
 	tree().add(*main_node, main_child);
 	tree().add(*main_node, main_child2);
-	MOCK_EXPECT(main_node->required_links)
-	        .returns(std::pmr::vector<name_t>{{"o"_s,"a"_s},{"data_id"_s,"b"_s}});
-	MOCK_EXPECT(main_child->required_links).returns(std::pmr::vector<name_t>{});
-	MOCK_EXPECT(main_child2->required_links).returns(std::pmr::vector<name_t>{});
 
-	auto other_child = make_node(22);
+	auto other_child = make_node(22, std::nullopt, std::nullopt, "a");
 	MOCK_EXPECT(other_dmng->id).returns("o"sv);
-	MOCK_EXPECT(other_child->name).returns("a"sv);
 	MOCK_EXPECT(other_node->name).returns("other_root"sv);
-	MOCK_EXPECT(other_child->required_links).returns(std::pmr::vector<name_t>{});
-	MOCK_EXPECT(other_node->required_links).returns(std::pmr::vector<name_t>{});
 
 	other_tree().add(other_tree().root(), other_child);
 
@@ -96,10 +86,9 @@ BOOST_FIXTURE_TEST_CASE(search_in_children, fixture)
 }
 BOOST_FIXTURE_TEST_CASE(not_found, fixture)
 {
-	main_node = make_node(1);
-	MOCK_EXPECT(main_node->name).returns("main_node"sv);
-	MOCK_EXPECT(main_node->required_links)
-	        .returns(std::pmr::vector<name_t>{{"o"_s,"a"_s},{"data_id"_s,"b"_s}});
+	main_node = make_node(
+	            1, std::nullopt, std::nullopt,
+	            "main_node", {{"o"_s,"a"_s},{"data_id"_s,"b"_s}});
 	links_manager mng({&tree()});
 	BOOST_TEST(mng.links(*main_node).size()==0);
 }
