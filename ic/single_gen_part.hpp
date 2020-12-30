@@ -13,6 +13,7 @@
 
 namespace modegen::ic {
 
+struct gen_config;
 struct gen_context;
 typedef std::pmr::map<std::pmr::string, input> compiled_output;
 
@@ -28,11 +29,15 @@ public:
 	compiled_output operator()(const gen_context& cur_part, input alli) const ;
 };
 
-struct gen_context {
+struct gen_config {
 	std::pmr::string map_tmpl;
 	std::pmr::string tmpl_file;
-	gen_utils::compilation_config* gen_cfg;
 	std::pmr::vector<std::pmr::string> links;
+};
+
+struct gen_context {
+	gen_config cfg_part;
+	gen_utils::compilation_config cfg_compilation;
 	std::pmr::map<std::pmr::string, compiled_output> generated;
 };
 

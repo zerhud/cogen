@@ -46,17 +46,19 @@ BOOST_AUTO_TEST_CASE(map_tmpl)
 	setts.add("part.a.inc_part", "b");
 	setts.add("part.a.inc_part", "c");
 	setts.put("part.b.tmpl", "v_tmpl2");
+	setts.put("part.c.file", "v_file");
+	setts.put("part.c.tmpl", "v_tmpl");
 	ic_ptsetts obj(setts);
-	BOOST_TEST(obj.parts().size() == 2);
+	BOOST_TEST(obj.parts().size() == 3);
 	modegen::ic::gen_context a_setts;
-	a_setts.links.emplace_back("a");
-	obj.part_setts("a"sv, a_setts);
-	BOOST_TEST(a_setts.map_tmpl == "v_file");
-	BOOST_TEST(a_setts.tmpl_file == "v_tmpl");
-	BOOST_TEST_REQUIRE(a_setts.links.size() == 2);
-	BOOST_TEST(a_setts.links.at(0) == "b");
-	BOOST_TEST(a_setts.links.at(1) == "c");
-	BOOST_CHECK_THROW(obj.part_setts("b"sv, a_setts), std::exception);
+	a_setts.cfg_part = obj.part_setts("a"sv);
+	BOOST_TEST(a_setts.cfg_part.map_tmpl == "v_file");
+	BOOST_TEST(a_setts.cfg_part.tmpl_file == "v_tmpl");
+	BOOST_TEST_REQUIRE(a_setts.cfg_part.links.size() == 2);
+	BOOST_TEST(a_setts.cfg_part.links.at(0) == "b");
+	BOOST_TEST(a_setts.cfg_part.links.at(1) == "c");
+	BOOST_CHECK_THROW(obj.part_setts("b"sv), std::exception);
+	BOOST_CHECK_NO_THROW(obj.part_setts("c"sv));
 }
 BOOST_AUTO_TEST_SUITE_END() // ptsetts
 BOOST_AUTO_TEST_SUITE_END() // input_configuration

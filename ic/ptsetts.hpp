@@ -18,12 +18,12 @@ namespace mdg::ic {
 
 class ptsetts final {
 	boost::property_tree::ptree setts;
-	void conf_links(const std::string& path, modegen::ic::gen_context& ctx) const ;
+	void conf_links(const std::string& path, modegen::ic::gen_config& cfg) const ;
 public:
 	ptsetts(boost::property_tree::ptree s);
 
 	std::pmr::vector<std::pmr::string> parts() const ;
-	void part_setts(std::string_view p, modegen::ic::gen_context& ctx) const ;
+	modegen::ic::gen_config part_setts(std::string_view p) const ;
 };
 
 } // namespace mdg::ic

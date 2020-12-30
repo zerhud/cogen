@@ -75,7 +75,8 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 	MOCK_EXPECT(t1_dsl->to_json)
 	        .calls([this](auto& cfg, const gen_utils::tree& src){
 		BOOST_TEST(&src != &t1);
-		BOOST_TEST(&cfg == compile_cfg.get());
+		BOOST_CHECK(cfg.name == gen_utils::compiler::cpp);
+		BOOST_CHECK(cfg.naming == gen_utils::name_conversion::camel_case);
 		boost::json::object ret;
 		return ret["a"] = src.children(src.root()).at(0)->node_var()->value, ret;
 	});
@@ -83,7 +84,8 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 	        .once().with("t", R"([{"a":"v1","includes":[]}])"_bj, "v1.cpp");
 	MOCK_EXPECT(prov->generate)
 	        .once().with("t", R"([{"a":"v2","includes":[]}])"_bj, "v2.cpp");
-	sg(gen_context{"${n}.cpp"_s, "t"_s, compile_cfg.get()}, all_data);
+	compile_cfg->naming = gen_utils::name_conversion::camel_case;
+	sg(gen_context{{"${n}.cpp"_s, "t"_s, {}}, *compile_cfg, {}}, all_data);
 }
 BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 {
@@ -99,20 +101,20 @@ BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 	        .once().with("t", R"([{"includes":[]}])"_bj, "v1");
 	MOCK_EXPECT(prov->generate)
 	        .once().with("t", R"([{"includes":[]}])"_bj, "v2");
-	gen_context ctx{"${n}"_s, "t"_s, compile_cfg.get()};
+	gen_context ctx{{"${n}"_s, "t"_s, {}}, *compile_cfg.get(), {}};
 	ctx.generated["a"] = sg(ctx, all_data);
 
-	ctx.map_tmpl = "f.cpp";
+	ctx.cfg_part.map_tmpl = "f.cpp";
 	MOCK_EXPECT(prov->generate)
 	        .once().with("t", R"([{"includes":[]}])"_bj, "f.cpp");
 	sg(ctx, all_data);
 
-	ctx.links.emplace_back("a");
+	ctx.cfg_part.links.emplace_back("a");
 	MOCK_EXPECT(prov->generate)
 	        .once().with("t", R"([{"includes":["v1","v2"]}])"_bj, "f.cpp");
 	ctx.generated["b"] = sg(ctx, all_data);
 
-	ctx.map_tmpl = "${n}";
+	ctx.cfg_part.map_tmpl = "${n}";
 	MOCK_EXPECT(prov->generate)
 	        .once().with("t", R"([{"includes":["v1"]}])"_bj, "v1");
 	MOCK_EXPECT(prov->generate)

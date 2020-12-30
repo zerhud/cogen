@@ -25,14 +25,12 @@ single_gen_part::single_gen_part(const provider* p)
 compiled_output single_gen_part::operator()(const gen_context& cur_part, input alli) const
 {
 	assert(outside);
-	if(!cur_part.gen_cfg)
-		throw std::runtime_error("no gen configuration in settings");
 	auto compiled = compile(cur_part, alli);
 	for(auto& [n,d]:compiled)
 		outside->generate(
-				cur_part.tmpl_file,
-				make_json(cur_part, d),
-				n);
+		            cur_part.cfg_part.tmpl_file,
+		            make_json(cur_part, d),
+		            n);
 	return compiled;
 }
 
@@ -42,7 +40,7 @@ compiled_output single_gen_part::compile(
 	gen_utils::map_to mapper;
 	std::pmr::map<std::pmr::string, input> ret;
 	for(auto& it:data.all()) {
-		auto compiled = mapper(std::pmr::string(setts.map_tmpl), *it);
+		auto compiled = mapper(std::pmr::string(setts.cfg_part.map_tmpl), *it);
 		for(auto& [k,v] : compiled) ret[k].add(std::move(v));
 	}
 	return ret;
@@ -53,9 +51,9 @@ boost::json::value single_gen_part::make_json(
 {
 	boost::json::array data_ar;
 	for(auto& it:data.all()) {
-		auto& dobj = data_ar.emplace_back(it->to_json(*setts.gen_cfg)).as_object();
+		auto& dobj = data_ar.emplace_back(it->to_json(setts.cfg_compilation)).as_object();
 		auto& incs = dobj["includes"].emplace_array();
-		for(auto& link:setts.links) {
+		for(auto& link:setts.cfg_part.links) {
 			for(auto& l:matched_includes(setts, link, data))
 				incs.emplace_back(l);
 		}

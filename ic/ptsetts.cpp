@@ -25,20 +25,22 @@ std::pmr::vector<std::pmr::string> ptsetts::parts() const
 	return ret;
 }
 
-void ptsetts::part_setts(std::string_view p, modegen::ic::gen_context& ctx) const
+modegen::ic::gen_config ptsetts::part_setts(std::string_view p) const
 {
+	modegen::ic::gen_config ret;
 	auto path = "part."s+std::string(p);
-	ctx.map_tmpl = setts.get<std::pmr::string>(path+".file"s);
-	ctx.tmpl_file = setts.get<std::pmr::string>(path+".tmpl"s);
-	conf_links(path, ctx);
+	ret.map_tmpl = setts.get<std::pmr::string>(path+".file"s);
+	ret.tmpl_file = setts.get<std::pmr::string>(path+".tmpl"s);
+	conf_links(path, ret);
+	return ret;
 }
 
-void ptsetts::conf_links(const std::string& path, modegen::ic::gen_context& ctx) const
+void ptsetts::conf_links(const std::string& path, modegen::ic::gen_config& cfg) const
 {
-	ctx.links.clear();
+	cfg.links.clear();
 	auto incs = setts.get_child_optional(path);
 	if(incs) for(auto& ip:*incs) {
 		if(ip.first == "inc_part") // cannot access the last key
-			ctx.links.emplace_back(ip.second.get_value<std::string>());
+			cfg.links.emplace_back(ip.second.get_value<std::string>());
 	}
 }
