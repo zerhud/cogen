@@ -33,11 +33,11 @@ struct gen_config {
 	std::pmr::string map_tmpl;
 	std::pmr::string tmpl_file;
 	std::pmr::vector<std::pmr::string> links;
+	gen_utils::compilation_config compilation;
 };
 
 struct gen_context {
 	gen_config cfg_part;
-	gen_utils::compilation_config cfg_compilation;
 	std::pmr::map<std::pmr::string, compiled_output> generated;
 };
 
