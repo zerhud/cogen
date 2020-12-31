@@ -15,15 +15,14 @@ namespace gen_utils {
 
 struct import_info {
 	std::pmr::string name;
+	std::pmr::string cond;
 	node_pointer node;
 };
 
-class out_info {
-public:
-	out_info(boost::json::value cnt);
-};
-
 class compiled_result final {
+	boost::json::value data_;
+	std::pmr::vector<import_info> imports_;
+	bool import_exists(const import_info& src) const ;
 public:
 	void combine(compiled_result other);
 

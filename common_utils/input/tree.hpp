@@ -17,7 +17,7 @@
 
 #include "declarations.hpp"
 #include "naming.hpp"
-#include "out_info.hpp"
+#include "compiled_result.hpp"
 
 namespace gen_utils {
 
@@ -75,6 +75,7 @@ public:
 	tree(node_ptr root, std::shared_ptr<dsl_manager> dm);
 
 	[[nodiscard]] boost::json::value to_json(const compilation_context& ctx) const ;
+	[[nodiscard]] compiled_result compile(const compilation_context& ctx) const ;
 	[[nodiscard]] std::string_view data_id() const ;
 	[[nodiscard]] const data_node& root() const ;
 

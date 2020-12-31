@@ -28,4 +28,8 @@ struct node_pointer {
 	const tree* owner;
 };
 
+inline bool operator == (const node_pointer& l, const node_pointer& r) {
+	return l.node == r.node && l.owner == r.owner;
+}
+
 } // namespace gen_utils

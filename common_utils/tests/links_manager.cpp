@@ -13,6 +13,7 @@
 #include <boost/test/data/test_case.hpp>
 
 #include "common_utils/input/links.hpp"
+#include "common_utils/input/compiled_result.hpp"
 #include "mocks.hpp"
 
 using namespace std::literals;
@@ -23,7 +24,6 @@ std::pmr::string operator "" _s (const char* d, std::size_t l)
 }
 
 BOOST_AUTO_TEST_SUITE(input)
-BOOST_AUTO_TEST_SUITE(link_with)
 struct fixture : gen_utils_mocks::base_tree_fixture
 {
 	std::shared_ptr<gen_utils_mocks::data_node> other_node;
@@ -93,5 +93,69 @@ BOOST_FIXTURE_TEST_CASE(not_found, fixture)
 	BOOST_TEST(mng.links(*main_node).size()==0);
 }
 BOOST_AUTO_TEST_SUITE_END() // links_manager
-BOOST_AUTO_TEST_SUITE_END() // link_with
+BOOST_AUTO_TEST_SUITE(compiled_result)
+using gen_utils::compiled_result;
+BOOST_AUTO_TEST_CASE(data)
+{
+	compiled_result cr;
+	boost::json::object obj;
+	obj["a"] = "test";
+	cr.data(obj);
+	BOOST_TEST(cr.data() == obj);
+}
+BOOST_AUTO_TEST_CASE(imports)
+{
+	compiled_result cr;
+	BOOST_TEST(cr.imports().size() == 0);
+
+	gen_utils::import_info ii1, ii2;
+	ii1.name = "ii1";
+	ii2.name = "ii2";
+
+	cr.add_import(ii1);
+	BOOST_TEST(cr.imports().size() == 1);
+	BOOST_TEST(cr.imports().at(0).name == "ii1");
+
+	cr.add_import(ii2);
+	BOOST_TEST(cr.imports().size() == 2);
+	BOOST_TEST(cr.imports().at(1).name == "ii2");
+}
+BOOST_AUTO_TEST_CASE(combine)
+{
+	compiled_result cr1, cr2, cr3;
+	gen_utils::node_pointer n1{gen_utils_mocks::make_node(1), nullptr};
+	gen_utils::node_pointer n2{gen_utils_mocks::make_node(2), nullptr};
+
+	gen_utils::import_info
+	        ii1{"i", "", n1}, ii2{"i", "", n2};
+
+	cr1.combine(cr2);
+	BOOST_TEST(cr1.imports().size() == 0);
+
+	cr2.add_import(ii1);
+	cr1.combine(cr2);
+	BOOST_TEST(cr1.imports().size() == 1);
+	BOOST_TEST(cr1.imports().at(0).name == "i");
+	BOOST_CHECK(cr1.imports().at(0).node == n1);
+
+	cr1.combine(cr3);
+	BOOST_TEST(cr1.imports().size() == 1);
+	BOOST_TEST(cr1.imports().at(0).name == "i");
+	BOOST_CHECK(cr1.imports().at(0).node == n1);
+
+	cr1.combine(cr2);
+	BOOST_TEST(cr1.imports().size() == 1);
+	BOOST_TEST(cr1.imports().at(0).name == "i");
+	BOOST_CHECK(cr1.imports().at(0).node == n1);
+
+	cr2.add_import(ii2);
+	cr1.combine(cr2);
+	BOOST_TEST(cr1.imports().size() == 2);
+	BOOST_TEST(cr1.imports().at(0).name == "i");
+	BOOST_CHECK(cr1.imports().at(0).node == n1);
+	BOOST_TEST(cr1.imports().at(1).name == "i");
+	BOOST_CHECK(cr1.imports().at(1).node == n2);
+
+}
+BOOST_AUTO_TEST_SUITE_END() // compiled_result
 BOOST_AUTO_TEST_SUITE_END() // input
