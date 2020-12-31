@@ -7,6 +7,7 @@
  *************************************************************************/
 
 #include "links.hpp"
+#include "tree.hpp"
 
 using gen_utils::links_manager;
 using gen_utils::node_links_info;

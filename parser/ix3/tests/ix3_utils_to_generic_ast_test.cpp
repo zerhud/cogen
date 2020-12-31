@@ -175,6 +175,26 @@ BOOST_AUTO_TEST_CASE(functions)
 	                 "req":true
 	               })"sv));
 }
+BOOST_AUTO_TEST_CASE(standard_types)
+{
+	to_generic_ast maker;
+	auto ast = txt::parse(txt::file_content,
+	                      "module mod1 v1.1:"
+	                      "i8 foo();"sv);
+	gen_utils::tree tree = maker(ast.modules);
+	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	BOOST_TEST(tree.children(*mod).size()==1);
+
+	auto foo = tree.children(*mod).at(0);
+	BOOST_TEST(foo->name()=="foo");
+//	BOOST_TEST(make_json(*foo, tree) == boost::json::parse(
+//	               R"({
+//	               "orig_name":"foo","name":"foo",
+//	               "type":"function",
+//	               "params":[ ],
+//	               "return":{"type":"type", "name":["std::int8_t"], "subs":[]}
+//	               })"sv));
+}
 BOOST_AUTO_TEST_SUITE_END() // gain_to_generic_ast
 
 BOOST_AUTO_TEST_SUITE(cpp_compiler) // cpp_compiler

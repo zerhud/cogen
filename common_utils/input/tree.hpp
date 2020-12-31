@@ -15,22 +15,22 @@
 #include <memory_resource>
 #include <boost/json.hpp>
 
+#include "declarations.hpp"
 #include "naming.hpp"
+#include "out_info.hpp"
 
 namespace gen_utils {
-
-enum class compiler { cpp } ;
-enum class tree_compare_result { not_comparable, none, only_root, partial, total };
 
 struct compilation_config final {
 	compiler name=compiler::cpp;
 	name_conversion naming=name_conversion::as_is;
 };
 
-class tree;
-class data_node;
-using node_ptr = std::shared_ptr<data_node>;
-using name_t = std::pmr::vector<std::pmr::string>;
+struct compilation_context final {
+	compiled_result info;
+	compilation_config cfg;
+	const links_manager* links;
+};
 
 struct variable {
 	std::pmr::string name;

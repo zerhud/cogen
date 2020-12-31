@@ -31,6 +31,7 @@ boost::json::object function_node::make_json(const compilation_context& ctx) con
 	boost::json::array& params=ret["params"].emplace_array();
 	for(auto& child:ctx.children(*this))
 		params.emplace_back(child->make_json(ctx));
+	ctx.compiling_aspect().aspect(*this, ret);
 	return ret;
 }
 

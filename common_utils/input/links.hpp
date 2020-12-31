@@ -11,7 +11,8 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include "tree.hpp"
+#include <optional>
+#include "declarations.hpp"
 
 namespace gen_utils {
 
