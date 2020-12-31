@@ -43,7 +43,7 @@ public:
 
 	[[nodiscard]] virtual std::string_view id() const =0 ;
 	[[nodiscard]] virtual boost::json::value to_json(
-			const compilation_config& cfg, const tree& container) const =0 ;
+	        const compilation_context& cfg, const tree& container) const =0 ;
 };
 
 class data_node {
@@ -74,7 +74,7 @@ public:
 	tree() =delete;
 	tree(node_ptr root, std::shared_ptr<dsl_manager> dm);
 
-	[[nodiscard]] boost::json::value to_json(const compilation_config& cfg) const ;
+	[[nodiscard]] boost::json::value to_json(const compilation_context& ctx) const ;
 	[[nodiscard]] std::string_view data_id() const ;
 	[[nodiscard]] const data_node& root() const ;
 

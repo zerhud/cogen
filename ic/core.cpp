@@ -42,11 +42,11 @@ void modegen::ic::core::gen(const configuration& config) const
 boost::json::value modegen::ic::core::make_json(
 		const configuration& config, const input& dsl) const
 {
-	gen_utils::compilation_config cfg;
-	cfg.name = gen_utils::compiler::cpp;
-	cfg.naming = gen_utils::name_conversion::as_is;
+	gen_utils::compilation_context ctx;
+	ctx.cfg.name = gen_utils::compiler::cpp;
+	ctx.cfg.naming = gen_utils::name_conversion::as_is;
 	boost::json::array ret;
 	for(auto& t:dsl.all())
-		ret.emplace_back(t->to_json(cfg));
+		ret.emplace_back(t->to_json(ctx));
 	return ret;
 }

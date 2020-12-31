@@ -23,10 +23,10 @@ tree::tree(node_ptr root, std::shared_ptr<dsl_manager> dm) : dmanager(std::move(
 	root_ver = *store.emplace_back(std::move(root))->version();
 }
 
-boost::json::value tree::to_json(const compilation_config& cfg) const
+boost::json::value tree::to_json(const compilation_context& ctx) const
 {
 	assert(dmanager);
-	return dmanager->to_json(cfg, *this);
+	return dmanager->to_json(ctx, *this);
 }
 
 std::string_view tree::data_id() const

@@ -73,10 +73,10 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 	t1.add(t1.root(), make_node(1, "n", "v2"));
 	all_data.add(t1);
 	MOCK_EXPECT(t1_dsl->to_json)
-	        .calls([this](auto& cfg, const gen_utils::tree& src){
+	        .calls([this](auto& ctx, const gen_utils::tree& src){
 		BOOST_TEST(&src != &t1);
-		BOOST_CHECK(cfg.name == gen_utils::compiler::cpp);
-		BOOST_CHECK(cfg.naming == gen_utils::name_conversion::camel_case);
+		BOOST_CHECK(ctx.cfg.name == gen_utils::compiler::cpp);
+		BOOST_CHECK(ctx.cfg.naming == gen_utils::name_conversion::camel_case);
 		boost::json::object ret;
 		return ret["a"] = src.children(src.root()).at(0)->node_var()->value, ret;
 	});
