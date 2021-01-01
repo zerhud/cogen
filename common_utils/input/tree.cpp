@@ -88,6 +88,33 @@ tree_compare_result tree::contains(const tree& other) const
 	          : tree_compare_result::partial;
 }
 
+node_ptr tree::search(name_t n) const
+{
+	if(n.empty()) return nullptr;
+	return search(root(), std::move(n));
+}
+
+node_ptr tree::search(const data_node& par, name_t n) const
+{
+	assert(!n.empty());
+	const edge* ce = search_edge(par);
+	if(ce) for(auto& child:ce->children) {
+		if(child->name() == n[0])
+			return n.size() == 1
+			    ? child
+			    : search(*child, name_t{++n.begin(),n.end()});
+		auto is = search(*child, n);
+		if(is) return is;
+	}
+	return nullptr;
+}
+
+const tree::edge* tree::search_edge(const data_node& par) const
+{
+	for(auto& e:edges) if(e.parent == &par) return &e;
+	return nullptr;
+}
+
 bool tree::node_exists(const data_node *n) const
 {
 	auto pos = std::find_if(

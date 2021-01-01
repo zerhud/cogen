@@ -28,8 +28,12 @@ class imports_manager final {
 	std::pmr::map<const input*, std::pmr::vector<std::pmr::string>> matched;
 
 	void scan_self_matched();
+	void scan_required_imports();
+	import_info* scan_required_imports(
+	        const gen_utils::tree& from, const gen_utils::tree& to);
 public:
 	void build();
+	imports_manager& operator()(const std::pmr::string& file, const input& data);
 	imports_manager& add(const std::pmr::string& file, const input& data);
 	std::pmr::vector<import_info> result_for(const input& file_data) const ;
 	std::pmr::vector<std::pmr::string> self_matched(const input& file_data) const ;

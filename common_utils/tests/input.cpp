@@ -25,16 +25,8 @@ std::pmr::string operator "" _s (const char* d, std::size_t l)
 }
 
 BOOST_AUTO_TEST_SUITE(input)
+using gen_utils_mocks::make_node;
 struct fixture : gen_utils_mocks::base_tree_fixture {
-	std::shared_ptr<gen_utils_mocks::data_node> make_node(
-	              std::optional<std::uint64_t> v
-	            , std::optional<std::pmr::string> name=std::nullopt
-	            , std::optional<std::pmr::string> value=std::nullopt
-	            )
-	{
-		return gen_utils_mocks::make_node(v, std::move(name), std::move(value));
-	}
-
 	template<typename T, typename L>
 	void check_vec(const std::pmr::vector<T>& vec, std::initializer_list<L> list) const
 	{
@@ -282,6 +274,26 @@ BOOST_FIXTURE_TEST_CASE(contains_two_child, fixture)
 
 	tree().add(tree().root(), make_node(103));
 	BOOST_CHECK(tree().contains(t2) == gen_utils::tree_compare_result::partial);
+}
+BOOST_FIXTURE_TEST_CASE(search, fixture)
+{
+	main_node = make_node(100, std::nullopt, std::nullopt, "m");
+	auto node_b = make_node(120, std::nullopt, std::nullopt, "b");
+	auto node_a = make_node(110, std::nullopt, std::nullopt, "a");
+	auto node_c = make_node(121, std::nullopt, std::nullopt, "c");
+	tree().add(tree().root(), node_a);
+	tree().add(tree().root(), node_b);
+	tree().add(*node_b, node_c);
+
+	BOOST_TEST(tree().search({}) == nullptr);
+	BOOST_TEST(tree().search({"m"}) == nullptr, "root cannot to be found");
+	BOOST_TEST(tree().search({"d"}) == nullptr);
+	BOOST_TEST(tree().search({"a", "c"}) == nullptr);
+
+	BOOST_TEST(tree().search({"a"}) == node_a);
+	BOOST_TEST(tree().search({"b"}) == node_b);
+	BOOST_TEST(tree().search({"c"}) == node_c);
+	BOOST_TEST(tree().search({"b", "c"}) == node_c);
 }
 BOOST_AUTO_TEST_SUITE_END() // tree
 BOOST_AUTO_TEST_SUITE(tree_map_to)
