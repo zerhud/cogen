@@ -187,13 +187,17 @@ BOOST_AUTO_TEST_CASE(standard_types)
 
 	auto foo = tree.children(*mod).at(0);
 	BOOST_TEST(foo->name()=="foo");
-//	BOOST_TEST(make_json(*foo, tree) == boost::json::parse(
-//	               R"({
-//	               "orig_name":"foo","name":"foo",
-//	               "type":"function",
-//	               "params":[ ],
-//	               "return":{"type":"type", "name":["std::int8_t"], "subs":[]}
-//	               })"sv));
+	BOOST_TEST(make_json(*foo, tree) == boost::json::parse(
+	               R"({
+	               "orig_name":"foo","name":"foo",
+	               "type":"function",
+	               "params":[ ],
+	               "return":{
+	                 "type":"type",
+	                 "cpp_name":"std::int8_t",
+	                 "name":["i8"],
+	                 "subs":[]}
+	               })"sv));
 }
 BOOST_AUTO_TEST_SUITE_END() // gain_to_generic_ast
 
