@@ -80,6 +80,8 @@ BOOST_FIXTURE_TEST_CASE(required_for, ic_fixture)
 	fdata1.add(t1());
 	fdata2.add(t2());
 
+	MOCK_EXPECT(t1_child1->link_condition).returns("cond_child1"sv);
+
 	imports_manager mng1;
 	mng1("f1", fdata1)("f2", fdata2).build();
 
@@ -89,9 +91,10 @@ BOOST_FIXTURE_TEST_CASE(required_for, ic_fixture)
 	BOOST_TEST_REQUIRE(r2.size() == 1);
 	BOOST_TEST(r2[0].from.node == t2_child1);
 	BOOST_TEST(r2[0].from.owner->data_id() == "t2_id");
-	BOOST_TEST(r2[0].file == "f1");
 	BOOST_TEST(r2[0].to.node == t1_child1);
 	BOOST_TEST(r2[0].to.owner->data_id() == "t1_id");
+	BOOST_TEST(r2[0].file == "f1");
+	BOOST_TEST(r2[0].cond == "cond_child1");
 }
 BOOST_AUTO_TEST_SUITE_END() // imports_manager_test
 

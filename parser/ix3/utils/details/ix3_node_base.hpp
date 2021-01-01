@@ -52,6 +52,8 @@ public:
 	[[nodiscard]]
 	std::optional<gen_utils::variable> node_var() const override ;
 	std::pmr::vector<gen_utils::name_t> required_links() const override ;
+	std::string_view link_condition() const override {return "";}
+	void link_modification(boost::json::value& val) const override {}
 
 	[[nodiscard]]
 	virtual boost::json::object make_json(const compilation_context& ctx) const =0 ;

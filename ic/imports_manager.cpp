@@ -95,8 +95,13 @@ std::pmr::vector<import_info> imports_manager::required_for_links(
 			if(in_tree == &src) continue;
 			auto requests = cur->required_links();
 			for(auto& req:requests) {
-				auto r = in_tree->search(req);
-				if(r) ret.emplace_back(import_info{{r, in_tree}, {cur, &src}, in_name, ""});
+				auto to = in_tree->search(req);
+				if(to) ret.emplace_back(
+				            import_info{
+				                {to, in_tree},
+				                {cur, &src},
+				                in_name,
+				                std::pmr::string(to->link_condition())});
 			}
 		}
 	}

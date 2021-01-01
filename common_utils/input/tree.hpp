@@ -50,9 +50,12 @@ class data_node {
 public:
 	virtual ~data_node() noexcept =default ;
 	[[nodiscard]] virtual std::string_view name() const =0 ;
+	[[nodiscard]] virtual std::pmr::vector<name_t> required_links() const =0 ;
+	[[nodiscard]] virtual std::string_view link_condition() const =0 ;
+	virtual void link_modification(boost::json::value& val) const =0 ;
+
 	[[nodiscard]] virtual std::optional<std::uint64_t> version() const =0 ;
 	[[nodiscard]] virtual std::optional<variable> node_var() const =0 ;
-	[[nodiscard]] virtual std::pmr::vector<name_t> required_links() const =0 ;
 };
 
 class tree final {
