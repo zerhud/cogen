@@ -25,9 +25,9 @@ std::pmr::vector<std::pmr::string> ptsetts::parts() const
 	return ret;
 }
 
-modegen::ic::gen_config ptsetts::part_setts(std::string_view p) const
+mdg::ic::gen_config ptsetts::part_setts(std::string_view p) const
 {
-	modegen::ic::gen_config ret;
+	gen_config ret;
 	auto path = "part."s+std::string(p);
 	ret.map_tmpl = setts.get<std::pmr::string>(path+".file"s);
 	ret.tmpl_file = setts.get<std::pmr::string>(path+".tmpl"s);
@@ -35,7 +35,7 @@ modegen::ic::gen_config ptsetts::part_setts(std::string_view p) const
 	return ret;
 }
 
-void ptsetts::conf_links(const std::string& path, modegen::ic::gen_config& cfg) const
+void ptsetts::conf_links(const std::string& path, gen_config& cfg) const
 {
 	cfg.links.clear();
 	auto incs = setts.get_child_optional(path);

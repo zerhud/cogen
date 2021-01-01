@@ -12,12 +12,12 @@
 
 using namespace std::literals;
 
-modegen::ic::core::core(std::shared_ptr<provider> p)
+mdg::ic::core::core(std::shared_ptr<provider> p)
     : prov(std::move(p))
 {
 }
 
-void modegen::ic::core::gen(const configuration& config) const
+void mdg::ic::core::gen(const configuration& config) const
 {
 	assert(prov);
 	gen_utils::map_to mapper;
@@ -39,7 +39,7 @@ void modegen::ic::core::gen(const configuration& config) const
 	}
 }
 
-boost::json::value modegen::ic::core::make_json(
+boost::json::value mdg::ic::core::make_json(
 		const configuration& config, const input& dsl) const
 {
 	gen_utils::compilation_context ctx;

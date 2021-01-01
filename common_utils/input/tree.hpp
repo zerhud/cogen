@@ -75,7 +75,6 @@ public:
 	tree(node_ptr root, std::shared_ptr<dsl_manager> dm);
 
 	[[nodiscard]] boost::json::value to_json(const compilation_context& ctx) const ;
-	[[nodiscard]] compiled_result compile(const compilation_context& ctx) const ;
 	[[nodiscard]] std::string_view data_id() const ;
 	[[nodiscard]] const data_node& root() const ;
 

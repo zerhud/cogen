@@ -16,7 +16,7 @@
 #include "ic/input.hpp"
 
 using namespace std::literals;
-using ic_input = modegen::ic::input;
+using ic_input = mdg::ic::input;
 
 template <class T0, class... Ts>
 auto make_vector(T0&& first, Ts&&... args)

@@ -40,7 +40,7 @@ struct single_gen_part_fixture {
 	    = std::make_unique<gen_utils::compilation_config>();
 	std::shared_ptr<icmocks::provider> prov = std::make_shared<icmocks::provider>();
 
-	modegen::ic::input all_data;
+	mic::input all_data;
 
 	single_gen_part_fixture()
 	    : t1(t1_root_node, t1_dsl)
@@ -58,8 +58,8 @@ BOOST_AUTO_TEST_SUITE(single_gen_part)
 
 using gen_utils_mocks::make_node;
 
-using modegen::ic::gen_context;
-using modegen::ic::single_gen_part;
+using mic::gen_context;
+using mic::single_gen_part;
 
 BOOST_AUTO_TEST_CASE(no_provider)
 {

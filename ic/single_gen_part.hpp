@@ -11,7 +11,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include "core.hpp"
 
-namespace modegen::ic {
+namespace mdg::ic {
 
 struct gen_config;
 struct gen_context;

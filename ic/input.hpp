@@ -15,7 +15,7 @@
 #include <functional>
 #include "common_utils/input/tree.hpp"
 
-namespace modegen::ic {
+namespace mdg::ic {
 
 class input final {
 	std::pmr::vector<gen_utils::tree> storage;

@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(map_tmpl)
 	setts.put("part.c.tmpl", "v_tmpl");
 	ic_ptsetts obj(setts);
 	BOOST_TEST(obj.parts().size() == 3);
-	modegen::ic::gen_context a_setts;
+	mic::gen_context a_setts;
 	a_setts.cfg_part = obj.part_setts("a"sv);
 	BOOST_TEST(a_setts.cfg_part.map_tmpl == "v_file");
 	BOOST_TEST(a_setts.cfg_part.tmpl_file == "v_tmpl");

@@ -9,7 +9,7 @@
 #include "input.hpp"
 
 using namespace std::literals;
-using modegen::ic::input;
+using mdg::ic::input;
 
 void input::add(input&& other)
 {

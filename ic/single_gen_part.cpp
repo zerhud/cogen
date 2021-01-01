@@ -9,9 +9,9 @@
 #include "single_gen_part.hpp"
 #include "common_utils/input/map_to.hpp"
 
-using modegen::ic::input;
-using modegen::ic::single_gen_part;
-using modegen::ic::compiled_output;
+using mdg::ic::input;
+using mdg::ic::single_gen_part;
+using mdg::ic::compiled_output;
 
 single_gen_part::single_gen_part(const provider* p)
 	: outside(std::move(p))

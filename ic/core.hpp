@@ -18,7 +18,7 @@
 #include "common_utils/naming.hpp"
 #include "input.hpp"
 
-namespace modegen::ic {
+namespace mdg::ic {
 
 enum class json_generator { cpp, cmake, simple };
 

@@ -12,7 +12,7 @@
 
 namespace mdg2 {
 
-class json_provider : public modegen::ic::provider {
+class json_provider : public mdg::ic::provider {
 	mutable boost::json::array all_data;
 	std::filesystem::path outdir;
 public:

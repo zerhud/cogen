@@ -10,6 +10,7 @@
 
 #include <turtle/mock.hpp>
 #include "ic/core.hpp"
+#include "common_utils/tests/mocks.hpp"
 
 namespace mic = modegen::ic;
 

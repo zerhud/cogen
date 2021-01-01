@@ -17,9 +17,7 @@
 namespace gen_utils {
 
 struct node_links_info {
-	/// refers to dsl_manager::id
 	std::string_view dsl_id;
-	/// refers to tree node
 	const data_node* node;
 };
 
