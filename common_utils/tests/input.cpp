@@ -196,7 +196,6 @@ BOOST_FIXTURE_TEST_CASE(getters, fixture)
 	BOOST_CHECK( tc_2.has_value()) ;
 	BOOST_TEST(tc_2.value().root_version() == tree().root_version());
 }
-
 BOOST_FIXTURE_TEST_CASE(uncond_parent_not_copying_children, fixture)
 {
 	auto child1   = make_node(std::nullopt, "child1", "1");
@@ -224,7 +223,6 @@ BOOST_FIXTURE_TEST_CASE(uncond_parent_not_copying_children, fixture)
 	BOOST_TEST( names.size() == 2) ;
 	for( auto name :names) BOOST_CHECK( name != "child2"sv && name != "child11"sv);
 }
-
 BOOST_AUTO_TEST_SUITE_END() // copy
 BOOST_FIXTURE_TEST_CASE(node_variables, fixture)
 {
@@ -271,6 +269,19 @@ BOOST_FIXTURE_TEST_CASE(contains, fixture)
 	MOCK_EXPECT(t4dm->id).returns("tt");
 	gen_utils::tree t4(c1, t4dm);
 	BOOST_CHECK(tree().contains(t4) == gen_utils::tree_compare_result::not_comparable);
+}
+BOOST_FIXTURE_TEST_CASE(contains_two_child, fixture)
+{
+	auto c1 = make_node(101);
+	auto c2 = make_node(102);
+	tree().add(tree().root(), c1);
+	tree().add(tree().root(), c2);
+	gen_utils::tree t2(main_node, dmanager);
+	t2.add(t2.root(), c2);
+	BOOST_CHECK(tree().contains(t2) == gen_utils::tree_compare_result::partial);
+
+	tree().add(tree().root(), make_node(103));
+	BOOST_CHECK(tree().contains(t2) == gen_utils::tree_compare_result::partial);
 }
 BOOST_AUTO_TEST_SUITE_END() // tree
 BOOST_AUTO_TEST_SUITE(tree_map_to)

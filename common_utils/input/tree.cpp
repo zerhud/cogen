@@ -74,11 +74,10 @@ tree_compare_result tree::contains(const tree& other) const
 		return tree_compare_result::not_comparable;
 	if(&root() != &other.root())
 		return tree_compare_result::none;
-	auto beg = store.begin();
 	std::size_t match_count = 0;
-	for(;beg!=store.end();++beg) {
-		if(other.node_exists(beg->get())) ++match_count;
-		else break;
+	for(auto& sn:store) {
+		if(other.node_exists(sn.get())) ++match_count;
+		else if(1 < match_count) break;
 	}
 	if(match_count == 1)
 		return store.size() == 1
