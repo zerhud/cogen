@@ -24,14 +24,12 @@ void imports_manager::build()
 
 void imports_manager::scan_self_matched()
 {
+	using tcr = gen_utils::tree_compare_result;
 	for(auto& [from, fd]:all_input) {
 		for(auto& [to, td]:all_input) {
 			if(from == to) continue;
-			auto r = fd->match_with(*td);
-			if(r==gen_utils::tree_compare_result::total) {
-				matched[fd].emplace_back(to);
-			}
-			if(r==gen_utils::tree_compare_result::partial)
+			tcr r = fd->match_with(*td);
+			if(r==tcr::total || r==tcr::partial)
 				matched[fd].emplace_back(to);
 		}
 	}
