@@ -62,10 +62,45 @@ import_info* imports_manager::scan_required_imports(
 	return nullptr;
 }
 
-std::pmr::vector<mdg::ic::import_info> imports_manager::result_for(
+std::pmr::vector<mdg::ic::import_info> imports_manager::required_for(
         const mdg::ic::input& file_data) const
 {
-	return {};
+	std::pmr::vector<mdg::ic::import_info> ret;
+	for(auto& dt:file_data.all()) {
+		auto dt_result = required_for_scan(*dt, dt->root());
+		ret.insert(ret.end(), dt_result.begin(), dt_result.end());
+	}
+	return ret;
+}
+
+std::pmr::vector<import_info> imports_manager::required_for_scan(
+    const gen_utils::tree& src, const gen_utils::data_node& par) const
+{
+	std::pmr::vector<import_info> ret;
+	for(auto& child:src.children(par)) {
+		auto child_result = required_for_links(src, child);
+		ret.insert(ret.end(), child_result.begin(), child_result.end());
+		child_result = required_for_scan(src, *child);
+		ret.insert(ret.end(), child_result.begin(), child_result.end());
+	}
+	return ret;
+}
+
+std::pmr::vector<import_info> imports_manager::required_for_links(
+    const gen_utils::tree& src, gen_utils::node_ptr cur) const
+{
+	std::pmr::vector<import_info> ret;
+	for(auto& [in_name, in]:all_input) {
+		for(auto& in_tree:in->all()) {
+			if(in_tree == &src) continue;
+			auto requests = cur->required_links();
+			for(auto& req:requests) {
+				auto r = in_tree->search(req);
+				if(r) ret.emplace_back(import_info{{r, in_tree}, {cur, &src}, "", ""});
+			}
+		}
+	}
+	return ret;
 }
 
 std::pmr::vector<std::pmr::string> imports_manager::self_matched(const input& file_data) const

@@ -69,7 +69,7 @@ BOOST_FIXTURE_TEST_CASE(self_matched, ic_fixture)
 	BOOST_TEST(r3.at(0) == "b");
 	BOOST_TEST(r3.at(1) == "c");
 }
-BOOST_FIXTURE_TEST_CASE(result_for, ic_fixture)
+BOOST_FIXTURE_TEST_CASE(required_for, ic_fixture)
 {
 	mic::input fdata1, fdata2;
 	auto t1_child1 = gen_utils_mocks::make_node(11, std::nullopt, std::nullopt, "a");
@@ -83,10 +83,14 @@ BOOST_FIXTURE_TEST_CASE(result_for, ic_fixture)
 	imports_manager mng1;
 	mng1("f1", fdata1)("f2", fdata2).build();
 
-	BOOST_TEST(mng1.result_for(fdata1).size() == 0);
+	BOOST_TEST(mng1.required_for(fdata1).size() == 0);
 
-	auto r2 = mng1.result_for(fdata2);
+	auto r2 = mng1.required_for(fdata2);
 	BOOST_TEST_REQUIRE(r2.size() == 1);
+	BOOST_TEST(r2[0].from.node == t2_child1);
+	BOOST_TEST(r2[0].from.owner->data_id() == "t2_id");
+	BOOST_TEST(r2[0].to.node == t1_child1);
+	BOOST_TEST(r2[0].to.owner->data_id() == "t1_id");
 }
 BOOST_AUTO_TEST_SUITE_END() // imports_manager_test
 
