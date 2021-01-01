@@ -96,7 +96,7 @@ std::pmr::vector<import_info> imports_manager::required_for_links(
 			auto requests = cur->required_links();
 			for(auto& req:requests) {
 				auto r = in_tree->search(req);
-				if(r) ret.emplace_back(import_info{{r, in_tree}, {cur, &src}, "", ""});
+				if(r) ret.emplace_back(import_info{{r, in_tree}, {cur, &src}, in_name, ""});
 			}
 		}
 	}
