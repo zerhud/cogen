@@ -55,13 +55,16 @@ struct ic_fixture {
 	}
 
 	ic_fixture()
-	    : t1_root(gen_utils_mocks::make_node(1, "t1r"))
-	    , t2_root(gen_utils_mocks::make_node(2, "t2r"))
-	    , t3_root(gen_utils_mocks::make_node(3, "t3r"))
+	    : t1_root(gen_utils_mocks::make_node(1, std::nullopt, std::nullopt, "t1r"))
+	    , t2_root(gen_utils_mocks::make_node(2, std::nullopt, std::nullopt, "t2r"))
+	    , t3_root(gen_utils_mocks::make_node(3, std::nullopt, std::nullopt, "t3r"))
 	    , t1_dsl(std::make_shared<gen_utils_mocks::dsl_manager>())
 	    , t2_dsl(std::make_shared<gen_utils_mocks::dsl_manager>())
 	    , t3_dsl(std::make_shared<gen_utils_mocks::dsl_manager>())
 	{
+		MOCK_EXPECT(t1_dsl->id).returns("t1_id");
+		MOCK_EXPECT(t2_dsl->id).returns("t2_id");
+		MOCK_EXPECT(t3_dsl->id).returns("t3_id");
 	}
 };
 
