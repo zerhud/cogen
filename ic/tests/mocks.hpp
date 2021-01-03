@@ -9,7 +9,7 @@
 #pragma once
 
 #include <turtle/mock.hpp>
-#include "ic/core.hpp"
+#include "ic/provider.hpp"
 #include "common_utils/tests/mocks.hpp"
 
 namespace mic = mdg::ic;
@@ -19,19 +19,6 @@ namespace icmocks {
 MOCK_BASE_CLASS( provider, mic::provider )
 {
 	MOCK_METHOD(generate, 3)
-};
-
-MOCK_BASE_CLASS( configuration, mic::configuration )
-{
-	MOCK_METHOD(parts, 0)
-
-	MOCK_METHOD(all_dsl, 0)
-
-	MOCK_METHOD(split_versions, 1)
-	MOCK_METHOD(naming, 1)
-	MOCK_METHOD(tmpl_file, 1)
-	MOCK_METHOD(map_tmpl, 1)
-	MOCK_METHOD(lang, 1)
 };
 
 } // namespace icmocks

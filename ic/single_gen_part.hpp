@@ -9,7 +9,9 @@
 #pragma once
 #include <map>
 #include <boost/property_tree/ptree.hpp>
-#include "core.hpp"
+
+#include "provider.hpp"
+#include "input/input.hpp"
 
 namespace mdg::ic {
 

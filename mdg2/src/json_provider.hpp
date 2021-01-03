@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "ic/core.hpp"
+#include "ic/provider.hpp"
 
 namespace mdg2 {
 

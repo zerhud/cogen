@@ -8,6 +8,10 @@
 
 #pragma once
 
+#include <memory>
+
 namespace mdg::ic {
+
+class provider;
 
 } // namespace mdg::ic
