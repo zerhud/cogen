@@ -25,7 +25,7 @@ void mdg::ic::core::gen(const configuration& config) const
 	for(auto& p:config.parts()) {
 
 		auto map_tmpl = config.map_tmpl(p);
-		std::map<std::pmr::string, input> part_outputs;
+		std::map<std::pmr::string, gen_utils::input> part_outputs;
 		for(auto& t:all_dsl.all()) {
 			auto result = mapper(map_tmpl, *t);
 			for(auto& r:result)
@@ -40,7 +40,7 @@ void mdg::ic::core::gen(const configuration& config) const
 }
 
 boost::json::value mdg::ic::core::make_json(
-		const configuration& config, const input& dsl) const
+        const configuration& config, const gen_utils::input& dsl) const
 {
 	gen_utils::compilation_context ctx;
 	ctx.cfg.name = gen_utils::compiler::cpp;

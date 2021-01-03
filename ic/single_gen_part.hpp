@@ -15,18 +15,22 @@ namespace mdg::ic {
 
 struct gen_config;
 struct gen_context;
-typedef std::pmr::map<std::pmr::string, input> compiled_output;
+typedef std::pmr::map<std::pmr::string, gen_utils::input> compiled_output;
 
 class single_gen_part final {
 	const provider* outside;
-	compiled_output compile(const gen_context& setts, const input& data) const ;
+	compiled_output compile(const gen_context& setts,
+	                        const gen_utils::input& data) const ;
 	boost::json::value make_json(
-	        const gen_context& setts, const input& data) const ;
+	        const gen_context& setts, const gen_utils::input& data) const ;
 	std::pmr::vector<std::pmr::string> matched_includes(
-	        const gen_context& setts, const std::pmr::string& link, const input& data) const ;
+	        const gen_context& setts,
+	        const std::pmr::string& link,
+	        const gen_utils::input& data) const ;
 public:
 	single_gen_part(const provider* p);
-	compiled_output operator()(const gen_context& cur_part, input alli) const ;
+	compiled_output operator()(const gen_context& cur_part,
+	                           gen_utils::input alli) const ;
 };
 
 struct gen_config {

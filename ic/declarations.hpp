@@ -10,7 +10,4 @@
 
 namespace mdg::ic {
 
-class input;
-class imports_manager;
-
 } // namespace mdg::ic

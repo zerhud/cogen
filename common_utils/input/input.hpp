@@ -8,29 +8,32 @@
 
 #pragma once
 
-#include <boost/json.hpp>
-#include "declarations.hpp"
+#include <vector>
+#include <memory>
+#include <string>
+#include <optional>
+#include <functional>
+#include "tree.hpp"
 
 namespace gen_utils {
 
-struct import_info {
-	std::pmr::string name;
-	std::pmr::string cond;
-	node_pointer node;
-};
-
-class compiled_result final {
-	boost::json::value data_;
-	std::pmr::vector<import_info> imports_;
-	bool import_exists(const import_info& src) const ;
+class input final {
+	std::pmr::vector<tree> storage;
 public:
-	void combine(compiled_result other);
+	input() =default ;
+	~input() noexcept =default;
 
-	void add_import(import_info i) ;
-	std::pmr::vector<import_info> imports() const ;
+	void add(input&& other);
+	void add(tree data);
 
-	boost::json::value data() const ;
-	void data(boost::json::value d) ;
+	[[nodiscard]] std::pmr::vector<const tree*> select(
+			std::string_view id) const ;
+
+	[[nodiscard]] std::pmr::vector<const tree*> all() const ;
+
+	[[nodiscard]]
+	tree_compare_result match_with(const input& other) const ;
 };
+
 
 } // namespace gen_utils

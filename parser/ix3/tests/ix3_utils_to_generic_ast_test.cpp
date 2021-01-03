@@ -16,8 +16,8 @@
 #include "utils/to_generic_ast.hpp"
 #include "utils/details/ix3_node_base.hpp"
 #include "common_utils/tests/mocks.hpp"
-#include "ic/imports_manager.hpp"
-#include "ic/input.hpp"
+#include "input/imports_manager.hpp"
+#include "input/input.hpp"
 
 namespace ast = ix3::ast;
 namespace txt = ix3::text;
@@ -197,8 +197,8 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	std_types.add(std_types.root(), std_i8);
 	std_types.add(*std_i8, i8_cpp);
 	std_types.add(*std_i8, i8_py);
-	mdg::ic::imports_manager im;
-	mdg::ic::input file_data;
+	gen_utils::imports_manager im;
+	gen_utils::input file_data;
 	file_data.add(std_types);
 	file_data.add(tree);
 	im("file", file_data).build();

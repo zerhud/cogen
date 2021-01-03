@@ -12,7 +12,8 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include "mocks.hpp"
-#include "imports_manager.hpp"
+#include "input/imports_manager.hpp"
+#include "input/input.hpp"
 
 using namespace std::literals;
 
@@ -30,11 +31,11 @@ boost::json::value operator "" _bj(const char* d, std::size_t l)
 BOOST_AUTO_TEST_SUITE(input)
 
 BOOST_AUTO_TEST_SUITE(imports_manager_test)
-using mdg::ic::imports_manager;
-using icmocks::ic_fixture;
-BOOST_FIXTURE_TEST_CASE(self_matched, ic_fixture)
+using gen_utils::imports_manager;
+using gen_utils_mocks::trees_fixture;
+BOOST_FIXTURE_TEST_CASE(self_matched, trees_fixture)
 {
-	mic::input fdata1, fdata2;
+	gen_utils::input fdata1, fdata2;
 	auto t1_child1 = gen_utils_mocks::make_node(11);
 	t1().add(t1().root(), t1_child1);
 	fdata1.add(t1());
@@ -58,7 +59,7 @@ BOOST_FIXTURE_TEST_CASE(self_matched, ic_fixture)
 	auto sep_t2 = t2().copy_if(
 	            [this, &t1_child1](const gen_utils::data_node& n){
 		return &n == t2_root.get() || &n == t1_child1.get(); });
-	mic::input fdata3, fdata4, fdata5;
+	gen_utils::input fdata3, fdata4, fdata5;
 	fdata3.add(sep_t1.value());
 	fdata4.add(sep_t2.value());
 	fdata5.add(t2());
@@ -69,10 +70,11 @@ BOOST_FIXTURE_TEST_CASE(self_matched, ic_fixture)
 	BOOST_TEST(r3.at(0) == "b");
 	BOOST_TEST(r3.at(1) == "c");
 }
-BOOST_FIXTURE_TEST_CASE(required_for, ic_fixture)
+BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 {
-	mic::input fdata1, fdata2;
-	auto t1_child1 = gen_utils_mocks::make_node(11, std::nullopt, std::nullopt, "a");
+	gen_utils::input fdata1, fdata2;
+	auto t1_child1 = gen_utils_mocks::make_node(
+	            11, std::nullopt, std::nullopt, "a");
 	auto t2_child1 = gen_utils_mocks::make_node(
 	            12, std::nullopt, std::nullopt, std::nullopt, {{"a"}});
 	t1().add(t1().root(), t1_child1);

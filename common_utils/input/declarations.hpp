@@ -19,6 +19,7 @@ enum class tree_compare_result { not_comparable, none, only_root, partial, total
 class links_manager;
 
 class tree;
+class input;
 class data_node;
 using node_ptr = std::shared_ptr<data_node>;
 using name_t = std::pmr::vector<std::pmr::string>;

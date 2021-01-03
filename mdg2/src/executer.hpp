@@ -21,7 +21,7 @@ class executer {
 	boost::program_options::variables_map opt_vars;
 	path_config pathes;
 
-	mdg::ic::input user_data;
+	gen_utils::input user_data;
 
 	void set_options();
 

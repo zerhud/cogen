@@ -9,15 +9,14 @@
 #pragma once
 
 #include "declarations.hpp"
-#include "common_utils/input/declarations.hpp"
 
 #include <map>
 
-namespace mdg::ic {
+namespace gen_utils {
 
 struct import_info {
-	gen_utils::node_pointer to;
-	gen_utils::node_pointer from;
+	node_pointer to;
+	node_pointer from;
 	std::pmr::string file;
 	std::pmr::string cond;
 };
@@ -29,12 +28,11 @@ class imports_manager final {
 
 	void scan_self_matched();
 	void scan_required_imports();
-	import_info* scan_required_imports(
-	        const gen_utils::tree& from, const gen_utils::tree& to);
+	import_info* scan_required_imports(const tree& from, const tree& to);
 	std::pmr::vector<import_info> required_for_scan(
-	        const gen_utils::tree& src, const gen_utils::data_node& par) const ;
+	        const tree& src, const data_node& par) const ;
 	std::pmr::vector<import_info> required_for_links(
-	        const gen_utils::tree& src, gen_utils::node_ptr cur) const ;
+	        const tree& src, node_ptr cur) const ;
 public:
 	void build();
 	imports_manager& operator()(const std::pmr::string& file, const input& data);
@@ -43,4 +41,4 @@ public:
 	std::pmr::vector<std::pmr::string> self_matched(const input& file_data) const ;
 };
 
-} // namespace mdg::ic
+} // namespace gen_utils

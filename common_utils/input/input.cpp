@@ -9,7 +9,7 @@
 #include "input.hpp"
 
 using namespace std::literals;
-using mdg::ic::input;
+using gen_utils::input;
 
 void input::add(input&& other)
 {
@@ -17,14 +17,14 @@ void input::add(input&& other)
 		add(std::move(oc));
 }
 
-void input::add(gen_utils::tree data)
+void input::add(tree data)
 {
 	storage.emplace_back(std::move(data));
 }
 
 std::pmr::vector<const gen_utils::tree*> input::select(std::string_view id) const
 {
-	std::pmr::vector<const gen_utils::tree*> ret;
+	std::pmr::vector<const tree*> ret;
 	ret.reserve(storage.size());
 	for(auto& t:storage) if(t.data_id()==id) ret.emplace_back(&t);
 	return ret;
@@ -32,7 +32,7 @@ std::pmr::vector<const gen_utils::tree*> input::select(std::string_view id) cons
 
 std::pmr::vector<const gen_utils::tree*> input::all() const
 {
-	std::pmr::vector<const gen_utils::tree*> ret;
+	std::pmr::vector<const tree*> ret;
 	ret.reserve(storage.size());
 	for(auto& t:storage) ret.emplace_back(&t);
 	return ret;
@@ -40,7 +40,6 @@ std::pmr::vector<const gen_utils::tree*> input::all() const
 
 gen_utils::tree_compare_result input::match_with(const input& other) const
 {
-	using gen_utils::tree_compare_result;
 	tree_compare_result result = tree_compare_result::none;
 	if(storage.empty() && other.storage.empty())
 		return tree_compare_result::total;

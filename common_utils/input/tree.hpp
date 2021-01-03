@@ -18,7 +18,7 @@
 #include "declarations.hpp"
 #include "ic/declarations.hpp"
 #include "naming.hpp"
-#include "compiled_result.hpp"
+#include "imports_manager.hpp"
 
 namespace gen_utils {
 
@@ -28,9 +28,8 @@ struct compilation_config final {
 };
 
 struct compilation_context final {
-	compiled_result info;
 	compilation_config cfg;
-	const mdg::ic::imports_manager* links;
+	const imports_manager* links;
 };
 
 struct variable {

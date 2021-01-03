@@ -16,7 +16,7 @@
 #include <boost/json.hpp>
 
 #include "common_utils/naming.hpp"
-#include "input.hpp"
+#include "common_utils/input/input.hpp"
 
 namespace mdg::ic {
 
@@ -37,7 +37,7 @@ public:
 
 	virtual ~configuration() noexcept =default;
 
-	[[nodiscard]] virtual input all_dsl() const =0 ;
+	[[nodiscard]] virtual gen_utils::input all_dsl() const =0 ;
 
 	[[nodiscard]]
 	virtual std::pmr::vector<std::string_view> parts() const =0;
@@ -53,7 +53,7 @@ public:
 class core {
 	std::shared_ptr<provider> prov;
 	boost::json::value make_json(
-			const configuration& config, const input& dsl) const ;
+	        const configuration& config, const gen_utils::input& dsl) const ;
 public:
 	core(std::shared_ptr<provider> p) ;
 	void gen(const configuration& config) const ;

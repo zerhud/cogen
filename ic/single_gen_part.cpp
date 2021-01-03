@@ -9,7 +9,7 @@
 #include "single_gen_part.hpp"
 #include "common_utils/input/map_to.hpp"
 
-using mdg::ic::input;
+using gen_utils::input;
 using mdg::ic::single_gen_part;
 using mdg::ic::compiled_output;
 

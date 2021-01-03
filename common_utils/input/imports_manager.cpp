@@ -9,15 +9,15 @@
 #include "imports_manager.hpp"
 #include "input.hpp"
 
-using mdg::ic::import_info;
-using mdg::ic::imports_manager;
+using gen_utils::import_info;
+using gen_utils::imports_manager;
 
 imports_manager& imports_manager::operator()(const std::pmr::string& file, const input& data)
 {
 	return add(file, data);
 }
 
-imports_manager& imports_manager::add(const std::pmr::string& file, const mdg::ic::input& data)
+imports_manager& imports_manager::add(const std::pmr::string& file, const input& data)
 {
 	all_input[file] = &data;
 	return *this;
@@ -31,7 +31,7 @@ void imports_manager::build()
 
 void imports_manager::scan_self_matched()
 {
-	using tcr = gen_utils::tree_compare_result;
+	using tcr = tree_compare_result;
 	for(auto& [from, fd]:all_input) {
 		for(auto& [to, td]:all_input) {
 			if(from == to) continue;
@@ -56,16 +56,16 @@ void imports_manager::scan_required_imports()
 }
 
 import_info* imports_manager::scan_required_imports(
-        const gen_utils::tree& from, const gen_utils::tree& to)
+        const tree& from, const tree& to)
 {
 	if(&from == &to) return nullptr;
 	return nullptr;
 }
 
-std::pmr::vector<mdg::ic::import_info> imports_manager::required_for(
-        const mdg::ic::input& file_data) const
+std::pmr::vector<import_info> imports_manager::required_for(
+        const input& file_data) const
 {
-	std::pmr::vector<mdg::ic::import_info> ret;
+	std::pmr::vector<import_info> ret;
 	for(auto& dt:file_data.all()) {
 		auto dt_result = required_for_scan(*dt, dt->root());
 		ret.insert(ret.end(), dt_result.begin(), dt_result.end());
@@ -74,7 +74,7 @@ std::pmr::vector<mdg::ic::import_info> imports_manager::required_for(
 }
 
 std::pmr::vector<import_info> imports_manager::required_for_scan(
-    const gen_utils::tree& src, const gen_utils::data_node& par) const
+    const tree& src, const data_node& par) const
 {
 	std::pmr::vector<import_info> ret;
 	for(auto& child:src.children(par)) {
@@ -87,7 +87,7 @@ std::pmr::vector<import_info> imports_manager::required_for_scan(
 }
 
 std::pmr::vector<import_info> imports_manager::required_for_links(
-    const gen_utils::tree& src, gen_utils::node_ptr cur) const
+    const tree& src, node_ptr cur) const
 {
 	std::pmr::vector<import_info> ret;
 	for(auto& [in_name, in]:all_input) {

@@ -40,7 +40,7 @@ struct single_gen_part_fixture {
 	    = std::make_unique<gen_utils::compilation_config>();
 	std::shared_ptr<icmocks::provider> prov = std::make_shared<icmocks::provider>();
 
-	mic::input all_data;
+	gen_utils::input all_data;
 
 	single_gen_part_fixture()
 	    : t1(t1_root_node, t1_dsl)
