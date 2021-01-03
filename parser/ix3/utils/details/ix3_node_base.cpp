@@ -14,9 +14,12 @@ using ix3::utils::details::compilation_context;
 
 
 compilation_context::compilation_context(
-		const gen_utils::tree* c, const ix3_compiler* a)
+        const gen_utils::tree* c,
+        const ix3_compiler* a,
+        const gen_utils::compilation_context* gc)
     : container(c)
     , asp(a)
+    , gu_ctx(gc)
 {
 	assert(asp);
 	assert(container);

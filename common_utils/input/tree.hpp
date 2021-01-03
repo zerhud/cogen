@@ -16,6 +16,7 @@
 #include <boost/json.hpp>
 
 #include "declarations.hpp"
+#include "ic/declarations.hpp"
 #include "naming.hpp"
 #include "compiled_result.hpp"
 
@@ -29,7 +30,7 @@ struct compilation_config final {
 struct compilation_context final {
 	compiled_result info;
 	compilation_config cfg;
-	const links_manager* links;
+	const mdg::ic::imports_manager* links;
 };
 
 struct variable {

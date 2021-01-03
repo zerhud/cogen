@@ -16,6 +16,8 @@
 #include "utils/to_generic_ast.hpp"
 #include "utils/details/ix3_node_base.hpp"
 #include "common_utils/tests/mocks.hpp"
+#include "ic/imports_manager.hpp"
+#include "ic/input.hpp"
 
 namespace ast = ix3::ast;
 namespace txt = ix3::text;
@@ -42,10 +44,10 @@ struct fake_compiler : ix3::utils::details::ix3_compiler {
 boost::json::value make_json(const gen_utils::data_node& root, const gen_utils::tree& cnt)
 {
 	assert(dynamic_cast<const ix3::utils::details::ix3_node_base*>(&root));
-	gen_utils::compilation_config cfg;
-	cfg.naming = gen_utils::name_conversion::camel_case;
-	fake_compiler fc{cfg};
-	ix3::utils::details::compilation_context ctx(&cnt, &fc);
+	gen_utils::compilation_context gu_ctx;
+	gu_ctx.cfg.naming = gen_utils::name_conversion::camel_case;
+	fake_compiler fc{gu_ctx.cfg};
+	ix3::utils::details::compilation_context ctx(&cnt, &fc, &gu_ctx);
 	return static_cast<const ix3::utils::details::ix3_node_base&>(root).make_json(ctx);
 }
 BOOST_AUTO_TEST_CASE(json_compare)
@@ -177,6 +179,7 @@ BOOST_AUTO_TEST_CASE(functions)
 }
 BOOST_AUTO_TEST_CASE(standard_types)
 {
+	using ix3::utils::details::ix3_node_base;
 	to_generic_ast maker;
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
@@ -185,7 +188,28 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
 	BOOST_TEST(tree.children(*mod).size()==1);
 
+	auto std_i8 = gen_utils_mocks::make_node(10, std::nullopt, std::nullopt, "i8");
+	auto i8_cpp = gen_utils_mocks::make_node(11);
+	auto i8_py = gen_utils_mocks::make_node(12);
+	auto std_dsl = std::make_shared<gen_utils_mocks::dsl_manager>();
+	MOCK_EXPECT(std_dsl->id).returns("std_types");
+	gen_utils::tree std_types(gen_utils_mocks::make_node(1), std_dsl);
+	std_types.add(std_types.root(), std_i8);
+	std_types.add(*std_i8, i8_cpp);
+	std_types.add(*std_i8, i8_py);
+	mdg::ic::imports_manager im;
+	mdg::ic::input file_data;
+	file_data.add(std_types);
+	file_data.add(tree);
+	im("file", file_data).build();
+
 	auto foo = tree.children(*mod).at(0);
+
+	gen_utils::compilation_context gu_ctx;
+	fake_compiler fc{gu_ctx.cfg};
+	ix3::utils::details::compilation_context ctx(&tree, &fc, &gu_ctx);
+	auto json = static_cast<const ix3_node_base&>(*foo).make_json(ctx);
+
 	BOOST_TEST(foo->name()=="foo");
 	BOOST_TEST(make_json(*foo, tree) == boost::json::parse(
 	               R"({

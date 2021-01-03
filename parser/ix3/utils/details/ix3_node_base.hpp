@@ -35,8 +35,12 @@ public:
 class compilation_context  {
 	const gen_utils::tree* container;
 	const ix3_compiler* asp;
+	const gen_utils::compilation_context* gu_ctx;
 public:
-	explicit compilation_context(const gen_utils::tree* c, const ix3_compiler* a);
+	explicit compilation_context(
+	        const gen_utils::tree* c,
+	        const ix3_compiler* a,
+	        const gen_utils::compilation_context *gc);
 
 	[[nodiscard]] std::pmr::vector<const ix3_node_base*> children(
 			const ix3_node_base& par) const ;

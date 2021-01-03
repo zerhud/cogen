@@ -11,6 +11,6 @@
 namespace mdg::ic {
 
 class input;
-class import_manager;
+class imports_manager;
 
 } // namespace mdg::ic

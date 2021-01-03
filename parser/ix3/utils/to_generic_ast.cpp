@@ -28,7 +28,7 @@ boost::json::value ix3_manager::to_json(
 	const auto* root = static_cast<const ix3_root_node*>(&container.root());
 	assert(ctx.cfg.name==gen_utils::compiler::cpp);
 	details::cpp_compiler compiler{&ctx.cfg};
-	details::compilation_context inner_ctx( &container, &compiler );
+	details::compilation_context inner_ctx( &container, &compiler, &ctx );
 	return root->make_json(inner_ctx);
 }
 
