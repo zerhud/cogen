@@ -15,6 +15,7 @@
 #include "grammar/all.hpp"
 #include "utils/to_generic_ast.hpp"
 #include "utils/details/ix3_node_base.hpp"
+#include "utils/details/sep_nodes.hpp"
 #include "common_utils/tests/mocks.hpp"
 #include "input/imports_manager.hpp"
 #include "input/input.hpp"
@@ -225,7 +226,44 @@ BOOST_AUTO_TEST_CASE(standard_types)
 }
 BOOST_AUTO_TEST_SUITE_END() // gain_to_generic_ast
 
-BOOST_AUTO_TEST_SUITE(cpp_compiler) // cpp_compiler
+BOOST_AUTO_TEST_SUITE(ix3_manager_suite)
+BOOST_AUTO_TEST_CASE(getters)
+{
+	ix3::utils::ix3_manager mng;
+	BOOST_TEST(mng.id() == "ix3"sv);
+}
+BOOST_AUTO_TEST_CASE(to_json)
+{
+	struct fake_ix3_node : ix3::utils::details::ix3_node_base {
+		boost::json::object js;
+		fake_ix3_node(boost::json::object j) : js(std::move(j)) { }
+		std::string_view name() const override { return "fake_ix3_node"sv; }
+		std::optional<std::uint64_t> version() const override { return std::nullopt; }
+		boost::json::object make_json(const ix3::utils::details::compilation_context&) const override
+		{
+			return js;
+		}
+	};
+
+	boost::json::object js;
+
+	auto mng = std::make_shared<ix3::utils::ix3_manager>();
+	auto root = std::make_shared<ix3::utils::details::ix3_root_node>();
+	gen_utils::tree t1(root, mng);
+	auto child1 = std::make_shared<fake_ix3_node>(js);
+	auto child11 = std::make_shared<fake_ix3_node>((js["test"]="ok", js));
+	t1.add(*root, child1);
+	t1.add(*child1, child11);
+	gen_utils::compilation_context ctx;
+	gen_utils::imports_manager imports;
+	ctx.linked_to = child11;
+	ctx.links = &imports;
+	BOOST_TEST(t1.to_json(ctx) == child11->js);
+
+}
+BOOST_AUTO_TEST_SUITE_END() // ix3_manager_suite
+
+BOOST_AUTO_TEST_SUITE(cpp_compiler)
 BOOST_AUTO_TEST_SUITE_END() // cpp_compiler
 
 BOOST_AUTO_TEST_SUITE_END() // utils

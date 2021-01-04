@@ -30,6 +30,7 @@ struct compilation_config final {
 struct compilation_context final {
 	compilation_config cfg;
 	const imports_manager* links;
+	node_ptr linked_to = nullptr;
 };
 
 struct variable {
@@ -70,7 +71,6 @@ class tree final {
 
 	std::pmr::vector<edge> edges;
 
-	bool node_exists(const data_node* n) const ;
 	node_ptr create_link(const data_node* p, node_ptr c);
 	const edge* search_edge(const data_node& par) const ;
 	node_ptr search(const data_node& par, name_t n) const ;
@@ -87,6 +87,7 @@ public:
 	[[nodiscard]] std::pmr::vector<node_ptr> children(const data_node& par) const ;
 	[[nodiscard]] tree_compare_result contains(const tree& other) const ;
 	[[nodiscard]] node_ptr search(name_t n) const ;
+	[[nodiscard]] bool node_exists(const data_node* n) const ;
 
 	[[nodiscard]] std::uint64_t root_version() const ;
 	void root_version(std::uint64_t v) ;

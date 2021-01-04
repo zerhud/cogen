@@ -15,17 +15,23 @@
 #include "details/cpp_compiler.hpp"
 
 using namespace std::literals;
-using ix3::utils::to_generic_ast;
 using ix3::utils::ix3_manager;
+using ix3::utils::to_generic_ast;
+using ix3::utils::details::ix3_node_base;
 
 std::string_view ix3_manager::id() const { return "ix3"sv; }
 boost::json::value ix3_manager::to_json(
         const gen_utils::compilation_context& ctx,
         const gen_utils::tree& container) const
 {
-	using details::ix3_root_node;
-	assert(dynamic_cast<const ix3_root_node*>(&container.root()) != nullptr);
-	const auto* root = static_cast<const ix3_root_node*>(&container.root());
+	const ix3_node_base* root;
+	if(!ctx.linked_to)
+		root = dynamic_cast<const ix3_node_base*>(&container.root());
+	else {
+		assert(container.node_exists(ctx.linked_to.get()));
+		root = dynamic_cast<const ix3_node_base*>(ctx.linked_to.get());
+	}
+	assert(root != nullptr);
 	assert(ctx.cfg.name==gen_utils::compiler::cpp);
 	details::cpp_compiler compiler{&ctx.cfg};
 	details::compilation_context inner_ctx( &container, &compiler, &ctx );
