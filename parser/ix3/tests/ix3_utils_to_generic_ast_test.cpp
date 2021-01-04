@@ -181,6 +181,8 @@ BOOST_AUTO_TEST_CASE(functions)
 BOOST_AUTO_TEST_CASE(standard_types)
 {
 	using ix3::utils::details::ix3_node_base;
+	using gu_tree = gen_utils::tree;
+	using gu_ctx = gen_utils::compilation_context;
 	to_generic_ast maker;
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
@@ -189,15 +191,24 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
 	BOOST_TEST(tree.children(*mod).size()==1);
 
-	auto std_i8 = gen_utils_mocks::make_node(10, std::nullopt, std::nullopt, "i8");
-	auto i8_cpp = gen_utils_mocks::make_node(11);
-	auto i8_py = gen_utils_mocks::make_node(12);
+	auto std_i8 = gen_utils_mocks::make_node(10, std::nullopt, std::nullopt, "");
+	auto i8_cpp = gen_utils_mocks::make_node(11, std::nullopt, std::nullopt, "i8");
+	auto i8_js = gen_utils_mocks::make_node(12, std::nullopt, std::nullopt, "i8");
 	auto std_dsl = std::make_shared<gen_utils_mocks::dsl_manager>();
 	MOCK_EXPECT(std_dsl->id).returns("std_types");
+	MOCK_EXPECT(std_dsl->to_json).calls(
+	            [](const gu_ctx& ctx, const gu_tree& con){
+		BOOST_TEST(ctx.linked_to != nullptr);
+		boost::json::value ret;
+		ret = "std::uint8_t"s;
+		return ret;
+	});
+	MOCK_EXPECT(i8_cpp->link_condition).returns("cpp");
+	MOCK_EXPECT(i8_js->link_condition).returns("js");
 	gen_utils::tree std_types(gen_utils_mocks::make_node(1), std_dsl);
 	std_types.add(std_types.root(), std_i8);
 	std_types.add(*std_i8, i8_cpp);
-	std_types.add(*std_i8, i8_py);
+	std_types.add(*std_i8, i8_js);
 	gen_utils::imports_manager im;
 	gen_utils::input file_data;
 	file_data.add(std_types);
@@ -206,20 +217,22 @@ BOOST_AUTO_TEST_CASE(standard_types)
 
 	auto foo = tree.children(*mod).at(0);
 
-	gen_utils::compilation_context gu_ctx;
-	fake_compiler fc{gu_ctx.cfg};
-	ix3::utils::details::compilation_context ctx(&tree, &fc, &gu_ctx);
+	gu_ctx test_ctx;
+	test_ctx.links = &im;
+	fake_compiler fc{test_ctx.cfg};
+	ix3::utils::details::compilation_context ctx(&tree, &fc, &test_ctx);
 	auto json = static_cast<const ix3_node_base&>(*foo).make_json(ctx);
 
 	BOOST_TEST(foo->name()=="foo");
-	BOOST_TEST(make_json(*foo, tree) == boost::json::parse(
+	BOOST_TEST(json == boost::json::parse(
 	               R"({
 	               "orig_name":"foo","name":"foo",
 	               "type":"function",
 	               "params":[ ],
 	               "return":{
 	                 "type":"type",
-	                 "cpp_name":"std::int8_t",
+	                 "cpp":"std::int8_t",
+	                 "js":"integer",
 	                 "name":["i8"],
 	                 "subs":[]}
 	               })"sv));

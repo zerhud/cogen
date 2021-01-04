@@ -36,6 +36,7 @@ class compilation_context  {
 	const gen_utils::tree* container;
 	const ix3_compiler* asp;
 	const gen_utils::compilation_context* gu_ctx;
+	std::pmr::vector<gen_utils::import_info> cur_imports;
 public:
 	explicit compilation_context(
 	        const gen_utils::tree* c,
@@ -46,6 +47,8 @@ public:
 			const ix3_node_base& par) const ;
 
 	const ix3_compiler& compiling_aspect() const ;
+
+	boost::json::object linked_json(const ix3_node_base& node) const ;
 
 	[[nodiscard]]
 	std::pmr::vector<std::pmr::string> naming(std::string_view orig) const ;

@@ -35,6 +35,14 @@ boost::json::object function_node::make_json(const compilation_context& ctx) con
 	return ret;
 }
 
+std::pmr::vector<gen_utils::name_t> function_node::required_links() const
+{
+	gen_utils::name_t ret;
+	for(auto& n:original_node().return_type.name)
+		ret.emplace_back(n);
+	return {ret};
+}
+
 fnc_param_node::fnc_param_node(ast::function_parameter n) : ast_node(std::move(n)) {}
 
 boost::json::object fnc_param_node::make_json(const compilation_context& ctx) const

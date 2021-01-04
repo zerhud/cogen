@@ -29,7 +29,7 @@ struct compilation_config final {
 
 struct compilation_context final {
 	compilation_config cfg;
-	const imports_manager* links;
+	const imports_manager* links = nullptr;
 	node_ptr linked_to = nullptr;
 };
 

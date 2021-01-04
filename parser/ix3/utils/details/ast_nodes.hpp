@@ -62,7 +62,7 @@ public:
 
 	boost::json::object make_json(const compilation_context& ctx) const override
 	{
-		boost::json::object ret;
+		boost::json::object ret = ctx.linked_json(*this);
 		ret["orig_name"] = name();
 		auto list = ctx.naming(name());
 		if(list.size()==1) ret["name"] = list[0];
@@ -78,6 +78,7 @@ public:
 struct function_node : ast_node<ast::function> {
 	function_node(ast::function n);
 	boost::json::object make_json(const compilation_context& ctx) const override ;
+	std::pmr::vector<gen_utils::name_t> required_links() const override ;
 };
 
 struct fnc_param_node : ast_node<ast::function_parameter> {

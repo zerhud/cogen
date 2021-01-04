@@ -23,12 +23,24 @@ compilation_context::compilation_context(
 {
 	assert(asp);
 	assert(container);
+	if(gc->links) cur_imports = gc->links->required_for(*container);
 }
 
 const ix3_compiler & compilation_context::compiling_aspect() const
 {
 	assert(asp);
 	return *asp;
+}
+
+boost::json::object compilation_context::linked_json(const ix3_node_base& node) const
+{
+	boost::json::object ret;
+	gen_utils::compilation_context ctx = *gu_ctx;
+	for(auto& link:cur_imports) {
+		if(link.from.node.get() == &node)
+			ret[link.cond] = link.to.owner->to_json((ctx.linked_to=link.to.node,ctx));
+	}
+	return ret;
 }
 
 std::pmr::vector<std::pmr::string> compilation_context::naming(std::string_view orig) const
