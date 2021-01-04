@@ -73,6 +73,12 @@ std::pmr::vector<import_info> imports_manager::required_for(
 	return ret;
 }
 
+std::pmr::vector<import_info> imports_manager::required_for(
+        const tree& file_data) const
+{
+	return required_for_scan(file_data, file_data.root());
+}
+
 std::pmr::vector<import_info> imports_manager::required_for_scan(
     const tree& src, const data_node& par) const
 {

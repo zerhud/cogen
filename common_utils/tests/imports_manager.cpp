@@ -76,7 +76,7 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	auto t1_child1 = gen_utils_mocks::make_node(
 	            11, std::nullopt, std::nullopt, "a");
 	auto t2_child1 = gen_utils_mocks::make_node(
-	            12, std::nullopt, std::nullopt, std::nullopt, {{"a"}});
+	            12, std::nullopt, std::nullopt, "not_used", {{"a"}});
 	t1().add(t1().root(), t1_child1);
 	t2().add(t2().root(), t2_child1);
 	fdata1.add(t1());
@@ -97,6 +97,15 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	BOOST_TEST(r2[0].to.owner->data_id() == "t1_id");
 	BOOST_TEST(r2[0].file == "f1");
 	BOOST_TEST(r2[0].cond == "cond_child1");
+
+	auto r3 = mng1.required_for(t2());
+	BOOST_TEST(r3.size() == r2.size());
+	BOOST_TEST(r3[0].from.node == t2_child1);
+	BOOST_TEST(r3[0].from.owner->data_id() == "t2_id");
+	BOOST_TEST(r3[0].to.node == t1_child1);
+	BOOST_TEST(r3[0].to.owner->data_id() == "t1_id");
+	BOOST_TEST(r3[0].file == "f1");
+	BOOST_TEST(r3[0].cond == "cond_child1");
 }
 BOOST_AUTO_TEST_SUITE_END() // imports_manager_test
 

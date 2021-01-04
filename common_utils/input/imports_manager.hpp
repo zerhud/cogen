@@ -21,6 +21,13 @@ struct import_info {
 	std::pmr::string cond;
 };
 
+inline const bool operator == (const import_info& l, const import_info& r)
+{
+	return
+	        std::tie(l.to, l.from, l.file, l.cond) ==
+	        std::tie(r.to, r.from, l.file, l.cond);
+}
+
 class imports_manager final {
 	std::pmr::map<std::pmr::string, const input*> all_input;
 	std::pmr::vector<import_info> imports;
@@ -38,6 +45,7 @@ public:
 	imports_manager& operator()(const std::pmr::string& file, const input& data);
 	imports_manager& add(const std::pmr::string& file, const input& data);
 	std::pmr::vector<import_info> required_for(const input& file_data) const ;
+	std::pmr::vector<import_info> required_for(const tree& file_data) const ;
 	std::pmr::vector<std::pmr::string> self_matched(const input& file_data) const ;
 };
 
