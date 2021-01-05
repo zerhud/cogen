@@ -34,4 +34,3 @@ struct type : x3::position_tagged {
 };
 
 } // namespace ix3::ast
-

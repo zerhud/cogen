@@ -43,7 +43,9 @@ public:
 	const Ast& original_node() const { return ast; }
 
 	[[nodiscard]] std::string_view name() const override {
-		return ast.name;
+		if constexpr (requires{ {ast.name} -> std::convertible_to<std::string_view>; })
+		    return ast.name;
+		else return "";
 	}
 
 	[[nodiscard]]
@@ -73,6 +75,14 @@ public:
 		}
 		return ret;
 	}
+};
+
+struct type_node : ast_node<ast::type> {
+	type_node(ast::type t);
+	std::string_view type_name() const ;
+	std::string_view name() const override ;
+	boost::json::object make_json(const compilation_context& ctx) const override ;
+	std::pmr::vector<gen_utils::name_t> required_links() const override ;
 };
 
 struct function_node : ast_node<ast::function> {

@@ -74,6 +74,13 @@ void to_generic_ast::on_obj(ast::module &obj)
 	new_mod(obj);
 }
 
+void to_generic_ast::make_type(ast::type& v, const gen_utils::data_node& par)
+{
+	auto in = std::make_shared<details::type_node>(v);
+	result.add(par, in);
+	for(auto& sub:v.sub_types) make_type(sub, *in);
+}
+
 void to_generic_ast::on_obj(ast::record& obj)
 {
 	assert(parents.size()<=2);
@@ -92,12 +99,15 @@ void to_generic_ast::on_obj(ast::function& obj)
 {
 	cur_fnc = std::make_shared<details::function_node>(obj);
 	result.add(*parents.back(), cur_fnc);
+	make_type(obj.return_type, *cur_fnc);
 }
 
 void to_generic_ast::on_obj(ast::function_parameter& obj)
 {
 	assert(cur_fnc);
-	result.add(*cur_fnc, std::make_shared<details::fnc_param_node>(obj));
+	auto param = std::make_shared<details::fnc_param_node>(obj);
+	result.add(*cur_fnc, param);
+	make_type(obj.param_type, *param);
 }
 
 gen_utils::tree to_generic_ast::operator()(std::vector<ast::module> mods)

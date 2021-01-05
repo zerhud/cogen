@@ -16,6 +16,7 @@
 #include "utils/to_generic_ast.hpp"
 #include "utils/details/ix3_node_base.hpp"
 #include "utils/details/sep_nodes.hpp"
+#include "utils/details/ast_nodes.hpp"
 #include "common_utils/tests/mocks.hpp"
 #include "input/imports_manager.hpp"
 #include "input/input.hpp"
@@ -145,9 +146,9 @@ BOOST_AUTO_TEST_CASE(functions)
 	BOOST_TEST(*mod->version() < *bar->version());
 
 	auto foo_params = tree.children(*foo);
-	BOOST_TEST(foo_params.size() == 2);
-	BOOST_TEST(foo_params.at(0)->name() == "bar");
-	BOOST_CHECK(!foo_params.at(0)->version().has_value());
+	BOOST_TEST(foo_params.size() == 3);
+	BOOST_TEST(foo_params.at(1)->name() == "bar");
+	BOOST_CHECK(!foo_params.at(1)->version().has_value());
 
 	BOOST_TEST(make_json(*bar, tree) == boost::json::parse(
 	               R"({
@@ -162,13 +163,15 @@ BOOST_AUTO_TEST_CASE(functions)
 	               "return":{"type":"type", "name":["int"], "subs":[]}
 	               })"sv));
 	BOOST_TEST(make_json(*foo_params.at(0), tree) == boost::json::parse(
+	               R"({ "type":"type","name":["int"],"subs":[] })"sv));
+	BOOST_TEST(make_json(*foo_params.at(1), tree) == boost::json::parse(
 	               R"({
 	                 "orig_name":"bar","name":"bar",
 	                 "param_t":{"type":"type", "name":["string"], "subs":[]},
 	                 "type":"function_parameter",
 	                 "req":false
 	               })"sv));
-	BOOST_TEST(make_json(*foo_params.at(1), tree) == boost::json::parse(
+	BOOST_TEST(make_json(*foo_params.at(2), tree) == boost::json::parse(
 	               R"({
 	                 "orig_name":"baz","name":"baz",
 	                 "param_t":{"type":"type", "name":["list"], "subs":[
@@ -177,6 +180,54 @@ BOOST_AUTO_TEST_CASE(functions)
 	                 "type":"function_parameter",
 	                 "req":true
 	               })"sv));
+}
+BOOST_AUTO_TEST_CASE(type_nodes)
+{
+	to_generic_ast maker;
+	auto ast = txt::parse(txt::file_content,
+	                      "module mod1 v1.1:"
+	                      "int foo(-string<char,alloc> bar, +list<foo<str_t>> bar2);"sv);
+	gen_utils::tree tree = maker(ast.modules);
+	auto extract_type_node = [&tree](auto& par, int at){
+		auto ret = dynamic_cast<const ix3::utils::details::type_node*>(
+		            tree.children(*par).at(at).get());
+		BOOST_REQUIRE(ret != nullptr);
+		return ret;
+	};
+	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	auto foo = tree.children(*mod).at(0);
+	auto ret_type = extract_type_node(foo, 0);
+	auto bar1 = tree.children(*foo).at(1);
+	auto bar1_type = extract_type_node(bar1, 0);
+	auto bar2 = tree.children(*foo).at(2);
+	auto bar2_type = extract_type_node(bar2, 0);
+
+	BOOST_TEST(ret_type->type_name() == "int");
+	BOOST_TEST(tree.children(*ret_type).size()==0);
+	BOOST_TEST(tree.children(*bar1).size() == 1);
+	BOOST_TEST(tree.children(*bar2).size() == 1);
+	BOOST_TEST(bar1_type->type_name() == "string");
+	BOOST_TEST(bar2_type->type_name() == "list");
+	BOOST_TEST(tree.children(*bar1_type).size()==2);
+	BOOST_TEST(extract_type_node(bar1_type, 0)->type_name()=="char");
+	BOOST_TEST(extract_type_node(bar1_type, 1)->type_name()=="alloc");
+	BOOST_TEST(tree.children(*bar2_type).size()==1);
+	auto bar2_foo = extract_type_node(bar2_type, 0);
+	BOOST_TEST(bar2_foo->type_name() == "foo");
+	BOOST_TEST(extract_type_node(bar2_foo, 0)->type_name() == "str_t");
+
+	BOOST_TEST(make_json(*ret_type, tree) == boost::json::parse(
+	               R"( {"type":"type", "name":["int"], "subs":[]} )"sv));
+	BOOST_TEST(make_json(*bar1_type, tree) == boost::json::parse(
+	               R"( {"type":"type", "name":["string"], "subs":[
+	               {"type":"type", "name":["char"], "subs":[]},
+	               {"type":"type", "name":["alloc"], "subs":[]}
+	               ]} )"sv));
+	BOOST_TEST(make_json(*bar2_type, tree) == boost::json::parse(
+	               R"( {"type":"type", "name":["list"], "subs":[
+	               {"type":"type", "name":["foo"], "subs":[
+	                 { "type":"type", "name":["str_t"], "subs":[] }]}
+	               ]} )"sv));
 }
 BOOST_AUTO_TEST_CASE(standard_types)
 {

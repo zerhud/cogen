@@ -33,6 +33,8 @@ class to_generic_ast : protected traverser {
 	void new_mod(ast::module& obj) ;
 	void new_mod_ver(ast::module& v);
 
+	void make_type(ast::type& v, const gen_utils::data_node& par);
+
 	void on_obj(ast::module& obj) override ;
 	void on_obj(ast::record& obj) override;
 	void on_obj(ast::record_item& obj) override;

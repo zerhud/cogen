@@ -9,6 +9,7 @@
 #include "ast_nodes.hpp"
 
 using namespace std::literals;
+using ix3::utils::details::type_node;
 using ix3::utils::details::function_node;
 using ix3::utils::details::fnc_param_node;
 using ix3::utils::details::record_node;
@@ -21,16 +22,45 @@ std::int64_t ix3::utils::details::splash_version(const ast::meta::version& v)
 	return a >= b ? a * a + a + b : a + b * b;
 }
 
+type_node::type_node(ast::type t) : ast_node(std::move(t)) { }
+
+std::string_view type_node::type_name() const
+{
+	return original_node().name.at(0);
+}
+
+std::string_view type_node::name() const
+{
+	return "";
+}
+
+boost::json::object type_node::make_json(const compilation_context& ctx) const
+{
+	boost::json::object ret;
+	ret["type"] = "type";
+	ret["name"] = ast_to_json(original_node().name);
+	boost::json::array& subs = ret["subs"].emplace_array();
+	for(auto& child:ctx.children(*this))
+		subs.emplace_back(child->make_json(ctx));
+	return ret;
+}
+std::pmr::vector<gen_utils::name_t> type_node::required_links() const
+{
+	return {};
+}
+
 function_node::function_node(ast::function n) : ast_node(std::move(n)) {}
 
 boost::json::object function_node::make_json(const compilation_context& ctx) const
 {
 	boost::json::object ret = ast_node::make_json(ctx);
 	ret["type"] = "function"sv;
-	ret["return"] = ast_to_json(original_node().return_type);
+	auto children = ctx.children(*this);
+	assert(1 <= children.size());
+	ret["return"] = children[0]->make_json(ctx);
 	boost::json::array& params=ret["params"].emplace_array();
-	for(auto& child:ctx.children(*this))
-		params.emplace_back(child->make_json(ctx));
+	for(auto pos = (++children.begin());pos!=children.end();++pos)
+		params.emplace_back((*pos)->make_json(ctx));
 	ctx.compiling_aspect().aspect(*this, ret);
 	return ret;
 }
