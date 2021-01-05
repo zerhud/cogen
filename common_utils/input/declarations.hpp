@@ -16,7 +16,6 @@ namespace gen_utils {
 
 enum class compiler { cpp } ;
 enum class tree_compare_result { not_comparable, none, only_root, partial, total };
-class links_manager;
 
 class tree;
 class input;
