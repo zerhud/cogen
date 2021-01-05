@@ -282,19 +282,28 @@ BOOST_FIXTURE_TEST_CASE(search, fixture)
 	auto node_b = make_node(120, std::nullopt, std::nullopt, "b");
 	auto node_a = make_node(110, std::nullopt, std::nullopt, "a");
 	auto node_c = make_node(121, std::nullopt, std::nullopt, "c");
+	auto node_c2 = make_node(121, std::nullopt, std::nullopt, "c");
+	auto node_c3 = make_node(131, std::nullopt, std::nullopt, "c");
+	auto node_c3_par = make_node(130, std::nullopt, std::nullopt, "c3_par");
 	tree().add(tree().root(), node_a);
 	tree().add(tree().root(), node_b);
+	tree().add(tree().root(), node_c3_par);
 	tree().add(*node_b, node_c);
+	tree().add(*node_b, node_c2);
+	tree().add(*node_c3_par, node_c3);
 
-	BOOST_TEST(tree().search({}) == nullptr);
-	BOOST_TEST(tree().search({"m"}) == nullptr, "root cannot to be found");
-	BOOST_TEST(tree().search({"d"}) == nullptr);
-	BOOST_TEST(tree().search({"a", "c"}) == nullptr);
+	BOOST_TEST(tree().search({}).size() == 0);
+	BOOST_TEST(tree().search({"m"}).size() == 0, "root cannot to be found");
+	BOOST_TEST(tree().search({"d"}).size() == 0);
+	BOOST_TEST(tree().search({"a", "c"}).size() == 0);
 
-	BOOST_TEST(tree().search({"a"}) == node_a);
-	BOOST_TEST(tree().search({"b"}) == node_b);
-	BOOST_TEST(tree().search({"c"}) == node_c);
-	BOOST_TEST(tree().search({"b", "c"}) == node_c);
+	BOOST_TEST(tree().search({"a"}).at(0) == node_a);
+	BOOST_TEST(tree().search({"b"}).at(0) == node_b);
+	BOOST_TEST(tree().search({"c"}).at(0) == node_c);
+	BOOST_TEST(tree().search({"c"}).at(1) == node_c2);
+	BOOST_TEST(tree().search({"c"}).at(2) == node_c3);
+	BOOST_TEST(tree().search({"b", "c"}).at(0) == node_c);
+	BOOST_TEST(tree().search({"b", "c"}).at(1) == node_c2);
 }
 BOOST_AUTO_TEST_SUITE_END() // tree
 BOOST_AUTO_TEST_SUITE(tree_map_to)

@@ -254,10 +254,11 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	auto std_dsl = std::make_shared<gen_utils_mocks::dsl_manager>();
 	MOCK_EXPECT(std_dsl->id).returns("std_types");
 	MOCK_EXPECT(std_dsl->to_json).calls(
-	            [](const gu_ctx& ctx, const gu_tree& con){
+	            [&i8_cpp, &i8_js](const gu_ctx& ctx, const gu_tree& con){
 		BOOST_TEST(ctx.linked_to != nullptr);
 		boost::json::value ret;
-		ret = "std::uint8_t"s;
+		if(ctx.linked_to == i8_cpp) ret = "std::int8_t"s;
+		if(ctx.linked_to == i8_js) ret = "integer"s;
 		return ret;
 	});
 	MOCK_EXPECT(i8_cpp->link_condition).returns("cpp");

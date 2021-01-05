@@ -88,25 +88,30 @@ tree_compare_result tree::contains(const tree& other) const
 	          : tree_compare_result::partial;
 }
 
-node_ptr tree::search(name_t n) const
+std::pmr::vector<node_ptr> tree::search(name_t n) const
 {
-	if(n.empty()) return nullptr;
+	std::pmr::vector<node_ptr> ret;
+	if(n.empty()) return ret;
 	return search(root(), std::move(n));
 }
 
-node_ptr tree::search(const data_node& par, name_t n) const
+std::pmr::vector<node_ptr> tree::search(const data_node& par, name_t n) const
 {
+	std::pmr::vector<node_ptr> ret;
 	assert(!n.empty());
 	const edge* ce = search_edge(par);
 	if(ce) for(auto& child:ce->children) {
-		if(child->name() == n[0])
-			return n.size() == 1
-			    ? child
-			    : search(*child, name_t{++n.begin(),n.end()});
-		auto is = search(*child, n);
-		if(is) return is;
+		if(child->name() == n[0]) {
+			if(n.size()==1) ret.emplace_back(child);
+			else {
+				auto fnd = search(*child, name_t{++n.begin(),n.end()});
+				ret.insert(ret.end(), fnd.begin(), fnd.end());
+			}
+		}
+		auto fnd = search(*child, n);
+		ret.insert(ret.end(), fnd.begin(), fnd.end());
 	}
-	return nullptr;
+	return ret;
 }
 
 const tree::edge* tree::search_edge(const data_node& par) const
