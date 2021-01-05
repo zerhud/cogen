@@ -139,6 +139,7 @@ BOOST_AUTO_TEST_CASE(functions)
 	auto foo = tree.children(*mod).at(0);
 	BOOST_TEST(foo->name()=="foo");
 	BOOST_CHECK(!foo->version().has_value());
+	BOOST_TEST(foo->required_links().size() == 0);
 
 	auto bar = tree.children(*mod).at(1);
 	BOOST_TEST(bar->name()=="bar");
@@ -228,6 +229,11 @@ BOOST_AUTO_TEST_CASE(type_nodes)
 	               {"type":"type", "name":["foo"], "subs":[
 	                 { "type":"type", "name":["str_t"], "subs":[] }]}
 	               ]} )"sv));
+
+	auto ret_links = ret_type->required_links();
+	BOOST_TEST_REQUIRE(ret_links.size()==1);
+	BOOST_TEST_REQUIRE(ret_links[0].size()==1);
+	BOOST_TEST(ret_links[0][0]=="int");
 }
 BOOST_AUTO_TEST_CASE(standard_types)
 {

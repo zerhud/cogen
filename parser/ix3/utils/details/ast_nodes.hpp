@@ -88,7 +88,6 @@ struct type_node : ast_node<ast::type> {
 struct function_node : ast_node<ast::function> {
 	function_node(ast::function n);
 	boost::json::object make_json(const compilation_context& ctx) const override ;
-	std::pmr::vector<gen_utils::name_t> required_links() const override ;
 };
 
 struct fnc_param_node : ast_node<ast::function_parameter> {

@@ -36,7 +36,7 @@ std::string_view type_node::name() const
 
 boost::json::object type_node::make_json(const compilation_context& ctx) const
 {
-	boost::json::object ret;
+	boost::json::object ret = ctx.linked_json(*this);
 	ret["type"] = "type";
 	ret["name"] = ast_to_json(original_node().name);
 	boost::json::array& subs = ret["subs"].emplace_array();
@@ -46,7 +46,10 @@ boost::json::object type_node::make_json(const compilation_context& ctx) const
 }
 std::pmr::vector<gen_utils::name_t> type_node::required_links() const
 {
-	return {};
+	gen_utils::name_t ret;
+	for(auto& n:original_node().name)
+		ret.emplace_back(n);
+	return {ret};
 }
 
 function_node::function_node(ast::function n) : ast_node(std::move(n)) {}
@@ -63,14 +66,6 @@ boost::json::object function_node::make_json(const compilation_context& ctx) con
 		params.emplace_back((*pos)->make_json(ctx));
 	ctx.compiling_aspect().aspect(*this, ret);
 	return ret;
-}
-
-std::pmr::vector<gen_utils::name_t> function_node::required_links() const
-{
-	gen_utils::name_t ret;
-	for(auto& n:original_node().return_type.name)
-		ret.emplace_back(n);
-	return {ret};
 }
 
 fnc_param_node::fnc_param_node(ast::function_parameter n) : ast_node(std::move(n)) {}
