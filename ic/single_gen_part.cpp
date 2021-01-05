@@ -53,10 +53,11 @@ boost::json::value single_gen_part::make_json(
 	boost::json::array data_ar;
 	for(auto& it:data.all()) {
 		auto& dobj = data_ar.emplace_back(it->to_json(ctx)).as_object();
-		auto& incs = dobj["includes"].emplace_array();
+		auto& incs = dobj["includes"].emplace_object();
+		auto& mincs = incs["matched"].emplace_array();
 		for(auto& link:setts.cfg_part.links) {
 			for(auto& l:matched_includes(setts, link, data))
-				incs.emplace_back(l);
+				mincs.emplace_back(l);
 		}
 	}
 	return data_ar;

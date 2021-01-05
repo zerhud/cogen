@@ -81,9 +81,9 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 		return ret["a"] = src.children(src.root()).at(0)->node_var()->value, ret;
 	});
 	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"a":"v1","includes":[]}])"_bj, "v1.cpp");
+	        .once().with("t", R"([{"a":"v1","includes":{"matched":[]}}])"_bj, "v1.cpp");
 	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"a":"v2","includes":[]}])"_bj, "v2.cpp");
+	        .once().with("t", R"([{"a":"v2","includes":{"matched":[]}}])"_bj, "v2.cpp");
 	compile_cfg->naming = gen_utils::name_conversion::camel_case;
 	sg(gen_context{{"${n}.cpp"_s, "t"_s, {}, *compile_cfg}, {}}, all_data);
 }
@@ -98,28 +98,32 @@ BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 		return boost::json::object{};
 	});
 	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"includes":[]}])"_bj, "v1");
+	        .once().with("t", R"([{"includes":{"matched":[]}}])"_bj, "v1");
 	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"includes":[]}])"_bj, "v2");
+	        .once().with("t", R"([{"includes":{"matched":[]}}])"_bj, "v2");
 	gen_context ctx{{"${n}"_s, "t"_s, {}, *compile_cfg.get()}, {}};
 	ctx.generated["a"] = sg(ctx, all_data);
 
 	ctx.cfg_part.map_tmpl = "f.cpp";
 	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"includes":[]}])"_bj, "f.cpp");
+	        .once().with("t", R"([{"includes":{"matched":[]}}])"_bj, "f.cpp");
 	sg(ctx, all_data);
 
 	ctx.cfg_part.links.emplace_back("a");
 	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"includes":["v1","v2"]}])"_bj, "f.cpp");
+	        .once().with("t", R"([{"includes":{"matched":["v1","v2"]}}])"_bj, "f.cpp");
 	ctx.generated["b"] = sg(ctx, all_data);
 
 	ctx.cfg_part.map_tmpl = "${n}";
 	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"includes":["v1"]}])"_bj, "v1");
+	        .once().with("t", R"([{"includes":{"matched":["v1"]}}])"_bj, "v1");
 	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"includes":["v2"]}])"_bj, "v2");
+	        .once().with("t", R"([{"includes":{"matched":["v2"]}}])"_bj, "v2");
 	ctx.generated["c"] = sg(ctx, all_data);
+}
+BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
+{
+	BOOST_FAIL("no test");
 }
 BOOST_AUTO_TEST_SUITE_END() // single_gen_part
 BOOST_AUTO_TEST_SUITE_END() // input_configurator
