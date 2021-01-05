@@ -30,12 +30,9 @@ inline const bool operator == (const import_info& l, const import_info& r)
 
 class imports_manager final {
 	std::pmr::map<std::pmr::string, const input*> all_input;
-	std::pmr::vector<import_info> imports;
 	std::pmr::map<const input*, std::pmr::vector<std::pmr::string>> matched;
 
 	void scan_self_matched();
-	void scan_required_imports();
-	import_info* scan_required_imports(const tree& from, const tree& to);
 	std::pmr::vector<import_info> required_for_scan(
 	        const tree& src, const data_node& par) const ;
 	std::pmr::vector<import_info> required_for_links(

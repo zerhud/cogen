@@ -26,7 +26,6 @@ imports_manager& imports_manager::add(const std::pmr::string& file, const input&
 void imports_manager::build()
 {
 	scan_self_matched();
-	scan_required_imports();
 }
 
 void imports_manager::scan_self_matched()
@@ -40,26 +39,6 @@ void imports_manager::scan_self_matched()
 				matched[fd].emplace_back(to);
 		}
 	}
-}
-
-void imports_manager::scan_required_imports()
-{
-	for(auto& [from, fdata]:all_input) {
-		for(auto& [to, todata]:all_input) {
-			for(auto& ft:fdata->all()) {
-				for(auto& tt:todata->all()) {
-					scan_required_imports(*ft, *tt);
-				}
-			}
-		}
-	}
-}
-
-import_info* imports_manager::scan_required_imports(
-        const tree& from, const tree& to)
-{
-	if(&from == &to) return nullptr;
-	return nullptr;
 }
 
 std::pmr::vector<import_info> imports_manager::required_for(

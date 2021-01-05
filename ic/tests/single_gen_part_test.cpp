@@ -123,7 +123,17 @@ BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 {
-	BOOST_FAIL("no test");
+	single_gen_part sg(prov.get());
+	t1.add(t1.root(), make_node(1, "n", "v1", "a"));
+	t1.add(t1.root(), make_node(1, "n", "v2"));
+	all_data.add(t1);
+	MOCK_EXPECT(t1_dsl->to_json)
+	        .calls([this](auto&, const gen_utils::tree&){
+		return boost::json::object{};
+	});
+
+	//gen_context ctx{{"${n}"_s, "t"_s, {}, *compile_cfg.get()}, {}};
+	//ctx.generated["a"] = sg(ctx, all_data);
 }
 BOOST_AUTO_TEST_SUITE_END() // single_gen_part
 BOOST_AUTO_TEST_SUITE_END() // input_configurator
