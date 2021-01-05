@@ -102,6 +102,7 @@ BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 	MOCK_EXPECT(prov->generate)
 	        .once().with("t", R"([{"includes":{"matched":[]}}])"_bj, "v2");
 	gen_context ctx{{"${n}"_s, "t"_s, {}, *compile_cfg.get()}, {}};
+
 	ctx.generated["a"] = sg(ctx, all_data);
 
 	ctx.cfg_part.map_tmpl = "f.cpp";
@@ -114,11 +115,11 @@ BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 	        .once().with("t", R"([{"includes":{"matched":["v1","v2"]}}])"_bj, "f.cpp");
 	ctx.generated["b"] = sg(ctx, all_data);
 
-	ctx.cfg_part.map_tmpl = "${n}";
+	ctx.cfg_part.map_tmpl = "_${n}";
 	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"includes":{"matched":["v1"]}}])"_bj, "v1");
+	        .once().with("t", R"([{"includes":{"matched":["v1"]}}])"_bj, "_v1");
 	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"includes":{"matched":["v2"]}}])"_bj, "v2");
+	        .once().with("t", R"([{"includes":{"matched":["v2"]}}])"_bj, "_v2");
 	ctx.generated["c"] = sg(ctx, all_data);
 }
 BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)

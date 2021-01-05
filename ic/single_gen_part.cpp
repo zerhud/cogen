@@ -26,10 +26,11 @@ compiled_output single_gen_part::operator()(const gen_context& cur_part, input a
 {
 	assert(outside);
 	auto compiled = compile(cur_part, alli);
+	gen_utils::imports_manager imports = make_imports(cur_part, compiled);
 	for(auto& [n,d]:compiled)
 		outside->generate(
 		            cur_part.cfg_part.tmpl_file,
-		            make_json(cur_part, d),
+		            make_json(cur_part, d, imports),
 		            n);
 	return compiled;
 }
@@ -46,8 +47,23 @@ compiled_output single_gen_part::compile(
 	return ret;
 }
 
+gen_utils::imports_manager single_gen_part::make_imports(
+        const mdg::ic::gen_context& setts,
+        const compiled_output& result) const
+{
+	gen_utils::imports_manager imports;
+	for(auto& [n,d]:result) imports.add(n, d);
+	for(auto& link:setts.cfg_part.links)
+		for(auto& [n,d]:setts.generated.at(link))
+			imports.add(n,d);
+	imports.build();
+	return imports;
+}
+
 boost::json::value single_gen_part::make_json(
-        const gen_context& setts, const input& data) const
+        const gen_context& setts,
+        const input& data,
+        const gen_utils::imports_manager& imports) const
 {
 	gen_utils::compilation_context ctx{.cfg = setts.cfg_part.compilation};
 	boost::json::array data_ar;
@@ -55,28 +71,8 @@ boost::json::value single_gen_part::make_json(
 		auto& dobj = data_ar.emplace_back(it->to_json(ctx)).as_object();
 		auto& incs = dobj["includes"].emplace_object();
 		auto& mincs = incs["matched"].emplace_array();
-		for(auto& link:setts.cfg_part.links) {
-			for(auto& l:matched_includes(setts, link, data))
-				mincs.emplace_back(l);
-		}
+		for(auto& l:imports.self_matched(data))
+			mincs.emplace_back(l);
 	}
 	return data_ar;
-}
-
-std::pmr::vector<std::pmr::string> single_gen_part::matched_includes(
-        const gen_context& setts,
-        const std::pmr::string& link,
-        const input& data) const
-{
-	using gen_utils::tree_compare_result;
-	std::pmr::vector<std::pmr::string> ret;
-	const compiled_output& ldata = setts.generated.at(link);
-	for(auto& [dn, dt]:ldata) {
-		auto rc = dt.match_with(data);
-		if(rc==tree_compare_result::total)
-			ret.emplace_back(dn);
-		else if(rc==tree_compare_result::partial)
-			ret.emplace_back(dn);
-	}
-	return ret;
 }

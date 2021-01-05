@@ -25,6 +25,7 @@ imports_manager& imports_manager::add(const std::pmr::string& file, const input&
 
 void imports_manager::build()
 {
+	matched.clear();
 	scan_self_matched();
 }
 
