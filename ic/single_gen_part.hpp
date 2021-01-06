@@ -30,6 +30,10 @@ class single_gen_part final {
 	gen_utils::imports_manager make_imports(
 	        const gen_context& setts,
 	        const compiled_output& result) const ;
+	void add_includes_to_result(
+	        boost::json::object& result,
+	        const gen_utils::input& data,
+	        const gen_utils::imports_manager& imports) const ;
 public:
 	single_gen_part(const provider* p);
 	compiled_output operator()(const gen_context& cur_part,

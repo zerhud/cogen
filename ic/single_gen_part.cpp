@@ -69,11 +69,19 @@ boost::json::value single_gen_part::make_json(
 	boost::json::object result;
 	boost::json::array& data_ar = result["data"].emplace_array();
 	for(auto& it:data.all()) data_ar.emplace_back(it->to_json(ctx));
+	add_includes_to_result(result, data, imports);
+	return result;
+}
+void single_gen_part::add_includes_to_result(
+        boost::json::object& result,
+        const gen_utils::input& data,
+        const gen_utils::imports_manager& imports) const
+{
 	boost::json::object& incs = result["includes"].emplace_object();
 	boost::json::array& mincs = incs["matched"].emplace_array();
-	for(auto& l:imports.self_matched(data)) mincs.emplace_back(l);
+	for(auto& l:imports.self_matched(data))
+		mincs.emplace_back(l);
 	boost::json::object& rincs = incs["required"].emplace_object();
 	for(auto& r:imports.required_for(data))
 		rincs[r.cond].emplace_array().emplace_back(r.file);
-	return result;
 }
