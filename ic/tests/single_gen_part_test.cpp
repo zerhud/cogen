@@ -57,6 +57,20 @@ struct single_gen_part_fixture {
 		MOCK_EXPECT(t3_dsl->id).returns("t3_dsl");
 	}
 
+	void expect_empty_result(gen_utils_mocks::dsl_manager& dm)
+	{
+		MOCK_EXPECT(dm.to_json).calls([](auto&, const gen_utils::tree&){
+			return boost::json::object{}; });
+	}
+
+	template<typename Arg, typename... Args>
+	void expect_empty_result(Arg arg, Args... args)
+	{
+		expect_empty_result(arg);
+		if constexpr (0 < sizeof...(Args))
+		        expect_empty_result(args...);
+	}
+
 	boost::json::value make_result_json(
 	        std::vector<std::string> mincs,
 	        std::map<std::string,std::vector<std::string>> rincs,
@@ -119,10 +133,7 @@ BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 	t1.add(t1.root(), make_node(1, "n", "v1"));
 	t1.add(t1.root(), make_node(1, "n", "v2"));
 	all_data.add(t1);
-	MOCK_EXPECT(t1_dsl->to_json)
-	        .calls([this](auto&, const gen_utils::tree&){
-		return boost::json::object{};
-	});
+	expect_empty_result(*t1_dsl);
 	auto empty_data = make_result_json({},{});
 	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "v1");
 	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "v2");
@@ -154,9 +165,7 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	t1.add(t1.root(), t1_child1);
 	t1.add(t1.root(), make_node(1, "n", "v2", "t1_b"));
 	all_data.add(t1);
-	auto null_obj_maker = [this](auto&, const gen_utils::tree&){ return boost::json::object{}; };
-	MOCK_EXPECT(t1_dsl->to_json).calls(null_obj_maker);
-	MOCK_EXPECT(t2_dsl->to_json).calls(null_obj_maker);
+	expect_empty_result(*t1_dsl, *t2_dsl);
 
 	auto empty_data = make_result_json({}, {});
 	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "v1");
