@@ -9,9 +9,16 @@ def check_example_json(result, tmpl, out):
     assert result[0]['out_file'] == out
 
 def check_example_data(result, count=1):
-    assert len(result[0]['data']['data']) == count
-    assert result[0]['data']['data'][0]['name']=='ix3'
-    assert len(result[0]['data']['data'][0]['mods'])==1
+    #assert "std::vector<std::string>" in result
+    #assert "\"vector\"" in result
+    #assert "\"string\"" in result
+    #assert "std::int64_t" in result
+    #assert "\"cinttypes\"" in result
+    parsed = json.loads(result)
+    assert len(parsed[0]['data']['data']) == count
+    data = parsed[0]['data']['data']
+    assert data[0]['name']=='ix3'
+    assert len(data[0]['mods'])==1
 
 def test_wrong_mode():
     r=sp.run(['./mdg2', '-m', 'wrong', '-iix3=ix3_example', '-gcpp_decl'], stdout=sp.PIPE, stderr=sp.PIPE)
@@ -29,5 +36,5 @@ def test_simple_config():
     result = json.loads(r.stdout)
     assert len(result) == 4
     check_example_json(result, 'declarations.jinja', 'outdir/declarations.hpp')
-    check_example_data(result)
+    check_example_data(r.stdout)
 
