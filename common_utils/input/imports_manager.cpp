@@ -87,6 +87,7 @@ std::pmr::vector<import_info> imports_manager::required_for_links(
 					            import_info{
 					                {to, in_tree},
 					                {cur, &src},
+					                {false, "in_name"},
 					                in_name,
 					                std::pmr::string(to->link_condition())});
 			}

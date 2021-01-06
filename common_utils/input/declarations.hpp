@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <vector>
+#include <ostream>
 #include <memory_resource>
 
 namespace gen_utils {
