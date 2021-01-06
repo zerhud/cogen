@@ -9,6 +9,7 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE ic_single_gen_part
 
+#include <iomanip>
 #include <boost/test/included/unit_test.hpp>
 #include <common_utils/tests/mocks.hpp>
 
@@ -24,7 +25,11 @@ std::pmr::string operator "" _s (const char* d, std::size_t l)
 
 boost::json::value operator "" _bj(const char* d, std::size_t l)
 {
-	return boost::json::parse(std::string_view(d,l));
+	boost::json::parse_options opts{.allow_trailing_commas=true};
+	return boost::json::parse(
+	            boost::json::string_view(d,l),
+	            boost::json::storage_ptr(),
+	            opts);
 }
 
 struct single_gen_part_fixture {
@@ -50,6 +55,27 @@ struct single_gen_part_fixture {
 		MOCK_EXPECT(t1_dsl->id).returns("t1_dsl");
 		MOCK_EXPECT(t2_dsl->id).returns("t2_dsl");
 		MOCK_EXPECT(t3_dsl->id).returns("t3_dsl");
+	}
+
+	boost::json::value make_result_json(
+	        std::vector<std::string> mincs,
+	        std::map<std::string,std::vector<std::string>> rincs,
+	        std::optional<boost::json::value> data_val = std::nullopt)
+	{
+		if(!data_val) data_val = "[ { } ]"_bj;
+		std::stringstream json;
+		json << "{\"includes\":{\"matched\":[";
+		for(auto& i:mincs) json << '"' << i << '"' << ',';
+		json << "], \"required\":{";
+		for(auto& [cond, incs]:rincs) {
+			json << std::quoted(cond) << ":[";
+			for(auto& i:incs) json << std::quoted(i) << ',';
+			json << "],";
+		}
+		json << "}}, \"data\":" << *data_val << " }";
+
+		boost::json::parse_options opts{.allow_trailing_commas=true};
+		return boost::json::parse(json.str(), boost::json::storage_ptr(), opts);
 	}
 };
 
@@ -80,10 +106,10 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 		boost::json::object ret;
 		return ret["a"] = src.children(src.root()).at(0)->node_var()->value, ret;
 	});
-	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"a":"v1","includes":{"matched":[]}}])"_bj, "v1.cpp");
-	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"a":"v2","includes":{"matched":[]}}])"_bj, "v2.cpp");
+	auto data_v1 = make_result_json({}, {}, "[{\"a\":\"v1\"}]"_bj);
+	auto data_v2 = make_result_json({}, {}, "[{\"a\":\"v2\"}]"_bj);
+	MOCK_EXPECT(prov->generate).once().with("t", data_v1, "v1.cpp");
+	MOCK_EXPECT(prov->generate).once().with("t", data_v2, "v2.cpp");
 	compile_cfg->naming = gen_utils::name_conversion::camel_case;
 	sg(gen_context{{"${n}.cpp"_s, "t"_s, {}, *compile_cfg}, {}}, all_data);
 }
@@ -97,44 +123,55 @@ BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 	        .calls([this](auto&, const gen_utils::tree&){
 		return boost::json::object{};
 	});
-	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"includes":{"matched":[]}}])"_bj, "v1");
-	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"includes":{"matched":[]}}])"_bj, "v2");
+	auto empty_data = make_result_json({},{});
+	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "v1");
+	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "v2");
 	gen_context ctx{{"${n}"_s, "t"_s, {}, *compile_cfg.get()}, {}};
 
 	ctx.generated["a"] = sg(ctx, all_data);
 
 	ctx.cfg_part.map_tmpl = "f.cpp";
-	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"includes":{"matched":[]}}])"_bj, "f.cpp");
+	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "f.cpp");
 	sg(ctx, all_data);
 
+	auto mincs_data = make_result_json({"v1", "v2"}, {});
 	ctx.cfg_part.links.emplace_back("a");
-	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"includes":{"matched":["v1","v2"]}}])"_bj, "f.cpp");
+	MOCK_EXPECT(prov->generate).once().with("t", mincs_data, "f.cpp");
 	ctx.generated["b"] = sg(ctx, all_data);
 
+	mincs_data = make_result_json({"v1"}, {});
 	ctx.cfg_part.map_tmpl = "_${n}";
-	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"includes":{"matched":["v1"]}}])"_bj, "_v1");
-	MOCK_EXPECT(prov->generate)
-	        .once().with("t", R"([{"includes":{"matched":["v2"]}}])"_bj, "_v2");
+	MOCK_EXPECT(prov->generate).once().with("t", mincs_data, "_v1");
+	mincs_data = make_result_json({"v2"}, {});
+	MOCK_EXPECT(prov->generate).once().with("t", mincs_data, "_v2");
 	ctx.generated["c"] = sg(ctx, all_data);
 }
 BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 {
 	single_gen_part sg(prov.get());
-	t1.add(t1.root(), make_node(1, "n", "v1", "a"));
-	t1.add(t1.root(), make_node(1, "n", "v2"));
+	auto t1_child1 = make_node(1, "n", "v1", "t1_a");
+	MOCK_EXPECT(t1_child1->link_condition).returns("cond1");
+	t1.add(t1.root(), t1_child1);
+	t1.add(t1.root(), make_node(1, "n", "v2", "t1_b"));
 	all_data.add(t1);
-	MOCK_EXPECT(t1_dsl->to_json)
-	        .calls([this](auto&, const gen_utils::tree&){
-		return boost::json::object{};
-	});
+	auto null_obj_maker = [this](auto&, const gen_utils::tree&){ return boost::json::object{}; };
+	MOCK_EXPECT(t1_dsl->to_json).calls(null_obj_maker);
+	MOCK_EXPECT(t2_dsl->to_json).calls(null_obj_maker);
 
-	//gen_context ctx{{"${n}"_s, "t"_s, {}, *compile_cfg.get()}, {}};
-	//ctx.generated["a"] = sg(ctx, all_data);
+	auto empty_data = make_result_json({}, {});
+	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "v1");
+	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "v2");
+	gen_context ctx{{"${n}"_s, "t"_s, {}, *compile_cfg.get()}, {}};
+	ctx.generated["part1"] = sg(ctx, all_data);
+
+	t2.add(t2.root(), make_node(2, std::nullopt, std::nullopt, std::nullopt, {{"t1_a"}}));
+	gen_utils::input other_data;
+	other_data.add(t2);
+	ctx.cfg_part.map_tmpl = "file";
+	ctx.cfg_part.links.emplace_back("part1");
+	MOCK_EXPECT(prov->generate).once()
+	        .with("t", make_result_json({}, {{"cond1", {"v1"}}}), "file");
+	ctx.generated["part2"] = sg(ctx, other_data);
 }
 BOOST_AUTO_TEST_SUITE_END() // single_gen_part
 BOOST_AUTO_TEST_SUITE_END() // input_configurator

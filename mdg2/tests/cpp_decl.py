@@ -9,9 +9,9 @@ def check_example_json(result, tmpl, out):
     assert result[0]['out_file'] == out
 
 def check_example_data(result, count=1):
-    assert len(result[0]['data']) == count
-    assert result[0]['data'][0]['name']=='ix3'
-    assert len(result[0]['data'][0]['mods'])==1
+    assert len(result[0]['data']['data']) == count
+    assert result[0]['data']['data'][0]['name']=='ix3'
+    assert len(result[0]['data']['data'][0]['mods'])==1
 
 def test_wrong_mode():
     r=sp.run(['./mdg2', '-m', 'wrong', '-iix3=ix3_example', '-gcpp_decl'], stdout=sp.PIPE, stderr=sp.PIPE)
