@@ -23,6 +23,11 @@ class data_node;
 using node_ptr = std::shared_ptr<data_node>;
 using name_t = std::pmr::vector<std::pmr::string>;
 
+struct import_file {
+	bool sys;
+	std::pmr::string name;
+};
+
 struct node_pointer {
 	node_ptr node;
 	const tree* owner;
@@ -30,6 +35,14 @@ struct node_pointer {
 
 inline bool operator == (const node_pointer& l, const node_pointer& r) {
 	return l.node == r.node && l.owner == r.owner;
+}
+
+inline bool operator == (const import_file& l, const import_file& r) {
+	return l.sys == r.sys && l.name == r.name;
+}
+
+inline std::ostream& operator << (std::ostream& out, const import_file& f) {
+	return out << (f.sys ? '<' : '"') << f.name << (f.sys ? '>' : '"');
 }
 
 } // namespace gen_utils

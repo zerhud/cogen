@@ -17,6 +17,7 @@ namespace gen_utils {
 struct import_info {
 	node_pointer to;
 	node_pointer from;
+	import_file file_;
 	std::pmr::string file;
 	std::pmr::string cond;
 };
