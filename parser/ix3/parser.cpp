@@ -107,9 +107,3 @@ void ix3::parser::create_tree()
 {
 
 }
-
-std::vector<gen_utils::tree> ix3::parser::get_tree() const
-{
-	return tree ;
-}
-
