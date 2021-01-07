@@ -20,6 +20,7 @@ class path_config final {
 
 	searcher data_pathes;
 	searcher gens_pathes;
+	searcher libs_pathes;
 
 	std::filesystem::path etc_dir() const ;
 	std::filesystem::path xmpl_dir() const ;
@@ -30,6 +31,7 @@ public:
 
 	std::filesystem::path input_data(const std::filesystem::path& fn) const ;
 	std::filesystem::path generator(const std::filesystem::path& fn) const ;
+	std::filesystem::path library(const std::filesystem::path& fn) const ;
 };
 
 } // namespace mdg2

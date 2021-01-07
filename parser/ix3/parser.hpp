@@ -30,8 +30,6 @@ public:
 	void parse(std::filesystem::path file) ;
 	void finish_loads() ;
 
-	void create_tree() ;
-
 	std::vector<ix3::ast::module> result() const ;
 private:
 	ast::file_content parse_stream(std::istream& input) const ;

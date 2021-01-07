@@ -102,8 +102,3 @@ std::filesystem::path ix3::parser::search_file(const std::filesystem::path& f) c
 
 	throw std::runtime_error("file " + f.string() + " not found");
 }
-
-void ix3::parser::create_tree()
-{
-
-}
