@@ -14,6 +14,7 @@
 #include <boost/property_tree/info_parser.hpp>
 
 #include "ix3/utils/to_generic_ast.hpp"
+#include "standard_types/src/loader.hpp"
 
 using namespace mdg2;
 using mdg2::path_config;
@@ -84,6 +85,9 @@ void executer::load_inputs()
 	}
 	ix3_loader.finish_loads();
 	user_data.add( ix3::utils::to_generic_ast()(ix3_loader.result()) );
+
+	std_types::loader st;
+	user_data.add( st.load_types(pathes.library("standard_types.info")) );
 }
 
 void executer::dir_mode() const

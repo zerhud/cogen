@@ -17,7 +17,7 @@ path_config::path_config(const std::filesystem::path& exe_path)
 	self_path = fs::absolute(exe_path.parent_path()).lexically_normal();
 	data_pathes.add(".").add(xmpl_dir());
 	gens_pathes.add(".").add(gens_dir());
-	gens_pathes.add(etc_dir() / "lib");
+	libs_pathes.add(etc_dir() / "lib");
 }
 
 std::filesystem::path path_config::xmpl_dir() const

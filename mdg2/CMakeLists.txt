@@ -51,7 +51,7 @@ copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/standard_types.info" "${build_lib_di
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE
 		${Boost_LIBRARIES}
-		input_configurator ix3
+		input_configurator ix3 standard_types
 		cppjinja::evaluator cppjinja::loader
 	)
 
