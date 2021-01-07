@@ -24,7 +24,7 @@ MOCK_BASE_CLASS(data_node, gen_utils::data_node)
 	MOCK_METHOD(name, 0)
 	MOCK_METHOD(required_links, 0)
 	MOCK_METHOD(link_condition, 0)
-	MOCK_METHOD(link_modification, 1)
+	MOCK_METHOD(imports_modification, 0)
 
 	MOCK_METHOD(version, 0)
 	MOCK_METHOD(node_var, 0)

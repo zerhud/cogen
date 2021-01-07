@@ -75,14 +75,21 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	gen_utils::input fdata1, fdata2;
 	auto t1_child1 = gen_utils_mocks::make_node(
 	            11, std::nullopt, std::nullopt, "a");
+	auto t1_child2 = gen_utils_mocks::make_node(
+	            12, std::nullopt, std::nullopt, "b");
 	auto t2_child1 = gen_utils_mocks::make_node(
-	            12, std::nullopt, std::nullopt, "not_used", {{"a"}});
+	            12, std::nullopt, std::nullopt, "not_used", {{"a"}, {"b"}});
 	t1().add(t1().root(), t1_child1);
+	t1().add(t1().root(), t1_child2);
 	t2().add(t2().root(), t2_child1);
 	fdata1.add(t1());
 	fdata2.add(t2());
 
 	MOCK_EXPECT(t1_child1->link_condition).returns("cond_child1"sv);
+	MOCK_EXPECT(t1_child2->link_condition).returns("cond_child2"sv);
+	MOCK_EXPECT(t1_child1->imports_modification).returns(std::nullopt);
+	MOCK_EXPECT(t1_child2->imports_modification)
+	        .returns(gen_utils::import_file{true, "sysfile"});
 
 	imports_manager mng1;
 	mng1("f1", fdata1)("f2", fdata2).build();
@@ -90,22 +97,41 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	BOOST_TEST(mng1.required_for(fdata1).size() == 0);
 
 	auto r2 = mng1.required_for(fdata2);
-	BOOST_TEST_REQUIRE(r2.size() == 1);
+	BOOST_TEST_REQUIRE(r2.size() == 2);
 	BOOST_TEST(r2[0].from.node == t2_child1);
 	BOOST_TEST(r2[0].from.owner->data_id() == "t2_id");
 	BOOST_TEST(r2[0].to.node == t1_child1);
 	BOOST_TEST(r2[0].to.owner->data_id() == "t1_id");
-	BOOST_TEST(r2[0].file == "f1");
+	BOOST_TEST(r2[0].file.sys == false);
+	BOOST_TEST(r2[0].file.name == "f1");
 	BOOST_TEST(r2[0].cond == "cond_child1");
+
+	BOOST_TEST(r2[1].from.node == t2_child1);
+	BOOST_TEST(r2[1].from.owner->data_id() == "t2_id");
+	BOOST_TEST(r2[1].to.node == t1_child2);
+	BOOST_TEST(r2[1].to.owner->data_id() == "t1_id");
+	BOOST_TEST(r2[1].file.sys == true);
+	BOOST_TEST(r2[1].file.name == "sysfile");
+	BOOST_TEST(r2[1].cond == "cond_child2");
 
 	auto r3 = mng1.required_for(t2());
 	BOOST_TEST(r3.size() == r2.size());
+
 	BOOST_TEST(r3[0].from.node == t2_child1);
 	BOOST_TEST(r3[0].from.owner->data_id() == "t2_id");
 	BOOST_TEST(r3[0].to.node == t1_child1);
 	BOOST_TEST(r3[0].to.owner->data_id() == "t1_id");
-	BOOST_TEST(r3[0].file == "f1");
+	BOOST_TEST(r3[0].file.sys == false);
+	BOOST_TEST(r3[0].file.name == "f1");
 	BOOST_TEST(r3[0].cond == "cond_child1");
+
+	BOOST_TEST(r3[1].from.node == t2_child1);
+	BOOST_TEST(r3[1].from.owner->data_id() == "t2_id");
+	BOOST_TEST(r3[1].to.node == t1_child2);
+	BOOST_TEST(r3[1].to.owner->data_id() == "t1_id");
+	BOOST_TEST(r3[1].file.sys == true);
+	BOOST_TEST(r3[1].file.name == "sysfile");
+	BOOST_TEST(r3[1].cond == "cond_child2");
 }
 BOOST_AUTO_TEST_SUITE_END() // imports_manager_test
 

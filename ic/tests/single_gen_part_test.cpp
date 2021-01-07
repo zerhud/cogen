@@ -83,7 +83,9 @@ struct single_gen_part_fixture {
 		json << "], \"required\":{";
 		for(auto& [cond, incs]:rincs) {
 			json << std::quoted(cond) << ":[";
-			for(auto& i:incs) json << std::quoted(i) << ',';
+			for(auto& i:incs) json
+			        << "{\"file\":" << std::quoted(i)
+			        << ",\"sys\":false},";
 			json << "],";
 		}
 		json << "}}, \"data\":" << *data_val << " }";
@@ -162,8 +164,11 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	single_gen_part sg(prov.get());
 	auto t1_child1 = make_node(1, "n", "v1", "t1_a");
 	MOCK_EXPECT(t1_child1->link_condition).returns("cond1");
+	MOCK_EXPECT(t1_child1->imports_modification).returns(std::nullopt);
+	auto t1_child2 = make_node(1, "n", "v2", "t1_b");
+	MOCK_EXPECT(t1_child2->imports_modification).returns(std::nullopt);
 	t1.add(t1.root(), t1_child1);
-	t1.add(t1.root(), make_node(1, "n", "v2", "t1_b"));
+	t1.add(t1.root(), t1_child2);
 	all_data.add(t1);
 	expect_empty_result(*t1_dsl, *t2_dsl);
 

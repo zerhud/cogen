@@ -82,14 +82,17 @@ std::pmr::vector<import_info> imports_manager::required_for_links(
 			auto requests = cur->required_links();
 			for(auto& req:requests) {
 				auto found_list = in_tree->search(req);
-				for(auto& to:found_list)
+				for(auto& to:found_list) {
+					auto mod = to->imports_modification();
+					import_file link{ false, in_name };
+					if(mod) link = *mod;
 					ret.emplace_back(
 					            import_info{
 					                {to, in_tree},
 					                {cur, &src},
-					                {false, "in_name"},
-					                in_name,
+					                link,
 					                std::pmr::string(to->link_condition())});
+				}
 			}
 		}
 	}

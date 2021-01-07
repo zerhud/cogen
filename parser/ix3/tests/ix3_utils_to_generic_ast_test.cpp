@@ -263,6 +263,8 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	});
 	MOCK_EXPECT(i8_cpp->link_condition).returns("cpp");
 	MOCK_EXPECT(i8_js->link_condition).returns("js");
+	MOCK_EXPECT(i8_cpp->imports_modification).returns(std::nullopt);
+	MOCK_EXPECT(i8_js->imports_modification).returns(std::nullopt);
 	gen_utils::tree std_types(gen_utils_mocks::make_node(1), std_dsl);
 	std_types.add(std_types.root(), std_i8);
 	std_types.add(*std_i8, i8_cpp);
