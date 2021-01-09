@@ -72,9 +72,10 @@ fnc_param_node::fnc_param_node(ast::function_parameter n) : ast_node(std::move(n
 
 boost::json::object fnc_param_node::make_json(const compilation_context& ctx) const
 {
+	assert(ctx.children(*this).size() == 1);
 	boost::json::object ret = ast_node::make_json(ctx);
 	ret["type"] = "function_parameter"sv;
-	ret["param_t"] = ast_to_json(original_node().param_type);
+	ret["param_t"] = ctx.children(*this)[0]->make_json(ctx);
 	ret["req"] = original_node().required;
 	return ret;
 }

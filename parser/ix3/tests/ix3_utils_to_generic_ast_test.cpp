@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	to_generic_ast maker;
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
-	                      "i8 foo();"sv);
+	                      "list<i8> foo(+list a);"sv);
 	gen_utils::tree tree = maker(ast.modules);
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
 	BOOST_TEST(tree.children(*mod).size()==1);
@@ -251,24 +251,29 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	auto std_i8 = gen_utils_mocks::make_node(10, std::nullopt, std::nullopt, "");
 	auto i8_cpp = gen_utils_mocks::make_node(11, std::nullopt, std::nullopt, "i8");
 	auto i8_js = gen_utils_mocks::make_node(12, std::nullopt, std::nullopt, "i8");
+	auto list_cpp = gen_utils_mocks::make_node(12, std::nullopt, std::nullopt, "list");
 	auto std_dsl = std::make_shared<gen_utils_mocks::dsl_manager>();
 	MOCK_EXPECT(std_dsl->id).returns("std_types");
 	MOCK_EXPECT(std_dsl->to_json).calls(
-	            [&i8_cpp, &i8_js](const gu_ctx& ctx, const gu_tree& con){
+	            [&i8_cpp, &i8_js, &list_cpp](const gu_ctx& ctx, const gu_tree& con){
 		BOOST_TEST(ctx.linked_to != nullptr);
 		boost::json::value ret;
 		if(ctx.linked_to == i8_cpp) ret = "std::int8_t"s;
 		if(ctx.linked_to == i8_js) ret = "integer"s;
+		if(ctx.linked_to == list_cpp) ret = "std::vector"s;
 		return ret;
 	});
 	MOCK_EXPECT(i8_cpp->link_condition).returns("cpp");
 	MOCK_EXPECT(i8_js->link_condition).returns("js");
+	MOCK_EXPECT(list_cpp->link_condition).returns("cpp");
 	MOCK_EXPECT(i8_cpp->imports_modification).returns(std::nullopt);
 	MOCK_EXPECT(i8_js->imports_modification).returns(std::nullopt);
+	MOCK_EXPECT(list_cpp->imports_modification).returns(std::nullopt);
 	gen_utils::tree std_types(gen_utils_mocks::make_node(1), std_dsl);
 	std_types.add(std_types.root(), std_i8);
 	std_types.add(*std_i8, i8_cpp);
 	std_types.add(*std_i8, i8_js);
+	std_types.add(std_types.root(), list_cpp);
 	gen_utils::imports_manager im;
 	gen_utils::input file_data;
 	file_data.add(std_types);
@@ -288,13 +293,23 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	               R"({
 	               "orig_name":"foo","name":"foo",
 	               "type":"function",
-	               "params":[ ],
+	               "params":[ {
+	                 "orig_name":"a", "name":"a", "type":"function_parameter", "req":true,
+	                 "param_t": { "type":"type",
+	                   "cpp":"std::vector", "name":["list"], "subs":[] }
+	               }],
 	               "return":{
 	                 "type":"type",
-	                 "cpp":"std::int8_t",
-	                 "js":"integer",
-	                 "name":["i8"],
-	                 "subs":[]}
+	                 "cpp":"std::vector",
+	                 "name":["list"],
+	                 "subs":[
+	                   { "type":"type",
+	                     "cpp":"std::int8_t",
+	                     "js":"integer",
+	                     "name":["i8"],
+	                     "subs":[]
+	                   }
+	                 ]}
 	               })"sv));
 }
 BOOST_AUTO_TEST_SUITE_END() // gain_to_generic_ast
