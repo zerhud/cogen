@@ -96,7 +96,6 @@ std::optional<gen_utils::variable> type_node::node_var() const
 
 boost::json::value type_node::to_json(const gen_utils::tree&) const
 {
-	boost::json::object ret;
-	ret[target] = replacer;
+	boost::json::value ret = replacer.c_str();
 	return ret;
 }

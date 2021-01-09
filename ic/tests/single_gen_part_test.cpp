@@ -59,7 +59,8 @@ struct single_gen_part_fixture {
 
 	void expect_empty_result(gen_utils_mocks::dsl_manager& dm)
 	{
-		MOCK_EXPECT(dm.to_json).calls([](auto&, const gen_utils::tree&){
+		MOCK_EXPECT(dm.to_json).calls([](auto& ctx, const gen_utils::tree&){
+			BOOST_TEST(ctx.links != nullptr);
 			return boost::json::object{}; });
 	}
 

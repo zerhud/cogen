@@ -66,6 +66,7 @@ boost::json::value single_gen_part::make_json(
         const gen_utils::imports_manager& imports) const
 {
 	gen_utils::compilation_context ctx{.cfg = setts.cfg_part.compilation};
+	ctx.links = &imports;
 	boost::json::object result;
 	boost::json::array& data_ar = result["data"].emplace_array();
 	for(auto& it:data.all()) data_ar.emplace_back(it->to_json(ctx));

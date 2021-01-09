@@ -44,6 +44,9 @@ string {
 	auto i8 = tt.search({"i8"})[0];
 	auto string = tt.search({"string"})[0];
 
+	BOOST_TEST(i8->name() == "i8");
+	BOOST_TEST(string->name() == "string");
+
 	BOOST_TEST(i8->required_links().size()==0);
 	BOOST_TEST(string->required_links().size()==0);
 
@@ -61,10 +64,7 @@ string {
 	gen_utils::compilation_context ctx;
 	ctx.linked_to = string;
 	std::cout << tt.to_json(ctx) << std::endl;
-	BOOST_TEST(tt.to_json(ctx) == boost::json::parse(
-	               "{"
-	               "\"cpp\": \"std::pmr::string\""
-	               "}"));
+	BOOST_TEST(tt.to_json(ctx).as_string() == "std::pmr::string");
 }
 BOOST_AUTO_TEST_SUITE_END() // library
 

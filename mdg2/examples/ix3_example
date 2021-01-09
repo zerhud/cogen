@@ -1,4 +1,4 @@
 module mod v1.0:
 
-string foo();
+string foo(+i8 p);
 i64 bar(+list<string> p1);
