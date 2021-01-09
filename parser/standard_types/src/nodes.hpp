@@ -10,7 +10,12 @@
 
 namespace std_types {
 
-class root_node : public gen_utils::data_node {
+class base_node : public gen_utils::data_node {
+public:
+	virtual boost::json::value to_json(const gen_utils::tree& con) const =0 ;
+};
+
+class root_node : public base_node {
 public:
 	std::string_view name() const override ;
 	std::pmr::vector<gen_utils::name_t> required_links() const override ;
@@ -19,9 +24,11 @@ public:
 
 	std::optional<std::uint64_t> version() const override ;
 	std::optional<gen_utils::variable> node_var() const override ;
+
+	boost::json::value to_json(const gen_utils::tree& con) const override ;
 };
 
-class type_node : public gen_utils::data_node {
+class type_node : public base_node {
 	std::string type;
 	std::string target;
 	std::string replacer;
@@ -42,6 +49,8 @@ public:
 
 	std::optional<std::uint64_t> version() const override ;
 	std::optional<gen_utils::variable> node_var() const override ;
+
+	boost::json::value to_json(const gen_utils::tree& con) const override ;
 };
 
 } // namespace std_types

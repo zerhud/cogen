@@ -15,6 +15,8 @@
 
 #include "loader.hpp"
 
+using namespace std::literals;
+
 BOOST_AUTO_TEST_SUITE(library)
 using std_types::loader;
 BOOST_AUTO_TEST_CASE(cpp_types)
@@ -55,6 +57,14 @@ string {
 	BOOST_CHECK(string->imports_modification()->sys);
 	BOOST_TEST(i8->imports_modification()->name == "cinttypes");
 	BOOST_TEST(string->imports_modification()->name == "string");
+
+	gen_utils::compilation_context ctx;
+	ctx.linked_to = string;
+	std::cout << tt.to_json(ctx) << std::endl;
+	BOOST_TEST(tt.to_json(ctx) == boost::json::parse(
+	               "{"
+	               "\"cpp\": \"std::pmr::string\""
+	               "}"));
 }
 BOOST_AUTO_TEST_SUITE_END() // library
 

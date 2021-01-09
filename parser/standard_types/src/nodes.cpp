@@ -41,6 +41,14 @@ std::optional<gen_utils::variable> root_node::node_var() const
 	return std::nullopt;
 }
 
+boost::json::value root_node::to_json(const gen_utils::tree& con) const
+{
+	boost::json::array ret;
+	for(auto& c:con.children(*this))
+		ret.emplace_back(static_cast<const base_node*>(c.get())->to_json(con));
+	return ret;
+}
+
 
 type_node::type_node(
         std::string name,
@@ -84,4 +92,11 @@ std::optional<std::uint64_t> type_node::version() const
 std::optional<gen_utils::variable> type_node::node_var() const
 {
 	return std::nullopt;
+}
+
+boost::json::value type_node::to_json(const gen_utils::tree&) const
+{
+	boost::json::object ret;
+	ret[target] = replacer;
+	return ret;
 }

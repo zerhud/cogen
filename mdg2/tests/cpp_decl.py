@@ -9,11 +9,11 @@ def check_example_json(result, tmpl, out):
     assert result[0]['out_file'] == out
 
 def check_example_data(result, count=1):
-    assert "std::vector<std::string>" in result
     assert "\"vector\"" in result
     assert "\"string\"" in result
-    assert "std::int64_t" in result
     assert "\"cinttypes\"" in result
+    assert "std::int64_t" in result
+    assert "std::vector<std::string>" in result
     parsed = json.loads(result)
     assert len(parsed[0]['data']['data']) == count
     data = parsed[0]['data']['data']
