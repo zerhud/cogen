@@ -37,6 +37,9 @@ class imports_manager final {
 	        const tree& src, const data_node& par) const ;
 	std::pmr::vector<import_info> required_for_links(
 	        const tree& src, node_ptr cur) const ;
+
+	static std::pmr::vector<import_info> unique(
+	        std::pmr::vector<import_info> src);
 public:
 	void build();
 	imports_manager& operator()(const std::pmr::string& file, const input& data);

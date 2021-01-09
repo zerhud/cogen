@@ -8,9 +8,18 @@
 
 #include "imports_manager.hpp"
 #include "input.hpp"
+#include <algorithm>
+#include <ranges>
 
 using gen_utils::import_info;
 using gen_utils::imports_manager;
+
+template< typename C, typename F>
+auto
+operator | (C && c, F f)
+{
+	return f(c);
+}
 
 imports_manager& imports_manager::operator()(const std::pmr::string& file, const input& data)
 {
@@ -50,13 +59,13 @@ std::pmr::vector<import_info> imports_manager::required_for(
 		auto dt_result = required_for_scan(*dt, dt->root());
 		ret.insert(ret.end(), dt_result.begin(), dt_result.end());
 	}
-	return ret;
+	return ret | unique;
 }
 
 std::pmr::vector<import_info> imports_manager::required_for(
         const tree& file_data) const
 {
-	return required_for_scan(file_data, file_data.root());
+	return required_for_scan(file_data, file_data.root()) | unique;
 }
 
 std::pmr::vector<import_info> imports_manager::required_for_scan(
@@ -105,4 +114,20 @@ std::pmr::vector<std::pmr::string> imports_manager::self_matched(const input& fi
 	auto pos = matched.find(&file_data);
 	if(pos!=matched.end()) for(auto& f:pos->second) ret.emplace_back(f);
 	return ret;
+}
+
+std::pmr::vector<import_info> imports_manager::unique(
+            std::pmr::vector<import_info> src)
+{
+	auto comparater = [](auto& l, auto& r){
+		return l.cond == r.cond && l.file == r.file; };
+	auto less = [](auto& l, auto& r){
+		return l.cond < r.cond
+		        && l.file.sys < r.file.sys
+		        && l.file.name < r.file.name; };
+	std::sort(src.begin(), src.end(), less);
+	//std::ranges::sort(src, less);
+	auto [f,t] = std::ranges::unique(src, comparater);
+	src.erase(f,t);
+	return src;
 }
