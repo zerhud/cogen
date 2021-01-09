@@ -30,7 +30,7 @@ string {
 	}
 }
 
-vector {
+list {
 	cpp {
 		file vector
 		sys true

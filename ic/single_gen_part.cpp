@@ -83,7 +83,11 @@ void single_gen_part::add_includes_to_result(
 		mincs.emplace_back(l);
 	boost::json::object& rincs = incs["required"].emplace_object();
 	for(auto& r:imports.required_for(data)) {
-		auto& obj = rincs[r.cond].emplace_array().emplace_back(boost::json::object{}).as_object();
+		boost::json::array* rcond = nullptr;
+		if(rincs.find(r.cond) == rincs.end())
+			rcond = &rincs[r.cond].emplace_array();
+		else rcond = &rincs[r.cond].as_array();
+		auto& obj = rcond->emplace_back(boost::json::object{}).as_object();
 		obj["file"] = r.file.name;
 		obj["sys"] = r.file.sys;
 	}
