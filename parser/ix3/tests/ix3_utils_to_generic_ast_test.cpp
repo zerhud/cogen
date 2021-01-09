@@ -112,6 +112,11 @@ BOOST_AUTO_TEST_CASE(records)
 	BOOST_TEST(rec_fields.at(0)->name() == "f1");
 	BOOST_TEST(mod->version().value() < rec_fields.at(1)->version().value());
 
+	BOOST_TEST(tree.children(*rec_fields[0]).size()==1);
+	BOOST_TEST(tree.children(*rec_fields[1]).size()==1);
+	BOOST_TEST(tree.children(*rec_fields[0])[0]->
+	        required_links().at(0).at(0) == "int");
+
 	BOOST_TEST(make_json(*rec, tree) == boost::json::parse(
 	               R"({
 	               "orig_name":"rec","name":"rec",

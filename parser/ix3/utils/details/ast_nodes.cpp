@@ -97,9 +97,10 @@ record_field::record_field(ast::record_item i) : ast_node(std::move(i)) {}
 
 boost::json::object record_field::make_json(const compilation_context& ctx) const
 {
+	assert(ctx.children(*this).size() == 1);
 	boost::json::object ret = ast_node::make_json(ctx);
 	ret["type"] = "record_item"sv;
 	ret["req"] = original_node().is_required;
-	ret["param_t"] = ast_to_json(original_node().param_type);
+	ret["param_t"] = ctx.children(*this)[0]->make_json(ctx);
 	return ret;
 }

@@ -92,7 +92,9 @@ void to_generic_ast::on_obj(ast::record& obj)
 
 void to_generic_ast::on_obj(ast::record_item& obj)
 {
-	result.add(*parents.back(), std::make_shared<details::record_field>(obj));
+	auto field = std::make_shared<details::record_field>(obj);
+	result.add(*parents.back(), field);
+	make_type(obj.param_type, *field);
 }
 
 void to_generic_ast::on_obj(ast::function& obj)

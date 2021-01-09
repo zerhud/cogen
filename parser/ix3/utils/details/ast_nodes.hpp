@@ -26,16 +26,6 @@ protected:
 		return ret;
 	}
 
-	boost::json::object ast_to_json(const ix3::ast::type& obj) const {
-		boost::json::object ret;
-		ret["type"] = "type";
-		ret["name"] = ast_to_json(obj.name);
-		boost::json::array& subs = ret["subs"].emplace_array();
-		for (auto& sub:obj.sub_types)
-			subs.emplace_back(ast_to_json(sub));
-		return ret;
-	}
-
 public:
 	explicit ast_node(Ast n) : ast(std::move(n)) {}
 
