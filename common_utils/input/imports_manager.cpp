@@ -121,12 +121,7 @@ std::pmr::vector<import_info> imports_manager::unique(
 {
 	auto comparater = [](auto& l, auto& r){
 		return l.cond == r.cond && l.file == r.file; };
-	auto less = [](auto& l, auto& r){
-		return l.cond < r.cond
-		        && l.file.sys < r.file.sys
-		        && l.file.name < r.file.name; };
-	std::sort(src.begin(), src.end(), less);
-	//std::ranges::sort(src, less);
+	std::sort(src.begin(), src.end());
 	auto [f,t] = std::ranges::unique(src, comparater);
 	src.erase(f,t);
 	return src;
