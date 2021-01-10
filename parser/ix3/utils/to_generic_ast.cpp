@@ -99,17 +99,16 @@ void to_generic_ast::on_obj(ast::record_item& obj)
 
 void to_generic_ast::on_obj(ast::function& obj)
 {
-	cur_fnc = std::make_shared<details::function_node>(obj);
+	auto cur_fnc = std::make_shared<details::function_node>(obj);
 	result.add(*parents.back(), cur_fnc);
-	make_type(obj.return_type, *cur_fnc);
 	parents.emplace_back(cur_fnc);
+	make_type(obj.return_type, *cur_fnc);
 }
 
 void to_generic_ast::on_obj(ast::function_parameter& obj)
 {
-	assert(cur_fnc);
 	auto param = std::make_shared<details::fnc_param_node>(obj);
-	result.add(*cur_fnc, param);
+	result.add(*parents.back(), param);
 	make_type(obj.param_type, *param);
 }
 

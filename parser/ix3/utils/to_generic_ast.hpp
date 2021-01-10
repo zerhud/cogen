@@ -28,7 +28,6 @@ class to_generic_ast : protected traverser {
 	std::shared_ptr<ix3_manager> ix3_owner;
 	gen_utils::tree result;
 	std::vector<gen_utils::node_ptr> parents;
-	gen_utils::node_ptr cur_fnc;
 
 	void new_mod(ast::module& obj) ;
 	void new_mod_ver(ast::module& v);
