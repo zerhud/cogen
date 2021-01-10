@@ -317,6 +317,32 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	                 ]}
 	               })"sv));
 }
+BOOST_AUTO_TEST_CASE(enums)
+{
+	to_generic_ast maker;
+	auto ast = txt::parse(txt::file_content,
+	                      "module mod1 v1.1:"
+	                      "enum e +auto_io { one, two => \"test\" }"sv);
+	gen_utils::tree tree = maker(ast.modules);
+	BOOST_TEST(tree.children(tree.root()).size()==1);
+	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	BOOST_TEST(tree.children(*mod).size()==1);
+
+	auto e = tree.children(*mod).at(0);
+	BOOST_TEST(e->name()=="e");
+	BOOST_CHECK(!e->version().has_value());
+	BOOST_TEST(e->required_links().size() == 0);
+
+	BOOST_TEST(make_json(*e, tree) == boost::json::parse(
+	               R"({
+	                 "type":"enum","name":"e", "orig_name":"e",
+	                 "auto_io":true, "as_flags":false,
+	                 "items":[
+	                   {"name":"one", "io":"one"},
+	                   {"name":"two", "io":"test"}
+	                 ]
+	               })"sv));
+}
 BOOST_AUTO_TEST_SUITE_END() // gain_to_generic_ast
 
 BOOST_AUTO_TEST_SUITE(ix3_manager_suite)

@@ -95,4 +95,9 @@ struct record_field : ast_node<ast::record_item> {
 	boost::json::object make_json(const compilation_context& ctx) const override ;
 };
 
+struct enums : ast_node<ast::enumeration> {
+	enums(ast::enumeration e);
+	boost::json::object make_json(const compilation_context& ctx) const override ;
+};
+
 } // namespace ix3::utils::details

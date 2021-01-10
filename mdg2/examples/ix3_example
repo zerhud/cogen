@@ -2,3 +2,4 @@ module mod v1.0:
 
 string foo(+i8 p);
 i64 bar(+list<string> p1);
+enum etest +auto_io { one, two }

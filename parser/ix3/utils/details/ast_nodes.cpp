@@ -14,6 +14,7 @@ using ix3::utils::details::function_node;
 using ix3::utils::details::fnc_param_node;
 using ix3::utils::details::record_node;
 using ix3::utils::details::record_field;
+using ix3::utils::details::enums;
 
 std::int64_t ix3::utils::details::splash_version(const ast::meta::version& v)
 {
@@ -102,5 +103,23 @@ boost::json::object record_field::make_json(const compilation_context& ctx) cons
 	ret["type"] = "record_item"sv;
 	ret["req"] = original_node().is_required;
 	ret["param_t"] = ctx.children(*this)[0]->make_json(ctx);
+	return ret;
+}
+
+enums::enums(ast::enumeration e) : ast_node(std::move(e)) {}
+
+boost::json::object enums::make_json(const compilation_context& ctx) const
+{
+	boost::json::object ret = ast_node::make_json(ctx);
+	ret["type"]="enum";
+	ret["auto_io"] = original_node().gen_io;
+	ret["as_flags"] = original_node().use_bitmask;
+	boost::json::array& items = ret["items"].emplace_array();
+	for(auto& e:original_node().elements) {
+		boost::json::object eobj;
+		eobj["name"] = e.name;
+		eobj["io"] = e.io.empty() ? e.name : e.io;
+		items.emplace_back(eobj);
+	}
 	return ret;
 }

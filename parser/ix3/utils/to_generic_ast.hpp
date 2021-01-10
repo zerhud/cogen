@@ -40,6 +40,8 @@ class to_generic_ast : protected traverser {
 	void on_obj(ast::record_item& obj) override;
 	void on_obj(ast::function& obj) override ;
 	void on_obj(ast::function_parameter &obj) override;
+	void on_obj(ast::enumeration& obj) override ;
+	void on_obj(ast::enum_element& obj) override ;
 public:
 	to_generic_ast();
 	gen_utils::tree operator()(std::vector<ast::module> mods);

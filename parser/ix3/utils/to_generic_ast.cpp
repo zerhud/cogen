@@ -112,6 +112,17 @@ void to_generic_ast::on_obj(ast::function_parameter& obj)
 	make_type(obj.param_type, *param);
 }
 
+void to_generic_ast::on_obj(ast::enumeration& obj)
+{
+	auto enode = std::make_shared<details::enums>(obj);
+	result.add(*parents.back(), enode);
+}
+
+void to_generic_ast::on_obj(ast::enum_element& obj)
+{
+
+}
+
 gen_utils::tree to_generic_ast::operator()(std::vector<ast::module> mods)
 {
 	for(auto& mod:mods) trav_module(mod, trav_direction::paret_first);
