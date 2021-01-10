@@ -69,6 +69,8 @@ private:
 	virtual void on_obj(ast::meta::depricated& obj)    { (void)obj; }
 	virtual void on_obj(ast::meta::documentation& obj) { (void)obj; }
 
+	virtual void pop_parent() {}
+
 	template<typename T, typename... Args>
 	std::string make_path(T&& v1, Args... v)
 	{
@@ -89,6 +91,7 @@ private:
 		parents_.emplace_back(&obj);
 		fnc();
 		parents_.pop_back();
+		pop_parent();
 
 		if(cur_direction==trav_direction::child_first)
 			on_obj(obj);

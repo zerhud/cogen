@@ -15,6 +15,7 @@ using ix3::utils::details::fnc_param_node;
 using ix3::utils::details::record_node;
 using ix3::utils::details::record_field;
 using ix3::utils::details::enums;
+using ix3::utils::details::interface;
 
 std::int64_t ix3::utils::details::splash_version(const ast::meta::version& v)
 {
@@ -69,6 +70,16 @@ boost::json::object function_node::make_json(const compilation_context& ctx) con
 	return ret;
 }
 
+std::string_view function_node::inner_name() const
+{
+	return original_node().name;
+}
+
+std::string_view function_node::name() const
+{
+	return "";
+}
+
 fnc_param_node::fnc_param_node(ast::function_parameter n) : ast_node(std::move(n)) {}
 
 boost::json::object fnc_param_node::make_json(const compilation_context& ctx) const
@@ -121,5 +132,18 @@ boost::json::object enums::make_json(const compilation_context& ctx) const
 		eobj["io"] = e.io.empty() ? e.name : e.io;
 		items.emplace_back(eobj);
 	}
+	return ret;
+}
+
+interface::interface(ast::interface i) : ast_node(std::move(i)) {}
+
+boost::json::object interface::make_json(const compilation_context& ctx) const
+{
+	boost::json::object ret = ast_node::make_json(ctx);
+	ret["type"] = "interface";
+	ret["ex"] = original_node().use_as_exception;
+	ret["rinvert"] = original_node().realization_in_client;
+	auto& ctors = ret["ctors"].emplace_array();
+	auto& funcs = ret["funcs"].emplace_array();
 	return ret;
 }

@@ -55,8 +55,8 @@ public:
 	boost::json::object make_json(const compilation_context& ctx) const override
 	{
 		boost::json::object ret = ctx.linked_json(*this);
-		ret["orig_name"] = name();
-		auto list = ctx.naming(name());
+		ret["orig_name"] = inner_name();
+		auto list = ctx.naming(inner_name());
 		if(list.size()==1) ret["name"] = list[0];
 		else {
 			auto& nl = ret["name"].emplace_array();
@@ -78,6 +78,8 @@ struct type_node : ast_node<ast::type> {
 struct function_node : ast_node<ast::function> {
 	function_node(ast::function n);
 	boost::json::object make_json(const compilation_context& ctx) const override ;
+	std::string_view inner_name() const override ;
+	std::string_view name() const override ;
 };
 
 struct fnc_param_node : ast_node<ast::function_parameter> {
@@ -97,6 +99,11 @@ struct record_field : ast_node<ast::record_item> {
 
 struct enums : ast_node<ast::enumeration> {
 	enums(ast::enumeration e);
+	boost::json::object make_json(const compilation_context& ctx) const override ;
+};
+
+struct interface : ast_node<ast::interface> {
+	interface(ast::interface i);
 	boost::json::object make_json(const compilation_context& ctx) const override ;
 };
 

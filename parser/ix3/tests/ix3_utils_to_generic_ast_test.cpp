@@ -131,6 +131,8 @@ BOOST_AUTO_TEST_CASE(records)
 }
 BOOST_AUTO_TEST_CASE(functions)
 {
+	using ix3::utils::details::ix3_node_base;
+
 	to_generic_ast maker;
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
@@ -142,14 +144,16 @@ BOOST_AUTO_TEST_CASE(functions)
 	BOOST_TEST(tree.children(*mod).size()==2);
 
 	auto foo = tree.children(*mod).at(0);
-	BOOST_TEST(foo->name()=="foo");
+	BOOST_TEST(foo->name()=="");
 	BOOST_CHECK(!foo->version().has_value());
 	BOOST_TEST(foo->required_links().size() == 0);
+	BOOST_TEST(dynamic_cast<const ix3_node_base&>(*foo).inner_name() == "foo");
 
 	auto bar = tree.children(*mod).at(1);
-	BOOST_TEST(bar->name()=="bar");
+	BOOST_TEST(bar->name()=="");
 	BOOST_CHECK(bar->version().has_value());
 	BOOST_TEST(*mod->version() < *bar->version());
+	BOOST_TEST(dynamic_cast<const ix3_node_base&>(*bar).inner_name() == "bar");
 
 	auto foo_params = tree.children(*foo);
 	BOOST_TEST(foo_params.size() == 3);
@@ -293,7 +297,6 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	ix3::utils::details::compilation_context ctx(&tree, &fc, &test_ctx);
 	auto json = static_cast<const ix3_node_base&>(*foo).make_json(ctx);
 
-	BOOST_TEST(foo->name()=="foo");
 	BOOST_TEST(json == boost::json::parse(
 	               R"({
 	               "orig_name":"foo","name":"foo",
@@ -342,6 +345,43 @@ BOOST_AUTO_TEST_CASE(enums)
 	                   {"name":"two", "io":"test"}
 	                 ]
 	               })"sv));
+}
+BOOST_AUTO_TEST_CASE(interface)
+{
+	to_generic_ast maker;
+	auto ast = txt::parse(txt::file_content,
+	                      "module mod1 v1.1:"
+	                      "interface i +ex { constructor(); i8 foo() const; }"sv);
+	gen_utils::tree tree = maker(ast.modules);
+	BOOST_TEST(tree.children(tree.root()).size()==1);
+	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	BOOST_TEST(tree.children(*mod).size()==1);
+
+	auto e = tree.children(*mod).at(0);
+	BOOST_TEST(e->name()=="i");
+	BOOST_CHECK(!e->version().has_value());
+	BOOST_TEST(e->required_links().size() == 0);
+
+	BOOST_TEST(make_json(*e, tree) == boost::json::parse(
+	               R"({
+	                 "type":"interface","name":"i", "orig_name":"i",
+	                 "ex":true, "rinvert":false,
+	                 "ctors":[ ],
+	                 "funcs":[ ]
+	               })"sv));
+}
+BOOST_AUTO_TEST_CASE(pop_parent)
+{
+	to_generic_ast maker;
+	auto ast = txt::parse(txt::file_content,
+	                      "module mod1 v1.1:"
+	                      "record r {-int f1;}"
+	                      "i8 foo();"sv);
+	gen_utils::tree tree = maker(ast.modules);
+	BOOST_TEST(tree.children(tree.root()).size()==1);
+	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	BOOST_TEST(tree.children(*mod).size()==2);
+
 }
 BOOST_AUTO_TEST_SUITE_END() // gain_to_generic_ast
 

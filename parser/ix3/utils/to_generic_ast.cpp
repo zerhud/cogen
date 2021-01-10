@@ -102,6 +102,7 @@ void to_generic_ast::on_obj(ast::function& obj)
 	cur_fnc = std::make_shared<details::function_node>(obj);
 	result.add(*parents.back(), cur_fnc);
 	make_type(obj.return_type, *cur_fnc);
+	parents.emplace_back(cur_fnc);
 }
 
 void to_generic_ast::on_obj(ast::function_parameter& obj)
@@ -114,17 +115,25 @@ void to_generic_ast::on_obj(ast::function_parameter& obj)
 
 void to_generic_ast::on_obj(ast::enumeration& obj)
 {
-	auto enode = std::make_shared<details::enums>(obj);
-	result.add(*parents.back(), enode);
+	result.add(*parents.back(), std::make_shared<details::enums>(obj));
 }
 
-void to_generic_ast::on_obj(ast::enum_element& obj)
+void to_generic_ast::on_obj(ast::interface& obj)
 {
-
+	auto i = std::make_shared<details::interface>(obj);
+	result.add(*parents.back(), i);
+	parents.emplace_back(i);
 }
 
 gen_utils::tree to_generic_ast::operator()(std::vector<ast::module> mods)
 {
 	for(auto& mod:mods) trav_module(mod, trav_direction::paret_first);
 	return result;
+}
+
+
+void to_generic_ast::pop_parent()
+{
+	assert(!parents.empty());
+	parents.pop_back();
 }
