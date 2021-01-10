@@ -165,13 +165,18 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	single_gen_part sg(prov.get());
 	auto t1_child1 = make_node(1, "n", "v1", "t1_a");
 	auto t1_child2 = make_node(1, "n", "v2", "t1_b");
+	auto t1_child3 = make_node(1, "n", "v2", "t1_c");
 	MOCK_EXPECT(t1_child1->link_condition).returns("cond1");
 	MOCK_EXPECT(t1_child2->link_condition).returns("cond1");
+	MOCK_EXPECT(t1_child3->link_condition).returns("cond1");
 	MOCK_EXPECT(t1_child1->imports_modification).returns(std::nullopt);
 	MOCK_EXPECT(t1_child2->imports_modification)
 	        .returns(gen_utils::import_file{false, "vector"});
+	MOCK_EXPECT(t1_child3->imports_modification)
+	        .returns(gen_utils::import_file{false, "vector"});
 	t1.add(t1.root(), t1_child1);
 	t1.add(t1.root(), t1_child2);
+	t1.add(t1.root(), t1_child3);
 	all_data.add(t1);
 	expect_empty_result(*t1_dsl, *t2_dsl);
 
@@ -181,7 +186,9 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	gen_context ctx{{"${n}"_s, "t"_s, {}, *compile_cfg.get()}, {}};
 	ctx.generated["part1"] = sg(ctx, all_data);
 
-	t2.add(t2.root(), make_node(2, std::nullopt, std::nullopt, std::nullopt, {{"t1_a"}, {"t1_b"}}));
+	t2.add( t2.root(), make_node(
+	            2, std::nullopt, std::nullopt,
+	            std::nullopt, {{"t1_a"}, {"t1_b"}, {"t1_c"}}));
 	gen_utils::input other_data;
 	other_data.add(t2);
 	ctx.cfg_part.map_tmpl = "file";

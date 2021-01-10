@@ -83,7 +83,7 @@ void single_gen_part::add_includes_to_result(
 	for(auto& l:imports.self_matched(data))
 		mincs.emplace_back(l);
 	boost::json::object& rincs = incs["required"].emplace_object();
-	for(auto& r:imports.required_for(data)) {
+	for(auto& r:imports.required_for_incs(data)) {
 		boost::json::array* rcond = nullptr;
 		if(rincs.find(r.cond) == rincs.end())
 			rcond = &rincs[r.cond].emplace_array();

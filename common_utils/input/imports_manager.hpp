@@ -52,6 +52,7 @@ public:
 	imports_manager& add(const std::pmr::string& file, const input& data);
 	std::pmr::vector<import_info> required_for(const input& file_data) const ;
 	std::pmr::vector<import_info> required_for(const tree& file_data) const ;
+	std::pmr::vector<import_info> required_for_incs(const input& file_data) const ;
 	std::pmr::vector<std::pmr::string> self_matched(const input& file_data) const ;
 };
 

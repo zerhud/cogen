@@ -59,13 +59,19 @@ std::pmr::vector<import_info> imports_manager::required_for(
 		auto dt_result = required_for_scan(*dt, dt->root());
 		ret.insert(ret.end(), dt_result.begin(), dt_result.end());
 	}
-	return ret | unique;
+	return ret;
 }
 
 std::pmr::vector<import_info> imports_manager::required_for(
         const tree& file_data) const
 {
-	return required_for_scan(file_data, file_data.root()) | unique;
+	return required_for_scan(file_data, file_data.root());
+}
+
+std::pmr::vector<import_info> imports_manager::required_for_incs(
+        const input& file_data) const
+{
+	return required_for(file_data) | unique;
 }
 
 std::pmr::vector<import_info> imports_manager::required_for_scan(
