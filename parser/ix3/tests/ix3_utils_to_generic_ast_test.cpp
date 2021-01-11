@@ -351,7 +351,7 @@ BOOST_AUTO_TEST_CASE(interface)
 	to_generic_ast maker;
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
-	                      "interface i +ex { constructor(); i8 foo() const; }"sv);
+	                      "interface i +ex { constructor(+i8 a); i8 foo(+i9 b) const; }"sv);
 	gen_utils::tree tree = maker(ast.modules);
 	BOOST_TEST(tree.children(tree.root()).size()==1);
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
@@ -366,11 +366,21 @@ BOOST_AUTO_TEST_CASE(interface)
 	               R"({
 	                 "type":"interface","name":"i", "orig_name":"i",
 	                 "ex":true, "rinvert":false,
-	                 "ctors":[ {"type":"ctor", "params":[]} ],
+	                 "ctors":[ {"type":"ctor", "params":[{
+	                    "orig_name":"a","name":"a",
+	                    "param_t":{"type":"type", "name":["i8"], "subs":[]},
+	                    "type":"function_parameter",
+	                    "req":true
+	                 }]} ],
 	                 "funcs":[ {
 	                   "type":"function","name":"foo", "orig_name":"foo",
 	                   "return":{"type":"type", "name":["i8"], "subs":[]},
-	                   "params":[]
+	                   "params":[{
+	                    "orig_name":"b","name":"b",
+	                    "param_t":{"type":"type", "name":["i9"], "subs":[]},
+	                    "type":"function_parameter",
+	                    "req":true
+			   }]
 	                 } ]
 	               })"));
 }
