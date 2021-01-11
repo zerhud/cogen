@@ -366,8 +366,12 @@ BOOST_AUTO_TEST_CASE(interface)
 	               R"({
 	                 "type":"interface","name":"i", "orig_name":"i",
 	                 "ex":true, "rinvert":false,
-	                 "ctors":[ ],
-	                 "funcs":[ ]
+	                 "ctors":[ {"type":"ctor", "params":[]} ],
+	                 "funcs":[ {
+	                   "type":"function","name":"", "orig_name":"foo",
+	                   "return":{"type":"type", "name":["i8"], "subs":[]},
+	                   "params":[]
+	                 } ]
 	               })"sv));
 }
 BOOST_AUTO_TEST_CASE(pop_parent)

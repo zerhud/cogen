@@ -7,6 +7,7 @@
  *************************************************************************/
 
 #include "ast_nodes.hpp"
+#include <iostream>
 
 using namespace std::literals;
 using ix3::utils::details::type_node;
@@ -16,6 +17,7 @@ using ix3::utils::details::record_node;
 using ix3::utils::details::record_field;
 using ix3::utils::details::enums;
 using ix3::utils::details::interface;
+using ix3::utils::details::ctor_node;
 
 std::int64_t ix3::utils::details::splash_version(const ast::meta::version& v)
 {
@@ -143,7 +145,35 @@ boost::json::object interface::make_json(const compilation_context& ctx) const
 	ret["type"] = "interface";
 	ret["ex"] = original_node().use_as_exception;
 	ret["rinvert"] = original_node().realization_in_client;
-	auto& ctors = ret["ctors"].emplace_array();
-	auto& funcs = ret["funcs"].emplace_array();
+	boost::json::array& ctors = ret["ctors"].emplace_array();
+	for(auto& c:ctx.children(*this))
+		if(c->inner_name()=="$ctor")
+			ctors.emplace_back(c->make_json(ctx));
+	boost::json::array& funcs = ret["funcs"].emplace_array();
+	for(auto& c:ctx.children(*this)) {
+		std::cout << __LINE__ << ' ' << c->inner_name() << std::endl;
+		if(c->inner_name()!="$ctor")
+			funcs.emplace_back(c->make_json(ctx));
+	}
 	return ret;
+}
+
+
+ctor_node::ctor_node(ast::constructor n) : ast_node(std::move(n)) {}
+boost::json::object ctor_node::make_json(const compilation_context& ctx) const
+{
+	boost::json::object ret;
+	ret["type"] = "ctor";
+	boost::json::array& params=ret["params"].emplace_array();
+	for(auto& p:ctx.children(*this))
+		params.emplace_back(p->make_json(ctx));
+	return ret;
+}
+std::string_view ctor_node::inner_name() const
+{
+	return "$ctor";
+}
+std::string_view ctor_node::name() const
+{
+	return "";
 }

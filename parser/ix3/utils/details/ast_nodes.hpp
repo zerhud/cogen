@@ -82,6 +82,13 @@ struct function_node : ast_node<ast::function> {
 	std::string_view name() const override ;
 };
 
+struct ctor_node : ast_node<ast::constructor> {
+	ctor_node(ast::constructor n);
+	boost::json::object make_json(const compilation_context& ctx) const override ;
+	std::string_view inner_name() const override ;
+	std::string_view name() const override ;
+};
+
 struct fnc_param_node : ast_node<ast::function_parameter> {
 	fnc_param_node(ast::function_parameter n);
 	boost::json::object make_json(const compilation_context& ctx) const override ;

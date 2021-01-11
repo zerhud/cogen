@@ -41,6 +41,7 @@ class to_generic_ast : protected traverser {
 	void on_obj(ast::function_parameter &obj) override;
 	void on_obj(ast::enumeration& obj) override ;
 	void on_obj(ast::interface& obj) override ;
+	void on_obj(ast::constructor& obj) override ;
 
 	void pop_parent() override ;
 public:

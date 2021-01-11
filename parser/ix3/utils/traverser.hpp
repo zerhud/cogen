@@ -33,6 +33,7 @@ protected:
 	   ast::record*,
 	   ast::interface*,
 	   ast::function*,
+	   ast::constructor*,
 	   ast::enumeration*> parent_t;
 
 	ast::module& module() ;
@@ -84,17 +85,18 @@ private:
 	template<typename O, typename Fnc>
 	void inner_trav(O& obj, const Fnc& fnc)
 	{
-		make_path(cur_mod_.name, obj.name);
+		if constexpr (requires{obj.name;}) make_path(cur_mod_.name, obj.name);
 		if(cur_direction==trav_direction::paret_first)
 			on_obj(obj);
 
 		parents_.emplace_back(&obj);
 		fnc();
 		parents_.pop_back();
-		pop_parent();
 
 		if(cur_direction==trav_direction::child_first)
 			on_obj(obj);
+
+		pop_parent();
 	}
 
 	trav_direction cur_direction = trav_direction::child_first;
