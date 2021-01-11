@@ -144,14 +144,15 @@ boost::json::object interface::make_json(const compilation_context& ctx) const
 	ret["type"] = "interface";
 	ret["ex"] = original_node().use_as_exception;
 	ret["rinvert"] = original_node().realization_in_client;
-	boost::json::array& ctors = ret["ctors"].emplace_array();
-	for(auto& c:ctx.children(*this))
-		if(c->inner_name()=="$ctor")
+	boost::json::array ctors, funcs;
+	for(auto& c:ctx.children(*this)) {
+		if(c->inner_name()=="$ctor"sv)
 			ctors.emplace_back(c->make_json(ctx));
-	boost::json::array& funcs = ret["funcs"].emplace_array();
-	for(auto& c:ctx.children(*this))
-		if(c->inner_name()!="$ctor")
+		else
 			funcs.emplace_back(c->make_json(ctx));
+	}
+	ret["ctors"] = std::move(ctors);
+	ret["funcs"] = std::move(funcs);
 	return ret;
 }
 
