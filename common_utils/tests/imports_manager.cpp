@@ -24,7 +24,7 @@ std::pmr::string operator "" _s (const char* d, std::size_t l)
 
 boost::json::value operator "" _bj(const char* d, std::size_t l)
 {
-	return boost::json::parse(std::string_view(d,l));
+	return boost::json::parse(boost::json::string_view(d,l));
 }
 
 

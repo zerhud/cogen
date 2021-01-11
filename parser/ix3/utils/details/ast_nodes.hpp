@@ -55,7 +55,7 @@ public:
 	boost::json::object make_json(const compilation_context& ctx) const override
 	{
 		boost::json::object ret = ctx.linked_json(*this);
-		ret["orig_name"] = inner_name();
+		ret["orig_name"] = boost::json::string_view(inner_name().data(), inner_name().size());
 		auto list = ctx.naming(inner_name());
 		if(list.size()==1) ret["name"] = list[0];
 		else {

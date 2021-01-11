@@ -61,7 +61,7 @@ function_node::function_node(ast::function n) : ast_node(std::move(n)) {}
 boost::json::object function_node::make_json(const compilation_context& ctx) const
 {
 	boost::json::object ret = ast_node::make_json(ctx);
-	ret["type"] = "function"sv;
+	ret["type"] = "function";
 	auto children = ctx.children(*this);
 	assert(1 <= children.size());
 	ret["return"] = children[0]->make_json(ctx);
@@ -88,7 +88,7 @@ boost::json::object fnc_param_node::make_json(const compilation_context& ctx) co
 {
 	assert(ctx.children(*this).size() == 1);
 	boost::json::object ret = ast_node::make_json(ctx);
-	ret["type"] = "function_parameter"sv;
+	ret["type"] = "function_parameter";
 	ret["param_t"] = ctx.children(*this)[0]->make_json(ctx);
 	ret["req"] = original_node().required;
 	return ret;
@@ -99,7 +99,7 @@ record_node::record_node(ast::record n) : ast_node(std::move(n)) {}
 boost::json::object record_node::make_json(const compilation_context& ctx) const
 {
 	boost::json::object ret = ast_node::make_json(ctx);
-	ret["type"] = "record"sv;
+	ret["type"] = "record";
 	ret["is_exception"] = original_node().use_as_exception;
 	boost::json::array& fields=ret["fields"].emplace_array();
 	for(auto& f:ctx.children(*this))
@@ -113,7 +113,7 @@ boost::json::object record_field::make_json(const compilation_context& ctx) cons
 {
 	assert(ctx.children(*this).size() == 1);
 	boost::json::object ret = ast_node::make_json(ctx);
-	ret["type"] = "record_item"sv;
+	ret["type"] = "record_item";
 	ret["req"] = original_node().is_required;
 	ret["param_t"] = ctx.children(*this)[0]->make_json(ctx);
 	return ret;

@@ -21,7 +21,7 @@ std::optional<std::uint64_t> ix3_root_node::version() const { return 0; }
 boost::json::object ix3_root_node::make_json(const compilation_context& ctx) const
 {
 	boost::json::object ret;
-	ret["name"] = name();
+	ret["name"] = boost::json::string_view(name().data(), name().size());
 	boost::json::array& cnt = ret["mods"].emplace_array();
 	for(auto& child:ctx.children(*this))
 		cnt.emplace_back(child->make_json(ctx));
@@ -39,7 +39,8 @@ std::optional<gen_utils::variable> module_node::node_var() const
 boost::json::object module_node::make_json(const compilation_context& ctx) const
 {
 	boost::json::object ret;
-	ret["name"] = name();
+	ret["name"] = boost::json::string_view(name().data(), name().size());
+	boost::json::array& cnt = ret["mods"].emplace_array();
 	boost::json::array& content=ret["content"].emplace_array();
 	for(auto& child:ctx.children(*this))
 		content.emplace_back(child->make_json(ctx));
@@ -66,7 +67,7 @@ std::optional<gen_utils::variable> module_version_node::node_var() const
 boost::json::object module_version_node::make_json(const compilation_context& ctx) const
 {
 	boost::json::object ret;
-	ret["type"] = "version"sv;
+	ret["type"] = "version";
 	ret["value"] = str_val;
 	boost::json::array& content=ret["content"].emplace_array();
 	for(auto& child:ctx.children(*this))

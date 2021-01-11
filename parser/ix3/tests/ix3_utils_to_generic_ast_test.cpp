@@ -55,14 +55,14 @@ boost::json::value make_json(const gen_utils::data_node& root, const gen_utils::
 BOOST_AUTO_TEST_CASE(json_compare)
 {
 	BOOST_TEST(
-		boost::json::parse(R"({"a":1,"b":2})"sv) ==
-		boost::json::parse(R"({"b":2,"a":1})"sv)
+		boost::json::parse(R"({"a":1,"b":2})") ==
+		boost::json::parse(R"({"b":2,"a":1})")
 		);
 }
 BOOST_AUTO_TEST_CASE(empty_modules)
 {
 	to_generic_ast maker;
-	auto ast = txt::parse(txt::file_content, "module mod1 v1.1: module mod1 v1.2:"sv);
+	auto ast = txt::parse(txt::file_content, "module mod1 v1.1: module mod1 v1.2:");
 	auto tree = maker(ast.modules);
 	BOOST_TEST(tree.root().name() == "ix3"sv);
 	BOOST_TEST(tree.root().version().value() == 0);
@@ -91,14 +91,14 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 	               R"({"name":"ix3","mods":[ {"name":"mod1","content":[
 	                 {"type":"version","value":"1.1","name":"mod1_v1_1","content":[]},
 	                 {"type":"version","value":"1.2","name":"mod1_v1_2","content":[]}
-	               ]} ]})"sv));
+	               ]} ]})"));
 }
 BOOST_AUTO_TEST_CASE(records)
 {
 	to_generic_ast maker;
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
-	                      "@v1.1 record rec { -int f1; @v1.2 +int f2;}"sv);
+	                      "@v1.1 record rec { -int f1; @v1.2 +int f2;}");
 	gen_utils::tree tree = maker(ast.modules);
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
 	BOOST_TEST(tree.children(*mod).size()==1);
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(records)
 	                   {"type":"type","name":["int"],"subs":[]}},
 	                 {"orig_name":"f2","name":"f2","type":"record_item","req":true,"param_t":
 	                   {"type":"type","name":["int"],"subs":[]}}
-	               ]})"sv));
+	               ]})"));
 }
 BOOST_AUTO_TEST_CASE(functions)
 {
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(functions)
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
 	                      "int foo(-string bar, +list<string> baz);"
-	                      "@v1.2 int bar(+u8 b);"sv);
+	                      "@v1.2 int bar(+u8 b);");
 	gen_utils::tree tree = maker(ast.modules);
 	BOOST_TEST(tree.children(tree.root()).size()==1);
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
@@ -171,16 +171,16 @@ BOOST_AUTO_TEST_CASE(functions)
 	                 "req":true
 	               } ],
 	               "return":{"type":"type", "name":["int"], "subs":[]}
-	               })"sv));
+	               })"));
 	BOOST_TEST(make_json(*foo_params.at(0), tree) == boost::json::parse(
-	               R"({ "type":"type","name":["int"],"subs":[] })"sv));
+	               R"({ "type":"type","name":["int"],"subs":[] })"));
 	BOOST_TEST(make_json(*foo_params.at(1), tree) == boost::json::parse(
 	               R"({
 	                 "orig_name":"bar","name":"bar",
 	                 "param_t":{"type":"type", "name":["string"], "subs":[]},
 	                 "type":"function_parameter",
 	                 "req":false
-	               })"sv));
+	               })"));
 	BOOST_TEST(make_json(*foo_params.at(2), tree) == boost::json::parse(
 	               R"({
 	                 "orig_name":"baz","name":"baz",
@@ -189,14 +189,14 @@ BOOST_AUTO_TEST_CASE(functions)
 	                 ]},
 	                 "type":"function_parameter",
 	                 "req":true
-	               })"sv));
+	               })"));
 }
 BOOST_AUTO_TEST_CASE(type_nodes)
 {
 	to_generic_ast maker;
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
-	                      "int foo(-string<char,alloc> bar, +list<foo<str_t>> bar2);"sv);
+	                      "int foo(-string<char,alloc> bar, +list<foo<str_t>> bar2);");
 	gen_utils::tree tree = maker(ast.modules);
 	auto extract_type_node = [&tree](auto& par, int at){
 		auto ret = dynamic_cast<const ix3::utils::details::type_node*>(
@@ -227,17 +227,17 @@ BOOST_AUTO_TEST_CASE(type_nodes)
 	BOOST_TEST(extract_type_node(bar2_foo, 0)->type_name() == "str_t");
 
 	BOOST_TEST(make_json(*ret_type, tree) == boost::json::parse(
-	               R"( {"type":"type", "name":["int"], "subs":[]} )"sv));
+	               R"( {"type":"type", "name":["int"], "subs":[]} )"));
 	BOOST_TEST(make_json(*bar1_type, tree) == boost::json::parse(
 	               R"( {"type":"type", "name":["string"], "subs":[
 	               {"type":"type", "name":["char"], "subs":[]},
 	               {"type":"type", "name":["alloc"], "subs":[]}
-	               ]} )"sv));
+	               ]} )"));
 	BOOST_TEST(make_json(*bar2_type, tree) == boost::json::parse(
 	               R"( {"type":"type", "name":["list"], "subs":[
 	               {"type":"type", "name":["foo"], "subs":[
 	                 { "type":"type", "name":["str_t"], "subs":[] }]}
-	               ]} )"sv));
+	               ]} )"));
 
 	auto ret_links = ret_type->required_links();
 	BOOST_TEST_REQUIRE(ret_links.size()==1);
@@ -252,7 +252,7 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	to_generic_ast maker;
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
-	                      "list<i8> foo(+list a);"sv);
+	                      "list<i8> foo(+list a);");
 	gen_utils::tree tree = maker(ast.modules);
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
 	BOOST_TEST(tree.children(*mod).size()==1);
@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	                     "subs":[]
 	                   }
 	                 ]}
-	               })"sv));
+	               })"));
 }
 BOOST_AUTO_TEST_CASE(enums)
 {
@@ -344,7 +344,7 @@ BOOST_AUTO_TEST_CASE(enums)
 	                   {"name":"one", "io":"one"},
 	                   {"name":"two", "io":"test"}
 	                 ]
-	               })"sv));
+	               })"));
 }
 BOOST_AUTO_TEST_CASE(interface)
 {
@@ -372,7 +372,7 @@ BOOST_AUTO_TEST_CASE(interface)
 	                   "return":{"type":"type", "name":["i8"], "subs":[]},
 	                   "params":[]
 	                 } ]
-	               })"sv));
+	               })"));
 }
 BOOST_AUTO_TEST_CASE(pop_parent)
 {

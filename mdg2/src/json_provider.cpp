@@ -23,7 +23,9 @@ void json_provider::generate(
 	boost::json::object result;
 	result["file"] = tmpl_file.string();
 	result["data"] = data;
-	result["out_file"] = outdir.empty() ? out_file : (outdir / out_file).string();
+	result["out_file"] = outdir.empty()
+		? boost::json::string_view(out_file.data(),out_file.size())
+		: (outdir / out_file).string();
 
 	all_data.emplace_back(result);
 }
