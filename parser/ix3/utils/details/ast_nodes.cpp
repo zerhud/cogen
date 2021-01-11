@@ -7,7 +7,6 @@
  *************************************************************************/
 
 #include "ast_nodes.hpp"
-#include <iostream>
 
 using namespace std::literals;
 using ix3::utils::details::type_node;
@@ -150,11 +149,9 @@ boost::json::object interface::make_json(const compilation_context& ctx) const
 		if(c->inner_name()=="$ctor")
 			ctors.emplace_back(c->make_json(ctx));
 	boost::json::array& funcs = ret["funcs"].emplace_array();
-	for(auto& c:ctx.children(*this)) {
-		std::cout << __LINE__ << ' ' << c->inner_name() << std::endl;
+	for(auto& c:ctx.children(*this))
 		if(c->inner_name()!="$ctor")
 			funcs.emplace_back(c->make_json(ctx));
-	}
 	return ret;
 }
 

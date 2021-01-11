@@ -368,7 +368,7 @@ BOOST_AUTO_TEST_CASE(interface)
 	                 "ex":true, "rinvert":false,
 	                 "ctors":[ {"type":"ctor", "params":[]} ],
 	                 "funcs":[ {
-	                   "type":"function","name":"", "orig_name":"foo",
+	                   "type":"function","name":"foo", "orig_name":"foo",
 	                   "return":{"type":"type", "name":["i8"], "subs":[]},
 	                   "params":[]
 	                 } ]

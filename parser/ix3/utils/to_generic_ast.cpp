@@ -8,7 +8,6 @@
 
 #include "to_generic_ast.hpp"
 #include "meta.hpp"
-#include <iostream>
 
 #include "details/ix3_node_base.hpp"
 #include "details/ast_nodes.hpp"
@@ -120,7 +119,6 @@ void to_generic_ast::on_obj(ast::enumeration& obj)
 
 void to_generic_ast::on_obj(ast::interface& obj)
 {
-	std::cout << __LINE__ << std::endl;
 	auto i = std::make_shared<details::interface>(obj);
 	result.add(*parents.back(), i);
 	parents.emplace_back(i);

@@ -63,7 +63,6 @@ string {
 
 	gen_utils::compilation_context ctx;
 	ctx.linked_to = string;
-	std::cout << tt.to_json(ctx) << std::endl;
 	BOOST_TEST(tt.to_json(ctx).as_string() == "std::pmr::string");
 }
 BOOST_AUTO_TEST_SUITE_END() // library
