@@ -9,13 +9,16 @@
 #pragma once
 
 #include "ic/provider.hpp"
+#include "path_config.hpp"
 
 namespace mdg2 {
 
 class json_provider : public mdg::ic::provider {
 	mutable boost::json::array all_data;
 	std::filesystem::path outdir;
+	const path_config& pathes;
 public:
+	json_provider(const path_config& pcfg);
 	void output_dir(const std::filesystem::path& dir);
 	void generate(
 	        std::filesystem::path tmpl_file,

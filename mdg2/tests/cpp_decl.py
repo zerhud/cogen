@@ -5,7 +5,7 @@ def check_example_json(result, tmpl, out):
     assert 'file' in result[0]
     assert 'out_file' in result[0]
     assert 'data' in result[0]
-    assert result[0]['file'] == tmpl
+    assert tmpl in result[0]['file']
     assert result[0]['out_file'] == out
 
 def check_example_data(result, count=2):

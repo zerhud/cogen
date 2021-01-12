@@ -97,7 +97,7 @@ void executer::dir_mode() const
 
 void executer::json_mode(const mdg::ic::ptsetts& setts) const
 {
-	json_provider json_out;
+	json_provider json_out(pathes);
 	json_out.output_dir(opt_vars["outdir"].as<std::string>());
 	mdg::ic::single_gen_part part(&json_out);
 	mdg::ic::gen_context ctx;

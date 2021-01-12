@@ -10,6 +10,11 @@
 
 using mdg2::json_provider;
 
+json_provider::json_provider(const path_config& pcfg)
+	: pathes(pcfg)
+{
+}
+
 void json_provider::output_dir(const std::filesystem::path& dir)
 {
 	outdir = dir;
@@ -21,7 +26,7 @@ void json_provider::generate(
 	        std::string_view out_file) const
 {
 	boost::json::object result;
-	result["file"] = tmpl_file.string();
+	result["file"] = pathes.library(tmpl_file).string();
 	result["data"] = data;
 	result["out_file"] = outdir.empty()
 		? boost::json::string_view(out_file.data(),out_file.size())

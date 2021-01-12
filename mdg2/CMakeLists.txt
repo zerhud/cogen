@@ -39,6 +39,8 @@ macro(copy_if_diff from to)
 	target_sources(${PROJECT_NAME} PRIVATE  "${to}")
 endmacro()
 
+copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/mdgwr.py" "${CMAKE_CURRENT_BINARY_DIR}/mdgwr.py")
+
 # generate ix3 example file
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/examples/ix3_example" "${build_examples_dir}/ix3_example")
 
@@ -47,6 +49,11 @@ copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/generators/cpp_decl.info" "${build_gener
 
 # library
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/standard_types.info" "${build_lib_dir}/standard_types.info")
+copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cpp/declarations.jinja" "${build_lib_dir}/cpp/declarations.jinja")
+copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cpp/header.jinja" "${build_lib_dir}/cpp/header.jinja")
+copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cpp/render.jinja" "${build_lib_dir}/cpp/render.jinja")
+copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cpp/definitions.jinja" "${build_lib_dir}/cpp/definitions.jinja")
+copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cmake/plain.jinja" "${build_lib_dir}/cmake/plain.jinja")
 
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE
