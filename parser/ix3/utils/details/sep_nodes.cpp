@@ -21,8 +21,7 @@ std::optional<std::uint64_t> ix3_root_node::version() const { return 0; }
 boost::json::object ix3_root_node::make_json(const compilation_context& ctx) const
 {
 	boost::json::object ret;
-	ret["name"] = boost::json::string_view(name().data(), name().size());
-	boost::json::array& cnt = ret["mods"].emplace_array();
+	boost::json::array& cnt = ret[name()].emplace_array();
 	for(auto& child:ctx.children(*this))
 		cnt.emplace_back(child->make_json(ctx));
 	ctx.compiling_aspect().aspect(*this, ret);

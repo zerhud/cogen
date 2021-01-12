@@ -18,8 +18,7 @@ def check_example_data(result, count=2):
     parsed = json.loads(result)
     assert len(parsed[0]['data']['data']) == count
     data = parsed[0]['data']['data']
-    assert data[0]['name']=='ix3'
-    assert len(data[0]['mods'])==1
+    assert 'ix3' in data[0]
 
 def test_wrong_mode():
     r=sp.run(['./mdg2', '-m', 'wrong', '-iix3=ix3_example', '-gcpp_decl'], stdout=sp.PIPE, stderr=sp.PIPE)

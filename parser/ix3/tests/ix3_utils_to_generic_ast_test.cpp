@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 	gen_utils::compilation_context ctx;
 	ctx.cfg.name = gen_utils::compiler::cpp;
 	BOOST_TEST(tree.to_json(ctx) == boost::json::parse(
-	               R"({"name":"ix3","mods":[ {"name":"mod1","content":[
+	               R"({"ix3":[ {"name":"mod1","content":[
 	                 {"type":"version","value":"1.1","name":"mod1_v1_1","content":[]},
 	                 {"type":"version","value":"1.2","name":"mod1_v1_2","content":[]}
 	               ]} ]})"));
