@@ -37,7 +37,7 @@ std::string_view type_node::name() const
 	return "";
 }
 
-boost::json::object type_node::make_json(const compilation_context& ctx) const
+boost::json::value type_node::make_json(const compilation_context& ctx) const
 {
 	boost::json::object ret = ctx.linked_json(*this);
 	ret["type"] = "type";
@@ -57,9 +57,9 @@ std::pmr::vector<gen_utils::name_t> type_node::required_links() const
 
 function_node::function_node(ast::function n) : ast_node(std::move(n)) {}
 
-boost::json::object function_node::make_json(const compilation_context& ctx) const
+boost::json::value function_node::make_json(const compilation_context& ctx) const
 {
-	boost::json::object ret = ast_node::make_json(ctx);
+	boost::json::object ret = ast_node::make_inner_json(ctx);
 	ret["type"] = "function";
 	auto children = ctx.children(*this);
 	assert(1 <= children.size());
@@ -83,10 +83,10 @@ std::string_view function_node::name() const
 
 fnc_param_node::fnc_param_node(ast::function_parameter n) : ast_node(std::move(n)) {}
 
-boost::json::object fnc_param_node::make_json(const compilation_context& ctx) const
+boost::json::value fnc_param_node::make_json(const compilation_context& ctx) const
 {
 	assert(ctx.children(*this).size() == 1);
-	boost::json::object ret = ast_node::make_json(ctx);
+	boost::json::object ret = ast_node::make_inner_json(ctx);
 	ret["type"] = "function_parameter";
 	ret["param_t"] = ctx.children(*this)[0]->make_json(ctx);
 	ret["req"] = original_node().required;
@@ -95,9 +95,9 @@ boost::json::object fnc_param_node::make_json(const compilation_context& ctx) co
 
 record_node::record_node(ast::record n) : ast_node(std::move(n)) {}
 
-boost::json::object record_node::make_json(const compilation_context& ctx) const
+boost::json::value record_node::make_json(const compilation_context& ctx) const
 {
-	boost::json::object ret = ast_node::make_json(ctx);
+	boost::json::object ret = ast_node::make_inner_json(ctx);
 	ret["type"] = "record";
 	ret["is_exception"] = original_node().use_as_exception;
 	boost::json::array& fields=ret["fields"].emplace_array();
@@ -108,10 +108,10 @@ boost::json::object record_node::make_json(const compilation_context& ctx) const
 
 record_field::record_field(ast::record_item i) : ast_node(std::move(i)) {}
 
-boost::json::object record_field::make_json(const compilation_context& ctx) const
+boost::json::value record_field::make_json(const compilation_context& ctx) const
 {
 	assert(ctx.children(*this).size() == 1);
-	boost::json::object ret = ast_node::make_json(ctx);
+	boost::json::object ret = ast_node::make_inner_json(ctx);
 	ret["type"] = "record_item";
 	ret["req"] = original_node().is_required;
 	ret["param_t"] = ctx.children(*this)[0]->make_json(ctx);
@@ -120,9 +120,9 @@ boost::json::object record_field::make_json(const compilation_context& ctx) cons
 
 enums::enums(ast::enumeration e) : ast_node(std::move(e)) {}
 
-boost::json::object enums::make_json(const compilation_context& ctx) const
+boost::json::value enums::make_json(const compilation_context& ctx) const
 {
-	boost::json::object ret = ast_node::make_json(ctx);
+	boost::json::object ret = ast_node::make_inner_json(ctx);
 	ret["type"]="enum";
 	ret["auto_io"] = original_node().gen_io;
 	ret["as_flags"] = original_node().use_bitmask;
@@ -138,9 +138,9 @@ boost::json::object enums::make_json(const compilation_context& ctx) const
 
 interface::interface(ast::interface i) : ast_node(std::move(i)) {}
 
-boost::json::object interface::make_json(const compilation_context& ctx) const
+boost::json::value interface::make_json(const compilation_context& ctx) const
 {
-	boost::json::object ret = ast_node::make_json(ctx);
+	boost::json::object ret = ast_node::make_inner_json(ctx);
 	ret["type"] = "interface";
 	ret["ex"] = original_node().use_as_exception;
 	ret["rinvert"] = original_node().realization_in_client;
@@ -158,7 +158,7 @@ boost::json::object interface::make_json(const compilation_context& ctx) const
 
 
 ctor_node::ctor_node(ast::constructor n) : ast_node(std::move(n)) {}
-boost::json::object ctor_node::make_json(const compilation_context& ctx) const
+boost::json::value ctor_node::make_json(const compilation_context& ctx) const
 {
 	boost::json::object ret;
 	ret["type"] = "ctor";

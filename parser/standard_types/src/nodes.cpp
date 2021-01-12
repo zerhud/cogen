@@ -43,12 +43,11 @@ std::optional<gen_utils::variable> root_node::node_var() const
 
 boost::json::value root_node::to_json(const gen_utils::tree& con) const
 {
-	boost::json::object ret;
-	boost::json::array& cnt=ret[con.data_id()].emplace_array();
+	boost::json::array cnt;
 	for(auto& c:con.children(*this))
 		cnt.emplace_back(static_cast<const base_node*>(
 					c.get())->to_json(con));
-	return ret;
+	return cnt;
 }
 
 

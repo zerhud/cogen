@@ -52,7 +52,7 @@ public:
 		return std::nullopt;
 	}
 
-	boost::json::object make_json(const compilation_context& ctx) const override
+	boost::json::object make_inner_json(const compilation_context& ctx) const
 	{
 		boost::json::object ret = ctx.linked_json(*this);
 		ret["orig_name"] = boost::json::string_view(inner_name().data(), inner_name().size());
@@ -71,47 +71,47 @@ struct type_node : ast_node<ast::type> {
 	type_node(ast::type t);
 	std::string_view type_name() const ;
 	std::string_view name() const override ;
-	boost::json::object make_json(const compilation_context& ctx) const override ;
+	boost::json::value make_json(const compilation_context& ctx) const override ;
 	std::pmr::vector<gen_utils::name_t> required_links() const override ;
 };
 
 struct function_node : ast_node<ast::function> {
 	function_node(ast::function n);
-	boost::json::object make_json(const compilation_context& ctx) const override ;
+	boost::json::value make_json(const compilation_context& ctx) const override ;
 	std::string_view inner_name() const override ;
 	std::string_view name() const override ;
 };
 
 struct ctor_node : ast_node<ast::constructor> {
 	ctor_node(ast::constructor n);
-	boost::json::object make_json(const compilation_context& ctx) const override ;
+	boost::json::value make_json(const compilation_context& ctx) const override ;
 	std::string_view inner_name() const override ;
 	std::string_view name() const override ;
 };
 
 struct fnc_param_node : ast_node<ast::function_parameter> {
 	fnc_param_node(ast::function_parameter n);
-	boost::json::object make_json(const compilation_context& ctx) const override ;
+	boost::json::value make_json(const compilation_context& ctx) const override ;
 };
 
 struct record_node : ast_node<ast::record> {
 	record_node(ast::record n);
-	boost::json::object make_json(const compilation_context& ctx) const override ;
+	boost::json::value make_json(const compilation_context& ctx) const override ;
 };
 
 struct record_field : ast_node<ast::record_item> {
 	record_field(ast::record_item n);
-	boost::json::object make_json(const compilation_context& ctx) const override ;
+	boost::json::value make_json(const compilation_context& ctx) const override ;
 };
 
 struct enums : ast_node<ast::enumeration> {
 	enums(ast::enumeration e);
-	boost::json::object make_json(const compilation_context& ctx) const override ;
+	boost::json::value make_json(const compilation_context& ctx) const override ;
 };
 
 struct interface : ast_node<ast::interface> {
 	interface(ast::interface i);
-	boost::json::object make_json(const compilation_context& ctx) const override ;
+	boost::json::value make_json(const compilation_context& ctx) const override ;
 };
 
 } // namespace ix3::utils::details

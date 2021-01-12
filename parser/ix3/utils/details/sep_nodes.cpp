@@ -18,14 +18,16 @@ std::string_view ix3_root_node::name() const { return "ix3"sv; }
 
 std::optional<std::uint64_t> ix3_root_node::version() const { return 0; }
 
-boost::json::object ix3_root_node::make_json(const compilation_context& ctx) const
+boost::json::value ix3_root_node::make_json(const compilation_context& ctx) const
 {
-	boost::json::object ret;
-	boost::json::array& cnt = ret[name()].emplace_array();
+	boost::json::array cnt;
 	for(auto& child:ctx.children(*this))
 		cnt.emplace_back(child->make_json(ctx));
+
+	boost::json::object ret;
 	ctx.compiling_aspect().aspect(*this, ret);
-	return ret;
+
+	return cnt;
 }
 
 module_node::module_node(std::string n) : mod_name(std::move(n)) {}
@@ -35,7 +37,7 @@ std::optional<gen_utils::variable> module_node::node_var() const
 {
 	return gen_utils::variable{"mod", std::pmr::string(mod_name)};
 }
-boost::json::object module_node::make_json(const compilation_context& ctx) const
+boost::json::value module_node::make_json(const compilation_context& ctx) const
 {
 	boost::json::object ret;
 	ret["name"] = boost::json::string_view(name().data(), name().size());
@@ -62,7 +64,7 @@ std::optional<gen_utils::variable> module_version_node::node_var() const
 {
 	return gen_utils::variable{"ver", str_val};
 }
-boost::json::object module_version_node::make_json(const compilation_context& ctx) const
+boost::json::value module_version_node::make_json(const compilation_context& ctx) const
 {
 	boost::json::object ret;
 	ret["type"] = "version";

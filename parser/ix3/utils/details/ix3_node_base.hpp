@@ -64,7 +64,7 @@ public:
 	virtual std::string_view inner_name() const {return name();}
 
 	[[nodiscard]]
-	virtual boost::json::object make_json(const compilation_context& ctx) const =0 ;
+	virtual boost::json::value make_json(const compilation_context& ctx) const =0 ;
 };
 
 } // namespace ix3::utils::details {

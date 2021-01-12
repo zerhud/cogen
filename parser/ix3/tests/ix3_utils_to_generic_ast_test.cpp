@@ -88,10 +88,10 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 	gen_utils::compilation_context ctx;
 	ctx.cfg.name = gen_utils::compiler::cpp;
 	BOOST_TEST(tree.to_json(ctx) == boost::json::parse(
-	               R"({"ix3":[ {"name":"mod1","content":[
+	               R"([{"name":"mod1","content":[
 	                 {"type":"version","value":"1.1","name":"mod1_v1_1","content":[]},
 	                 {"type":"version","value":"1.2","name":"mod1_v1_2","content":[]}
-	               ]} ]})"));
+	               ]}])"));
 }
 BOOST_AUTO_TEST_CASE(records)
 {
@@ -412,7 +412,7 @@ BOOST_AUTO_TEST_CASE(to_json)
 		fake_ix3_node(boost::json::object j) : js(std::move(j)) { }
 		std::string_view name() const override { return "fake_ix3_node"sv; }
 		std::optional<std::uint64_t> version() const override { return std::nullopt; }
-		boost::json::object make_json(const ix3::utils::details::compilation_context&) const override
+		boost::json::value make_json(const ix3::utils::details::compilation_context&) const override
 		{
 			return js;
 		}

@@ -77,7 +77,7 @@ struct single_gen_part_fixture {
 	        std::map<std::string,std::vector<std::string>> rincs,
 	        std::optional<boost::json::value> data_val = std::nullopt)
 	{
-		if(!data_val) data_val = "[ { } ]"_bj;
+		if(!data_val) data_val = "{\"t1_dsl\":{ }}"_bj;
 		std::stringstream json;
 		json << "{\"includes\":{\"matched\":[";
 		for(auto& i:mincs) json << '"' << i << '"' << ',';
@@ -123,8 +123,8 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 		boost::json::object ret;
 		return ret["a"] = src.children(src.root()).at(0)->node_var()->value, ret;
 	});
-	auto data_v1 = make_result_json({}, {}, "[{\"a\":\"v1\"}]"_bj);
-	auto data_v2 = make_result_json({}, {}, "[{\"a\":\"v2\"}]"_bj);
+	auto data_v1 = make_result_json({}, {}, "{\"t1_dsl\":{\"a\":\"v1\"}}"_bj);
+	auto data_v2 = make_result_json({}, {}, "{\"t1_dsl\":{\"a\":\"v2\"}}"_bj);
 	MOCK_EXPECT(prov->generate).once().with("t", data_v1, "v1.cpp");
 	MOCK_EXPECT(prov->generate).once().with("t", data_v2, "v2.cpp");
 	compile_cfg->naming = gen_utils::name_conversion::camel_case;
@@ -194,7 +194,11 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	ctx.cfg_part.map_tmpl = "file";
 	ctx.cfg_part.links.emplace_back("part1");
 	MOCK_EXPECT(prov->generate).once()
-	        .with("t", make_result_json({}, {{"cond1", {"v1", "vector"}}}), "file");
+	        .with("t", make_result_json(
+				{},
+				{{"cond1", {"v1", "vector"}}},
+				"{\"t2_dsl\":{}}"_bj),
+			"file");
 	ctx.generated["part2"] = sg(ctx, other_data);
 }
 BOOST_AUTO_TEST_SUITE_END() // single_gen_part
