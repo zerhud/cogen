@@ -10,6 +10,7 @@
 
 #include <cassert>
 #include <stdexcept>
+#include <boost/json/src.hpp>
 
 using namespace gen_utils;
 using namespace std::literals;

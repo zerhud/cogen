@@ -18,7 +18,8 @@ endif()
 
 # turtle uses auto_ptr if not defined
 # BOOST_BIND_GLOBAL_PLACEHOLDERS for boost warging about bind placehodlers
-add_compile_definitions(BOOST_NO_AUTO_PTR BOOST_BIND_GLOBAL_PLACEHOLDERS)
+# BOOST_JSON_STANDALONE for boost.json can read the std::string_view
+add_compile_definitions(BOOST_NO_AUTO_PTR BOOST_BIND_GLOBAL_PLACEHOLDERS BOOST_JSON_STANDALONE)
 add_subdirectory(common_utils)
 add_subdirectory(ic)
 add_subdirectory(parser/ix3)
