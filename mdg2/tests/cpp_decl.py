@@ -8,7 +8,7 @@ def check_example_json(result, tmpl, out):
     assert tmpl in result[0]['file']
     assert result[0]['out_file'] == out
 
-def check_example_data(result, count=2):
+def check_example_data(result, count=3):
     assert b'"vector"' in result
     assert b'"string"' in result
     assert b'"cinttypes"' in result

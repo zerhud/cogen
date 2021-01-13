@@ -30,9 +30,7 @@ jinja_env = jinja2.Environment(
 )
 
 def gen_file(src, to, data):
-    print("generate file")
-    print("from " + src)
-    print("to " + to)
+    print(src + "\t → \t" + to)
     to_dir = os.path.abspath(os.path.dirname(to))
     os.makedirs(to_dir, exist_ok=True)
     tmpl = jinja_env.from_string(open(src).read())

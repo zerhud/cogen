@@ -103,7 +103,9 @@ void executer::json_mode(const mdg::ic::ptsetts& setts) const
 	mdg::ic::gen_context ctx;
 	for(auto& pname:setts.parts()) {
 		ctx.cfg_part = setts.part_setts(pname);
-		ctx.generated[pname] = part(ctx, user_data);
+		auto pd = user_data;
+		pd.add(setts.generic_ast(pname));
+		ctx.generated[pname] = part(ctx, std::move(pd));
 	}
 	std::cout << json_out.result() << std::endl;
 }
