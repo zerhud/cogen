@@ -1,5 +1,4 @@
 defaults {
-	lang cpp
 	naming underscore
 }
 part
@@ -24,7 +23,6 @@ part
 		file module.cpp
 	}
 	cmake {
-		lang cmake
 		tmpl cmake/plain.jinja
 		file CMakeLists.txt
 		project interface
