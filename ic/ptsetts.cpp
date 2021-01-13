@@ -7,7 +7,7 @@
  *************************************************************************/
 
 #include "ptsetts.hpp"
-#include <iostream>
+#include <boost/property_tree/json_parser.hpp>
 
 using mdg::ic::ptsetts;
 using namespace std::literals;
@@ -43,4 +43,38 @@ void ptsetts::conf_links(const std::string& path, gen_config& cfg) const
 		if(ip.first == "inc_part") // cannot access the last key
 			cfg.links.emplace_back(ip.second.get_value<std::string>());
 	}
+}
+
+gen_utils::tree ptsetts::generic_ast(std::string_view p) const
+{
+	struct dslm : gen_utils::dsl_manager {
+		boost::json::value psetts;
+		dslm(boost::property_tree::ptree p)
+		{
+			std::stringstream ss;
+			boost::property_tree::write_json(ss, p);
+			psetts = boost::json::parse(ss.str());
+		}
+		std::string_view id() const override {return "ptsetts";}
+		boost::json::value to_json(
+			const gen_utils::compilation_context& cfg,
+			const gen_utils::tree& container) const override {
+			return psetts;
+		}
+	};
+
+	struct root_node : gen_utils::data_node {
+		std::string_view name() const override {return "ptsetts";}
+		std::pmr::vector<gen_utils::name_t> required_links() const override {return {};}
+		std::string_view link_condition() const override {return "";}
+		std::optional<gen_utils::import_file> imports_modification() const override {return std::nullopt;}
+
+		std::optional<std::uint64_t> version() const override {return 0;}
+		std::optional<gen_utils::variable> node_var() const override {return std::nullopt;}
+	};
+
+	auto path = "part." + std::string(p);
+	boost::property_tree::ptree pchild = setts.get_child(std::string(path));
+	gen_utils::tree ret(std::make_shared<root_node>(), std::make_shared<dslm>(std::move(pchild)));
+	return ret;
 }

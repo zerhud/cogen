@@ -20,6 +20,11 @@ using ic_ptsetts = mdg::ic::ptsetts;
 using boost::property_tree::ptree;
 
 
+boost::json::value operator "" _bj(const char* d, std::size_t l)
+{
+	return boost::json::parse(boost::json::string_view(d,l));
+}
+
 BOOST_AUTO_TEST_SUITE(input_configurator)
 BOOST_AUTO_TEST_SUITE(ptsetts)
 BOOST_AUTO_TEST_CASE(ptarray)
@@ -59,6 +64,19 @@ BOOST_AUTO_TEST_CASE(map_tmpl)
 	BOOST_TEST(a_setts.cfg_part.links.at(1) == "c");
 	BOOST_CHECK_THROW(obj.part_setts("b"sv), std::exception);
 	BOOST_CHECK_NO_THROW(obj.part_setts("c"sv));
+}
+BOOST_AUTO_TEST_CASE(generic_ast_tree)
+{
+	ptree setts;
+	setts.put("part.a.file", "f");
+	setts.put("part.a.tmpl", "t");
+	setts.put("part.a.some", "v");
+	ic_ptsetts obj(setts);
+	BOOST_TEST(obj.generic_ast("a").data_id() == "ptsetts");
+	auto ga = obj.generic_ast("a");
+	BOOST_TEST(ga.children(ga.root()).size() == 0);
+	gen_utils::compilation_context ctx;
+	BOOST_TEST(ga.to_json(ctx) == "{\"file\":\"f\", \"tmpl\":\"t\", \"some\":\"v\"}"_bj);
 }
 BOOST_AUTO_TEST_SUITE_END() // ptsetts
 BOOST_AUTO_TEST_SUITE_END() // input_configuration

@@ -24,6 +24,7 @@ public:
 
 	std::pmr::vector<std::pmr::string> parts() const ;
 	gen_config part_setts(std::string_view p) const ;
+	gen_utils::tree generic_ast(std::string_view p) const ;
 };
 
 } // namespace mdg::ic
