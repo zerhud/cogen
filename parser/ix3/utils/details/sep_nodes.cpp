@@ -39,8 +39,7 @@ std::optional<gen_utils::variable> module_node::node_var() const
 }
 boost::json::value module_node::make_json(const compilation_context& ctx) const
 {
-	boost::json::object ret;
-	ret["name"] = boost::json::string_view(name().data(), name().size());
+	boost::json::object ret = make_inner_json(ctx);
 	boost::json::array& content=ret["content"].emplace_array();
 	for(auto& child:ctx.children(*this))
 		content.emplace_back(child->make_json(ctx));

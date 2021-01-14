@@ -51,20 +51,6 @@ public:
 		}
 		return std::nullopt;
 	}
-
-	boost::json::object make_inner_json(const compilation_context& ctx) const
-	{
-		boost::json::object ret = ctx.linked_json(*this);
-		ret["orig_name"] = boost::json::string_view(inner_name().data(), inner_name().size());
-		auto list = ctx.naming(inner_name());
-		if(list.size()==1) ret["name"] = list[0];
-		else {
-			auto& nl = ret["name"].emplace_array();
-			for(auto& n:list)
-				nl.emplace_back(n);
-		}
-		return ret;
-	}
 };
 
 struct type_node : ast_node<ast::type> {

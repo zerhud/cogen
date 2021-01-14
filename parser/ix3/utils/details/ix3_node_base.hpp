@@ -65,6 +65,8 @@ public:
 
 	[[nodiscard]]
 	virtual boost::json::value make_json(const compilation_context& ctx) const =0 ;
+protected:
+	boost::json::object make_inner_json(const compilation_context& ctx) const;
 };
 
 } // namespace ix3::utils::details {

@@ -45,8 +45,14 @@ boost::json::object compilation_context::linked_json(const ix3_node_base& node) 
 
 std::pmr::vector<std::pmr::string> compilation_context::naming(std::string_view orig) const
 {
-	auto first_name = gen_utils::convert(std::string(orig), asp->config().naming);
-	return {std::pmr::string(std::move(first_name))};
+	std::pmr::vector<std::pmr::string> ret;
+	for(auto& n:asp->config().naming)
+		ret.emplace_back(gen_utils::convert(std::string(orig), n));
+	if(ret.empty())
+		ret.emplace_back(gen_utils::convert(
+					std::string(orig),
+					gen_utils::name_conversion::as_is));
+	return ret;
 }
 
 std::pmr::vector<const ix3_node_base *> compilation_context::children(
@@ -69,4 +75,18 @@ std::optional<gen_utils::variable> ix3_node_base::node_var() const
 std::pmr::vector<gen_utils::name_t> ix3_node_base::required_links() const
 {
 	return {};
+}
+
+boost::json::object ix3_node_base::make_inner_json(const compilation_context& ctx) const
+{
+	boost::json::object ret = ctx.linked_json(*this);
+	ret["orig_name"] = inner_name();
+	auto list = ctx.naming(inner_name());
+	if(list.size()==1) ret["name"] = list[0];
+	else {
+		auto& nl = ret["name"].emplace_array();
+		for(auto& n:list)
+			nl.emplace_back(n);
+	}
+	return ret;
 }

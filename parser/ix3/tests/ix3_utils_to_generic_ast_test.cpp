@@ -26,6 +26,15 @@ namespace txt = ix3::text;
 using namespace std::literals;
 using ix3::utils::to_generic_ast;
 
+boost::json::value operator "" _bj(const char* d, std::size_t l)
+{
+	boost::json::parse_options opts{.allow_trailing_commas=true};
+	return boost::json::parse(
+	            boost::json::string_view(d,l),
+	            boost::json::storage_ptr(),
+	            opts);
+}
+
 BOOST_AUTO_TEST_SUITE(ix3)
 BOOST_AUTO_TEST_SUITE(utils)
 BOOST_AUTO_TEST_SUITE(gain_to_generic_ast)
@@ -47,17 +56,14 @@ boost::json::value make_json(const gen_utils::data_node& root, const gen_utils::
 {
 	assert(dynamic_cast<const ix3::utils::details::ix3_node_base*>(&root));
 	gen_utils::compilation_context gu_ctx;
-	gu_ctx.cfg.naming = gen_utils::name_conversion::camel_case;
+	gu_ctx.cfg.naming = {gen_utils::name_conversion::as_is};
 	fake_compiler fc{gu_ctx.cfg};
 	ix3::utils::details::compilation_context ctx(&cnt, &fc, &gu_ctx);
 	return static_cast<const ix3::utils::details::ix3_node_base&>(root).make_json(ctx);
 }
 BOOST_AUTO_TEST_CASE(json_compare)
 {
-	BOOST_TEST(
-		boost::json::parse(R"({"a":1,"b":2})") ==
-		boost::json::parse(R"({"b":2,"a":1})")
-		);
+	BOOST_TEST(R"({"a":1,"b":2})"_bj == R"({"b":2,"a":1})"_bj);
 }
 BOOST_AUTO_TEST_CASE(empty_modules)
 {
@@ -87,11 +93,20 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 
 	gen_utils::compilation_context ctx;
 	ctx.cfg.name = gen_utils::compiler::cpp;
-	BOOST_TEST(tree.to_json(ctx) == boost::json::parse(
-	               R"([{"name":"mod1","content":[
+	BOOST_TEST(tree.to_json(ctx) == R"([{"name":"mod1", "orig_name":"mod1","content":[
 	                 {"type":"version","value":"1.1","name":"mod1_v1_1","content":[]},
 	                 {"type":"version","value":"1.2","name":"mod1_v1_2","content":[]}
-	               ]}])"));
+	               ]}])"_bj);
+	ctx.cfg.naming.emplace_back(gen_utils::name_conversion::title_case);
+	BOOST_TEST(tree.to_json(ctx) == R"([{"name":["mod1","Mod1"], "orig_name":"mod1","content":[
+	                 {"type":"version","value":"1.1","name":"mod1_v1_1","content":[]},
+	                 {"type":"version","value":"1.2","name":"mod1_v1_2","content":[]}
+	               ]}])"_bj);
+	ctx.cfg.naming.clear();
+	BOOST_TEST(tree.to_json(ctx) == R"([{"name":"mod1", "orig_name":"mod1","content":[
+	                 {"type":"version","value":"1.1","name":"mod1_v1_1","content":[]},
+	                 {"type":"version","value":"1.2","name":"mod1_v1_2","content":[]}
+	               ]}])"_bj);
 }
 BOOST_AUTO_TEST_CASE(records)
 {

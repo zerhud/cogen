@@ -63,13 +63,13 @@ std::vector<std::string> gen_utils::split_name(const std::string &name)
 	return ret;
 }
 
-std::string gen_utils::convert(const std::string& name, name_conversion c)
+std::string gen_utils::convert(std::string_view name, name_conversion c)
 {
-	std::string ret = name;
+	std::string ret { name };
 
 	if(c==name_conversion::as_is) return ret;
 
-	auto split = split_name(name);
+	auto split = split_name(ret);
 	if(split.empty()) return ret;
 
 	ret.clear();

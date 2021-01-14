@@ -119,7 +119,8 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 	        .calls([this](auto& ctx, const gen_utils::tree& src){
 		BOOST_TEST(&src != &t1);
 		BOOST_CHECK(ctx.cfg.name == gen_utils::compiler::cpp);
-		BOOST_CHECK(ctx.cfg.naming == gen_utils::name_conversion::camel_case);
+		BOOST_CHECK(ctx.cfg.naming.size() == 1);
+		BOOST_CHECK(ctx.cfg.naming.at(0) == gen_utils::name_conversion::camel_case);
 		boost::json::object ret;
 		return ret["a"] = src.children(src.root()).at(0)->node_var()->value, ret;
 	});
@@ -127,7 +128,7 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 	auto data_v2 = make_result_json({}, {}, "{\"t1_dsl\":{\"a\":\"v2\"}}"_bj);
 	MOCK_EXPECT(prov->generate).once().with("t", data_v1, "v1.cpp");
 	MOCK_EXPECT(prov->generate).once().with("t", data_v2, "v2.cpp");
-	compile_cfg->naming = gen_utils::name_conversion::camel_case;
+	compile_cfg->naming = {gen_utils::name_conversion::camel_case};
 	sg(gen_context{{"${n}.cpp"_s, "t"_s, {}, *compile_cfg}, {}}, all_data);
 }
 BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
