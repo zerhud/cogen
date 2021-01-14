@@ -47,10 +47,10 @@ std::pmr::vector<std::pmr::string> compilation_context::naming(std::string_view 
 {
 	std::pmr::vector<std::pmr::string> ret;
 	for(auto& n:asp->config().naming)
-		ret.emplace_back(gen_utils::convert(std::string(orig), n));
+		ret.emplace_back(gen_utils::convert(orig, n));
 	if(ret.empty())
-		ret.emplace_back(gen_utils::convert(
-					std::string(orig),
+		ret.emplace_back(
+				gen_utils::convert(orig,
 					gen_utils::name_conversion::as_is));
 	return ret;
 }
