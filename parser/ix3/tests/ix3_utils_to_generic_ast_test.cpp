@@ -52,11 +52,15 @@ struct fake_compiler : ix3::utils::details::ix3_compiler {
 	void aspect(const ix3::utils::details::record_node&, boost::json::object&) const override {}
 };
 
-boost::json::value make_json(const gen_utils::data_node& root, const gen_utils::tree& cnt)
+boost::json::value make_json(
+		const gen_utils::data_node& root,
+		const gen_utils::tree& cnt,
+		std::optional<gen_utils::compilation_context> i_ctx=std::nullopt)
 {
 	assert(dynamic_cast<const ix3::utils::details::ix3_node_base*>(&root));
 	gen_utils::compilation_context gu_ctx;
-	gu_ctx.cfg.naming = {gen_utils::name_conversion::as_is};
+	if(i_ctx) gu_ctx = std::move(*i_ctx);
+	else gu_ctx.cfg.naming = {gen_utils::name_conversion::as_is};
 	fake_compiler fc{gu_ctx.cfg};
 	ix3::utils::details::compilation_context ctx(&cnt, &fc, &gu_ctx);
 	return static_cast<const ix3::utils::details::ix3_node_base&>(root).make_json(ctx);
@@ -132,8 +136,7 @@ BOOST_AUTO_TEST_CASE(records)
 	BOOST_TEST(tree.children(*rec_fields[0])[0]->
 	        required_links().at(0).at(0) == "int");
 
-	BOOST_TEST(make_json(*rec, tree) == boost::json::parse(
-	               R"({
+	BOOST_TEST(make_json(*rec, tree) == R"({
 	               "orig_name":"rec","name":"rec",
 	               "type":"record",
 	               "is_exception":false,
@@ -142,7 +145,7 @@ BOOST_AUTO_TEST_CASE(records)
 	                   {"type":"type","name":["int"],"subs":[]}},
 	                 {"orig_name":"f2","name":"f2","type":"record_item","req":true,"param_t":
 	                   {"type":"type","name":["int"],"subs":[]}}
-	               ]})"));
+	               ]})"_bj);
 }
 BOOST_AUTO_TEST_CASE(functions)
 {
@@ -175,8 +178,7 @@ BOOST_AUTO_TEST_CASE(functions)
 	BOOST_TEST(foo_params.at(1)->name() == "bar");
 	BOOST_CHECK(!foo_params.at(1)->version().has_value());
 
-	BOOST_TEST(make_json(*bar, tree) == boost::json::parse(
-	               R"({
+	BOOST_TEST(make_json(*bar, tree) == R"({
 	               "orig_name":"bar","name":"bar",
 	               "type":"function",
 	               "params":[ {
@@ -186,25 +188,23 @@ BOOST_AUTO_TEST_CASE(functions)
 	                 "req":true
 	               } ],
 	               "return":{"type":"type", "name":["int"], "subs":[]}
-	               })"));
-	BOOST_TEST(make_json(*foo_params.at(0), tree) == boost::json::parse(
-	               R"({ "type":"type","name":["int"],"subs":[] })"));
-	BOOST_TEST(make_json(*foo_params.at(1), tree) == boost::json::parse(
-	               R"({
+	               })"_bj);
+	BOOST_TEST(make_json(*foo_params.at(0), tree) == 
+	               R"({ "type":"type","name":["int"],"subs":[] })"_bj);
+	BOOST_TEST(make_json(*foo_params.at(1), tree) == R"({
 	                 "orig_name":"bar","name":"bar",
 	                 "param_t":{"type":"type", "name":["string"], "subs":[]},
 	                 "type":"function_parameter",
 	                 "req":false
-	               })"));
-	BOOST_TEST(make_json(*foo_params.at(2), tree) == boost::json::parse(
-	               R"({
+	               })"_bj);
+	BOOST_TEST(make_json(*foo_params.at(2), tree) == R"({
 	                 "orig_name":"baz","name":"baz",
 	                 "param_t":{"type":"type", "name":["list"], "subs":[
 	                    {"type":"type", "name":["string"], "subs":[]}
 	                 ]},
 	                 "type":"function_parameter",
 	                 "req":true
-	               })"));
+	               })"_bj);
 }
 BOOST_AUTO_TEST_CASE(type_nodes)
 {
@@ -241,18 +241,18 @@ BOOST_AUTO_TEST_CASE(type_nodes)
 	BOOST_TEST(bar2_foo->type_name() == "foo");
 	BOOST_TEST(extract_type_node(bar2_foo, 0)->type_name() == "str_t");
 
-	BOOST_TEST(make_json(*ret_type, tree) == boost::json::parse(
-	               R"( {"type":"type", "name":["int"], "subs":[]} )"));
-	BOOST_TEST(make_json(*bar1_type, tree) == boost::json::parse(
+	BOOST_TEST(make_json(*ret_type, tree) == 
+	               R"( {"type":"type", "name":["int"], "subs":[]} )"_bj);
+	BOOST_TEST(make_json(*bar1_type, tree) == 
 	               R"( {"type":"type", "name":["string"], "subs":[
 	               {"type":"type", "name":["char"], "subs":[]},
 	               {"type":"type", "name":["alloc"], "subs":[]}
-	               ]} )"));
-	BOOST_TEST(make_json(*bar2_type, tree) == boost::json::parse(
+	               ]} )"_bj);
+	BOOST_TEST(make_json(*bar2_type, tree) == 
 	               R"( {"type":"type", "name":["list"], "subs":[
 	               {"type":"type", "name":["foo"], "subs":[
 	                 { "type":"type", "name":["str_t"], "subs":[] }]}
-	               ]} )"));
+	               ]} )"_bj);
 
 	auto ret_links = ret_type->required_links();
 	BOOST_TEST_REQUIRE(ret_links.size()==1);
