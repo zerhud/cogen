@@ -97,9 +97,7 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	BOOST_TEST(mng1.required_for(fdata1).size() == 0);
 
 	auto r2 = mng1.required_for(fdata2);
-	auto r2_incs = mng1.required_for_incs(fdata2);
-	std::reverse(r2_incs.begin(), r2_incs.end());
-	BOOST_CHECK(r2 == r2_incs);
+	gen_utils_mocks::check_vec_eq(r2, mng1.required_for_incs(fdata2));
 
 	BOOST_TEST_REQUIRE(r2.size() == 2);
 	BOOST_TEST(r2[0].from.node == t2_child1);

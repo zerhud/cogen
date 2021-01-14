@@ -30,6 +30,20 @@ MOCK_BASE_CLASS(data_node, gen_utils::data_node)
 	MOCK_METHOD(node_var, 0)
 };
 
+template<typename T, typename Vec>
+bool vec_contains(const Vec& vec, const T& obj)
+{
+	auto pos = std::find(vec.begin(), vec.end(), obj);
+	return pos != vec.end();
+}
+
+template<typename VecLeft, typename VecRight>
+void check_vec_eq(const VecLeft& l, const VecRight& r)
+{
+	BOOST_TEST( l.size() == r.size() );
+	for(auto& i:l) BOOST_CHECK( vec_contains(r, i) );
+}
+
 std::shared_ptr<gen_utils_mocks::data_node> make_node(
 		std::optional<std::uint64_t> v
 		, std::optional<std::pmr::string> name=std::nullopt
