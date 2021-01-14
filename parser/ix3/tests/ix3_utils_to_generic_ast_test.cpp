@@ -241,7 +241,11 @@ BOOST_AUTO_TEST_CASE(type_nodes)
 	BOOST_TEST(bar2_foo->type_name() == "foo");
 	BOOST_TEST(extract_type_node(bar2_foo, 0)->type_name() == "str_t");
 
-	BOOST_TEST(make_json(*ret_type, tree) == 
+	gen_utils::compilation_context ctx;
+	BOOST_TEST(make_json(*ret_type, tree, ctx) == 
+	               R"( {"type":"type", "name":["int"], "subs":[]} )"_bj);
+	ctx.cfg.naming.emplace_back(gen_utils::name_conversion::title_case);
+	BOOST_TEST(make_json(*ret_type, tree, ctx) == 
 	               R"( {"type":"type", "name":["int"], "subs":[]} )"_bj);
 	BOOST_TEST(make_json(*bar1_type, tree) == 
 	               R"( {"type":"type", "name":["string"], "subs":[
