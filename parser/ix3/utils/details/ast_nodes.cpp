@@ -137,7 +137,6 @@ boost::json::value enums::make_json(const compilation_context& ctx) const
 }
 
 interface::interface(ast::interface i) : ast_node(std::move(i)) {}
-
 boost::json::value interface::make_json(const compilation_context& ctx) const
 {
 	boost::json::object ret = ast_node::make_inner_json(ctx);
@@ -154,6 +153,10 @@ boost::json::value interface::make_json(const compilation_context& ctx) const
 	ret["ctors"] = std::move(ctors);
 	ret["funcs"] = std::move(funcs);
 	return ret;
+}
+std::string_view interface::link_condition() const
+{
+	return "ix3";
 }
 
 

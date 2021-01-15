@@ -189,7 +189,7 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 
 	t2.add( t2.root(), make_node(
 	            2, std::nullopt, std::nullopt,
-	            std::nullopt, {{"t1_a"}, {"t1_b"}, {"t1_c"}}));
+	            "t2_a", {{"t1_a"}, {"t1_b"}, {"t1_c"}}));
 	gen_utils::input other_data;
 	other_data.add(t2);
 	ctx.cfg_part.map_tmpl = "file";

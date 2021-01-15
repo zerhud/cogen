@@ -98,6 +98,7 @@ struct enums : ast_node<ast::enumeration> {
 struct interface : ast_node<ast::interface> {
 	interface(ast::interface i);
 	boost::json::value make_json(const compilation_context& ctx) const override ;
+	std::string_view link_condition() const override ;
 };
 
 } // namespace ix3::utils::details

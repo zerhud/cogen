@@ -380,6 +380,7 @@ BOOST_AUTO_TEST_CASE(interface)
 	BOOST_TEST(e->name()=="i");
 	BOOST_CHECK(!e->version().has_value());
 	BOOST_TEST(e->required_links().size() == 0);
+	BOOST_TEST(e->link_condition() == "ix3"sv);
 
 	BOOST_TEST(make_json(*e, tree) == boost::json::parse(
 	               R"({

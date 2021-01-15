@@ -93,7 +93,6 @@ std::pmr::vector<import_info> imports_manager::required_for_links(
 	std::pmr::vector<import_info> ret;
 	for(auto& [in_name, in]:all_input) {
 		for(auto& in_tree:in->all()) {
-			if(in_tree == &src) continue;
 			auto requests = cur->required_links();
 			for(auto& req:requests) {
 				auto found_list = in_tree->search(req);
