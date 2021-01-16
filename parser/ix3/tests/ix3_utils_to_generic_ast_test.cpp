@@ -440,13 +440,12 @@ BOOST_AUTO_TEST_CASE(lelf_links)
 
 	gen_utils::compilation_context ctx;
 	ctx.links = &imng;
-	BOOST_TEST(make_json(*foo, tree_f2, ctx) == R"({"orig_name":"foo",
-	                    "name":"foo","type":"function","params":[],
-	                    "return":{"type":"type","name":["mod1","inter"],"subs":[],
+	BOOST_TEST(make_json(*foo, tree_f2, ctx).as_object()["return"] == R"({
+	                    "type":"type","name":["mod1","inter"],"subs":[],
 	                    "ix3":{"type":"interface",
 	                        "orig_name":"inter", "name":"Inter",
 	                        "ex":false,"rinvert":false,"ctors":[],"funcs":[]}
-	                    }})"_bj);
+	                    })"_bj);
 }
 BOOST_AUTO_TEST_SUITE_END() // gain_to_generic_ast
 
