@@ -21,6 +21,9 @@ using namespace std::literals;
 namespace ast = ix3::ast;
 namespace txt = ix3::text;
 
+BOOST_AUTO_TEST_SUITE(ix3)
+BOOST_AUTO_TEST_SUITE(ast_tests)
+
 BOOST_AUTO_TEST_CASE(docs)
 {
 	ast::meta::documentation result ;
@@ -74,3 +77,6 @@ BOOST_AUTO_TEST_CASE(meta_set)
 	BOOST_TEST( result.cnt.size() == 3 );
 	BOOST_TEST( boost::get<ast::meta::version>(result.cnt[0]).major_v == 1 );
 }
+
+BOOST_AUTO_TEST_SUITE_END() // ast_tests
+BOOST_AUTO_TEST_SUITE_END() // ix3

@@ -24,6 +24,9 @@ namespace ast = ix3::ast;
 namespace txt = ix3::text;
 namespace utf = boost::unit_test;
 
+BOOST_AUTO_TEST_SUITE(ix3)
+BOOST_AUTO_TEST_SUITE(ast_tests)
+
 BOOST_AUTO_TEST_CASE(enumeration)
 {
 	ast::enumeration result;
@@ -95,3 +98,6 @@ BOOST_AUTO_TEST_CASE(interface_diff_exi,
 	BOOST_TEST( result.use_as_exception );
 	BOOST_TEST( result.realization_in_client );
 }
+
+BOOST_AUTO_TEST_SUITE() // ast_tests
+BOOST_AUTO_TEST_SUITE() // ix3
