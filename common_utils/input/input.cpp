@@ -11,15 +11,17 @@
 using namespace std::literals;
 using gen_utils::input;
 
-void input::add(input&& other)
+gen_utils::input& input::add(input&& other)
 {
 	for(gen_utils::tree& oc:other.storage)
 		add(std::move(oc));
+	return *this;
 }
 
-void input::add(tree data)
+gen_utils::input& input::add(tree data)
 {
 	storage.emplace_back(std::move(data));
+	return *this;
 }
 
 std::pmr::vector<const gen_utils::tree*> input::select(std::string_view id) const
@@ -58,4 +60,14 @@ gen_utils::tree_compare_result input::match_with(const input& other) const
 	        && other.storage.size() != storage.size())
 		result = tree_compare_result::partial;
 	return result;
+}
+
+gen_utils::compilation_config& input::conf()
+{
+	return cur_conf;
+}
+
+const gen_utils::compilation_config& input::conf() const
+{
+	return cur_conf;
 }

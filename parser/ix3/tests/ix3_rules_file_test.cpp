@@ -55,5 +55,5 @@ BOOST_AUTO_TEST_CASE(module)
 	BOOST_TEST( result.content.size() == 2 );
 }
 
-BOOST_AUTO_TEST_SUITE() // ast_tests
-BOOST_AUTO_TEST_SUITE() // ix3
+BOOST_AUTO_TEST_SUITE_END() // ast_tests
+BOOST_AUTO_TEST_SUITE_END() // ix3

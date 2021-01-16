@@ -37,8 +37,10 @@ boost::json::object compilation_context::linked_json(const ix3_node_base& node) 
 	boost::json::object ret;
 	gen_utils::compilation_context ctx = *gu_ctx;
 	for(auto& link:cur_imports) {
-		if(link.from.node.get() == &node)
-			ret[link.cond] = link.to.owner->to_json((ctx.linked_to=link.to.node,ctx));
+		if(link.from.node.get() != &node) continue;
+		ctx.linked_to = link.to.node;
+		ctx.cfg = link.cfg;
+		ret[link.cond] = link.to.owner->to_json(ctx);
 	}
 	return ret;
 }

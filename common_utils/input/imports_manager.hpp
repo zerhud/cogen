@@ -19,6 +19,7 @@ struct import_info {
 	node_pointer from;
 	import_file file;
 	std::pmr::string cond;
+	compilation_config cfg;
 };
 
 inline const bool operator == (const import_info& l, const import_info& r)

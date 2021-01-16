@@ -316,8 +316,7 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	ix3::utils::details::compilation_context ctx(&tree, &fc, &test_ctx);
 	auto json = static_cast<const ix3_node_base&>(*foo).make_json(ctx);
 
-	BOOST_TEST(json == boost::json::parse(
-	               R"({
+	BOOST_TEST(json == R"({
 	               "orig_name":"foo","name":"foo",
 	               "type":"function",
 	               "params":[ {
@@ -337,7 +336,7 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	                     "subs":[]
 	                   }
 	                 ]}
-	               })"));
+	               })"_bj);
 }
 BOOST_AUTO_TEST_CASE(enums)
 {
@@ -367,11 +366,10 @@ BOOST_AUTO_TEST_CASE(enums)
 }
 BOOST_AUTO_TEST_CASE(interface)
 {
-	to_generic_ast maker;
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
 	                      "interface i +ex { constructor(+i8 a); i8 foo(+i9 b) const; }"sv);
-	gen_utils::tree tree = maker(ast.modules);
+	gen_utils::tree tree = to_generic_ast()(ast.modules);
 	BOOST_TEST(tree.children(tree.root()).size()==1);
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
 	BOOST_TEST(tree.children(*mod).size()==1);
@@ -390,8 +388,7 @@ BOOST_AUTO_TEST_CASE(interface)
 	                    "orig_name":"a","name":"a",
 	                    "param_t":{"type":"type", "name":["i8"], "subs":[]},
 	                    "type":"function_parameter",
-	                    "req":true
-	                 }]} ],
+	                    "req":true }]} ],
 	                 "funcs":[ {
 	                   "type":"function","name":"foo", "orig_name":"foo",
 	                   "return":{"type":"type", "name":["i8"], "subs":[]},
@@ -399,8 +396,7 @@ BOOST_AUTO_TEST_CASE(interface)
 	                    "orig_name":"b","name":"b",
 	                    "param_t":{"type":"type", "name":["i9"], "subs":[]},
 	                    "type":"function_parameter",
-	                    "req":true
-			   }]
+	                    "req":true }]
 	                 } ]
 	               })"));
 }
@@ -416,6 +412,41 @@ BOOST_AUTO_TEST_CASE(pop_parent)
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
 	BOOST_TEST(tree.children(*mod).size()==2);
 
+}
+BOOST_AUTO_TEST_CASE(lelf_links)
+{
+	auto ast_f1 = txt::parse(txt::file_content,
+	                      "module mod1 v1.1:"
+	                      "interface inter {  }"sv);
+	auto ast_f2 = txt::parse(txt::file_content,
+	                      "module mod2 v1.1:"
+	                      "mod1.inter foo();"sv);
+	gen_utils::tree tree_f1 = to_generic_ast()(ast_f1.modules);
+	gen_utils::tree tree_f2 = to_generic_ast()(ast_f2.modules);
+
+	gen_utils::input f1, f2;
+	f1.add(tree_f1).conf().naming.at(0) = gen_utils::name_conversion::title_case;
+	f2.add(tree_f2);
+
+	BOOST_TEST(tree_f2.children(tree_f2.root()).size()==1);
+	auto mod = tree_f2.children(*tree_f2.children(tree_f2.root()).at(0)).at(0);
+	BOOST_TEST(tree_f2.children(*mod).size()==1);
+	auto foo = tree_f2.children(*mod).at(0);
+
+	gen_utils::imports_manager imng;
+	imng.add("f1", f1).add("f2", f2).build();
+	BOOST_TEST(imng.required_for(f2).size()==1);
+	BOOST_TEST(imng.required_for(f2).at(0).file.name=="f1");
+
+	gen_utils::compilation_context ctx;
+	ctx.links = &imng;
+	BOOST_TEST(make_json(*foo, tree_f2, ctx) == R"({"orig_name":"foo",
+	                    "name":"foo","type":"function","params":[],
+	                    "return":{"type":"type","name":["mod1","inter"],"subs":[],
+	                    "ix3":{"type":"interface",
+	                        "orig_name":"inter", "name":"Inter",
+	                        "ex":false,"rinvert":false,"ctors":[],"funcs":[]}
+	                    }})"_bj);
 }
 BOOST_AUTO_TEST_SUITE_END() // gain_to_generic_ast
 

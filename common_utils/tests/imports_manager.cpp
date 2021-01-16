@@ -16,6 +16,7 @@
 #include "input/input.hpp"
 
 using namespace std::literals;
+using gunc = gen_utils::name_conversion;
 
 std::pmr::string operator "" _s (const char* d, std::size_t l)
 {
@@ -40,6 +41,9 @@ BOOST_FIXTURE_TEST_CASE(self_matched, trees_fixture)
 	t1().add(t1().root(), t1_child1);
 	fdata1.add(t1());
 	fdata2.add(t1());
+
+	fdata1.conf().naming.clear();
+	fdata2.conf().naming.emplace_back(gunc::camel_case);
 
 	imports_manager mng1;
 	mng1.add("a", fdata1).add("b", fdata2).build();
@@ -84,6 +88,7 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	t2().add(t2().root(), t2_child1);
 	fdata1.add(t1());
 	fdata2.add(t2());
+	fdata1.conf().naming.clear();
 
 	MOCK_EXPECT(t1_child1->link_condition).returns("cond_child1"sv);
 	MOCK_EXPECT(t1_child2->link_condition).returns("cond_child2"sv);
@@ -107,6 +112,7 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	BOOST_TEST(r2[0].file.sys == false);
 	BOOST_TEST(r2[0].file.name == "f1");
 	BOOST_TEST(r2[0].cond == "cond_child1");
+	BOOST_TEST(r2[0].cfg.naming.size() == 0);
 
 	BOOST_TEST(r2[1].from.node == t2_child1);
 	BOOST_TEST(r2[1].from.owner->data_id() == "t2_id");
@@ -115,6 +121,7 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	BOOST_TEST(r2[1].file.sys == true);
 	BOOST_TEST(r2[1].file.name == "sysfile");
 	BOOST_TEST(r2[1].cond == "cond_child2");
+	BOOST_TEST(r2[1].cfg.naming.size() == 0);
 
 	auto r3 = mng1.required_for(t2());
 	BOOST_TEST(r3.size() == r2.size());
@@ -126,6 +133,7 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	BOOST_TEST(r3[0].file.sys == false);
 	BOOST_TEST(r3[0].file.name == "f1");
 	BOOST_TEST(r3[0].cond == "cond_child1");
+	BOOST_TEST(r3[0].cfg.naming.size() == 0);
 
 	BOOST_TEST(r3[1].from.node == t2_child1);
 	BOOST_TEST(r3[1].from.owner->data_id() == "t2_id");
@@ -134,6 +142,7 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	BOOST_TEST(r3[1].file.sys == true);
 	BOOST_TEST(r3[1].file.name == "sysfile");
 	BOOST_TEST(r3[1].cond == "cond_child2");
+	BOOST_TEST(r3[1].cfg.naming.size() == 0);
 }
 BOOST_AUTO_TEST_SUITE_END() // imports_manager_test
 

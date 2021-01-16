@@ -22,17 +22,6 @@
 
 namespace gen_utils {
 
-struct compilation_config final {
-	compiler name=compiler::cpp;
-	std::pmr::vector<name_conversion> naming{name_conversion::as_is};
-};
-
-struct compilation_context final {
-	compilation_config cfg;
-	const imports_manager* links = nullptr;
-	node_ptr linked_to = nullptr;
-};
-
 struct variable {
 	std::pmr::string name;
 	std::pmr::string value;

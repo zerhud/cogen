@@ -27,11 +27,13 @@ compiled_output single_gen_part::operator()(const gen_context& cur_part, input a
 	assert(outside);
 	auto compiled = compile(cur_part, alli);
 	gen_utils::imports_manager imports = make_imports(cur_part, compiled);
-	for(auto& [n,d]:compiled)
+	for(auto& [n,d]:compiled) {
+		d.conf() = cur_part.cfg_part.compilation;
 		outside->generate(
 		            cur_part.cfg_part.tmpl_file,
 		            make_json(cur_part, d, imports),
 		            n);
+	}
 	return compiled;
 }
 

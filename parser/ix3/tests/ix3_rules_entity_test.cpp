@@ -99,5 +99,5 @@ BOOST_AUTO_TEST_CASE(interface_diff_exi,
 	BOOST_TEST( result.realization_in_client );
 }
 
-BOOST_AUTO_TEST_SUITE() // ast_tests
-BOOST_AUTO_TEST_SUITE() // ix3
+BOOST_AUTO_TEST_SUITE_END() // ast_tests
+BOOST_AUTO_TEST_SUITE_END() // ix3

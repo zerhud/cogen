@@ -12,6 +12,7 @@
 #include <vector>
 #include <ostream>
 #include <memory_resource>
+#include "naming.hpp"
 
 namespace gen_utils {
 
@@ -24,6 +25,8 @@ class data_node;
 using node_ptr = std::shared_ptr<data_node>;
 using name_t = std::pmr::vector<std::pmr::string>;
 
+class imports_manager;
+
 struct import_file {
 	bool sys;
 	std::pmr::string name;
@@ -32,6 +35,17 @@ struct import_file {
 struct node_pointer {
 	node_ptr node;
 	const tree* owner;
+};
+
+struct compilation_config final {
+	compiler name=compiler::cpp;
+	std::pmr::vector<name_conversion> naming{name_conversion::as_is};
+};
+
+struct compilation_context final {
+	compilation_config cfg;
+	const imports_manager* links = nullptr;
+	node_ptr linked_to = nullptr;
 };
 
 inline bool operator == (const node_pointer& l, const node_pointer& r) {

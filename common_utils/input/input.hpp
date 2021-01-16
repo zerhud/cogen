@@ -19,12 +19,13 @@ namespace gen_utils {
 
 class input final {
 	std::pmr::vector<tree> storage;
+	compilation_config cur_conf;
 public:
 	input() =default ;
 	~input() noexcept =default;
 
-	void add(input&& other);
-	void add(tree data);
+	input& add(input&& other);
+	input& add(tree data);
 
 	[[nodiscard]] std::pmr::vector<const tree*> select(
 			std::string_view id) const ;
@@ -33,6 +34,9 @@ public:
 
 	[[nodiscard]]
 	tree_compare_result match_with(const input& other) const ;
+
+	compilation_config& conf() ;
+	const compilation_config& conf() const ;
 };
 
 

@@ -17,6 +17,7 @@
 #include "single_gen_part.hpp"
 
 using namespace std::literals;
+using gunc = gen_utils::name_conversion;
 
 std::pmr::string operator "" _s (const char* d, std::size_t l)
 {
@@ -120,7 +121,7 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 		BOOST_TEST(&src != &t1);
 		BOOST_CHECK(ctx.cfg.name == gen_utils::compiler::cpp);
 		BOOST_CHECK(ctx.cfg.naming.size() == 1);
-		BOOST_CHECK(ctx.cfg.naming.at(0) == gen_utils::name_conversion::camel_case);
+		BOOST_CHECK(ctx.cfg.naming.at(0) == gunc::camel_case);
 		boost::json::object ret;
 		return ret["a"] = src.children(src.root()).at(0)->node_var()->value, ret;
 	});
@@ -184,8 +185,11 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	auto empty_data = make_result_json({}, {});
 	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "v1");
 	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "v2");
+	compile_cfg->naming.emplace_back(gunc::camel_case);
 	gen_context ctx{{"${n}"_s, "t"_s, {}, *compile_cfg.get()}, {}};
 	ctx.generated["part1"] = sg(ctx, all_data);
+	BOOST_TEST(ctx.generated["part1"]["v1"].conf().naming.size() == 2);
+	BOOST_CHECK(ctx.generated["part1"]["v1"].conf().naming.at(1) == gunc::camel_case);
 
 	t2.add( t2.root(), make_node(
 	            2, std::nullopt, std::nullopt,

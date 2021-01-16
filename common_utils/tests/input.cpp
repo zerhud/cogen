@@ -397,9 +397,15 @@ BOOST_AUTO_TEST_SUITE(input)
 using ic_input = gen_utils::input;
 BOOST_AUTO_TEST_CASE(getters)
 {
+	using gunc = gen_utils::name_conversion;
 	ic_input i;
 	BOOST_TEST(i.all().size() == 0);
 	BOOST_TEST(i.select("test"sv).size()==0);
+	BOOST_TEST(i.conf().naming.size() == 1);
+	BOOST_CHECK(i.conf().naming.at(0) == gunc::as_is);
+	i.conf().naming.emplace_back(gunc::camel_case);
+	BOOST_CHECK(i.conf().naming.at(0) == gunc::as_is);
+	BOOST_CHECK(i.conf().naming.at(1) == gunc::camel_case);
 }
 BOOST_AUTO_TEST_CASE(adding)
 {
