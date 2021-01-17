@@ -32,9 +32,9 @@ void gen_utils::from_string(std::string_view val, name_conversion& c)
 	throw std::runtime_error("no such name_conversion: "s + std::string(val));
 }
 
-std::vector<std::string> gen_utils::split_name(const std::string &name)
+std::vector<std::pmr::string> gen_utils::split_name(const std::pmr::string& name)
 {
-	std::vector<std::string> ret;
+	std::vector<std::pmr::string> ret;
 
 	std::size_t prev_pos=0;
 	std::size_t pos = name.find('_');
@@ -57,15 +57,19 @@ std::vector<std::string> gen_utils::split_name(const std::string &name)
 		ret.emplace_back(cur);
 	}
 
-	ret.erase(std::remove_if(ret.begin(),ret.end(),[](const std::string& a){return a.empty();}), ret.end());
+	ret.erase(
+	            std::remove_if(
+	                ret.begin(),ret.end(),
+	                [](const std::pmr::string& a){return a.empty();}),
+	            ret.end());
 	for(auto& r:ret) for(auto& s:r) s=std::tolower(s);
 
 	return ret;
 }
 
-std::string gen_utils::convert(std::string_view name, name_conversion c)
+std::pmr::string gen_utils::convert(std::string_view name, name_conversion c)
 {
-	std::string ret { name };
+	std::pmr::string ret { name };
 
 	if(c==name_conversion::as_is) return ret;
 

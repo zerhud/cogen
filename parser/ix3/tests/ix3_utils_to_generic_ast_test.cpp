@@ -25,6 +25,7 @@ namespace ast = ix3::ast;
 namespace txt = ix3::text;
 using namespace std::literals;
 using ix3::utils::to_generic_ast;
+using gunc = gen_utils::name_conversion;
 
 boost::json::value operator "" _bj(const char* d, std::size_t l)
 {
@@ -64,6 +65,19 @@ boost::json::value make_json(
 	fake_compiler fc{gu_ctx.cfg};
 	ix3::utils::details::compilation_context ctx(&cnt, &fc, &gu_ctx);
 	return static_cast<const ix3::utils::details::ix3_node_base&>(root).make_json(ctx);
+}
+void check_naming(
+        const gen_utils::data_node& root,
+        const gen_utils::tree& cnt,
+        const std::vector<std::string> names)
+{
+	gen_utils::compilation_context ctx;
+	ctx.cfg.naming = {gunc::title_case};
+	BOOST_TEST(make_json(root, cnt, ctx).as_object()["name"] == names.at(0).c_str());
+	ctx.cfg.naming = {gunc::camel_case};
+	BOOST_TEST(make_json(root, cnt, ctx).as_object()["name"] == names.at(1).c_str());
+	ctx.cfg.naming = {gunc::underscore};
+	BOOST_TEST(make_json(root, cnt, ctx).as_object()["name"] == names.at(2).c_str());
 }
 BOOST_AUTO_TEST_CASE(json_compare)
 {
@@ -117,13 +131,13 @@ BOOST_AUTO_TEST_CASE(records)
 	to_generic_ast maker;
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
-	                      "@v1.1 record rec { -int f1; @v1.2 +int f2;}");
+	                      "@v1.1 record bar_baz { -int f1; @v1.2 +int f2;}");
 	gen_utils::tree tree = maker(ast.modules);
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
 	BOOST_TEST(tree.children(*mod).size()==1);
 
 	auto rec = tree.children(*mod).at(0);
-	BOOST_TEST(rec->name()=="rec");
+	BOOST_TEST(rec->name()=="bar_baz");
 	BOOST_CHECK(rec->version().value() == mod->version().value());
 
 	auto rec_fields = tree.children(*rec);
@@ -137,7 +151,7 @@ BOOST_AUTO_TEST_CASE(records)
 	        required_links().at(0).at(0) == "int");
 
 	BOOST_TEST(make_json(*rec, tree) == R"({
-	               "orig_name":"rec","name":"rec",
+	               "orig_name":"bar_baz","name":"bar_baz",
 	               "type":"record",
 	               "is_exception":false,
 	               "fields":[
@@ -146,6 +160,7 @@ BOOST_AUTO_TEST_CASE(records)
 	                 {"orig_name":"f2","name":"f2","type":"record_item","req":true,"param_t":
 	                   {"type":"type","name":["int"],"subs":[]}}
 	               ]})"_bj);
+	check_naming(*rec, tree, {"BarBaz"s, "BarBaz"s, "bar_baz"s});
 }
 BOOST_AUTO_TEST_CASE(functions)
 {
@@ -155,7 +170,7 @@ BOOST_AUTO_TEST_CASE(functions)
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
 	                      "int foo(-string bar, +list<string> baz);"
-	                      "@v1.2 int bar(+u8 b);");
+	                      "@v1.2 int bar_baz(+u8 b);");
 	gen_utils::tree tree = maker(ast.modules);
 	BOOST_TEST(tree.children(tree.root()).size()==1);
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
@@ -171,7 +186,7 @@ BOOST_AUTO_TEST_CASE(functions)
 	BOOST_TEST(bar->name()=="");
 	BOOST_CHECK(bar->version().has_value());
 	BOOST_TEST(*mod->version() < *bar->version());
-	BOOST_TEST(dynamic_cast<const ix3_node_base&>(*bar).inner_name() == "bar");
+	BOOST_TEST(dynamic_cast<const ix3_node_base&>(*bar).inner_name() == "bar_baz");
 
 	auto foo_params = tree.children(*foo);
 	BOOST_TEST(foo_params.size() == 3);
@@ -179,7 +194,7 @@ BOOST_AUTO_TEST_CASE(functions)
 	BOOST_CHECK(!foo_params.at(1)->version().has_value());
 
 	BOOST_TEST(make_json(*bar, tree) == R"({
-	               "orig_name":"bar","name":"bar",
+	               "orig_name":"bar_baz","name":"bar_baz",
 	               "type":"function",
 	               "params":[ {
 	                 "orig_name":"b","name":"b",
@@ -205,6 +220,8 @@ BOOST_AUTO_TEST_CASE(functions)
 	                 "type":"function_parameter",
 	                 "req":true
 	               })"_bj);
+
+	check_naming(*bar, tree, {"BarBaz"s, "barBaz"s, "bar_baz"s});
 }
 BOOST_AUTO_TEST_CASE(type_nodes)
 {
@@ -343,46 +360,48 @@ BOOST_AUTO_TEST_CASE(enums)
 	to_generic_ast maker;
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
-	                      "enum e +auto_io { one, two => \"test\" }"sv);
+	                      "enum bar_baz +auto_io { one, two => \"test\" }"sv);
 	gen_utils::tree tree = maker(ast.modules);
 	BOOST_TEST(tree.children(tree.root()).size()==1);
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
 	BOOST_TEST(tree.children(*mod).size()==1);
 
 	auto e = tree.children(*mod).at(0);
-	BOOST_TEST(e->name()=="e");
+	BOOST_TEST(e->name()=="bar_baz");
 	BOOST_CHECK(!e->version().has_value());
 	BOOST_TEST(e->required_links().size() == 0);
 
 	BOOST_TEST(make_json(*e, tree) == boost::json::parse(
 	               R"({
-	                 "type":"enum","name":"e", "orig_name":"e",
+	                 "type":"enum","name":"bar_baz", "orig_name":"bar_baz",
 	                 "auto_io":true, "as_flags":false,
 	                 "items":[
 	                   {"name":"one", "io":"one"},
 	                   {"name":"two", "io":"test"}
 	                 ]
 	               })"));
+
+	check_naming(*e, tree, {"BarBaz"s, "BarBaz"s, "bar_baz"s});
 }
 BOOST_AUTO_TEST_CASE(interface)
 {
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
-	                      "interface i +ex { constructor(+i8 a); i8 foo(+i9 b) const; }"sv);
+	                      "interface bar_baz +ex { constructor(+i8 a); i8 foo(+i9 b) const; }"sv);
 	gen_utils::tree tree = to_generic_ast()(ast.modules);
 	BOOST_TEST(tree.children(tree.root()).size()==1);
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
 	BOOST_TEST(tree.children(*mod).size()==1);
 
 	auto e = tree.children(*mod).at(0);
-	BOOST_TEST(e->name()=="i");
+	BOOST_TEST(e->name()=="bar_baz");
 	BOOST_CHECK(!e->version().has_value());
 	BOOST_TEST(e->required_links().size() == 0);
 	BOOST_TEST(e->link_condition() == "ix3"sv);
 
 	BOOST_TEST(make_json(*e, tree) == boost::json::parse(
 	               R"({
-	                 "type":"interface","name":"i", "orig_name":"i",
+	                 "type":"interface","name":"bar_baz", "orig_name":"bar_baz",
 	                 "ex":true, "rinvert":false,
 	                 "ctors":[ {"type":"ctor", "params":[{
 	                    "orig_name":"a","name":"a",
@@ -399,6 +418,7 @@ BOOST_AUTO_TEST_CASE(interface)
 	                    "req":true }]
 	                 } ]
 	               })"));
+	check_naming(*e, tree, {"BarBaz"s, "BarBaz"s, "bar_baz"s});
 }
 BOOST_AUTO_TEST_CASE(pop_parent)
 {

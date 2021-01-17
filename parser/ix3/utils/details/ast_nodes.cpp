@@ -17,12 +17,21 @@ using ix3::utils::details::record_field;
 using ix3::utils::details::enums;
 using ix3::utils::details::interface;
 using ix3::utils::details::ctor_node;
+using ix3::utils::details::camel_case_as_title;
 
 std::int64_t ix3::utils::details::splash_version(const ast::meta::version& v)
 {
 	const auto& a = v.major_v;
 	const auto& b = v.minor_v;
 	return a >= b ? a * a + a + b : a + b * b;
+}
+
+std::pmr::string camel_case_as_title::cvt_inner_name(
+        gen_utils::name_conversion n) const
+{
+	if(n==gen_utils::name_conversion::camel_case)
+		n = gen_utils::name_conversion::title_case;
+	return gen_utils::convert(inner_name(), n);
 }
 
 type_node::type_node(ast::type t) : ast_node(std::move(t)) { }

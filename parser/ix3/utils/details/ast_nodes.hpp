@@ -17,7 +17,7 @@ namespace ix3::utils::details {
 std::int64_t splash_version(const ast::meta::version& v);
 
 template<typename Ast>
-class ast_node : public ix3_node_base {
+class ast_node : virtual public ix3_node_base {
 	Ast ast;
 protected:
 	boost::json::value ast_to_json(const ix3::ast::variable_name& obj) const {
@@ -53,6 +53,10 @@ public:
 	}
 };
 
+struct camel_case_as_title : virtual ix3_node_base {
+	std::pmr::string cvt_inner_name(gen_utils::name_conversion n) const override ;
+};
+
 struct type_node : ast_node<ast::type> {
 	type_node(ast::type t);
 	std::string_view type_name() const ;
@@ -80,7 +84,7 @@ struct fnc_param_node : ast_node<ast::function_parameter> {
 	boost::json::value make_json(const compilation_context& ctx) const override ;
 };
 
-struct record_node : ast_node<ast::record> {
+struct record_node : camel_case_as_title, ast_node<ast::record> {
 	record_node(ast::record n);
 	boost::json::value make_json(const compilation_context& ctx) const override ;
 };
@@ -90,12 +94,12 @@ struct record_field : ast_node<ast::record_item> {
 	boost::json::value make_json(const compilation_context& ctx) const override ;
 };
 
-struct enums : ast_node<ast::enumeration> {
+struct enums : camel_case_as_title, ast_node<ast::enumeration> {
 	enums(ast::enumeration e);
 	boost::json::value make_json(const compilation_context& ctx) const override ;
 };
 
-struct interface : ast_node<ast::interface> {
+struct interface : camel_case_as_title, ast_node<ast::interface> {
 	interface(ast::interface i);
 	boost::json::value make_json(const compilation_context& ctx) const override ;
 	std::string_view link_condition() const override ;

@@ -10,12 +10,13 @@
 
 #include <vector>
 #include <string>
+#include <memory_resource>
 
 namespace gen_utils {
 
 	enum class name_conversion{underscore, camel_case, title_case, as_is};
-	std::vector<std::string> split_name(const std::string& name);
-	std::string convert(std::string_view name, name_conversion c);
+	std::vector<std::pmr::string> split_name(const std::pmr::string& name);
+	std::pmr::string convert(std::string_view name, name_conversion c);
 
 	std::string_view to_string(name_conversion v);
 	void from_string(std::string_view val, name_conversion& c);

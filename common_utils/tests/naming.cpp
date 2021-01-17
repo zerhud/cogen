@@ -17,7 +17,7 @@
 
 using namespace gen_utils;
 
-void check_some_name(const std::vector<std::string>& ns)
+void check_some_name(const std::vector<std::pmr::string>& ns)
 {
 	BOOST_REQUIRE_EQUAL(ns.size(), 2);
 	BOOST_CHECK_EQUAL(ns[0], "some");
