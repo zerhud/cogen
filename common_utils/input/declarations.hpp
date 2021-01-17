@@ -16,7 +16,6 @@
 
 namespace gen_utils {
 
-enum class compiler { cpp } ;
 enum class tree_compare_result { not_comparable, none, only_root, partial, total };
 
 class tree;
@@ -38,7 +37,6 @@ struct node_pointer {
 };
 
 struct compilation_config final {
-	compiler name=compiler::cpp;
 	std::pmr::vector<name_conversion> naming{name_conversion::as_is};
 };
 

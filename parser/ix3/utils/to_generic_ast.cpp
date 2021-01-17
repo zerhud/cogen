@@ -32,7 +32,6 @@ boost::json::value ix3_manager::to_json(
 		root = dynamic_cast<const ix3_node_base*>(ctx.linked_to.get());
 	}
 	assert(root != nullptr);
-	assert(ctx.cfg.name==gen_utils::compiler::cpp);
 	details::cpp_compiler compiler{&ctx.cfg};
 	details::compilation_context inner_ctx( &container, &compiler, &ctx );
 	return root->make_json(inner_ctx);

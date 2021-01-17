@@ -119,7 +119,6 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 	MOCK_EXPECT(t1_dsl->to_json)
 	        .calls([this](auto& ctx, const gen_utils::tree& src){
 		BOOST_TEST(&src != &t1);
-		BOOST_CHECK(ctx.cfg.name == gen_utils::compiler::cpp);
 		BOOST_CHECK(ctx.cfg.naming.size() == 1);
 		BOOST_CHECK(ctx.cfg.naming.at(0) == gunc::camel_case);
 		boost::json::object ret;
