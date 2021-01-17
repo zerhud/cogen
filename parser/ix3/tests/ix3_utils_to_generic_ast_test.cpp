@@ -78,6 +78,11 @@ void check_naming(
 	BOOST_TEST(make_json(root, cnt, ctx).as_object()["name"] == names.at(1).c_str());
 	ctx.cfg.naming = {gunc::underscore};
 	BOOST_TEST(make_json(root, cnt, ctx).as_object()["name"] == names.at(2).c_str());
+	ctx.cfg.naming = {gunc::camel_case, gunc::underscore};
+	BOOST_TEST(make_json(root, cnt, ctx)
+	           .as_object()["name"].as_array()[0] == names.at(1).c_str());
+	BOOST_TEST(make_json(root, cnt, ctx)
+	           .as_object()["name"].as_array()[1] == names.at(2).c_str());
 }
 BOOST_AUTO_TEST_CASE(json_compare)
 {
