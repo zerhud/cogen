@@ -141,14 +141,11 @@ void tree::root_version(std::uint64_t v)
 
 std::uint64_t tree::next_min_version() const
 {
-	auto is_a_less = [](auto& a, auto& b){
-		if(a->version() && b->version())
-			return *a->version() < b->version();
-		return a->version().has_value();
-	};
-	auto pos = std::min_element(++(store.begin()), store.end(), is_a_less);
-	if(pos==store.end()) return root_ver;
-	return (*pos)->version().value_or(root_ver);
+	std::pmr::vector<std::uint64_t> vers;
+	for(auto& n:store) if(n->version()) vers.emplace_back(*n->version());
+	std::ranges::sort(vers);
+	for(auto& v:vers) if(root_ver < v) return v;
+	return root_ver;
 }
 
 std::pmr::vector<std::pmr::string> tree::var_name_list() const

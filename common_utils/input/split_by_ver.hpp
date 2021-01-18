@@ -20,6 +20,7 @@ class split_by_ver {
 public:
 	std::pmr::vector<tree> operator()(tree src);
 private:
+	std::optional<gen_utils::tree> copy_for_next(const tree& src) const ; 
 };
 
 } // namespace gen_utils

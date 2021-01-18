@@ -137,6 +137,9 @@ BOOST_FIXTURE_TEST_CASE(next_min_version, fixture)
 	tree().add(*child1, child12);
 	BOOST_TEST(tree().next_min_version()==105);
 	BOOST_TEST(tree().root_version()==100);
+
+	tree().root_version(106);
+	BOOST_TEST(tree().next_min_version()==110);
 }
 BOOST_AUTO_TEST_SUITE(copy)
 BOOST_FIXTURE_TEST_CASE(no_cond, fixture)
