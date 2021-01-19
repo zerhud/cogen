@@ -131,6 +131,21 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 	compile_cfg->naming = {gen_utils::name_conversion::camel_case};
 	sg(gen_context{{"${n}.cpp"_s, "t"_s, {}, false, *compile_cfg}, {}}, all_data);
 }
+BOOST_FIXTURE_TEST_CASE(split_by_version, single_gen_part_fixture)
+{
+	single_gen_part sg(prov.get());
+	t1.add(t1.root(), make_node(1));
+	t1.add(t1.root(), make_node(2));
+	all_data.add(t1);
+
+	expect_empty_result();
+	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "f.cpp");
+
+	auto data_v1 = make_result_json({}, {});
+	auto data_v2 = make_result_json({}, {});
+
+	sg(gen_context{{"${n}.cpp"_s, "t"_s, {}, true, *compile_cfg}, {}}, all_data);
+}
 BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 {
 	single_gen_part sg(prov.get());
