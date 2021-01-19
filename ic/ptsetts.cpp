@@ -31,6 +31,7 @@ mdg::ic::gen_config ptsetts::part_setts(std::string_view p) const
 	auto path = "part."s+std::string(p);
 	ret.map_tmpl = setts.get<std::pmr::string>(path+".file"s);
 	ret.tmpl_file = setts.get<std::pmr::string>(path+".tmpl"s);
+	ret.split_by_version = setts.get(path+".split_by_version", false);
 	conf_links(path, ret);
 	return ret;
 }

@@ -129,7 +129,7 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 	MOCK_EXPECT(prov->generate).once().with("t", data_v1, "v1.cpp");
 	MOCK_EXPECT(prov->generate).once().with("t", data_v2, "v2.cpp");
 	compile_cfg->naming = {gen_utils::name_conversion::camel_case};
-	sg(gen_context{{"${n}.cpp"_s, "t"_s, {}, *compile_cfg}, {}}, all_data);
+	sg(gen_context{{"${n}.cpp"_s, "t"_s, {}, false, *compile_cfg}, {}}, all_data);
 }
 BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 {
@@ -141,7 +141,7 @@ BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 	auto empty_data = make_result_json({},{});
 	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "v1");
 	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "v2");
-	gen_context ctx{{"${n}"_s, "t"_s, {}, *compile_cfg.get()}, {}};
+	gen_context ctx{{"${n}"_s, "t"_s, {}, false, *compile_cfg.get()}, {}};
 
 	ctx.generated["a"] = sg(ctx, all_data);
 
@@ -185,7 +185,7 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "v1");
 	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "v2");
 	compile_cfg->naming.emplace_back(gunc::camel_case);
-	gen_context ctx{{"${n}"_s, "t"_s, {}, *compile_cfg.get()}, {}};
+	gen_context ctx{{"${n}"_s, "t"_s, {}, false, *compile_cfg.get()}, {}};
 	ctx.generated["part1"] = sg(ctx, all_data);
 	BOOST_TEST(ctx.generated["part1"]["v1"].conf().naming.size() == 2);
 	BOOST_CHECK(ctx.generated["part1"]["v1"].conf().naming.at(1) == gunc::camel_case);
