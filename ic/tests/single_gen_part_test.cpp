@@ -138,13 +138,16 @@ BOOST_FIXTURE_TEST_CASE(split_by_version, single_gen_part_fixture)
 	t1.add(t1.root(), make_node(2));
 	all_data.add(t1);
 
-	expect_empty_result();
-	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "f.cpp");
+	std::size_t cnt=0;
+	MOCK_EXPECT(t1_dsl->to_json).calls([&cnt](auto& ctx, const gen_utils::tree& t){
+		BOOST_TEST(ctx.links != nullptr);
+		return boost::json::value{std::to_string(++cnt)}; });
 
-	auto data_v1 = make_result_json({}, {});
-	auto data_v2 = make_result_json({}, {});
+	auto empty_result = make_result_json({}, {},
+			R"({"t1_dsl":["1", "2" ]})"_bj);
+	MOCK_EXPECT(prov->generate).once().with("t", empty_result, "f.cpp");
 
-	sg(gen_context{{"${n}.cpp"_s, "t"_s, {}, true, *compile_cfg}, {}}, all_data);
+	sg(gen_context{{"f.cpp"_s, "t"_s, {}, true, *compile_cfg}, {}}, all_data);
 }
 BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 {

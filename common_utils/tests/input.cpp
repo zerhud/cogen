@@ -19,6 +19,7 @@
 #include "mocks.hpp"
 
 using namespace std::literals;
+using gen_utils_mocks::trees_fixture;
 
 std::pmr::string operator "" _s (const char* d, std::size_t l)
 {
@@ -489,6 +490,26 @@ BOOST_AUTO_TEST_CASE(contains)
 
 	i2.add(t1); // t2 - t3, t1
 	BOOST_CHECK( i1.match_with(i2) == gen_utils::tree_compare_result::total );
+}
+BOOST_FIXTURE_TEST_CASE(modify, trees_fixture)
+{
+	ic_input isrc;
+	isrc.conf().naming.clear();
+	isrc.add(t1()).add(t2());
+	
+	ic_input iresult = isrc.modify([this](const gen_utils::tree& src_tree){
+			std::pmr::vector<gen_utils::tree> ret;
+			ret.emplace_back(src_tree);
+			ret.emplace_back(src_tree);
+			return ret;
+		});
+
+	BOOST_TEST(iresult.conf().naming.size() == 0);
+	BOOST_TEST(iresult.all().size() == 4);
+	BOOST_TEST(iresult.all().at(0)->data_id() == "t1_id");
+	BOOST_TEST(iresult.all().at(1)->data_id() == "t1_id");
+	BOOST_TEST(iresult.all().at(2)->data_id() == "t2_id");
+	BOOST_TEST(iresult.all().at(3)->data_id() == "t2_id");
 }
 BOOST_AUTO_TEST_SUITE_END() // input
 

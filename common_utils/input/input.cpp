@@ -71,3 +71,15 @@ const gen_utils::compilation_config& input::conf() const
 {
 	return cur_conf;
 }
+
+input input::modify(const input::mod_fnc& mod) const
+{
+	input ret;
+	ret.cur_conf = cur_conf;
+	for(auto &t:storage) {
+		auto mr = mod(t);
+		for(auto& r:mr)
+			ret.storage.emplace_back(std::move(r));
+	}
+	return ret;
+}

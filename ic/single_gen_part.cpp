@@ -8,6 +8,7 @@
 
 #include "single_gen_part.hpp"
 #include "common_utils/input/map_to.hpp"
+#include "common_utils/input/split_by_ver.hpp"
 
 using gen_utils::input;
 using mdg::ic::single_gen_part;
@@ -25,7 +26,15 @@ single_gen_part::single_gen_part(const provider* p)
 compiled_output single_gen_part::operator()(const gen_context& cur_part, input alli) const
 {
 	assert(outside);
-	auto compiled = compile(cur_part, alli);
+	input splitted;
+	if(!cur_part.cfg_part.split_by_version)
+		splitted = std::move(alli);
+	else {
+		splitted = alli.modify([](const gen_utils::tree& t){
+				return gen_utils::split_by_ver{}(t);
+			});
+	}
+	auto compiled = compile(cur_part, splitted);
 	gen_utils::imports_manager imports = make_imports(cur_part, compiled);
 	for(auto& [n,d]:compiled) {
 		d.conf() = cur_part.cfg_part.compilation;

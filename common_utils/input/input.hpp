@@ -21,6 +21,7 @@ class input final {
 	std::pmr::vector<tree> storage;
 	compilation_config cur_conf;
 public:
+	using mod_fnc = std::function<std::pmr::vector<tree>(const tree&)>;
 	input() =default ;
 	~input() noexcept =default;
 
@@ -37,6 +38,8 @@ public:
 
 	compilation_config& conf() ;
 	const compilation_config& conf() const ;
+
+	input modify(const mod_fnc& mod) const ;
 };
 
 
