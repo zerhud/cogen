@@ -60,8 +60,11 @@ class tree final {
 
 	std::pmr::vector<edge> edges;
 
-	node_ptr create_link(const data_node* p, node_ptr c);
+	edge* search_edge(const data_node& par) ;
 	const edge* search_edge(const data_node& par) const ;
+
+	node_ptr create_link(const data_node* p, node_ptr c);
+	node_ptr create_link_if_no(const data_node* p, node_ptr c);
 	std::pmr::vector<node_ptr> search(const data_node& par, name_t n) const ;
 public:
 	typedef std::function<bool(const data_node&)> copy_condition;
@@ -72,7 +75,7 @@ public:
 	[[nodiscard]] std::string_view data_id() const ;
 	[[nodiscard]] const data_node& root() const ;
 
-	void add(const data_node& par, node_ptr child);
+	tree& add(const data_node& par, node_ptr child);
 	[[nodiscard]] std::pmr::vector<node_ptr> children(const data_node& par) const ;
 	[[nodiscard]] tree_compare_result contains(const tree& other) const ;
 	[[nodiscard]] std::pmr::vector<node_ptr> search(name_t n) const ;

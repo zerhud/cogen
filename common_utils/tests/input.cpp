@@ -313,16 +313,22 @@ BOOST_FIXTURE_TEST_CASE(merge, trees_fixture)
 {
 	auto c1 = make_node(101);
 	auto c2 = make_node(102);
+	auto c3 = make_node(103);
+	auto c4 = make_node(104);
 	t1().add(t1().root(), c1);
 	
 	gen_utils::tree t1_c =
 		*t1().copy_if([](auto& c){ return true; });
-	t1_c.add(t1_c.root(), c2);
+	t1_c.add(t1_c.root(), c2).add(*c2, c3).add(*c3, c4);
 
 	t1().merge(t1_c);
 	BOOST_REQUIRE(t1().children(t1().root()).size() == 2);
 	BOOST_TEST(t1().children(t1().root())[0].get() == c1.get());
 	BOOST_TEST(t1().children(t1().root())[1].get() == c2.get());
+	BOOST_TEST(t1().children(*c2).size() == 1);
+	BOOST_TEST(t1().children(*c2).at(0) == c3);
+	BOOST_TEST(t1().children(*c3).size() == 1);
+	BOOST_TEST(t1().children(*c3).at(0) == c4);
 
 	BOOST_CHECK_THROW(t1().merge(t2()), std::exception);
 }

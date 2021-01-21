@@ -42,7 +42,7 @@ const data_node& tree::root() const
 	return *store.front();
 }
 
-void tree::add(const data_node &par, node_ptr child)
+tree& tree::add(const data_node &par, node_ptr child)
 {
 	if(!node_exists(&par))
 		throw std::runtime_error("no such node found"s);
@@ -51,6 +51,7 @@ void tree::add(const data_node &par, node_ptr child)
 	if(child->version() && *child->version() < root_version())
 		throw std::runtime_error("child version is less then root version"s);
 	store.emplace_back(create_link(&par, std::move(child)));
+	return *this;
 }
 
 node_ptr tree::create_link(const data_node *p, node_ptr c)
@@ -59,6 +60,17 @@ node_ptr tree::create_link(const data_node *p, node_ptr c)
 		if(e.parent==p)
 			return e.children.emplace_back(std::move(c));
 	return edges.emplace_back(edge{p, {std::move(c)}}).children[0];
+}
+
+node_ptr tree::create_link_if_no(const data_node *p, node_ptr c)
+{
+	edge* ie = search_edge(*p);
+	if(!ie) return create_link(p, std::move(c));
+	auto& ch = ie->children;
+	auto ch_pos = std::find(ch.begin(),ch.end(), c);
+	if(ch_pos == ch.end())
+		return store.emplace_back(create_link(p, std::move(c)));
+	return *ch_pos;
 }
 
 std::pmr::vector<node_ptr> tree::children(const data_node& par) const
@@ -115,10 +127,15 @@ std::pmr::vector<node_ptr> tree::search(const data_node& par, name_t n) const
 	return ret;
 }
 
-const tree::edge* tree::search_edge(const data_node& par) const
+tree::edge* tree::search_edge(const data_node& par)
 {
 	for(auto& e:edges) if(e.parent == &par) return &e;
 	return nullptr;
+}
+
+const tree::edge* tree::search_edge(const data_node& par) const
+{
+	return const_cast<tree*>(this)->search_edge(par);
 }
 
 bool tree::node_exists(const data_node *n) const
@@ -191,4 +208,20 @@ std::optional<tree> tree::copy_if(const tree::copy_condition& cond) const
 
 void tree::merge(tree other)
 {
+	if(other.data_id() != data_id())
+		throw std::runtime_error("cannot merge different trees"s);
+	if(&other.root() != &root())
+		throw std::runtime_error("cannot merge trees with defferent roots"s);
+	for(auto& oe:other.edges) {
+		auto ie = search_edge(*oe.parent);
+		if(!ie) {
+			assert(node_exists(oe.parent));
+			edges.emplace_back(oe);
+			for(auto& c:oe.children)
+				store.emplace_back(c);
+		} else {
+			for(auto& child:oe.children)
+				create_link_if_no(oe.parent, child);
+		}
+	}
 }
