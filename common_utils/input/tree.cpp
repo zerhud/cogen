@@ -188,3 +188,7 @@ std::optional<tree> tree::copy_if(const tree::copy_condition& cond) const
 
 	return ret;
 }
+
+void tree::merge(tree other)
+{
+}

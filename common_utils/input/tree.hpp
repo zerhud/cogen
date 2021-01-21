@@ -85,6 +85,7 @@ public:
 	[[nodiscard]] std::pmr::vector<std::pmr::string> var_name_list() const ;
 	[[nodiscard]] std::pmr::vector<std::pmr::string> var_value_list(std::string_view name) const ;
 
+	void merge(tree other) ;
 	[[nodiscard]] std::optional<tree> copy_if(const copy_condition& cond) const ;
 };
 

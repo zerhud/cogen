@@ -309,6 +309,23 @@ BOOST_FIXTURE_TEST_CASE(search, fixture)
 	BOOST_TEST(tree().search({"b", "c"}).at(0) == node_c);
 	BOOST_TEST(tree().search({"b", "c"}).at(1) == node_c2);
 }
+BOOST_FIXTURE_TEST_CASE(merge, trees_fixture)
+{
+	auto c1 = make_node(101);
+	auto c2 = make_node(102);
+	t1().add(t1().root(), c1);
+	
+	gen_utils::tree t1_c =
+		*t1().copy_if([](auto& c){ return true; });
+	t1_c.add(t1_c.root(), c2);
+
+	t1().merge(t1_c);
+	BOOST_REQUIRE(t1().children(t1().root()).size() == 2);
+	BOOST_TEST(t1().children(t1().root())[0].get() == c1.get());
+	BOOST_TEST(t1().children(t1().root())[1].get() == c2.get());
+
+	BOOST_CHECK_THROW(t1().merge(t2()), std::exception);
+}
 BOOST_AUTO_TEST_SUITE_END() // tree
 BOOST_AUTO_TEST_SUITE(tree_map_to)
 using gen_utils::map_to;
