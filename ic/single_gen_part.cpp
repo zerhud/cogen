@@ -31,7 +31,12 @@ compiled_output single_gen_part::operator()(const gen_context& cur_part, input a
 		splitted = std::move(alli);
 	else {
 		splitted = alli.modify([](const gen_utils::tree& t){
-				return gen_utils::split_by_ver{}(t);
+				auto splited = gen_utils::split_by_ver{}(t);
+				assert(!splited.empty());
+				auto first = splited.begin();
+				for(auto pos = first+1;pos!=splited.end();++pos)
+					first->merge(*pos);
+				return std::pmr::vector<gen_utils::tree>{*first};
 			});
 	}
 	auto compiled = compile(cur_part, splitted);
