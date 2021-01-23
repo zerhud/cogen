@@ -144,7 +144,7 @@ BOOST_FIXTURE_TEST_CASE(split_by_version, single_gen_part_fixture)
 		return boost::json::value{std::to_string(++cnt)}; });
 
 	auto empty_result = make_result_json({}, {},
-			R"({"t1_dsl":["1", "2" ]})"_bj);
+			R"({"t1_dsl":["1"]})"_bj);
 	MOCK_EXPECT(prov->generate).once().with("t", empty_result, "f.cpp");
 
 	sg(gen_context{{"f.cpp"_s, "t"_s, {}, true, *compile_cfg}, {}}, all_data);
