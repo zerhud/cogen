@@ -5,7 +5,7 @@
 <= render.includes(cdata.includes) =>
 
 <% for module in cdata.data.ix3 -%>
-<% for mod_ver in module.content %>
+<% for mod_ver in module.vers %>
 
 <= render.decl_meta_params(module) =>
 namespace <= render.gen_namespace_name(module, mod_ver) => {
