@@ -135,7 +135,7 @@ boost::json::value enums::make_json(const compilation_context& ctx) const
 	ret["type"]="enum";
 	ret["auto_io"] = original_node().gen_io;
 	ret["as_flags"] = original_node().use_bitmask;
-	boost::json::array& items = ret["items"].emplace_array();
+	boost::json::array& items = ret["members"].emplace_array();
 	for(auto& e:original_node().elements) {
 		boost::json::object eobj;
 		eobj["name"] = e.name;

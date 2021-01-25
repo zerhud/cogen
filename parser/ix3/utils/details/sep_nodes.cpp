@@ -68,6 +68,8 @@ boost::json::value module_version_node::make_json(const compilation_context& ctx
 	boost::json::object ret;
 	ret["type"] = "version";
 	ret["value"] = str_val;
+	ret["major"] = val.version.major_v;
+	ret["minor"] = val.version.minor_v;
 	boost::json::array& content=ret["content"].emplace_array();
 	for(auto& child:ctx.children(*this))
 		content.emplace_back(child->make_json(ctx));

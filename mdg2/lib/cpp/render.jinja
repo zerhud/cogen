@@ -1,14 +1,19 @@
+<%- macro gen_namespace_name(module, mod_ver) -%>
+<= module.name =>_<= mod_ver.major =>_<= mod_ver.minor =>
+<%- endmacro %>
+
 <% macro type(obj) -%>
-<= obj.name =><% if obj.sub[0] is defined %><<% for st in obj.sub %><= type(st) =><= ", " if not loop.last =><% endfor %>><% endif %>
+<= obj.cpp =><% if obj.subs[0] is defined %><<% for st in obj.subs %><= type(st) =><= ", " if not loop.last =><% endfor %>><% endif %>
+<%- endmacro %>
+
+<%- macro function_header(obj) -%>
+<= decl_meta_params(obj) -=>
+<= decl_depricated(obj) -=>
+<= "static " if obj.static =><=- type(obj.return) => <= obj.name =>(<= fparam(obj.params) =>)<= " const" if obj.mutable == False =>
 <%- endmacro %>
 
 <%- macro fparam(params) -%>
-<% for param in params %><= type(param.par_type) => <= param.name =><= ", " if not loop.last =><% endfor %>
-<%- endmacro %>
-
-<%- macro gen_namespace_name(module, cdata) -%>
-<% for n in cdata.namespaces %><=n=>::<% endfor -%>
-<= module.namespace =>
+<% for param in params %><= type(param.param_t) => <= param.name =><= ", " if not loop.last =><% endfor %>
 <%- endmacro %>
 
 <%- macro decl_depricated(obj) -%>
@@ -20,15 +25,18 @@
 <% endif -%>
 <%- endmacro %>
 
-<%- macro function_header(obj) -%>
-<= decl_meta_params(obj) -=>
-<= decl_depricated(obj) -=>
-<= "static " if obj.static =><=- type(obj.ret_type) => <= obj.name =>(<= fparam(obj.params) =>)<= " const" if obj.mutable == False =>
+<%- macro includes_for(list) -%>
+<% for info in list %>
+#include <= '<' if info.sys else '"' =><= info.file =><= '>' if info.sys else '"' =>
+<%- endfor -%>
 <%- endmacro %>
 
 <%- macro includes(incs) -%>
-<%- for inc in incs %>
-#include <= '<' if inc.sys else '"' =><= inc.n =><= '>' if inc.sys else '"' =>
+<% for (from, list) in incs.required.items() %>
+<= includes_for(list) =>
+<%- endfor -%>
+<% for (from, list) in incs.matched%>
+<= includes_for(list) =>
 <%- endfor -%>
 <%- endmacro -%>
 

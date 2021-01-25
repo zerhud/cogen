@@ -379,7 +379,7 @@ BOOST_AUTO_TEST_CASE(enums)
 	               R"({
 	                 "type":"enum","name":"bar_baz", "orig_name":"bar_baz",
 	                 "auto_io":true, "as_flags":false,
-	                 "items":[
+	                 "members":[
 	                   {"name":"one", "io":"one"},
 	                   {"name":"two", "io":"test"}
 	                 ]
