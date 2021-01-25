@@ -116,18 +116,18 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 
 	gen_utils::compilation_context ctx;
 	BOOST_TEST(tree.to_json(ctx) == R"([{"name":"mod1", "orig_name":"mod1","content":[
-	                 {"type":"version","value":"1.1","name":"mod1_v1_1","content":[]},
-	                 {"type":"version","value":"1.2","name":"mod1_v1_2","content":[]}
+	                 {"type":"version","minor":1,"major":1,"name":"mod1_v1_1","content":[]},
+	                 {"type":"version","minor":2,"major":1,"name":"mod1_v1_2","content":[]}
 	               ]}])"_bj);
 	ctx.cfg.naming.emplace_back(gen_utils::name_conversion::title_case);
 	BOOST_TEST(tree.to_json(ctx) == R"([{"name":["mod1","Mod1"], "orig_name":"mod1","content":[
-	                 {"type":"version","value":"1.1","name":"mod1_v1_1","content":[]},
-	                 {"type":"version","value":"1.2","name":"mod1_v1_2","content":[]}
+	                 {"type":"version","minor":1,"major":1,"name":"mod1_v1_1","content":[]},
+	                 {"type":"version","minor":2,"major":1,"name":"mod1_v1_2","content":[]}
 	               ]}])"_bj);
 	ctx.cfg.naming.clear();
 	BOOST_TEST(tree.to_json(ctx) == R"([{"name":"mod1", "orig_name":"mod1","content":[
-	                 {"type":"version","value":"1.1","name":"mod1_v1_1","content":[]},
-	                 {"type":"version","value":"1.2","name":"mod1_v1_2","content":[]}
+	                 {"type":"version","minor":1,"major":1,"name":"mod1_v1_1","content":[]},
+	                 {"type":"version","minor":2,"major":1,"name":"mod1_v1_2","content":[]}
 	               ]}])"_bj);
 }
 BOOST_AUTO_TEST_CASE(records)
