@@ -391,11 +391,16 @@ BOOST_AUTO_TEST_CASE(interface)
 {
 	auto ast = txt::parse(txt::file_content,
 	                      "module mod1 v1.1:"
-	                      "interface bar_baz +ex { constructor(+i8 a); i8 foo(+i9 b) const; }"sv);
+	                      "interface bar_baz +ex { "
+	                        "constructor(+i8 a); "
+	                        "i8 foo(+i9 b) const; } "
+	                      "enum z{o}"sv);
 	gen_utils::tree tree = to_generic_ast()(ast.modules);
 	BOOST_TEST(tree.children(tree.root()).size()==1);
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
-	BOOST_TEST(tree.children(*mod).size()==1);
+	BOOST_TEST(tree.children(*mod).size()==2);
+
+	BOOST_TEST(tree.children(*mod).at(1)->name() == "z");
 
 	auto e = tree.children(*mod).at(0);
 	BOOST_TEST(e->name()=="bar_baz");
