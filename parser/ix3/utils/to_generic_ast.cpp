@@ -82,11 +82,10 @@ void to_generic_ast::make_type(ast::type& v, const gen_utils::data_node& par)
 
 void to_generic_ast::on_obj(ast::record& obj)
 {
-	assert(parents.size()<=2);
-	if(parents.size()!=2) parents.resize(2);
-	auto par = parents.back();
-	parents.emplace_back(std::make_shared<details::record_node>(obj));
-	result.add(*par, parents.back());
+	assert(parents.size()==2);
+	auto r = std::make_shared<details::record_node>(obj);
+	result.add(*parents.back(), r);
+	parents.emplace_back(std::move(r));
 }
 
 void to_generic_ast::on_obj(ast::record_item& obj)
@@ -113,7 +112,9 @@ void to_generic_ast::on_obj(ast::function_parameter& obj)
 
 void to_generic_ast::on_obj(ast::enumeration& obj)
 {
-	result.add(*parents.back(), std::make_shared<details::enums>(obj));
+	auto e = std::make_shared<details::enums>(obj);
+	result.add(*parents.back(), e);
+	parents.emplace_back(std::move(e));
 }
 
 void to_generic_ast::on_obj(ast::interface& obj)
