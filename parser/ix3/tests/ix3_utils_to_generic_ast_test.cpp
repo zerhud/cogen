@@ -387,6 +387,22 @@ BOOST_AUTO_TEST_CASE(enums)
 
 	check_naming(*e, tree, {"BarBaz"s, "BarBaz"s, "bar_baz"s});
 }
+BOOST_AUTO_TEST_CASE(places)
+{
+	auto ast = txt::parse(txt::file_content,
+	                      "module mod1 v1.1:"
+	                      "enum z{o}"
+	                      "interface bar_baz +ex { }"
+			      ""sv);
+	gen_utils::compilation_context ctx;
+	auto tree = to_generic_ast()(ast.modules);
+	BOOST_TEST(tree.to_json(ctx) == R"([{"name":"mod1", "orig_name":"mod1","vers":[
+	                 {"type":"version","minor":1,"major":1,"name":"mod1_v1_1","content":[
+	                 {"type":"enum","orig_name":"z","name":"z","auto_io":false,"as_flags":false,"members":[{"name":"o","io":"o"}]},
+	                 {"type":"interface","orig_name":"bar_baz","name":"bar_baz","ex":true,"rinvert":false,"ctors":[],"funcs":[]},
+	                 ]}
+	               ]}])"_bj);
+}
 BOOST_AUTO_TEST_CASE(interface)
 {
 	auto ast = txt::parse(txt::file_content,
@@ -397,6 +413,7 @@ BOOST_AUTO_TEST_CASE(interface)
 	                      "enum z{o}"sv);
 	gen_utils::tree tree = to_generic_ast()(ast.modules);
 	BOOST_TEST(tree.children(tree.root()).size()==1);
+	BOOST_TEST(tree.children(*tree.children(tree.root()).at(0)).size()==1);
 	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
 	BOOST_TEST(tree.children(*mod).size()==2);
 
