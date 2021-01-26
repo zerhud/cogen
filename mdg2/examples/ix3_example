@@ -7,6 +7,10 @@ enum etest +auto_io { one, two }
 interface i +ex {
 }
 
+record some_rec {
+	+i64 filed1;
+}
+
 module test_two v2.0:
 
 mod.i fnc();
