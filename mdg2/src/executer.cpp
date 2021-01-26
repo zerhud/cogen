@@ -47,7 +47,7 @@ void executer::set_options()
 int executer::operator()()
 {
 	if(opt_vars.count("help"))
-		print_help();
+		print_help(), std::exit(0);
 	load_inputs();
 	mdg::ic::ptsetts setts(load_settings());
 	if(opt_vars["gmode"].as<std::string>()=="json")
