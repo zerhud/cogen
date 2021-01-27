@@ -472,6 +472,7 @@ BOOST_AUTO_TEST_CASE(meta)
 
 	BOOST_TEST(make_json(*bar_baz, tree).as_object()["meta"] ==
 			R"({"depricated":{"msg":"test","since":{"major":1,"minor":2}}})"_bj);
+	BOOST_TEST(make_json(*z, tree).as_object()["meta"] == R"({"doc":"doc string"})"_bj);
 }
 BOOST_AUTO_TEST_CASE(pop_parent)
 {

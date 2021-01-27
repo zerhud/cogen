@@ -42,6 +42,7 @@ struct module_version_node : ix3_node_base {
 	std::optional<std::uint64_t> version() const override ;
 	std::optional<gen_utils::variable> node_var() const override ;
 	boost::json::value make_json(const compilation_context& ctx) const override;
+	std::optional<ast::meta::version> ast_ver() const override ;
 };
 
 

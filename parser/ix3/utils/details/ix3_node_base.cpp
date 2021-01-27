@@ -71,10 +71,13 @@ std::pmr::vector<const ix3_node_base *> compilation_context::children(
 
 ix3::ast::meta::version compilation_context::cur_ver(const ix3_node_base& cur) const
 {
-	ix3::ast::meta::version ret;
-	ret.minor_v = 0;
-	ret.major_v = 0;
-	return ret;
+	if(cur.ast_ver()) return *cur.ast_ver();
+	const auto& par = container->parent(cur, [](const auto& n){
+				return n.version().has_value();
+			});
+	auto& ipar = static_cast<const ix3_node_base&>(par);
+	assert(ipar.ast_ver().has_value());
+	return *ipar.ast_ver();
 }
 
 std::optional<gen_utils::variable> ix3_node_base::node_var() const
@@ -107,6 +110,11 @@ boost::json::object ix3_node_base::make_inner_json(const compilation_context& ct
 boost::json::value ix3_node_base::make_meta_json(const compilation_context& ctx) const
 {
 	return boost::json::value{};
+}
+
+std::optional<ix3::ast::meta::version> ix3_node_base::ast_ver() const
+{
+	return std::nullopt;
 }
 
 std::pmr::string ix3_node_base::cvt_inner_name(gen_utils::name_conversion to) const

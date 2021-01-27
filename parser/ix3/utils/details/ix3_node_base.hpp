@@ -71,6 +71,7 @@ public:
 	virtual boost::json::value make_json(const compilation_context& ctx) const =0 ;
 	[[nodiscard]]
 	virtual std::pmr::string cvt_inner_name(gen_utils::name_conversion to) const ;
+	virtual std::optional<ast::meta::version> ast_ver() const ;
 protected:
 	boost::json::object make_inner_json(const compilation_context& ctx) const;
 	virtual boost::json::value make_meta_json(const compilation_context& ctx) const ;

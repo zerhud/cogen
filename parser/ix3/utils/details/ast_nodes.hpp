@@ -42,9 +42,13 @@ protected:
 			boost::json::object ret;
 			for(auto& mp:ast.meta_params.cnt) {
 				if(auto* dep = boost::get<ast::meta::depricated>(&mp); dep) {
+					if(ctx.cur_ver(*this) < dep->since) continue;
 					auto& dep_obj = ret["depricated"].emplace_object();
 					dep_obj["msg"] = dep->message;
 					dep_obj["since"] = ast_to_json(dep->since);
+				}
+				if(auto* doc = boost::get<ast::meta::documentation>(&mp); doc) {
+					ret["doc"] = doc->body;
 				}
 			}
 			return ret.empty() ? ix3_node_base::make_meta_json(ctx) : ret;
@@ -73,6 +77,13 @@ public:
 		if constexpr (requires{ Ast::meta_params; }) {
 			auto ver = ast::get<ast::meta::version>(original_node().meta_params);
 			if (ver) return splash_version(*ver);
+		}
+		return std::nullopt;
+	}
+	std::optional<ast::meta::version> ast_ver() const override {
+		if constexpr (requires{ Ast::meta_params; }) {
+			auto ver = ast::get<ast::meta::version>(original_node().meta_params);
+			if (ver) return *ver;
 		}
 		return std::nullopt;
 	}

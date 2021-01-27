@@ -75,3 +75,7 @@ boost::json::value module_version_node::make_json(const compilation_context& ctx
 	ctx.compiling_aspect().aspect(*this, ret);
 	return ret;
 }
+std::optional<ix3::ast::meta::version> module_version_node::ast_ver() const
+{
+	return val.version;
+}
