@@ -332,6 +332,25 @@ BOOST_FIXTURE_TEST_CASE(merge, trees_fixture)
 
 	BOOST_CHECK_THROW(t1().merge(t2()), std::exception);
 }
+BOOST_FIXTURE_TEST_CASE(parent, trees_fixture)
+{
+	BOOST_CHECK_THROW(t1().parent(t1().root()), std::exception);
+	auto c1 = make_node(110);
+	auto c2 = make_node(120);
+	BOOST_CHECK_THROW(t1().parent(*c1), std::exception);
+	t1().add(t1().root(), c1);
+	t1().add(t1().root(), c2);
+
+	auto c12 = make_node(111);
+	auto c13 = make_node(std::nullopt);
+	t1().add(*c1, c12);
+	t1().add(*c1, c13);
+
+	BOOST_TEST(&t1().parent(*c2) == &t1().root());
+	BOOST_TEST(&t1().parent(*c12) == c1.get());
+	BOOST_TEST(&t1().parent(*c12, [&c1](const auto& n){return &n!=c1.get();}) == &t1().root());
+	BOOST_TEST(&t1().parent(*c13, [&c1](const auto& n){return &n!=c1.get();}) == &t1().root());
+}
 BOOST_AUTO_TEST_SUITE_END() // tree
 BOOST_AUTO_TEST_SUITE(tree_map_to)
 using gen_utils::map_to;

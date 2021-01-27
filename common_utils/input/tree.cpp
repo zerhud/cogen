@@ -165,6 +165,26 @@ std::uint64_t tree::next_min_version() const
 	return root_ver;
 }
 
+const data_node& tree::parent(const data_node& child, const copy_condition cond) const
+{
+	if(&child == &root())
+		throw std::runtime_error("no root parent exists");
+	for(auto& e:edges) {
+		auto cpos = std::find_if(
+				e.children.begin(), e.children.end(),
+				[&child](const node_ptr& c) {
+					return c.get() == &child; }
+				);
+		if(cpos == e.children.end()) continue;
+		if( cond ) return cond(*e.parent)
+			? *e.parent
+			: parent(*e.parent, cond);
+		return *e.parent;
+	}
+	throw std::runtime_error("no such node exists");
+}
+
+
 std::pmr::vector<std::pmr::string> tree::var_name_list() const
 {
 	std::pmr::vector<std::pmr::string> ret;
