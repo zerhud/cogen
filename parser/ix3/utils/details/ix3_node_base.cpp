@@ -69,6 +69,14 @@ std::pmr::vector<const ix3_node_base *> compilation_context::children(
 	return ret;
 }
 
+ix3::ast::meta::version compilation_context::cur_ver(const ix3_node_base& cur) const
+{
+	ix3::ast::meta::version ret;
+	ret.minor_v = 0;
+	ret.major_v = 0;
+	return ret;
+}
+
 std::optional<gen_utils::variable> ix3_node_base::node_var() const
 {
 	return std::nullopt;
@@ -82,6 +90,9 @@ std::pmr::vector<gen_utils::name_t> ix3_node_base::required_links() const
 boost::json::object ix3_node_base::make_inner_json(const compilation_context& ctx) const
 {
 	boost::json::object ret = ctx.linked_json(*this);
+	auto meta = make_meta_json(ctx);
+	if(!meta.is_null())
+		ret["meta"] = meta;
 	ret["orig_name"] = inner_name();
 	auto list = ctx.naming(*this, inner_name());
 	if(list.size()==1) ret["name"] = list[0];
@@ -91,6 +102,11 @@ boost::json::object ix3_node_base::make_inner_json(const compilation_context& ct
 			nl.emplace_back(n);
 	}
 	return ret;
+}
+
+boost::json::value ix3_node_base::make_meta_json(const compilation_context& ctx) const
+{
+	return boost::json::value{};
 }
 
 std::pmr::string ix3_node_base::cvt_inner_name(gen_utils::name_conversion to) const

@@ -21,9 +21,12 @@ using ix3::utils::details::camel_case_as_title;
 
 std::int64_t ix3::utils::details::splash_version(const ast::meta::version& v)
 {
-	const auto& a = v.major_v;
-	const auto& b = v.minor_v;
-	return a >= b ? a * a + a + b : a + b * b;
+	return splash_version(v.major_v, v.minor_v);
+}
+
+std::int64_t ix3::utils::details::splash_version(std::int64_t a, std::int64_t i)
+{
+	return a >= i ? a * a + a + i : a + i * i;
 }
 
 std::pmr::string camel_case_as_title::cvt_inner_name(

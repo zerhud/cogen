@@ -15,6 +15,7 @@
 namespace ix3::utils::details {
 
 std::int64_t splash_version(const ast::meta::version& v);
+std::int64_t splash_version(std::int64_t a, std::int64_t i);
 
 template<typename Ast>
 class ast_node : virtual public ix3_node_base {
@@ -24,6 +25,30 @@ protected:
 		boost::json::array ret;
 		for (auto& n:obj) ret.emplace_back(n);
 		return ret;
+	}
+	boost::json::value ast_to_json(const ix3::ast::meta::version& obj) const {
+		boost::json::object ret;
+		ret["major"] = obj.major_v;
+		ret["minor"] = obj.minor_v;
+		return ret;
+	}
+
+	boost::json::value make_meta_json(const compilation_context& ctx) const
+	{
+		if constexpr (!requires{ ast.meta_params; } )
+			return ix3_node_base::make_meta_json(ctx);
+		else {
+			if(ast.meta_params.cnt.empty()) return ix3_node_base::make_meta_json(ctx);
+			boost::json::object ret;
+			for(auto& mp:ast.meta_params.cnt) {
+				if(auto* dep = boost::get<ast::meta::depricated>(&mp); dep) {
+					auto& dep_obj = ret["depricated"].emplace_object();
+					dep_obj["msg"] = dep->message;
+					dep_obj["since"] = ast_to_json(dep->since);
+				}
+			}
+			return ret.empty() ? ix3_node_base::make_meta_json(ctx) : ret;
+		}
 	}
 
 public:

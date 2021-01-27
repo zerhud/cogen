@@ -10,6 +10,7 @@
 
 #include <vector>
 #include "common_utils/input/tree.hpp"
+#include "ast/meta.hpp"
 
 namespace ix3::utils::details {
 
@@ -45,6 +46,7 @@ public:
 
 	[[nodiscard]] std::pmr::vector<const ix3_node_base*> children(
 			const ix3_node_base& par) const ;
+	ix3::ast::meta::version cur_ver(const ix3_node_base& cur) const ;
 
 	const ix3_compiler& compiling_aspect() const ;
 
@@ -71,6 +73,7 @@ public:
 	virtual std::pmr::string cvt_inner_name(gen_utils::name_conversion to) const ;
 protected:
 	boost::json::object make_inner_json(const compilation_context& ctx) const;
+	virtual boost::json::value make_meta_json(const compilation_context& ctx) const ;
 };
 
 } // namespace ix3::utils::details {

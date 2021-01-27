@@ -425,8 +425,7 @@ BOOST_AUTO_TEST_CASE(interface)
 	BOOST_TEST(e->required_links().size() == 0);
 	BOOST_TEST(e->link_condition() == "ix3"sv);
 
-	BOOST_TEST(make_json(*e, tree) == boost::json::parse(
-	               R"({
+	BOOST_TEST(make_json(*e, tree) == R"({
 	                 "type":"interface","name":"bar_baz", "orig_name":"bar_baz",
 	                 "ex":true, "rinvert":false,
 	                 "ctors":[ {"type":"ctor", "params":[{
@@ -443,8 +442,36 @@ BOOST_AUTO_TEST_CASE(interface)
 	                    "type":"function_parameter",
 	                    "req":true }]
 	                 } ]
-	               })"));
+	               })"_bj);
 	check_naming(*e, tree, {"BarBaz"s, "BarBaz"s, "bar_baz"s});
+}
+BOOST_AUTO_TEST_CASE(meta)
+{
+	auto ast = txt::parse(txt::file_content,
+	                      "module mod1 v1.1:\n"
+			      "@v1.2\n @depricated v1.2 (\"test\")\n"
+	                      "interface bar_baz +ex { "
+	                        "constructor(+i8 a); "
+	                        "i8 foo(+i9 b) const; }\n"
+	                      "@depricated v1.3 (\"no\")\n"
+	                      "#doc string\n"
+	                      "enum z{o}"sv);
+	gen_utils::tree tree = to_generic_ast()(ast.modules);
+	BOOST_TEST(tree.children(*tree.children(tree.root()).at(0)).size()==1);
+	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	BOOST_TEST(tree.children(*mod).size()==2);
+
+	BOOST_TEST(*mod->version() == ix3::utils::details::splash_version(1,1));
+
+	auto z = tree.children(*mod).at(1);
+	BOOST_TEST(z->name() == "z");
+
+	auto bar_baz = tree.children(*mod).at(0);
+	BOOST_TEST(bar_baz->name() == "bar_baz");
+	BOOST_TEST(*bar_baz->version() == ix3::utils::details::splash_version(1,2));
+
+	BOOST_TEST(make_json(*bar_baz, tree).as_object()["meta"] ==
+			R"({"depricated":{"msg":"test","since":{"major":1,"minor":2}}})"_bj);
 }
 BOOST_AUTO_TEST_CASE(pop_parent)
 {
