@@ -154,6 +154,48 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	BOOST_TEST(r3[1].cond == "cond_child2");
 	BOOST_TEST(r3[1].cfg.naming.size() == 0);
 }
+BOOST_FIXTURE_TEST_CASE(all_includes, trees_fixture)
+{
+	gen_utils::input fdata1, fdata2;
+	auto t1_child1 = gen_utils_mocks::make_node(
+	            11, std::nullopt, std::nullopt, "a");
+	auto t1_child2 = gen_utils_mocks::make_node(
+	            12, std::nullopt, std::nullopt, "b");
+	auto t2_child1 = gen_utils_mocks::make_node(
+	            12, std::nullopt, std::nullopt, "not_used", {{"a"}, {"b"}});
+	auto t2_child2 = gen_utils_mocks::make_node(
+	            12, std::nullopt, std::nullopt, "b");
+	t1().add(t1().root(), t1_child1);
+	t1().add(t1().root(), t1_child2);
+	t2().add(t2().root(), t2_child1);
+	t2().add(t2().root(), t2_child2);
+	fdata1.add(t1());
+	fdata2.add(t2());
+	fdata1.conf().naming.clear();
+
+	MOCK_EXPECT(t1_child1->link_condition).returns("cond_child1"sv);
+	MOCK_EXPECT(t1_child2->link_condition).returns("cond_child2"sv);
+	MOCK_EXPECT(t2_child2->link_condition).returns("cond_child2_t2"sv);
+	MOCK_EXPECT(t1_child1->imports_modification).returns(std::nullopt);
+	MOCK_EXPECT(t1_child2->imports_modification)
+	        .returns(gen_utils::import_file{true, "sysfile"});
+	MOCK_EXPECT(t2_child2->imports_modification).returns(std::nullopt);
+
+	imports_manager mng1;
+	mng1("f1", fdata1)("f2", fdata2).build();
+
+	auto incs = mng1.all_includes(fdata2);
+	BOOST_TEST(incs.size() == 2);
+	BOOST_TEST(incs["cond_child1"].size() == 1);
+	BOOST_TEST(incs["cond_child2"].size() == 1);
+
+	BOOST_TEST(incs["cond_child1"].at(0).sys == false);
+	BOOST_TEST(incs["cond_child1"].at(0).name == "f1");
+
+	BOOST_TEST(incs["cond_child2"].at(0).sys == true);
+	BOOST_TEST(incs["cond_child2"].at(0).name == "sysfile");
+
+}
 BOOST_AUTO_TEST_SUITE_END() // imports_manager_test
 
 BOOST_AUTO_TEST_SUITE_END() // input

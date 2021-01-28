@@ -55,6 +55,9 @@ public:
 	std::pmr::vector<import_info> required_for(const tree& file_data) const ;
 	std::pmr::vector<import_info> required_for_incs(const input& file_data) const ;
 	std::pmr::vector<std::pmr::string> self_matched(const input& file_data) const ;
+
+	std::pmr::map<std::pmr::string, std::pmr::vector<import_file>>
+		all_includes(const input& file_data) const ;
 };
 
 } // namespace gen_utils
