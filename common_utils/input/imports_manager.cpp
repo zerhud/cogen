@@ -15,8 +15,7 @@ using gen_utils::import_info;
 using gen_utils::imports_manager;
 
 template< typename C, typename F>
-auto
-operator | (C && c, F f)
+auto operator | (C && c, F f)
 {
 	return f(c);
 }
@@ -71,7 +70,14 @@ std::pmr::vector<import_info> imports_manager::required_for(
 std::pmr::vector<import_info> imports_manager::required_for_incs(
         const input& file_data) const
 {
-	return required_for(file_data) | unique;
+	auto ret = required_for(file_data) | unique;
+	for(auto& [file, data]:all_input) if(data==&file_data) {
+		auto pos = std::find_if(
+				ret.begin(),ret.end(),
+				[&file](auto& i){return i.file.name==file;});
+		if(pos!=ret.end()) ret.erase(pos);
+	}
+	return ret;
 }
 
 std::pmr::vector<import_info> imports_manager::required_for_scan(

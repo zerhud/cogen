@@ -10,9 +10,6 @@
 <= render.decl_meta_params(module) =>
 namespace <= render.gen_namespace_name(module, mod_ver) => {
 	<%- for obj in mod_ver.content %>
------
-<= obj =>
------
 	<% if obj.type == "function" -%><= render.function_header(obj) =>;
 	<%- elif obj.type == "enum" -%>
 	<= render.decl_meta_params(obj) =>

@@ -4,9 +4,11 @@ string foo(+i8 p);
 i64 bar(+list<string> p1);
 enum etest +auto_io { one, two }
 
+# doc string
 interface i +ex {
 }
 
+@v 1.1 @depricated v1.1 ("test depricated and version")
 record some_rec {
 	+i64 filed1;
 }
