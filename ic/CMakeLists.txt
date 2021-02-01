@@ -32,7 +32,7 @@ if(ENABLE_TESTS)
 		source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/${path}" FILES ${src_list})
 		target_link_libraries(ic_${tname}_test PRIVATE ${PROJECT_NAME} ${lib} ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
 		target_include_directories(ic_${tname}_test SYSTEM PRIVATE ${turtle} ${Boost_INCLUDE_DIR} "${CMAKE_CURRENT_LIST_DIR}/${path}")
-		add_test(NAME ic_${tname} COMMAND ic_${tname}_test)
+		add_test(NAME ic_${tname} COMMAND ic_${tname}_test --random)
 		unset(src_list)
 	endmacro()
 

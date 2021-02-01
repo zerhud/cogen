@@ -80,9 +80,11 @@ struct single_gen_part_fixture {
 	{
 		if(!data_val) data_val = "{\"t1_dsl\":{ }}"_bj;
 		std::stringstream json;
-		json << "{\"includes\":{\"matched\":[";
-		for(auto& i:mincs) json << '"' << i << '"' << ',';
-		json << "], \"required\":{";
+		json << "{\"includes\":{";
+		if(!mincs.empty()) json << "\"self\":[";
+		for(auto& i:mincs) json << "{\"sys\":false,\"file\":\"" << i << "\"},";
+		if(!mincs.empty()) json << "] ";
+		if(!mincs.empty() && !rincs.empty()) json << ',';
 		for(auto& [cond, incs]:rincs) {
 			json << std::quoted(cond) << ":[";
 			for(auto& i:incs) json
@@ -90,10 +92,12 @@ struct single_gen_part_fixture {
 			        << ",\"sys\":false},";
 			json << "],";
 		}
-		json << "}}, \"data\":" << *data_val << " }";
+		json << "}, \"data\":" << *data_val << " }";
 
 		boost::json::parse_options opts{.allow_trailing_commas=true};
-		return boost::json::parse(json.str(), boost::json::storage_ptr(), opts);
+		auto result = boost::json::parse(json.str(), boost::json::storage_ptr(), opts);
+		std::cout << "nned: " << result << std::endl;
+		return result;
 	}
 };
 
@@ -167,7 +171,7 @@ BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "f.cpp");
 	sg(ctx, all_data);
 
-	auto mincs_data = make_result_json({"v1", "v2"}, {});
+	boost::json::value mincs_data = make_result_json({"v1", "v2"}, {});
 	ctx.cfg_part.links.emplace_back("a");
 	MOCK_EXPECT(prov->generate).once().with("t", mincs_data, "f.cpp");
 	ctx.generated["b"] = sg(ctx, all_data);
@@ -217,10 +221,10 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	ctx.cfg_part.links.emplace_back("part1");
 	MOCK_EXPECT(prov->generate).once()
 	        .with("t", make_result_json(
-				{},
-				{{"cond1", {"v1", "vector"}}},
-				"{\"t2_dsl\":{}}"_bj),
-			"file");
+	            {},
+	            {{"cond1", {"vector", "v1"}}},
+	            "{\"t2_dsl\":{}}"_bj),
+	        "file");
 	ctx.generated["part2"] = sg(ctx, other_data);
 }
 BOOST_AUTO_TEST_SUITE_END() // single_gen_part

@@ -89,23 +89,20 @@ boost::json::value single_gen_part::make_json(
 	add_includes_to_result(result, data, imports);
 	return result;
 }
+
 void single_gen_part::add_includes_to_result(
         boost::json::object& result,
         const gen_utils::input& data,
         const gen_utils::imports_manager& imports) const
 {
 	boost::json::object& incs = result["includes"].emplace_object();
-	boost::json::array& mincs = incs["matched"].emplace_array();
-	for(auto& l:imports.self_matched(data))
-		mincs.emplace_back(l);
-	boost::json::object& rincs = incs["required"].emplace_object();
-	for(auto& r:imports.required_for_incs(data)) {
-		boost::json::array* rcond = nullptr;
-		if(rincs.find(r.cond) == rincs.end())
-			rcond = &rincs[r.cond].emplace_array();
-		else rcond = &rincs[r.cond].as_array();
-		auto& obj = rcond->emplace_back(boost::json::object{}).as_object();
-		obj["file"] = r.file.name;
-		obj["sys"] = r.file.sys;
+	for(auto& [cond, files]:imports.all_includes(data)) {
+		boost::json::array& far = incs[cond].emplace_array();
+		for(auto& f:files) {
+			boost::json::object fi;
+			fi["file"] = f.name;
+			fi["sys"] = f.sys;
+			far.emplace_back(std::move(fi));
+		}
 	}
 }

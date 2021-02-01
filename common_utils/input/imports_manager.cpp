@@ -138,3 +138,15 @@ std::pmr::vector<import_info> imports_manager::unique(
 	src.erase(f,t);
 	return src;
 }
+#include <iostream>
+std::pmr::map<std::pmr::string, std::pmr::vector<gen_utils::import_file>>
+	imports_manager::all_includes(const input& file_data) const
+{
+	std::pmr::map<std::pmr::string, std::pmr::vector<import_file>> ret;
+	auto self = self_matched(file_data);
+	for(auto& s:self) ret["self"].emplace_back(import_file{false, s});
+	auto req = required_for_incs(file_data);
+	for(auto& r:req) ret[r.cond].emplace_back(r.file);
+	std::cout << "we have " << ret.size() << std::endl;
+	return ret;
+}
