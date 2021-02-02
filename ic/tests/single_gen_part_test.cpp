@@ -96,7 +96,6 @@ struct single_gen_part_fixture {
 
 		boost::json::parse_options opts{.allow_trailing_commas=true};
 		auto result = boost::json::parse(json.str(), boost::json::storage_ptr(), opts);
-		std::cout << "nned: " << result << std::endl;
 		return result;
 	}
 };
@@ -222,7 +221,7 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	MOCK_EXPECT(prov->generate).once()
 	        .with("t", make_result_json(
 	            {},
-	            {{"cond1", {"vector", "v1"}}},
+	            {{"cond1", {"v1", "vector"}}},
 	            "{\"t2_dsl\":{}}"_bj),
 	        "file");
 	ctx.generated["part2"] = sg(ctx, other_data);
