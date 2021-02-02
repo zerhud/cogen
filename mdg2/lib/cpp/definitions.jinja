@@ -3,11 +3,35 @@
 // this file contains realization of helpers function
 
 #include <cassert>
-<= cdata =>
 <= render.includes(cdata.includes) =>
 
-<% for module in cdata.mods -%>
-// module <= module.namespace =>
-<% for obj in module.content if obj.type == "enumeration" and obj.gen_io %><= render.enum(obj, module, cdata) =><% endfor %>
+
+<% for module in cdata.data.ix3 -%>
+<% for mod_ver in module.vers -%>
+
+// module <= module.name => v<=mod_ver.major=>.<=mod_ver.minor=>
+
+<% for obj in mod_ver.content if obj.type == "enum" and obj.auto_io %>
+<% set nn = render.gen_namespace_name(module, mod_ver) -%>
+std::string <= nn =>::to_string(<=nn=>::<=obj.name=> v)
+{
+	<%- for i in  obj.members %>
+	if(v==<=obj.name=>::<=i.name=>) return "<=i.io=>";
+	<%-endfor%>
+	assert(false);
+	return "";
+}
+std::wstring <= nn =>::to_wstring(<=nn=>::<=obj.name=> v)
+{
+	<%- for i in  obj.members %>
+	if(v==<=obj.name=>::<=i.name=>) return L"<=i.io=>";
+	<%-endfor%>
+	assert(false);
+	return L"";
+}
+
+<% endfor %>
+
+<% endfor %>
 <% endfor %>
 
