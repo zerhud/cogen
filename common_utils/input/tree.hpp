@@ -84,7 +84,7 @@ public:
 	[[nodiscard]] std::uint64_t root_version() const ;
 	void root_version(std::uint64_t v) ;
 	[[nodiscard]] std::uint64_t next_min_version() const ;
-	const data_node& parent(const data_node& child, const copy_condition cond=copy_condition{}) const ;
+	const data_node* parent(const data_node& child, const copy_condition cond=copy_condition{}) const ;
 
 	[[nodiscard]] std::pmr::vector<std::pmr::string> var_name_list() const ;
 	[[nodiscard]] std::pmr::vector<std::pmr::string> var_value_list(std::string_view name) const ;

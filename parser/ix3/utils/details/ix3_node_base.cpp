@@ -72,12 +72,12 @@ std::pmr::vector<const ix3_node_base *> compilation_context::children(
 ix3::ast::meta::version compilation_context::cur_ver(const ix3_node_base& cur) const
 {
 	if(cur.ast_ver()) return *cur.ast_ver();
-	const auto& par = container->parent(cur, [](const auto& n){
-				return n.version().has_value();
-			});
-	auto& ipar = static_cast<const ix3_node_base&>(par);
-	assert(ipar.ast_ver().has_value());
-	return *ipar.ast_ver();
+	const auto* par = container->parent(cur, [](const auto& n){
+				return n.version().has_value(); });
+	const auto* ipar = static_cast<const ix3_node_base*>(par);
+	assert(ipar != nullptr);
+	assert(ipar->ast_ver().has_value());
+	return *ipar->ast_ver();
 }
 
 std::optional<gen_utils::variable> ix3_node_base::node_var() const

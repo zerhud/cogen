@@ -165,10 +165,9 @@ std::uint64_t tree::next_min_version() const
 	return root_ver;
 }
 
-const data_node& tree::parent(const data_node& child, const copy_condition cond) const
+const data_node* tree::parent(const data_node& child, const copy_condition cond) const
 {
-	if(&child == &root())
-		throw std::runtime_error("no root parent exists");
+	if(&child == &root()) return nullptr;
 	for(auto& e:edges) {
 		auto cpos = std::find_if(
 				e.children.begin(), e.children.end(),
@@ -177,9 +176,9 @@ const data_node& tree::parent(const data_node& child, const copy_condition cond)
 				);
 		if(cpos == e.children.end()) continue;
 		if( cond ) return cond(*e.parent)
-			? *e.parent
+			? e.parent
 			: parent(*e.parent, cond);
-		return *e.parent;
+		return e.parent;
 	}
 	throw std::runtime_error("no such node exists");
 }
