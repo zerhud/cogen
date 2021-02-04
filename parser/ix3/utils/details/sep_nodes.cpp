@@ -46,6 +46,10 @@ boost::json::value module_node::make_json(const compilation_context& ctx) const
 	ctx.compiling_aspect().aspect(*this, ret);
 	return ret;
 }
+boost::json::value module_node::make_linked_json(const compilation_context& ctx) const
+{
+	return make_inner_json(ctx);
+}
 
 
 module_version_node::module_version_node(ast::module v) : val(std::move(v))
@@ -63,17 +67,27 @@ std::optional<gen_utils::variable> module_version_node::node_var() const
 {
 	return gen_utils::variable{"ver", str_val};
 }
-boost::json::value module_version_node::make_json(const compilation_context& ctx) const
+boost::json::object module_version_node::common_json() const
 {
 	boost::json::object ret;
-	ret["type"] = "version";
 	ret["major"] = val.version.major_v;
 	ret["minor"] = val.version.minor_v;
+	return ret;
+}
+boost::json::value module_version_node::make_json(const compilation_context& ctx) const
+{
+	boost::json::object ret = common_json();
+	ret["type"] = "version";
 	boost::json::array& content=ret["content"].emplace_array();
 	for(auto& child:ctx.children(*this))
 		content.emplace_back(child->make_json(ctx));
 	ctx.compiling_aspect().aspect(*this, ret);
 	return ret;
+}
+boost::json::value module_version_node::make_linked_json(
+        const compilation_context&) const
+{
+	return common_json();
 }
 std::optional<ix3::ast::meta::version> module_version_node::ast_ver() const
 {

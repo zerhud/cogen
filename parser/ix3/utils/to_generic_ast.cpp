@@ -34,7 +34,9 @@ boost::json::value ix3_manager::to_json(
 	assert(root != nullptr);
 	details::cpp_compiler compiler{&ctx.cfg};
 	details::compilation_context inner_ctx( &container, &compiler, &ctx );
-	return root->make_json(inner_ctx);
+	return ctx.linked_to
+	        ? root->make_linked_json(inner_ctx)
+	        : root->make_json(inner_ctx);
 }
 
 to_generic_ast::to_generic_ast()

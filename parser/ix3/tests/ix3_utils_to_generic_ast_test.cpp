@@ -164,6 +164,14 @@ BOOST_AUTO_TEST_CASE(records)
 	                 {"orig_name":"f2","name":"f2","type":"record_item","req":true,"param_t":
 	                   {"type":"type","name":["int"],"subs":[]}}
 	               ]})"_bj);
+
+	gen_utils::compilation_context ctx;
+	ctx.linked_to = rec;
+	BOOST_TEST(tree.to_json(ctx) ==
+	           R"({"type":"record","name":"bar_baz", "orig_name":"bar_baz",
+	           "mod_ver":{"major":1,"minor":1},
+	           "mod":{"orig_name":"mod1","name":"mod1"}})"_bj);
+
 	check_naming(*rec, tree, {"BarBaz"s, "BarBaz"s, "bar_baz"s});
 }
 BOOST_AUTO_TEST_CASE(functions)
@@ -224,6 +232,10 @@ BOOST_AUTO_TEST_CASE(functions)
 	                 "type":"function_parameter",
 	                 "req":true
 	               })"_bj);
+
+	gen_utils::compilation_context ctx;
+	ctx.linked_to = bar;
+	BOOST_CHECK_THROW((void)tree.to_json(ctx), std::logic_error);
 
 	check_naming(*bar, tree, {"BarBaz"s, "barBaz"s, "bar_baz"s});
 }
@@ -385,6 +397,13 @@ BOOST_AUTO_TEST_CASE(enums)
 	                 ]
 	               })"));
 
+	gen_utils::compilation_context ctx;
+	ctx.linked_to = e;
+	BOOST_TEST(tree.to_json(ctx) ==
+	           R"({"type":"enum","name":"bar_baz", "orig_name":"bar_baz",
+	           "mod_ver":{"major":1,"minor":1},
+	           "mod":{"orig_name":"mod1","name":"mod1"}})"_bj);
+
 	check_naming(*e, tree, {"BarBaz"s, "BarBaz"s, "bar_baz"s});
 }
 BOOST_AUTO_TEST_CASE(places)
@@ -443,6 +462,14 @@ BOOST_AUTO_TEST_CASE(interface)
 	                    "req":true }]
 	                 } ]
 	               })"_bj);
+
+	gen_utils::compilation_context ctx;
+	ctx.linked_to = e;
+	BOOST_TEST(tree.to_json(ctx) ==
+	           R"({"type":"interface","name":"bar_baz", "orig_name":"bar_baz",
+	           "mod_ver":{"major":1,"minor":1},
+	           "mod":{"orig_name":"mod1","name":"mod1"}})"_bj);
+
 	check_naming(*e, tree, {"BarBaz"s, "BarBaz"s, "bar_baz"s});
 }
 BOOST_AUTO_TEST_CASE(meta)
@@ -518,8 +545,9 @@ BOOST_AUTO_TEST_CASE(lelf_links)
 	                    "type":"type","name":["mod1","inter"],"subs":[],
 	                    "ix3":{"type":"interface",
 	                        "orig_name":"inter", "name":"Inter",
-	                        "ex":false,"rinvert":false,"ctors":[],"funcs":[]}
-	                    })"_bj);
+	                        "mod_ver":{"major":1,"minor":1},
+	                        "mod":{"orig_name":"mod1","name":"Mod1"}
+	                    } })"_bj);
 }
 BOOST_AUTO_TEST_SUITE_END() // gain_to_generic_ast
 
@@ -537,6 +565,11 @@ BOOST_AUTO_TEST_CASE(to_json)
 		std::string_view name() const override { return "fake_ix3_node"sv; }
 		std::optional<std::uint64_t> version() const override { return std::nullopt; }
 		boost::json::value make_json(const ix3::utils::details::compilation_context&) const override
+		{
+			BOOST_FAIL("make_linked_json should be called");
+			return js;
+		}
+		boost::json::value make_linked_json(const ix3::utils::details::compilation_context&) const override
 		{
 			return js;
 		}

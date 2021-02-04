@@ -123,6 +123,7 @@ struct fnc_param_node : ast_node<ast::function_parameter> {
 struct record_node : camel_case_as_title, ast_node<ast::record> {
 	record_node(ast::record n);
 	boost::json::value make_json(const compilation_context& ctx) const override ;
+	boost::json::value make_linked_json(const compilation_context& ctx) const override ;
 };
 
 struct record_field : ast_node<ast::record_item> {
@@ -133,11 +134,13 @@ struct record_field : ast_node<ast::record_item> {
 struct enums : camel_case_as_title, ast_node<ast::enumeration> {
 	enums(ast::enumeration e);
 	boost::json::value make_json(const compilation_context& ctx) const override ;
+	boost::json::value make_linked_json(const compilation_context& ctx) const override ;
 };
 
 struct interface : camel_case_as_title, ast_node<ast::interface> {
 	interface(ast::interface i);
 	boost::json::value make_json(const compilation_context& ctx) const override ;
+	boost::json::value make_linked_json(const compilation_context& ctx) const override ;
 	std::string_view link_condition() const override ;
 };
 

@@ -118,6 +118,19 @@ boost::json::value record_node::make_json(const compilation_context& ctx) const
 	return ret;
 }
 
+boost::json::value record_node::make_linked_json(const compilation_context& ctx) const
+{
+	auto ret = make_inner_json(ctx);
+	ret["type"] = "record";
+	auto mod = ctx.mod_node(*this);
+	assert(mod);
+	ret["mod"] = mod->make_linked_json(ctx);
+	auto ver = ctx.mod_ver(*this);
+	assert(ver);
+	ret["mod_ver"] = ver->make_linked_json(ctx);
+	return ret;
+}
+
 record_field::record_field(ast::record_item i) : ast_node(std::move(i)) {}
 
 boost::json::value record_field::make_json(const compilation_context& ctx) const
@@ -148,6 +161,19 @@ boost::json::value enums::make_json(const compilation_context& ctx) const
 	return ret;
 }
 
+boost::json::value enums::make_linked_json(const compilation_context& ctx) const
+{
+	boost::json::object ret = ast_node::make_inner_json(ctx);
+	ret["type"]="enum";
+	auto mod = ctx.mod_node(*this);
+	assert(mod);
+	ret["mod"] = mod->make_linked_json(ctx);
+	auto ver = ctx.mod_ver(*this);
+	assert(ver);
+	ret["mod_ver"] = ver->make_linked_json(ctx);
+	return ret;
+}
+
 interface::interface(ast::interface i) : ast_node(std::move(i)) {}
 boost::json::value interface::make_json(const compilation_context& ctx) const
 {
@@ -164,6 +190,18 @@ boost::json::value interface::make_json(const compilation_context& ctx) const
 	}
 	ret["ctors"] = std::move(ctors);
 	ret["funcs"] = std::move(funcs);
+	return ret;
+}
+boost::json::value interface::make_linked_json(const compilation_context& ctx) const
+{
+	auto ret = make_inner_json(ctx);
+	ret["type"] = "interface";
+	auto mod = ctx.mod_node(*this);
+	assert(mod);
+	ret["mod"] = mod->make_linked_json(ctx);
+	auto ver = ctx.mod_ver(*this);
+	assert(ver);
+	ret["mod_ver"] = ver->make_linked_json(ctx);
 	return ret;
 }
 std::string_view interface::link_condition() const

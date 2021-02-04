@@ -46,6 +46,9 @@ public:
 
 	[[nodiscard]] std::pmr::vector<const ix3_node_base*> children(
 			const ix3_node_base& par) const ;
+	[[nodiscard]] const ix3_node_base* mod_ver(const ix3_node_base& n) const ;
+	[[nodiscard]] const ix3_node_base* mod_node(const ix3_node_base& n) const ;
+
 	ix3::ast::meta::version cur_ver(const ix3_node_base& cur) const ;
 
 	const ix3_compiler& compiling_aspect() const ;
@@ -69,6 +72,8 @@ public:
 
 	[[nodiscard]]
 	virtual boost::json::value make_json(const compilation_context& ctx) const =0 ;
+	[[nodiscard]]
+	virtual boost::json::value make_linked_json(const compilation_context& ctx) const ;
 	[[nodiscard]]
 	virtual std::pmr::string cvt_inner_name(gen_utils::name_conversion to) const ;
 	virtual std::optional<ast::meta::version> ast_ver() const ;

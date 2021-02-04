@@ -9,15 +9,12 @@
 <%- endmacro %>
 
 <% macro ix3_type(obj) -%>
-ix3_type
+<= gen_namespace_name(obj.mod, obj.mod_ver) =>::<= obj.name =>_ptr
 <%- endmacro %>
 
 <%- macro function_header(obj) -%>
 <= decl_meta_params(obj) -=>
 <= decl_depricated(obj) -=>
---
-<= obj.return =>
---
 <= "static " if obj.static =><=- type(obj.return) => <= obj.name =>(<= fparam(obj.params) =>)<= " const" if obj.mutable == False =>
 <%- endmacro %>
 

@@ -31,6 +31,7 @@ struct module_node : ix3_node_base {
 	std::optional<gen_utils::variable> node_var() const override ;
 
 	boost::json::value make_json(const compilation_context& ctx) const override;
+	boost::json::value make_linked_json(const compilation_context& ctx) const override ;
 };
 
 struct module_version_node : ix3_node_base {
@@ -41,8 +42,11 @@ struct module_version_node : ix3_node_base {
 	std::string_view name() const override ;
 	std::optional<std::uint64_t> version() const override ;
 	std::optional<gen_utils::variable> node_var() const override ;
-	boost::json::value make_json(const compilation_context& ctx) const override;
 	std::optional<ast::meta::version> ast_ver() const override ;
+
+	boost::json::value make_json(const compilation_context& ctx) const override;
+	boost::json::value make_linked_json(const compilation_context& ctx) const override ;
+	boost::json::object common_json() const ;
 };
 
 
