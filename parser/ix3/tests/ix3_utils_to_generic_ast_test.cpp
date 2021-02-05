@@ -143,6 +143,7 @@ BOOST_AUTO_TEST_CASE(records)
 	auto rec = tree.children(*mod).at(0);
 	BOOST_TEST(rec->name()=="bar_baz");
 	BOOST_CHECK(rec->version().value() == mod->version().value());
+	BOOST_TEST(rec->link_condition() == "ix3");
 
 	auto rec_fields = tree.children(*rec);
 	BOOST_TEST(rec_fields.size() == 2);
@@ -386,6 +387,7 @@ BOOST_AUTO_TEST_CASE(enums)
 	BOOST_TEST(e->name()=="bar_baz");
 	BOOST_CHECK(!e->version().has_value());
 	BOOST_TEST(e->required_links().size() == 0);
+	BOOST_TEST(e->link_condition() == "ix3"sv);
 
 	BOOST_TEST(make_json(*e, tree) == boost::json::parse(
 	               R"({

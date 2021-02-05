@@ -66,7 +66,7 @@ public:
 	[[nodiscard]]
 	std::optional<gen_utils::variable> node_var() const override ;
 	std::pmr::vector<gen_utils::name_t> required_links() const override ;
-	std::string_view link_condition() const override {return "";}
+	std::string_view link_condition() const override ;
 	std::optional<gen_utils::import_file> imports_modification() const override { return std::nullopt; }
 	virtual std::string_view inner_name() const {return name();}
 

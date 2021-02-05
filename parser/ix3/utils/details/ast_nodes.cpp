@@ -204,10 +204,6 @@ boost::json::value interface::make_linked_json(const compilation_context& ctx) c
 	ret["mod_ver"] = ver->make_linked_json(ctx);
 	return ret;
 }
-std::string_view interface::link_condition() const
-{
-	return "ix3";
-}
 
 
 ctor_node::ctor_node(ast::constructor n) : ast_node(std::move(n)) {}

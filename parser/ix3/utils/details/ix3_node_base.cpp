@@ -107,6 +107,11 @@ std::pmr::vector<gen_utils::name_t> ix3_node_base::required_links() const
 	return {};
 }
 
+std::string_view ix3_node_base::link_condition() const
+{
+	return "ix3";
+}
+
 boost::json::value ix3_node_base::make_linked_json(const compilation_context& ctx) const
 {
 	throw std::logic_error("the node shold not be linked (name: "s + std::string(name()) + ")"s);

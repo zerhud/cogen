@@ -43,6 +43,7 @@ copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/mdgwr.py" "${CMAKE_CURRENT_BINARY_DIR}/m
 
 # generate ix3 example file
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/examples/ix3_example" "${build_examples_dir}/ix3_example")
+copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/examples/ix3_example_inc" "${build_examples_dir}/ix3_example_inc")
 
 # generators
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/generators/cpp_decl.info" "${build_generators_dir}/cpp_decl.info")

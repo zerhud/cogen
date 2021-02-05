@@ -1,0 +1,8 @@
+module inc_mod v0.0:
+
+record in_other_file {
+	+i32 field;
+}
+
+interface i_in_other {
+}

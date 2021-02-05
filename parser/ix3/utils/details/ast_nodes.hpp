@@ -141,7 +141,6 @@ struct interface : camel_case_as_title, ast_node<ast::interface> {
 	interface(ast::interface i);
 	boost::json::value make_json(const compilation_context& ctx) const override ;
 	boost::json::value make_linked_json(const compilation_context& ctx) const override ;
-	std::string_view link_condition() const override ;
 };
 
 } // namespace ix3::utils::details

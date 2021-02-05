@@ -1,3 +1,5 @@
+include "ix3_example_inc"
+
 module mod v1.0:
 
 string foo(+i8 p);
@@ -16,3 +18,5 @@ record some_rec {
 module test_two v2.0:
 
 mod.i fnc();
+
+inc_mod.in_other_file other_fnc();
