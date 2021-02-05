@@ -44,6 +44,11 @@ std::filesystem::path path_config::etc_dir() const
 #endif
 }
 
+void path_config::add_input_data(std::filesystem::path p)
+{
+	data_pathes.add(p);
+}
+
 std::filesystem::path path_config::input_data(const std::filesystem::path& fn) const
 {
 	return data_pathes(fn);

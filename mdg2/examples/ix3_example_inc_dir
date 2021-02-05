@@ -1,0 +1,3 @@
+module mod_in_dir v1.1:
+
+i8 some_fnc_in_dir();

@@ -16,13 +16,7 @@ using namespace std::literals;
 
 ix3::parser::parser() noexcept =default ;
 
-ix3::parser::parser(std::vector<std::filesystem::path> incs)
-	: includes_dir(std::move(incs))
-{
-	for(auto& id:includes_dir) {
-		if(id.is_relative()) id = std::filesystem::absolute(id);
-	}
-}
+ix3::parser::parser(include_solver is) : solve_inc(std::move(is)) {}
 
 ix3::ast::file_content ix3::parser::parse_stream(std::istream& input) const
 {
@@ -95,11 +89,7 @@ std::filesystem::path ix3::parser::search_file(const std::filesystem::path& f) c
 		if(std::filesystem::exists(cur_file)) return cur_file;
 	}
 
-	for(const auto& i:includes_dir) {
-		assert(i.is_absolute());
-		auto cur_file = i/f;
-		if(std::filesystem::exists(cur_file)) return cur_file;
-	}
+	if(solve_inc) return solve_inc(f);
 
 	throw std::runtime_error("file " + f.string() + " not found");
 }

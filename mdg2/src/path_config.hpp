@@ -29,6 +29,8 @@ class path_config final {
 public:
 	path_config(const std::filesystem::path& exe_path);
 
+	void add_input_data(std::filesystem::path p);
+
 	std::filesystem::path input_data(const std::filesystem::path& fn) const ;
 	std::filesystem::path generator(const std::filesystem::path& fn) const ;
 	std::filesystem::path library(const std::filesystem::path& fn) const ;

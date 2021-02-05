@@ -1,4 +1,5 @@
 include "ix3_example_inc"
+include "ix3_example_inc_dir"
 
 module mod v1.0:
 

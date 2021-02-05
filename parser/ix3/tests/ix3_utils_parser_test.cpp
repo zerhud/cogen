@@ -50,12 +50,19 @@ BOOST_AUTO_TEST_CASE(once_for_file)
 }
 BOOST_AUTO_TEST_CASE(search_for_includes)
 {
-	std::stringstream data1, data2;
+	std::stringstream data1;
 	data1 << "include \"2\"\nmodule mod1 v1.1: i64 foo();";
-	data2 << "module mod2 v1.1: i64 foo();";
 
-	ix3::parser p;
-	p.parse(data1, "1");
+	auto solver = [](const std::filesystem::path& req) {
+		BOOST_TEST(req=="2");
+		return std::filesystem::path("/tmp/ix3_test_input_file_2");
+	};
+
+	ix3::parser p(solver);
+	BOOST_CHECK_EXCEPTION(p.parse(data1, "1"), std::exception, [](const std::exception& ex){
+		BOOST_TEST(ex.what() == "file /tmp/ix3_test_input_file_2 doesn't exists");
+		return true;
+	});
 }
 BOOST_AUTO_TEST_SUITE_END() // parser
 BOOST_AUTO_TEST_SUITE_END() // utils

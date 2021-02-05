@@ -29,6 +29,7 @@ class executer {
 	void dir_mode() const ;
 	void json_mode(const mdg::ic::ptsetts& setts) const ;
 	void load_inputs() ;
+	void load_inludes() ;
 	boost::property_tree::ptree load_settings() const ;
 public:
 	executer(path_config pc, int argc, char** argv);

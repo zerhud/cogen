@@ -36,18 +36,20 @@ executer::executer(path_config pc, int argc, char** argv)
 void executer::set_options()
 {
 	desc.add_options()
-		("help,h", "produce this help message")
-		("outdir,o", po::value<std::string>()->default_value(""), "directory or file where to output")
-		("generator,g", po::value<std::string>(), "generator (info file)")
-		("gmode,m", po::value<std::string>()->default_value("json"), "generation mode (\"json\" for generate json and \"dir\" to generate files)")
-		("input,i", po::value<std::vector<std::string>>(), "input (foramt like -Iinterface=some_file). use - for read from std input")
-		;
+	    ("help,h", "produce this help message")
+	    ("outdir,o", po::value<std::string>()->default_value(""), "directory or file where to output")
+	    ("generator,g", po::value<std::string>(), "generator (info file)")
+	    ("gmode,m", po::value<std::string>()->default_value("json"), "generation mode (\"json\" for generate json and \"dir\" to generate files)")
+	    ("input,i", po::value<std::vector<std::string>>(), "input (foramt like -iix3=some_file). use - for read from std input")
+	    ("include,I", po::value<std::vector<std::string>>(), "search path for input dsl (common for all inputs)")
+	    ;
 }
 
 int executer::operator()()
 {
 	if(opt_vars.count("help"))
 		print_help(), std::exit(0);
+	load_inludes();
 	load_inputs();
 	mdg::ic::ptsetts setts(load_settings());
 	if(opt_vars["gmode"].as<std::string>()=="json")
@@ -75,7 +77,7 @@ boost::property_tree::ptree executer::load_settings() const
 
 void executer::load_inputs()
 {
-	ix3::parser ix3_loader;
+	ix3::parser ix3_loader([this](const auto& f){return pathes.input_data(f);});
 	std::regex key_val_parser("([0-9a-zA-Z_.]+)(=(.+))?", std::regex::egrep);
 	for(auto& input:opt_vars["input"].as<std::vector<std::string>>()) {
 		std::cmatch m;
@@ -88,6 +90,13 @@ void executer::load_inputs()
 
 	std_types::loader st;
 	user_data.add( st.load_types(pathes.library("standard_types.info")) );
+}
+
+void executer::load_inludes()
+{
+	if(opt_vars.count("include"))
+		for(auto& inc:opt_vars["include"].as<std::vector<std::string>>())
+			pathes.add_input_data(inc);
 }
 
 void executer::dir_mode() const
