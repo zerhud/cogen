@@ -16,6 +16,9 @@ namespace ix3 {
 
 class parser {
 public:
+	using include_solver =
+	    std::function<std::filesystem::path(const std::filesystem::path&)>;
+
 	parser(const parser&) =delete ;
 	parser& operator = (const parser&) =delete ;
 

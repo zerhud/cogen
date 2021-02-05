@@ -49,6 +49,7 @@ void ix3::parser::parse(std::istream& input, std::string fn)
 	std::unique_ptr<char,decltype(frem_fnc)> frem(nullptr,frem_fnc);
 	cur_dir.emplace_back(result.path.parent_path());
 
+	if(already_loaded(result.path)) return;
 	loaded_files.emplace_back(result.path);
 
 	for(auto& i:result.includes) parse(search_file(i.path));
