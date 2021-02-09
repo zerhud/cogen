@@ -22,6 +22,8 @@ class ptsetts final {
 public:
 	ptsetts(boost::property_tree::ptree s);
 
+	boost::property_tree::ptree part_src(std::string_view name) const ;
+
 	std::pmr::vector<std::pmr::string> parts() const ;
 	gen_config part_setts(std::string_view p) const ;
 	gen_utils::tree generic_ast(std::string_view p) const ;

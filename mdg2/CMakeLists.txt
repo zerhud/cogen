@@ -60,7 +60,7 @@ copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cmake/plain.jinja" "${build_lib_dir}
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE
 		${Boost_LIBRARIES}
-		input_configurator ix3 standard_types
+		input_configurator ix3 standard_types builders
 		cppjinja::evaluator cppjinja::loader
 	)
 

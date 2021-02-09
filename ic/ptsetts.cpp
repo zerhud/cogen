@@ -17,6 +17,11 @@ ptsetts::ptsetts(boost::property_tree::ptree s)
 {
 }
 
+boost::property_tree::ptree ptsetts::part_src(std::string_view name) const
+{
+	return setts.get_child("part."s + std::string(name));
+}
+
 std::pmr::vector<std::pmr::string> ptsetts::parts() const
 {
 	std::pmr::vector<std::pmr::string> ret;

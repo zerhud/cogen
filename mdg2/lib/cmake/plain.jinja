@@ -1,14 +1,18 @@
+<% set sd = cdata.data.builders -%>
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
-project(<= cdata.data.ptsetts.project => VERSION <= cdata.data.ptsetts.version => LANGUAGES C CXX)
+----
+<= sd =>
+----
+project(<= sd.project => VERSION <= sd.version => LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-<% for dep in cdata.data.ptsetts.deps -%>
+<% for dep in sd.deps -%>
 find_package( <= dep.pack => REQUIRED)
 <% endfor %>
 
-<% for item, value in cdata.data.ptsetts.libraries.items() %>
+<% for item, value in sd.libraries.items() %>
 add_library("<= item =>-static" STATIC
 <% for file in value.files %>	<= file =>
 <% endfor -%>

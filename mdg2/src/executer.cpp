@@ -15,6 +15,7 @@
 
 #include "ix3/utils/to_generic_ast.hpp"
 #include "standard_types/src/loader.hpp"
+#include "builders/src/loader.hpp"
 
 using namespace mdg2;
 using mdg2::path_config;
@@ -110,10 +111,13 @@ void executer::json_mode(const mdg::ic::ptsetts& setts) const
 	json_out.output_dir(opt_vars["outdir"].as<std::string>());
 	mdg::ic::single_gen_part part(&json_out);
 	mdg::ic::gen_context ctx;
+	builders::loader bld_ldr;
 	for(auto& pname:setts.parts()) {
 		ctx.cfg_part = setts.part_setts(pname);
 		auto pd = user_data;
 		pd.add(setts.generic_ast(pname));
+		if(auto bld = bld_ldr(setts.part_src(pname), ctx);bld)
+			pd.add(*bld);
 		ctx.generated[pname] = part(ctx, std::move(pd));
 	}
 	std::cout << json_out.result() << std::endl;

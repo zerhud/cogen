@@ -81,5 +81,18 @@ BOOST_AUTO_TEST_CASE(generic_ast_tree)
 	gen_utils::compilation_context ctx;
 	BOOST_TEST(ga.to_json(ctx) == "{\"file\":\"f\", \"tmpl\":\"t\", \"some\":\"v\"}"_bj);
 }
+BOOST_AUTO_TEST_CASE(part_src)
+{
+	ptree setts;
+	setts.put("part.a.file", "f");
+	setts.put("part.a.tmpl", "t");
+	setts.put("part.a.some", "v");
+	setts.put("part.a.kuku", "ok");
+	ic_ptsetts obj(setts);
+	BOOST_TEST(obj.part_src("a").get<std::string>("file") == "f");
+	BOOST_TEST(obj.part_src("a").get<std::string>("tmpl") == "t");
+	BOOST_TEST(obj.part_src("a").get<std::string>("some") == "v");
+	BOOST_TEST(obj.part_src("a").get<std::string>("kuku") == "ok");
+}
 BOOST_AUTO_TEST_SUITE_END() // ptsetts
 BOOST_AUTO_TEST_SUITE_END() // input_configuration
