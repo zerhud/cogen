@@ -67,4 +67,5 @@ target_link_libraries( ${PROJECT_NAME}
 if(ENABLE_TESTS)
 	enable_testing()
 	add_test(NAME mdg2_cpp_decl COMMAND python3 -m pytest "${CMAKE_CURRENT_SOURCE_DIR}/tests/cpp_decl.py")
+	add_test(NAME mdg2_results COMMAND python3 -m pytest "${CMAKE_CURRENT_SOURCE_DIR}/tests/results.py")
 endif()

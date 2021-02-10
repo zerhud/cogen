@@ -32,7 +32,7 @@
 <%- endmacro %>
 
 <%- macro includes(incs) -%>
-<% for (from, list) in incs.items() if from == "cpp" %>
+<% for (from, list) in incs.items() if from == "cpp"  or from == "ix3" %>
 <% for info in list %>
 #include <= '<' if info.sys else '"' =><= info.file =><= '>' if info.sys else '"' =>
 <%- endfor -%>
