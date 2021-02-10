@@ -14,6 +14,7 @@
 #include <common_utils/tests/mocks.hpp>
 
 #include "loader.hpp"
+#include "nodes.hpp"
 
 using namespace std::literals;
 using boost::property_tree::ptree;

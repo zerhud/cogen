@@ -45,6 +45,10 @@ BOOST_AUTO_TEST_CASE(proj_and_lib)
 	setts.put("project", "proj");
 	setts.add("libraries.lib1.part", "a");
 	setts.add("libraries.lib1.part", "b");
+	setts.add("libraries.lib1.dep", "dep1");
+	setts.add("libraries.lib1.dep", "dep2");
+	setts.add("libraries.lib1.link_lib", "lib1");
+	setts.add("libraries.lib1.link_lib", "lib2");
 
 	builders::loader ldr;
 	gen_utils::input dsls;
@@ -60,7 +64,9 @@ BOOST_AUTO_TEST_CASE(proj_and_lib)
 	BOOST_TEST(result->to_json(js_ctx) == R"({ "project":"proj",
 	           "libraries":{
 	             "lib1":{
-	               "files":["file_a1", "file_a2", "file_b0"]
+	               "files":["file_a1", "file_a2", "file_b0"],
+	               "deps":["dep1", "dep2"],
+	               "link_libs":["lib1", "lib2"]
 	             }
 	           }})"_bj);
 }

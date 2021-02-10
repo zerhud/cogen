@@ -43,6 +43,12 @@ class library : public base_node {
 	std::string lib;
 	boost::property_tree::ptree setts;
 	std::vector<std::string> files;
+	std::vector<std::string> deps;
+	std::vector<std::string> libs;
+
+	boost::json::value make_json_files() const ;
+	boost::json::value make_json_deps() const ;
+	boost::json::value make_json_libs() const ;
 public:
 	library(
 	        std::string n,

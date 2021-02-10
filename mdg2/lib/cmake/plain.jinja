@@ -1,18 +1,16 @@
 <% set sd = cdata.data.builders -%>
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
-----
-<= sd =>
-----
 project(<= sd.project => VERSION <= sd.version => LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+<%- for item, value in sd.libraries.items() %>
 
-<% for dep in sd.deps -%>
-find_package( <= dep.pack => REQUIRED)
-<% endfor %>
+<% for dep in value.deps -%>
+find_package( <= dep => REQUIRED)
+<% endfor %><% endfor %>
 
-<% for item, value in sd.libraries.items() %>
+<%- for item, value in sd.libraries.items() %>
 add_library("<= item =>-static" STATIC
 <% for file in value.files %>	<= file =>
 <% endfor -%>
@@ -21,7 +19,7 @@ add_library("<= item =>" SHARED
 <% for file in value.files %>	<= file =>
 <% endfor -%>
 )
-<% if value.target_link_libraries %>target_link_libraries("<= item =>" PRIVATE	<% for dep in value.target_link_libraries %> <= dep =><% endfor %>) <% endif %>
-<% if value.target_link_libraries %>target_link_libraries("<= item =>-static" PUBLIC	<% for dep in value.target_link_libraries %> <= dep =><% endfor %>) <% endif %>
+<% if value.link_libs %>target_link_libraries("<= item =>" PRIVATE	<% for dep in value.link_libs %> <= dep =><% endfor %>) <% endif %>
+<% if value.link_libs %>target_link_libraries("<= item =>-static" PUBLIC	<% for dep in value.link_libs %> <= dep =><% endfor %>) <% endif %>
 <% endfor %>
 
