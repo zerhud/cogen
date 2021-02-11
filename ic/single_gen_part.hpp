@@ -11,7 +11,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "provider.hpp"
-#include "input/input.hpp"
+#include "utils/input.hpp"
 
 namespace mdg::ic {
 

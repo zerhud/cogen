@@ -9,7 +9,7 @@
 #pragma once
 
 #include <turtle/mock.hpp>
-#include "common_utils/input/tree.hpp"
+#include "utils/tree.hpp"
 
 namespace gen_utils_mocks {
 

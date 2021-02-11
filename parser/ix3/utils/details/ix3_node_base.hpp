@@ -9,7 +9,7 @@
 #pragma once
 
 #include <vector>
-#include "common_utils/input/tree.hpp"
+#include "utils/tree.hpp"
 #include "ast/meta.hpp"
 
 namespace ix3::utils::details {

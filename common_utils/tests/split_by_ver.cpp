@@ -13,9 +13,9 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include "common_utils/input/tree.hpp"
-#include "common_utils/input/input.hpp"
-#include "common_utils/input/split_by_ver.hpp"
+#include "utils/tree.hpp"
+#include "utils/input.hpp"
+#include "utils/split_by_ver.hpp"
 #include "mocks.hpp"
 
 using namespace std::literals;

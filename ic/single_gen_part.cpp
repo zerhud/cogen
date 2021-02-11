@@ -7,8 +7,8 @@
  *************************************************************************/
 
 #include "single_gen_part.hpp"
-#include "common_utils/input/map_to.hpp"
-#include "common_utils/input/split_by_ver.hpp"
+#include "utils/map_to.hpp"
+#include "utils/split_by_ver.hpp"
 
 using gen_utils::input;
 using mdg::ic::single_gen_part;

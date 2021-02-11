@@ -9,7 +9,7 @@
 #pragma once
 
 #include <boost/property_tree/ptree.hpp>
-#include "common_utils/input/tree.hpp"
+#include "utils/tree.hpp"
 #include "ic/single_gen_part.hpp"
 
 namespace builders {

@@ -18,8 +18,8 @@
 #include "utils/details/sep_nodes.hpp"
 #include "utils/details/ast_nodes.hpp"
 #include "common_utils/tests/mocks.hpp"
-#include "input/imports_manager.hpp"
-#include "input/input.hpp"
+#include "utils/imports_manager.hpp"
+#include "utils/input.hpp"
 
 namespace ast = ix3::ast;
 namespace txt = ix3::text;

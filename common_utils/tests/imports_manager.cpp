@@ -12,8 +12,8 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include "mocks.hpp"
-#include "input/imports_manager.hpp"
-#include "input/input.hpp"
+#include "utils/imports_manager.hpp"
+#include "utils/input.hpp"
 
 using namespace std::literals;
 using gunc = gen_utils::name_conversion;

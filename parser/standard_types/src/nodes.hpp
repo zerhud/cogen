@@ -6,7 +6,7 @@
  * or <http://www.gnu.org/licenses/> for details
  *************************************************************************/
 
-#include "input/tree.hpp"
+#include "utils/tree.hpp"
 
 namespace std_types {
 

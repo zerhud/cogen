@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "common_utils/input/tree.hpp"
+#include "utils/tree.hpp"
 
 namespace builders {
 

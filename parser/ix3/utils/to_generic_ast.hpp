@@ -10,7 +10,7 @@
 
 #include "traverser.hpp"
 #include "ix3/ast/file.hpp"
-#include "common_utils/input/tree.hpp"
+#include "utils/tree.hpp"
 
 namespace ix3::utils {
 
