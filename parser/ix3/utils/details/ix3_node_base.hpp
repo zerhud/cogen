@@ -56,6 +56,9 @@ public:
 	boost::json::object linked_json(const ix3_node_base& node) const ;
 
 	[[nodiscard]]
+	std::pmr::vector<gen_utils::name_conversion> namings(const ix3_node_base& target) const ;
+
+	[[nodiscard]]
 	std::pmr::vector<std::pmr::string> naming(
 	        const ix3_node_base& target,
 	        std::string_view orig) const ;
@@ -75,7 +78,7 @@ public:
 	[[nodiscard]]
 	virtual boost::json::value make_linked_json(const compilation_context& ctx) const ;
 	[[nodiscard]]
-	virtual std::pmr::string cvt_inner_name(gen_utils::name_conversion to) const ;
+	virtual gen_utils::name_conversion treat_as(gen_utils::name_conversion c) const ;
 	virtual std::optional<ast::meta::version> ast_ver() const ;
 protected:
 	boost::json::object make_inner_json(const compilation_context& ctx) const;

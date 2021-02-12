@@ -90,7 +90,7 @@ public:
 };
 
 struct camel_case_as_title : virtual ix3_node_base {
-	std::pmr::string cvt_inner_name(gen_utils::name_conversion n) const override ;
+	gen_utils::name_conversion treat_as(gen_utils::name_conversion c) const override ;
 };
 
 struct type_node : ast_node<ast::type> {

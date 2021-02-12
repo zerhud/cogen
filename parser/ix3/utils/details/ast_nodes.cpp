@@ -29,12 +29,13 @@ std::int64_t ix3::utils::details::splash_version(std::int64_t a, std::int64_t i)
 	return a >= i ? a * a + a + i : a + i * i;
 }
 
-std::pmr::string camel_case_as_title::cvt_inner_name(
-        gen_utils::name_conversion n) const
+gen_utils::name_conversion camel_case_as_title::treat_as(
+        gen_utils::name_conversion c) const
 {
-	if(n==gen_utils::name_conversion::camel_case)
-		n = gen_utils::name_conversion::title_case;
-	return gen_utils::convert(inner_name(), n);
+	return c == gen_utils::name_conversion::camel_case
+	        ? gen_utils::name_conversion::title_case
+	        : c
+	          ;
 }
 
 type_node::type_node(ast::type t) : ast_node(std::move(t)) { }
