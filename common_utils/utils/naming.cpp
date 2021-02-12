@@ -26,10 +26,10 @@ std::string_view gen_utils::to_string(name_conversion v)
 void gen_utils::from_string(std::string_view val, name_conversion& c)
 {
 	if(val=="underscore"sv) c = name_conversion::underscore;
-	if(val=="camel_case"sv) c = name_conversion::camel_case;
-	if(val=="title_case"sv) c = name_conversion::title_case;
-	if(val=="as_is"sv) c = name_conversion::as_is;
-	throw std::runtime_error("no such name_conversion: "s + std::string(val));
+	else if(val=="camel_case"sv) c = name_conversion::camel_case;
+	else if(val=="title_case"sv) c = name_conversion::title_case;
+	else if(val=="as_is"sv) c = name_conversion::as_is;
+	else throw std::runtime_error("no such name_conversion: "s + std::string(val));
 }
 
 std::vector<std::pmr::string> gen_utils::split_name(const std::pmr::string& name)

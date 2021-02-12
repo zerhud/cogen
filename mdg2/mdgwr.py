@@ -15,6 +15,22 @@ def template_loader(name):
             return open(cur_path).read()
     return None
 
+def apply_sufix(obj, sufix, nind=0):
+    naming = obj['naming'][nind]
+    if naming == "underscore" or naming == "as_is":
+        return obj['name'] + '_' + sufix
+    if naming == "title_case" or naming == "camel_case":
+        return obj["name"] + sufix.title()
+    return obj['name'] + sufix
+
+def apply_prefix(obj, prefix, nind=0):
+    naming = obj['naming'][nind]
+    if naming == "underscore": return prefix + '_' + obj['name']
+    if naming == "title_case": return prefix.title() + obj["name"]
+    if naming == "camel_case":
+        return prefix.title() + obj["name"][:1].upper() + obj["name"][1:]
+    return prefix + obj['name']
+
 jinja_env = jinja2.Environment(
     block_start_string = '<%',
     block_end_string = '%>',
@@ -28,6 +44,9 @@ jinja_env = jinja2.Environment(
 		jinja2.FileSystemLoader('${templates_dir_path}/', followlinks=True),
 	] )
 )
+
+jinja_env.filters["apply_sufix"] = apply_sufix
+jinja_env.filters["apply_prefix"] = apply_prefix
 
 def gen_file(src, to, data):
     print(src + "\t → \t" + to)

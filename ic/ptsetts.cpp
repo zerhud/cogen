@@ -38,7 +38,22 @@ mdg::ic::gen_config ptsetts::part_setts(std::string_view p) const
 	ret.tmpl_file = setts.get<std::pmr::string>(path+".tmpl"s);
 	ret.split_by_version = setts.get(path+".split_by_version", false);
 	conf_links(path, ret);
+	config_compilation(path, ret.compilation);
 	return ret;
+}
+
+void ptsetts::config_compilation(
+        const std::string& path, gen_utils::compilation_config& cfg) const
+{
+	cfg.naming.clear();
+	for(auto& [name, value]:setts.get_child(path)) {
+		if(name == "naming")
+			gen_utils::from_string(
+			            value.get_value<std::string>(),
+			            cfg.naming.emplace_back());
+	}
+	if(cfg.naming.empty())
+		cfg.naming.emplace_back(gen_utils::name_conversion::as_is);
 }
 
 void ptsetts::conf_links(const std::string& path, gen_config& cfg) const

@@ -39,7 +39,7 @@
 <%- endfor -%>
 <%- endmacro -%>
 
-<%- macro ptr(obj, cdata) -%><=obj.name=>_ptr<% endmacro -%>
+<%- macro ptr(obj) -%><= obj | apply_sufix('ptr') =><% endmacro -%>
 
 
 <%- macro interface(obj) -%>
