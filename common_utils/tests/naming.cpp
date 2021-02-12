@@ -24,6 +24,7 @@ void check_some_name(const std::vector<std::pmr::string>& ns)
 	BOOST_CHECK_EQUAL(ns[1], "name");
 }
 
+BOOST_AUTO_TEST_SUITE(naming)
 BOOST_AUTO_TEST_SUITE(split)
 BOOST_AUTO_TEST_CASE(one)
 {
@@ -99,3 +100,19 @@ BOOST_AUTO_TEST_CASE(as_is)
 	BOOST_CHECK_EQUAL("Foo_Bar", gen_utils::convert("Foo_Bar", name_conversion::as_is));
 }
 BOOST_AUTO_TEST_SUITE_END() // convert
+
+BOOST_AUTO_TEST_CASE(from_string)
+{
+	name_conversion r;
+	BOOST_CHECK_NO_THROW(gen_utils::from_string("underscore", r));
+	BOOST_CHECK(r==name_conversion::underscore);
+	BOOST_CHECK_NO_THROW(gen_utils::from_string("as_is", r));
+	BOOST_CHECK(r==name_conversion::as_is);
+}
+BOOST_AUTO_TEST_CASE(to_string)
+{
+	BOOST_TEST(gen_utils::to_string(name_conversion::as_is) == "as_is");
+	BOOST_TEST(gen_utils::to_string(name_conversion::underscore) == "underscore");
+}
+
+BOOST_AUTO_TEST_SUITE_END() // naming
