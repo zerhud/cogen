@@ -35,6 +35,14 @@ boost::json::array make_json_array(T... obj)
 	return ret;
 }
 
+template<typename T>
+boost::json::array make_json_array(const std::vector<T>& list)
+{
+	boost::json::array ret;
+	for(auto&& i:list) ret.emplace_back(i);
+	return ret;
+}
+
 boost::json::object operator "" _bj(const char* d, std::size_t l)
 {
 	boost::json::parse_options opts{.allow_trailing_commas=true};
@@ -82,25 +90,13 @@ boost::json::value make_valid_json(
 	assert(!names.empty());
 	assert(!naming.empty());
 
-	std::stringstream js;
-	js << "{\"orig_name\":" << std::quoted(orig) << ",\"name\":";
-	if(names.size()==1) js << std::quoted(names.front());
-	else {
-		js << '[';
-		for(auto& n:names) js << std::quoted(n) << ',';
-		js << ']';
-	}
-	js << ",\"naming\":[";
-	for(auto& n:naming) js << std::quoted(n) << ',';
-	js << "]}";
-
-	boost::json::parse_options opts{.allow_trailing_commas=true};
-	auto main =  boost::json::parse(
-	            js.str(),
-	            boost::json::storage_ptr(),
-	            opts).as_object();
+	boost::json::object main;
 	for(auto& [name,value]:extra) main[name] = value;
 	main["type"] = type;
+	main["orig_name"] = orig;
+	main["naming"] = make_json_array(naming);
+	if(names.size() == 1) main["name"] = names.front();
+	else main["name"] = make_json_array(names);
 	return main;
 }
 
