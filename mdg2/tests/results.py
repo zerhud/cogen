@@ -21,6 +21,5 @@ def test_cpp_decl():
     r_cmake = sp.run(['cmake', '..'], cwd = build_dir)
     r_make = sp.run(['cmake', '--build', '.'], cwd = build_dir)
     assert r_make.returncode == 0
-    assert os.path.exists(build_dir + '/libinterface.so')
-    assert os.path.exists(build_dir + '/libinterface-static.a')
+    assert os.path.exists(build_dir + '/libinterface.a')
 

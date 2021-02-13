@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(proj_and_lib)
 	BOOST_REQUIRE(result.has_value());
 	BOOST_TEST_REQUIRE(result->children(result->root()).size() == 1);
 	gen_utils::compilation_context js_ctx;
-	BOOST_TEST(result->to_json(js_ctx) == R"({ "project":"proj",
+	BOOST_TEST(result->to_json(js_ctx) == R"({ "project":"proj", "version":"0.0.0.0",
 	           "libraries":{
 	             "lib1":{
 	               "files":["file_a1", "file_a2", "file_b0"],

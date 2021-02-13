@@ -11,8 +11,7 @@ namespace <= render.gen_namespace_name(module, mod_ver) => {
 
 <% for obj in mod_ver.content if obj.type == "interface" %><= render.interface(obj) =><% endfor %>
 <% for obj in mod_ver.content if obj.type == "record" -%>
-<= render.decl_depricated(obj) =>
-struct <= obj.name => {
+struct <= render.decl_depricated(obj) =><= obj.name => {
 <%- for mem in obj.members %>
 	<= render.decl_meta_params(mem) =>
 	<= render.type(mem.par_type) => <= mem.name =>;

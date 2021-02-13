@@ -57,7 +57,9 @@ boost::json::value builders::root_node::to_json(const gen_utils::tree& con) cons
 	return ret;
 }
 
-builders::project::project(std::string n) : pname(std::move(n))
+builders::project::project(std::string n, std::string v)
+	: pname(std::move(n))
+	, ver(std::move(v))
 {
 }
 
@@ -71,6 +73,7 @@ boost::json::value builders::project::to_json(const gen_utils::tree& con) const
 	boost::json::object ret;
 	ret["project"] = pname;
 	ret["libraries"] = libs;
+	ret["version"] = ver;
 	return ret;
 }
 

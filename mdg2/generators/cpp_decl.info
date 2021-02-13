@@ -26,6 +26,7 @@ part
 		tmpl cmake/plain.jinja
 		file CMakeLists.txt
 		project interface
+		version "0.0.1.0"
 		libraries {
 			interface {
 				part dec

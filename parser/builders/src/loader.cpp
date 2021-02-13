@@ -21,7 +21,7 @@ std::optional<gen_utils::tree> builders::loader::operator()(
 	auto pch = setts.get_optional<std::string>("project"s);
 	if(!pch) return ret;
 	ret.emplace(std::make_shared<root_node>(), std::make_shared<dsl_manager>());
-	auto proj = std::make_shared<project>(*pch);
+	auto proj = std::make_shared<project>(*pch, setts.get("version", "0.0.0.0"s));
 	ret->add(ret->root(), proj);
 	for(auto& [name, opts]:setts.get_child("libraries"))
 		ret->add(*proj, std::make_shared<library>(name, opts, ctx));

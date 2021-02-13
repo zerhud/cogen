@@ -34,8 +34,9 @@ public:
 
 class project : public base_node {
 	std::string pname;
+	std::string ver;
 public:
-	project(std::string n);
+	project(std::string n, std::string v);
 	boost::json::value to_json(const gen_utils::tree& con) const override ;
 };
 

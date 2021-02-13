@@ -11,15 +11,13 @@ find_package( <= dep => REQUIRED)
 <% endfor %><% endfor %>
 
 <%- for item, value in sd.libraries.items() %>
-add_library("<= item =>-static" STATIC
+add_library("<= item =>" STATIC
 <% for file in value.files %>	<= file =>
 <% endfor -%>
 )
-add_library("<= item =>" SHARED
-<% for file in value.files %>	<= file =>
-<% endfor -%>
-)
-<% if value.link_libs %>target_link_libraries("<= item =>" PRIVATE	<% for dep in value.link_libs %> <= dep =><% endfor %>) <% endif %>
-<% if value.link_libs %>target_link_libraries("<= item =>-static" PUBLIC	<% for dep in value.link_libs %> <= dep =><% endfor %>) <% endif %>
+set_source_files_properties(
+	<% for file in value.files if '.cpp' in file %><=file=> <%endfor%>
+	PROPERTIES COMPILE_OPTIONS "-Wno-deprecated-declarations")
+<% if value.link_libs %>target_link_libraries("<= item =>" PUBLIC	<% for dep in value.link_libs %> <= dep =><% endfor %>) <% endif %>
 <% endfor %>
 
