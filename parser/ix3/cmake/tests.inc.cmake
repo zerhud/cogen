@@ -1,3 +1,4 @@
+set(Boost_USE_STATIC_LIBS   OFF)
 find_package(Boost 1.69 COMPONENTS unit_test_framework REQUIRED)
 
 # unit tests...

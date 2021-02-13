@@ -25,6 +25,7 @@ void check_some_name(const std::vector<std::pmr::string>& ns)
 }
 
 BOOST_AUTO_TEST_SUITE(naming)
+
 BOOST_AUTO_TEST_SUITE(split)
 BOOST_AUTO_TEST_CASE(one)
 {

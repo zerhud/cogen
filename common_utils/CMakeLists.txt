@@ -4,7 +4,9 @@ project(generation_utils VERSION 0.1.0.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(boost_json REQUIRED)
+set(Boost_USE_STATIC_LIBS   ON)
+find_package(Boost COMPONENTS json REQUIRED)
+#find_package(boost_json REQUIRED)
 
 file(
     GLOB_RECURSE src
@@ -20,12 +22,14 @@ list(FILTER src EXCLUDE REGEX "tests/.*")
 list(FILTER hdr EXCLUDE REGEX "tests/.*")
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/" FILES ${src} ${hdr})
 
-add_library(${PROJECT_NAME} ${src} ${hdr})
+add_library(${PROJECT_NAME} STATIC ${src} ${hdr})
 target_include_directories(${PROJECT_NAME}
     PUBLIC ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} PUBLIC Boost::json)
+target_link_libraries(${PROJECT_NAME} PUBLIC Boost::json
+		-static-libgcc -static-libstdc++)
 
 if(ENABLE_TESTS)
+	set(Boost_USE_STATIC_LIBS   OFF)
 	find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 	macro(add_unit_test tname path lib)
