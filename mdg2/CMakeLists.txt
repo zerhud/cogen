@@ -49,6 +49,7 @@ copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/examples/ix3_example_inc_dir" "${build_e
 
 # generators
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/generators/cpp_decl.info" "${build_generators_dir}/cpp_decl.info")
+copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/generators/cpp_py.info" "${build_generators_dir}/cpp_py.info")
 
 # library
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/standard_types.info" "${build_lib_dir}/standard_types.info")
@@ -56,7 +57,9 @@ copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cpp/declarations.jinja" "${build_lib
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cpp/header.jinja" "${build_lib_dir}/cpp/header.jinja")
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cpp/render.jinja" "${build_lib_dir}/cpp/render.jinja")
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cpp/definitions.jinja" "${build_lib_dir}/cpp/definitions.jinja")
+copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cpp/cpppy.jinja" "${build_lib_dir}/cpp/cpppy.jinja")
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cmake/plain.jinja" "${build_lib_dir}/cmake/plain.jinja")
+copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cmake/pybind11.jinja" "${build_lib_dir}/cmake/pybind11.jinja")
 
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE

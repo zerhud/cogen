@@ -8,3 +8,4 @@ parser/ix3/build/*
 cbuild/*
 build-cov/*
 *.user
+tmp/*

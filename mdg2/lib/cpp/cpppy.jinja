@@ -4,7 +4,10 @@
 
 #include <cassert>
 #include <pybind11/pybind11.h>
-<= render.includes(cdata.incs) =>
+<= render.includes(cdata.includes) =>
+
+<% for module in cdata.data.ix3 -%>
+<% for mod_ver in module.vers %>
 
 <%- macro module_name(mod) %><= mod.name =>_<= mod.v.major =><= mod.v.minor =><% endmacro %>
 <%- macro obj_ref(obj, mod, cdata) %><= render.gen_namespace_name(mod, cdata) =>::<= obj.name =><% endmacro %>
@@ -23,10 +26,7 @@
 		;
 <% endmacro %>
 
-<% for module in cdata.mods -%>
-
-<= render.decl_meta_params(module) =>
-PYBIND11_MODULE(<= module_name(module) =>, m) {
+PYBIND11_MODULE(<= module.name =>_<= mod_ver.major =>_<= mod_ver.minor =>, m) {
 	<%- for obj in module.content -%>
 	<% if obj.type == "function" -%>m.def("<= obj.name =>", &<= obj_ref(obj, module, cdata) =>, "<= obj.docs =>");<%- endif %>
 	<% if obj.type == "interface" -%><= def_class(obj,module,cdata) =><%- endif %>
@@ -34,5 +34,6 @@ PYBIND11_MODULE(<= module_name(module) =>, m) {
 	<% endfor %>
 }
 
+<% endfor %>
 <% endfor %>
 

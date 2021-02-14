@@ -1,0 +1,38 @@
+part
+{
+	dec {
+		tmpl cpp/declarations.jinja
+		file "${mod}_${ver_a}_${ver_i}/declarations.hpp"
+	}
+	header {
+		inc_part dec
+		tmpl cpp/header.jinja
+		file module.hpp
+	}
+	definition {
+		inc_part dec
+		inc_part header
+		tmpl cpp/definitions.jinja
+		file module.cpp
+	}
+	pybind {
+		inc_part dec
+		inc_part header
+		file pybind.cpp
+		tmpl cpp/cpppy.jinja
+	}
+	cmake {
+		tmpl cmake/pybind11.jinja
+		file CMakeLists.txt
+		project interface
+		version "0.0.1.0"
+		libraries {
+			interface {
+				part dec
+				part header
+				part definition
+				dep pybind11
+			}
+		}
+	}
+}

@@ -153,7 +153,10 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 	BOOST_TEST(mod->node_var().value().name == "mod");
 	BOOST_TEST(mod->node_var().value().value == "mod1");
 
-	auto vers = tree.children(*mod);
+	auto vers_major = tree.children(*mod);
+	BOOST_TEST_REQUIRE(vers_major.size()==1);
+
+	auto vers = tree.children(*vers_major.at(0));
 	BOOST_TEST(vers.size()==2);
 	BOOST_TEST(vers.at(0)->name()=="1.1");
 	BOOST_TEST(vers.at(1)->name()=="1.2");
