@@ -90,7 +90,9 @@ const ix3_node_base* compilation_context::mod_ver(const ix3_node_base& n) const
 
 const ix3_node_base* compilation_context::mod_node(const ix3_node_base& n) const
 {
-	const auto* mod = container->parent(*mod_ver(n));
+	const auto* major = container->parent(*mod_ver(n));
+	assert( dynamic_cast<const module_major_ver_node*>(major) != nullptr );
+	const auto* mod = container->parent(*major);
 	assert( dynamic_cast<const module_node*>(mod) != nullptr );
 	return static_cast<const module_node*>(mod);
 }

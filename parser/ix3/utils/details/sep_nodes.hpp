@@ -49,5 +49,17 @@ struct module_version_node : ix3_node_base {
 	boost::json::object common_json() const ;
 };
 
+struct module_major_ver_node : ix3_node_base {
+	decltype(ast::meta::version::major_v) ver;
+
+	std::string_view name() const override ;
+	std::optional<std::uint64_t> version() const override ;
+	std::optional<gen_utils::variable> node_var() const override ;
+	std::optional<ast::meta::version> ast_ver() const override ;
+
+	boost::json::value make_json(const compilation_context& ctx) const override;
+	boost::json::value make_linked_json(const compilation_context& ctx) const override ;
+};
+
 
 } // namespace ix3::utils::details

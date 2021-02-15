@@ -57,8 +57,24 @@ void to_generic_ast::new_mod(ast::module& obj)
 void to_generic_ast::new_mod_ver(ast::module& v)
 {
 	using namespace details;
+
+	std::shared_ptr<module_major_ver_node> major;
+	auto majors = result.children(*parents.back());
+	for(auto& m:majors) {
+		assert(dynamic_cast<const module_major_ver_node*>(m.get()));
+		if(static_cast<const module_major_ver_node*>(m.get())->ver == v.version.major_v) {
+			major = std::static_pointer_cast<module_major_ver_node>(m);
+			break;
+		}
+	}
+	if(!major) {
+		major = std::make_shared<module_major_ver_node>();
+		major->ver = v.version.major_v;
+		result.add(*parents.back(), major);
+	}
+
 	auto node = std::make_shared<module_version_node>(v);
-	result.add(*parents.back(), node);
+	result.add(*major, node);
 	parents.emplace_back(node);
 }
 

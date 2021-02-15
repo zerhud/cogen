@@ -64,6 +64,24 @@ boost::json::value operator "" _bjs(const char* d, std::size_t l)
 BOOST_AUTO_TEST_SUITE(ix3)
 BOOST_AUTO_TEST_SUITE(utils)
 BOOST_AUTO_TEST_SUITE(gain_to_generic_ast)
+
+std::shared_ptr<ix3::utils::details::ix3_node_base> extract_mver(
+        const gen_utils::tree& con)
+{
+	BOOST_TEST(con.root().name() == "ix3"sv);
+	BOOST_TEST(con.root().version().value() == 0);
+	BOOST_CHECK(!con.root().node_var().has_value());
+	BOOST_TEST(con.children(con.root()).size()==1);
+	auto mod = con.children(con.root()).at(0);
+	BOOST_CHECK(!mod->version().has_value());
+	auto vers_major = con.children(*mod);
+	BOOST_TEST_REQUIRE(vers_major.size()==1);
+	auto vers = con.children(*vers_major.at(0));
+	auto ret = std::dynamic_pointer_cast<ix3::utils::details::ix3_node_base>(vers.at(0));
+	assert(ret);
+	return ret;
+}
+
 struct fake_compiler : ix3::utils::details::ix3_compiler {
 
 	fake_compiler(const gen_utils::compilation_config& c) : cfg(c) {}
@@ -193,7 +211,8 @@ BOOST_AUTO_TEST_CASE(records)
 	                      "module mod1 v1.1:"
 	                      "@v1.1 record bar_baz { -int f1; @v1.2 +int f2;}");
 	gen_utils::tree tree = maker(ast.modules);
-	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	auto major = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	auto mod = tree.children(*major).at(0);
 	BOOST_TEST(tree.children(*mod).size()==1);
 
 	auto rec = tree.children(*mod).at(0);
@@ -241,9 +260,7 @@ BOOST_AUTO_TEST_CASE(functions)
 	                      "int foo(-string bar, +list<string> baz);"
 	                      "@v1.2 int bar_baz(+u8 b);");
 	gen_utils::tree tree = maker(ast.modules);
-	BOOST_TEST(tree.children(tree.root()).size()==1);
-	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
-	BOOST_TEST(tree.children(*mod).size()==2);
+	auto mod = extract_mver(tree);
 
 	auto foo = tree.children(*mod).at(0);
 	BOOST_TEST(foo->name()=="");
@@ -299,7 +316,7 @@ BOOST_AUTO_TEST_CASE(type_nodes)
 		BOOST_REQUIRE(ret != nullptr);
 		return ret;
 	};
-	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	auto mod = extract_mver(tree);
 	auto foo = tree.children(*mod).at(0);
 	auto ret_type = extract_type_node(foo, 0);
 	auto bar1 = tree.children(*foo).at(1);
@@ -353,7 +370,7 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	                      "module mod1 v1.1:"
 	                      "list<i8> foo(+list a);");
 	gen_utils::tree tree = maker(ast.modules);
-	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	auto mod = extract_mver(tree);
 	BOOST_TEST(tree.children(*mod).size()==1);
 
 	auto std_i8 = gen_utils_mocks::make_node(10, std::nullopt, std::nullopt, "");
@@ -423,7 +440,7 @@ BOOST_AUTO_TEST_CASE(enums)
 	                      "enum bar_baz +auto_io { one, two => \"test\" }"sv);
 	gen_utils::tree tree = maker(ast.modules);
 	BOOST_TEST(tree.children(tree.root()).size()==1);
-	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	auto mod = extract_mver(tree);
 	BOOST_TEST(tree.children(*mod).size()==1);
 
 	auto e = tree.children(*mod).at(0);
@@ -479,7 +496,7 @@ BOOST_AUTO_TEST_CASE(interface)
 	gen_utils::tree tree = to_generic_ast()(ast.modules);
 	BOOST_TEST(tree.children(tree.root()).size()==1);
 	BOOST_TEST(tree.children(*tree.children(tree.root()).at(0)).size()==1);
-	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	auto mod = extract_mver(tree);
 	BOOST_TEST(tree.children(*mod).size()==2);
 
 	BOOST_TEST(tree.children(*mod).at(1)->name() == "z");
@@ -529,7 +546,7 @@ BOOST_AUTO_TEST_CASE(meta)
 	                      "enum z{o}"sv);
 	gen_utils::tree tree = to_generic_ast()(ast.modules);
 	BOOST_TEST(tree.children(*tree.children(tree.root()).at(0)).size()==1);
-	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	auto mod = extract_mver(tree);
 	BOOST_TEST(tree.children(*mod).size()==2);
 
 	BOOST_TEST(*mod->version() == ix3::utils::details::splash_version(1,1));
@@ -554,7 +571,7 @@ BOOST_AUTO_TEST_CASE(pop_parent)
 	                      "i8 foo();"sv);
 	gen_utils::tree tree = maker(ast.modules);
 	BOOST_TEST(tree.children(tree.root()).size()==1);
-	auto mod = tree.children(*tree.children(tree.root()).at(0)).at(0);
+	auto mod = extract_mver(tree);
 	BOOST_TEST(tree.children(*mod).size()==2);
 
 }
@@ -574,7 +591,7 @@ BOOST_AUTO_TEST_CASE(lelf_links)
 	f2.add(tree_f2);
 
 	BOOST_TEST(tree_f2.children(tree_f2.root()).size()==1);
-	auto mod = tree_f2.children(*tree_f2.children(tree_f2.root()).at(0)).at(0);
+	auto mod = extract_mver(tree_f2);
 	BOOST_TEST(tree_f2.children(*mod).size()==1);
 	auto foo = tree_f2.children(*mod).at(0);
 

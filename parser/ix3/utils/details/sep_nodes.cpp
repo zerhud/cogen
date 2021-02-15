@@ -41,8 +41,10 @@ boost::json::value module_node::make_json(const compilation_context& ctx) const
 {
 	boost::json::object ret = make_inner_json(ctx);
 	boost::json::array& content=ret["vers"].emplace_array();
-	for(auto& child:ctx.children(*this))
-		content.emplace_back(child->make_json(ctx));
+	for(auto& major:ctx.children(*this)) {
+		for(auto& child:ctx.children(*major))
+			content.emplace_back(child->make_json(ctx));
+	}
 	ctx.compiling_aspect().aspect(*this, ret);
 	return ret;
 }
@@ -92,4 +94,38 @@ boost::json::value module_version_node::make_linked_json(
 std::optional<ix3::ast::meta::version> module_version_node::ast_ver() const
 {
 	return val.version;
+}
+
+std::string_view ix3::utils::details::module_major_ver_node::name() const
+{
+	return "";
+}
+
+std::optional<std::uint64_t> ix3::utils::details::module_major_ver_node::version() const
+{
+	return std::nullopt;
+}
+
+std::optional<gen_utils::variable> ix3::utils::details::module_major_ver_node::node_var() const
+{
+	return std::nullopt;
+}
+
+std::optional<ix3::ast::meta::version> ix3::utils::details::module_major_ver_node::ast_ver() const
+{
+	return std::nullopt;
+}
+
+boost::json::value ix3::utils::details::module_major_ver_node::make_json(
+        const ix3::utils::details::compilation_context& ctx) const
+{
+	assert(false);
+	throw std::logic_error("this node cannot produce json");
+}
+
+boost::json::value ix3::utils::details::module_major_ver_node::make_linked_json(
+        const ix3::utils::details::compilation_context& ctx) const
+{
+	assert(false);
+	throw std::logic_error("this node cannot produce json");
 }
