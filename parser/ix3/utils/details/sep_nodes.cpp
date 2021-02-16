@@ -56,18 +56,16 @@ boost::json::value module_node::make_linked_json(const compilation_context& ctx)
 
 module_version_node::module_version_node(ast::module v) : val(std::move(v))
 {
-	str_val =
-			std::to_string(val.version.major_v) + '.' +
-			std::to_string(val.version.minor_v);
+	str_val = std::to_string(val.version.minor_v);
 }
-std::string_view module_version_node::name() const { return str_val; }
+std::string_view module_version_node::name() const { return ""; }
 std::optional<std::uint64_t> module_version_node::version() const
 {
 	return squash_version(val.version);
 }
 std::optional<gen_utils::variable> module_version_node::node_var() const
 {
-	return gen_utils::variable{"ver", str_val};
+	return gen_utils::variable{"mod_i", str_val};
 }
 boost::json::object module_version_node::common_json() const
 {

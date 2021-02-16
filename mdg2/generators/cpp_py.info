@@ -2,7 +2,7 @@ part
 {
 	dec {
 		tmpl cpp/declarations.jinja
-		file "${mod}_${ver_a}_${ver_i}/declarations.hpp"
+		file "${mod}_${mod_a}_${mod_i}/declarations.hpp"
 	}
 	header {
 		inc_part dec

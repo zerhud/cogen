@@ -196,14 +196,14 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 
 	auto vers = tree.children(*vers_major.at(0));
 	BOOST_TEST(vers.size()==2);
-	BOOST_TEST(vers.at(0)->name()=="1.1");
-	BOOST_TEST(vers.at(1)->name()=="1.2");
+	BOOST_TEST(vers.at(0)->name()=="");
+	BOOST_TEST(vers.at(1)->name()=="");
 	BOOST_CHECK(vers.at(0)->version().has_value());
 	BOOST_CHECK(vers.at(1)->version().has_value());
-	BOOST_TEST(vers.at(0)->node_var().value().name == "ver");
-	BOOST_TEST(vers.at(0)->node_var().value().value == "1.1");
-	BOOST_TEST(vers.at(1)->node_var().value().name == "ver");
-	BOOST_TEST(vers.at(1)->node_var().value().value == "1.2");
+	BOOST_TEST(vers.at(0)->node_var().value().name == "mod_i");
+	BOOST_TEST(vers.at(0)->node_var().value().value == "1");
+	BOOST_TEST(vers.at(1)->node_var().value().name == "mod_i");
+	BOOST_TEST(vers.at(1)->node_var().value().value == "2");
 
 	gen_utils::compilation_context ctx;
 	BOOST_TEST(tree.to_json(ctx) ==
