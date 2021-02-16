@@ -103,12 +103,12 @@ std::string_view ix3::utils::details::module_major_ver_node::name() const
 
 std::optional<std::uint64_t> ix3::utils::details::module_major_ver_node::version() const
 {
-	return std::nullopt;
+	return splash_version(ver, 0);
 }
 
 std::optional<gen_utils::variable> ix3::utils::details::module_major_ver_node::node_var() const
 {
-	return std::nullopt;
+	return gen_utils::variable{"mod_a", std::pmr::string(std::to_string(ver))};
 }
 
 std::optional<ix3::ast::meta::version> ix3::utils::details::module_major_ver_node::ast_ver() const

@@ -14,8 +14,8 @@
 
 namespace ix3::utils::details {
 
-std::int64_t splash_version(const ast::meta::version& v);
-std::int64_t splash_version(std::int64_t a, std::int64_t i);
+std::uint64_t splash_version(const ast::meta::version& v);
+std::uint64_t splash_version(int32_t a, int32_t i);
 
 template<typename Ast>
 class ast_node : virtual public ix3_node_base {

@@ -152,6 +152,19 @@ void check_naming(
 	BOOST_TEST(robj["naming"].as_array().size() == 2);
 	BOOST_TEST(robj["naming"].as_array().at(1) == to_string(gunc::underscore));
 }
+BOOST_AUTO_TEST_CASE(splashing)
+{
+	using ix3::utils::details::splash_version;
+	auto max = std::numeric_limits<decltype(ix3::ast::meta::version::major_v)>::max();
+	auto min = std::numeric_limits<decltype(ix3::ast::meta::version::major_v)>::min();
+	BOOST_TEST(splash_version(0, 0) == splash_version(0, 0));
+	BOOST_TEST(splash_version(1, 0) == splash_version(1, 0));
+	BOOST_TEST(splash_version(0, 0) < splash_version(0, 1));
+	BOOST_TEST(splash_version(1, 0) < splash_version(2, 1));
+	BOOST_TEST(splash_version(0, 9) < splash_version(1, 0));
+	BOOST_TEST(splash_version(0, max) < splash_version(1, 0));
+	BOOST_TEST(splash_version(max, max-1) < splash_version(max, max));
+}
 BOOST_AUTO_TEST_CASE(json_compare)
 {
 	BOOST_TEST(R"({"a":1,"b":2})"_bj == R"({"b":2,"a":1})"_bj);
@@ -173,6 +186,13 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 
 	auto vers_major = tree.children(*mod);
 	BOOST_TEST_REQUIRE(vers_major.size()==1);
+	BOOST_TEST(vers_major.at(0)->name().empty() == true);
+	BOOST_TEST(vers_major.at(0)->node_var().has_value() == true);
+	BOOST_TEST(vers_major.at(0)->node_var()->name == "mod_a");
+	BOOST_TEST(vers_major.at(0)->node_var()->value == "1");
+	BOOST_TEST(vers_major.at(0)->version().has_value() == true);
+	BOOST_TEST(0 < *vers_major.at(0)->version());
+	BOOST_TEST(ix3::utils::details::splash_version(1, 0) == *vers_major.at(0)->version());
 
 	auto vers = tree.children(*vers_major.at(0));
 	BOOST_TEST(vers.size()==2);

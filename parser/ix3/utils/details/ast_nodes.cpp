@@ -19,14 +19,16 @@ using ix3::utils::details::interface;
 using ix3::utils::details::ctor_node;
 using ix3::utils::details::camel_case_as_title;
 
-std::int64_t ix3::utils::details::splash_version(const ast::meta::version& v)
+std::uint64_t ix3::utils::details::splash_version(const ast::meta::version& v)
 {
 	return splash_version(v.major_v, v.minor_v);
 }
 
-std::int64_t ix3::utils::details::splash_version(std::int64_t a, std::int64_t i)
+std::uint64_t ix3::utils::details::splash_version(std::int32_t a, std::int32_t i)
 {
-	return a >= i ? a * a + a + i : a + i * i;
+	assert( 0 <= a );
+	assert( 0 <= i );
+	return (((std::uint64_t)a) << 32) + i;
 }
 
 gen_utils::name_conversion camel_case_as_title::treat_as(
