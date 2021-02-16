@@ -63,7 +63,7 @@ module_version_node::module_version_node(ast::module v) : val(std::move(v))
 std::string_view module_version_node::name() const { return str_val; }
 std::optional<std::uint64_t> module_version_node::version() const
 {
-	return splash_version(val.version);
+	return squash_version(val.version);
 }
 std::optional<gen_utils::variable> module_version_node::node_var() const
 {
@@ -103,7 +103,7 @@ std::string_view ix3::utils::details::module_major_ver_node::name() const
 
 std::optional<std::uint64_t> ix3::utils::details::module_major_ver_node::version() const
 {
-	return splash_version(ver, 0);
+	return squash_version(ver, 0);
 }
 
 std::optional<gen_utils::variable> ix3::utils::details::module_major_ver_node::node_var() const

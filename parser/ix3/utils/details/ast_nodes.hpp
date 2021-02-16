@@ -14,8 +14,8 @@
 
 namespace ix3::utils::details {
 
-std::uint64_t splash_version(const ast::meta::version& v);
-std::uint64_t splash_version(int32_t a, int32_t i);
+std::uint64_t squash_version(const ast::meta::version& v);
+std::uint64_t squash_version(int32_t a, int32_t i);
 
 template<typename Ast>
 class ast_node : virtual public ix3_node_base {
@@ -76,7 +76,7 @@ public:
 	std::optional<std::uint64_t> version() const override {
 		if constexpr (requires{ Ast::meta_params; }) {
 			auto ver = ast::get<ast::meta::version>(original_node().meta_params);
-			if (ver) return splash_version(*ver);
+			if (ver) return squash_version(*ver);
 		}
 		return std::nullopt;
 	}

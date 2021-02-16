@@ -19,12 +19,12 @@ using ix3::utils::details::interface;
 using ix3::utils::details::ctor_node;
 using ix3::utils::details::camel_case_as_title;
 
-std::uint64_t ix3::utils::details::splash_version(const ast::meta::version& v)
+std::uint64_t ix3::utils::details::squash_version(const ast::meta::version& v)
 {
-	return splash_version(v.major_v, v.minor_v);
+	return squash_version(v.major_v, v.minor_v);
 }
 
-std::uint64_t ix3::utils::details::splash_version(std::int32_t a, std::int32_t i)
+std::uint64_t ix3::utils::details::squash_version(std::int32_t a, std::int32_t i)
 {
 	assert( 0 <= a );
 	assert( 0 <= i );
