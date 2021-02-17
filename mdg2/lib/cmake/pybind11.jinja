@@ -1,0 +1,23 @@
+<% set sd = cdata.data.builders -%>
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+project(<= sd.project => VERSION <= sd.version => LANGUAGES C CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+<%- for item, value in sd.libraries.items() %>
+
+<% for dep in value.deps -%>
+find_package( <= dep => REQUIRED)
+<% endfor %><% endfor %>
+
+<%- for item, value in sd.libraries.items() %>
+add_library("<= item =>" STATIC
+<% for file in value.files %>	<= file =>
+<% endfor -%>
+)
+set_source_files_properties(
+	<% for file in value.files if '.cpp' in file %><=file=> <%endfor%>
+	PROPERTIES COMPILE_OPTIONS "-Wno-deprecated-declarations")
+<% if value.link_libs %>target_link_libraries("<= item =>" PUBLIC	<% for dep in value.link_libs %> <= dep =><% endfor %>) <% endif %>
+<% endfor %>
+

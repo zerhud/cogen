@@ -7,18 +7,18 @@ part
 	header {
 		inc_part dec
 		tmpl cpp/header.jinja
-		file module.hpp
+		file "${mod}_${mod_a}_${mod_i}/module.hpp"
 	}
 	definition {
 		inc_part dec
 		inc_part header
 		tmpl cpp/definitions.jinja
-		file module.cpp
+		file "${mod}_${mod_a}_${mod_i}/module.cpp"
 	}
 	pybind {
 		inc_part dec
 		inc_part header
-		file pybind.cpp
+		file "${mod}_${mod_a}_${mod_i}/pybind.cpp"
 		tmpl cpp/cpppy.jinja
 	}
 	cmake {
@@ -27,10 +27,11 @@ part
 		project interface
 		version "0.0.1.0"
 		libraries {
-			interface {
+			"interface_${mod}_${mod_a}_${mod_i}" {
 				part dec
 				part header
 				part definition
+				part pybind
 				dep pybind11
 			}
 		}
