@@ -113,11 +113,14 @@ BOOST_AUTO_TEST_CASE(no_provider)
 	BOOST_CHECK_THROW(single_gen_part(nullptr), std::exception);
 }
 
-auto data_amaker = [](std::string t1, std::string t2) {
+auto make_adata(std::string t1, std::string t2)
+{
 	boost::json::object ret;
 	ret["t1_dsl"].emplace_object()["a"] = t1;
 	ret["t2_dsl"].emplace_object()["a"] = t2;
-	return ret; };
+	return ret;
+}
+
 BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 {
 	single_gen_part sg(prov.get());
@@ -143,8 +146,8 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 	sg(gen_context{{"${n}.cpp"_s, "t"_s, {}, false, *compile_cfg}, {}}, all_data);
 
 	all_data.add(t2);
-	data_v1 = make_result_json( {"n2.cpp"}, {}, data_amaker("n1", "m1"));
-	data_v2 = make_result_json( {"n1.cpp"}, {}, data_amaker("n2", "m1"));
+	data_v1 = make_result_json( {"n2.cpp"}, {}, make_adata("n1", "m1"));
+	data_v2 = make_result_json( {"n1.cpp"}, {}, make_adata("n2", "m1"));
 	MOCK_EXPECT(prov->generate).once().with("t", data_v1, "n1.cpp");
 	MOCK_EXPECT(prov->generate).once().with("t", data_v2, "n2.cpp");
 	sg(gen_context{{"${n}.cpp"_s, "t"_s, {}, false, *compile_cfg}, {}}, all_data);
@@ -166,10 +169,10 @@ BOOST_FIXTURE_TEST_CASE(main_rules_map_to_both, single_gen_part_fixture)
 	};
 	MOCK_EXPECT(t1_dsl->to_json).calls(jsoner);
 	MOCK_EXPECT(t2_dsl->to_json).calls(jsoner);
-	auto data_v1 = make_result_json({"n2_m1.cpp"}, {}, data_amaker("n1", "m1"));
-	auto data_v2 = make_result_json({"n2_m2.cpp"}, {}, data_amaker("n1", "m2"));
-	auto data_v3 = make_result_json({"n1_m1.cpp"}, {}, data_amaker("n2", "m1"));
-	auto data_v4 = make_result_json({"n1_m2.cpp"}, {}, data_amaker("n2", "m2"));
+	auto data_v1 = make_result_json({"n2_m1.cpp"}, {}, make_adata("n1", "m1"));
+	auto data_v2 = make_result_json({"n2_m2.cpp"}, {}, make_adata("n1", "m2"));
+	auto data_v3 = make_result_json({"n1_m1.cpp"}, {}, make_adata("n2", "m1"));
+	auto data_v4 = make_result_json({"n1_m2.cpp"}, {}, make_adata("n2", "m2"));
 	MOCK_EXPECT(prov->generate).once().with("t", data_v1, "n1_m1.cpp");
 	MOCK_EXPECT(prov->generate).once().with("t", data_v2, "n1_m2.cpp");
 	MOCK_EXPECT(prov->generate).once().with("t", data_v3, "n2_m1.cpp");
