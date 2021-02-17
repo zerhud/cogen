@@ -56,9 +56,20 @@ compiled_output single_gen_part::compile(
 {
 	gen_utils::map_to mapper;
 	std::pmr::map<std::pmr::string, input> ret;
-	for(auto& it:data.all()) {
-		auto compiled = mapper(std::pmr::string(setts.cfg_part.map_tmpl), *it);
-		for(auto& [k,v] : compiled) ret[k].add(std::move(v));
+	auto all_data = data.all();
+	auto to_con = [](gen_utils::map_to::result_t r, auto& con) {
+		for(auto& [k,v]:r) con[k].add(v); };
+	while(!all_data.empty()) {
+		if(ret.empty()) to_con(mapper(setts.cfg_part.map_tmpl, *all_data.back()), ret);
+		else {
+			std::pmr::map<std::pmr::string, input> cur;
+			for(auto& [t, i]:ret) {
+				auto r = mapper(t, *all_data.back());
+				for(auto& [k,v]:r) cur[k].add(v).add(input(i));
+			}
+			ret.swap(cur);
+		}
+		all_data.pop_back();
 	}
 	return ret;
 }

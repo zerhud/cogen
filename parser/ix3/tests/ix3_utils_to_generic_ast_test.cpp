@@ -26,6 +26,7 @@ namespace txt = ix3::text;
 using namespace std::literals;
 using ix3::utils::to_generic_ast;
 using gunc = gen_utils::name_conversion;
+using ix3::utils::details::squash_version;
 
 template<typename... T>
 boost::json::array make_json_array(T... obj)
@@ -154,7 +155,6 @@ void check_naming(
 }
 BOOST_AUTO_TEST_CASE(splashing)
 {
-	using ix3::utils::details::squash_version;
 	auto max = std::numeric_limits<decltype(ix3::ast::meta::version::major_v)>::max();
 	auto min = std::numeric_limits<decltype(ix3::ast::meta::version::major_v)>::min();
 	BOOST_TEST(squash_version(0, 0) == squash_version(0, 0));
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 	BOOST_TEST(vers_major.at(0)->node_var()->value == "1");
 	BOOST_TEST(vers_major.at(0)->version().has_value() == true);
 	BOOST_TEST(0 < *vers_major.at(0)->version());
-	BOOST_TEST(ix3::utils::details::squash_version(1, 0) == *vers_major.at(0)->version());
+	BOOST_TEST(squash_version(1, 0) == *vers_major.at(0)->version());
 
 	auto vers = tree.children(*vers_major.at(0));
 	BOOST_TEST(vers.size()==2);
@@ -569,14 +569,14 @@ BOOST_AUTO_TEST_CASE(meta)
 	auto mod = extract_mver(tree);
 	BOOST_TEST(tree.children(*mod).size()==2);
 
-	BOOST_TEST(*mod->version() == ix3::utils::details::squash_version(1,1));
+	BOOST_TEST(*mod->version() == squash_version(1,1));
 
 	auto z = tree.children(*mod).at(1);
 	BOOST_TEST(z->name() == "z");
 
 	auto bar_baz = tree.children(*mod).at(0);
 	BOOST_TEST(bar_baz->name() == "bar_baz");
-	BOOST_TEST(*bar_baz->version() == ix3::utils::details::squash_version(1,2));
+	BOOST_TEST(*bar_baz->version() == squash_version(1,2));
 
 	BOOST_TEST(make_json(*bar_baz, tree).as_object()["meta"] ==
 			R"({"depricated":{"msg":"test","since":{"major":1,"minor":2}}})"_bj);
