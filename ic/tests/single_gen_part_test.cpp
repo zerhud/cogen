@@ -113,7 +113,43 @@ BOOST_AUTO_TEST_CASE(no_provider)
 	BOOST_CHECK_THROW(single_gen_part(nullptr), std::exception);
 }
 
+auto data_amaker = [](std::string t1, std::string t2) {
+	boost::json::object ret;
+	ret["t1_dsl"].emplace_object()["a"] = t1;
+	ret["t2_dsl"].emplace_object()["a"] = t2;
+	return ret; };
 BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
+{
+	single_gen_part sg(prov.get());
+	t1.add(t1.root(), make_node(1, "n", "n1"));
+	t1.add(t1.root(), make_node(1, "n", "n2"));
+	t2.add(t2.root(), make_node(2, "m", "m1"));
+	t2.add(t2.root(), make_node(2, "m", "m2"));
+	all_data.add(t1);
+	auto jsoner = [this](auto& ctx, const gen_utils::tree& src){
+		BOOST_TEST(&src != &t1);
+		BOOST_CHECK(ctx.cfg.naming.size() == 1);
+		BOOST_CHECK(ctx.cfg.naming.at(0) == gunc::camel_case);
+		boost::json::object ret;
+		return ret["a"] = src.children(src.root()).at(0)->node_var()->value, ret;
+	};
+	MOCK_EXPECT(t1_dsl->to_json).calls(jsoner);
+	MOCK_EXPECT(t2_dsl->to_json).calls(jsoner);
+	auto data_v1 = make_result_json( {}, {}, R"({"t1_dsl":{"a":"n1"}})"_bj);
+	auto data_v2 = make_result_json( {}, {}, R"({"t1_dsl":{"a":"n2"}})"_bj);
+	MOCK_EXPECT(prov->generate).once().with("t", data_v1, "n1.cpp");
+	MOCK_EXPECT(prov->generate).once().with("t", data_v2, "n2.cpp");
+	compile_cfg->naming = {gen_utils::name_conversion::camel_case};
+	sg(gen_context{{"${n}.cpp"_s, "t"_s, {}, false, *compile_cfg}, {}}, all_data);
+
+	all_data.add(t2);
+	data_v1 = make_result_json( {"n2.cpp"}, {}, data_amaker("n1", "m1"));
+	data_v2 = make_result_json( {"n1.cpp"}, {}, data_amaker("n2", "m1"));
+	MOCK_EXPECT(prov->generate).once().with("t", data_v1, "n1.cpp");
+	MOCK_EXPECT(prov->generate).once().with("t", data_v2, "n2.cpp");
+	sg(gen_context{{"${n}.cpp"_s, "t"_s, {}, false, *compile_cfg}, {}}, all_data);
+}
+BOOST_FIXTURE_TEST_CASE(main_rules_map_to_both, single_gen_part_fixture)
 {
 	single_gen_part sg(prov.get());
 	t1.add(t1.root(), make_node(1, "n", "n1"));
@@ -130,14 +166,16 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 	};
 	MOCK_EXPECT(t1_dsl->to_json).calls(jsoner);
 	MOCK_EXPECT(t2_dsl->to_json).calls(jsoner);
-	auto data_v1 = make_result_json( {"n2.cpp"}, {},
-	                 R"({"t1_dsl":{"a":"n1"},"t2_dsl":{"a":"m1"}})"_bj);
-	auto data_v2 = make_result_json( {"n1.cpp"}, {},
-	                 R"({"t1_dsl":{"a":"n2"},"t2_dsl":{"a":"m1"}})"_bj);
-	MOCK_EXPECT(prov->generate).once().with("t", data_v1, "n1.cpp");
-	MOCK_EXPECT(prov->generate).once().with("t", data_v2, "n2.cpp");
+	auto data_v1 = make_result_json({"n2_m1.cpp"}, {}, data_amaker("n1", "m1"));
+	auto data_v2 = make_result_json({"n2_m2.cpp"}, {}, data_amaker("n1", "m2"));
+	auto data_v3 = make_result_json({"n1_m1.cpp"}, {}, data_amaker("n2", "m1"));
+	auto data_v4 = make_result_json({"n1_m2.cpp"}, {}, data_amaker("n2", "m2"));
+	MOCK_EXPECT(prov->generate).once().with("t", data_v1, "n1_m1.cpp");
+	MOCK_EXPECT(prov->generate).once().with("t", data_v2, "n1_m2.cpp");
+	MOCK_EXPECT(prov->generate).once().with("t", data_v3, "n2_m1.cpp");
+	MOCK_EXPECT(prov->generate).once().with("t", data_v4, "n2_m2.cpp");
 	compile_cfg->naming = {gen_utils::name_conversion::camel_case};
-	sg(gen_context{{"${n}.cpp"_s, "t"_s, {}, false, *compile_cfg}, {}}, all_data);
+	sg(gen_context{{"${n}_${m}.cpp"_s, "t"_s, {}, false, *compile_cfg}, {}}, all_data);
 }
 BOOST_FIXTURE_TEST_CASE(split_by_version, single_gen_part_fixture)
 {
