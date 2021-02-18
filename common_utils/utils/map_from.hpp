@@ -16,7 +16,7 @@ namespace gen_utils {
 class map_from {
 public:
 	[[nodiscard]] std::pmr::vector<std::pmr::string> operator()(
-	        const map_to::result_t& mapped) ;
+	        const map_to::result_t& mapped, std::string_view tmpl, const tree& src) ;
 };
 
 } // namespace gen_utils

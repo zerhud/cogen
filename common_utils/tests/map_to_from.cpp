@@ -16,6 +16,7 @@
 #include "utils/tree.hpp"
 #include "utils/input.hpp"
 #include "utils/map_to.hpp"
+#include "utils/map_from.hpp"
 #include "mocks.hpp"
 
 using namespace std::literals;
@@ -26,12 +27,27 @@ std::pmr::string operator "" _s (const char* d, std::size_t l)
 	return std::pmr::string(d, l);
 }
 
+std::ostream& operator << (std::ostream& out, const gen_utils::map_to::result_t& mr)
+{
+	for(auto& v:mr) out << v.first << ' ';
+	return out;
+}
+
+std::ostream& operator << (std::ostream& out, const std::pmr::vector<std::pmr::string>& vec)
+{
+	for(auto& v:vec) out << v << ' ' ;
+	return out ;
+}
+
 BOOST_AUTO_TEST_SUITE(input)
 
-BOOST_AUTO_TEST_SUITE(tree_map_to)
 using gen_utils::map_to;
+using gen_utils::map_from;
 using gen_utils_mocks::make_node;
 using fixture = gen_utils_mocks::base_tree_fixture;
+using gen_utils_mocks::trees_fixture;
+
+BOOST_AUTO_TEST_SUITE(tree_map_to)
 BOOST_FIXTURE_TEST_CASE(one_var, fixture)
 {
 	map_to mapper;
@@ -116,5 +132,28 @@ BOOST_FIXTURE_TEST_CASE(double_use, fixture)
 	BOOST_CHECK(r.contains("_val_"));
 }
 BOOST_AUTO_TEST_SUITE_END() // tree_map_to
+
+BOOST_AUTO_TEST_SUITE(tree_map_from)
+BOOST_FIXTURE_TEST_CASE(simple, trees_fixture)
+{
+	map_to mapper;
+	t1().add(*t1_root, make_node(1, "var1", "val1"));
+	t1().add(*t1_root, make_node(1, "var1", "val2"));
+	t1().add(*t1_root, make_node(1, "var2", "v2"));
+	auto r = mapper("_${var1}_${var2}_", t1());
+	std::cout << __LINE__ << ' ' << r << std::endl;
+
+	map_from demapper;
+	std::cout << "var1: ";
+	for(auto& v:demapper(r, "_${var1}_", t1())) std::cout << v << ' ';
+	std::cout << std::endl;
+	std::cout << "var2: ";
+	for(auto& v:demapper(r, "_${var2}_", t1())) std::cout << v << ' ';
+	std::cout << std::endl;
+	BOOST_TEST(demapper(r, "_${var1}_", t1()).size() == 2);
+	BOOST_TEST(demapper(r, "_${var2}_", t1()).size() == 2);
+	BOOST_TEST(demapper(r, "__", t1()).size() == 1);
+}
+BOOST_AUTO_TEST_SUITE_END() // tree_map_from
 
 BOOST_AUTO_TEST_SUITE_END() // input
