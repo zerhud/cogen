@@ -154,11 +154,8 @@ BOOST_FIXTURE_TEST_CASE(simple, trees_fixture)
 	auto map_result = mapper("_${var1}_${var2}_${var3}_", t1());
 	std::vector<std::pmr::string> map_names;
 	for(auto& [n,_]:map_result) map_names.emplace_back(n);
-	std::cout << __LINE__ << ' ' << map_result << std::endl;
 
 	map_from demapper;
-	std::cout << "var1: " << demapper(map_result, "_${var1}_", t1()) << std::endl;
-	std::cout << "var2: " << demapper(map_result, "_${var2}_", t1()) << std::endl;
 	BOOST_TEST(demapper(map_result, "_${var1}_", t1()).size() == 2);
 	BOOST_TEST(demapper(map_result, "_${var1}_", t1()).at("_v11_").size() == 4);
 	BOOST_TEST(demapper(map_result, "_${var1}_", t1()).at("_v12_").size() == 4);
