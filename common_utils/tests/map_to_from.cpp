@@ -137,9 +137,10 @@ BOOST_AUTO_TEST_SUITE(tree_map_from)
 BOOST_FIXTURE_TEST_CASE(simple, trees_fixture)
 {
 	map_to mapper;
-	t1().add(*t1_root, make_node(1, "var1", "val1"));
-	t1().add(*t1_root, make_node(1, "var1", "val2"));
-	t1().add(*t1_root, make_node(1, "var2", "v2"));
+	t1().add(*t1_root, make_node(1, "var1", "v11"));
+	t1().add(*t1_root, make_node(1, "var1", "v12"));
+	t1().add(*t1_root, make_node(1, "var2", "v21"));
+	t1().add(*t1_root, make_node(1, "var2", "v22"));
 	auto r = mapper("_${var1}_${var2}_", t1());
 	std::cout << __LINE__ << ' ' << r << std::endl;
 
