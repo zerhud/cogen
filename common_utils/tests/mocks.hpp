@@ -44,6 +44,17 @@ void check_vec_eq(const VecLeft& l, const VecRight& r)
 	for(auto& i:l) BOOST_CHECK( vec_contains(r, i) );
 }
 
+template<typename VecLeft, typename T>
+void check_vec_eq(const VecLeft& l, std::initializer_list<T> r)
+{
+	BOOST_TEST( l.size() == r.size() );
+	for(auto& i:r) {
+		BOOST_TEST_CONTEXT("checking " << i) {
+			BOOST_CHECK( vec_contains(l, i) );
+		}
+	}
+}
+
 std::shared_ptr<gen_utils_mocks::data_node> make_node(
 		std::optional<std::uint64_t> v
 		, std::optional<std::pmr::string> name=std::nullopt

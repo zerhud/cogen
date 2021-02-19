@@ -29,13 +29,18 @@ std::pmr::string operator "" _s (const char* d, std::size_t l)
 
 std::ostream& operator << (std::ostream& out, const gen_utils::map_to::result_t& mr)
 {
+	out << "map " << mr.size() << ": ";
 	for(auto& v:mr) out << v.first << ' ';
 	return out;
 }
 
-std::ostream& operator << (std::ostream& out, const std::pmr::vector<std::pmr::string>& vec)
+std::ostream& operator << (std::ostream& out, const gen_utils::map_from::result_t& vec)
 {
-	for(auto& v:vec) out << v << ' ' ;
+	for(auto& [n,d]:vec) {
+		out << n << ": (";
+		for(auto& v:d) out << v << ' ' ;
+		out << ") ";
+	}
 	return out ;
 }
 
@@ -136,24 +141,47 @@ BOOST_AUTO_TEST_SUITE_END() // tree_map_to
 BOOST_AUTO_TEST_SUITE(tree_map_from)
 BOOST_FIXTURE_TEST_CASE(simple, trees_fixture)
 {
+	using gen_utils_mocks::check_vec_eq;
+
 	map_to mapper;
 	t1().add(*t1_root, make_node(1, "var1", "v11"));
 	t1().add(*t1_root, make_node(1, "var1", "v12"));
 	t1().add(*t1_root, make_node(1, "var2", "v21"));
 	t1().add(*t1_root, make_node(1, "var2", "v22"));
-	auto r = mapper("_${var1}_${var2}_", t1());
-	std::cout << __LINE__ << ' ' << r << std::endl;
+	t1().add(*t1_root, make_node(1, "var3", "v31"));
+	t1().add(*t1_root, make_node(1, "var3", "v32"));
+
+	auto map_result = mapper("_${var1}_${var2}_${var3}_", t1());
+	std::vector<std::pmr::string> map_names;
+	for(auto& [n,_]:map_result) map_names.emplace_back(n);
+	std::cout << __LINE__ << ' ' << map_result << std::endl;
 
 	map_from demapper;
-	std::cout << "var1: ";
-	for(auto& v:demapper(r, "_${var1}_", t1())) std::cout << v << ' ';
-	std::cout << std::endl;
-	std::cout << "var2: ";
-	for(auto& v:demapper(r, "_${var2}_", t1())) std::cout << v << ' ';
-	std::cout << std::endl;
-	BOOST_TEST(demapper(r, "_${var1}_", t1()).size() == 2);
-	BOOST_TEST(demapper(r, "_${var2}_", t1()).size() == 2);
-	BOOST_TEST(demapper(r, "__", t1()).size() == 1);
+	std::cout << "var1: " << demapper(map_result, "_${var1}_", t1()) << std::endl;
+	std::cout << "var2: " << demapper(map_result, "_${var2}_", t1()) << std::endl;
+	BOOST_TEST(demapper(map_result, "_${var1}_", t1()).size() == 2);
+	BOOST_TEST(demapper(map_result, "_${var1}_", t1()).at("_v11_").size() == 4);
+	BOOST_TEST(demapper(map_result, "_${var1}_", t1()).at("_v12_").size() == 4);
+	check_vec_eq(
+		demapper(map_result, "_${var1}_", t1()).at("_v11_"),
+		{"_v11_v21_v31_"_s, "_v11_v21_v32_"_s, "_v11_v22_v31_"_s, "_v11_v22_v32_"_s});
+	check_vec_eq(
+		demapper(map_result, "_${var1}_", t1()).at("_v12_"),
+		{"_v12_v21_v31_"_s, "_v12_v21_v32_"_s, "_v12_v22_v31_"_s, "_v12_v22_v32_"_s});
+
+	BOOST_TEST(demapper(map_result, "_${var2}_", t1()).size() == 2);
+	BOOST_TEST(demapper(map_result, "_${var2}_", t1()).at("_v21_").size() == 4);
+	BOOST_TEST(demapper(map_result, "_${var2}_", t1()).at("_v22_").size() == 4);
+	check_vec_eq(
+		demapper(map_result, "_${var2}_", t1()).at("_v21_"),
+		{"_v11_v21_v31_"_s, "_v11_v21_v32_"_s, "_v12_v21_v31_"_s, "_v12_v21_v32_"_s});
+	check_vec_eq(
+		demapper(map_result, "_${var2}_", t1()).at("_v22_"),
+		{"_v11_v22_v31_"_s, "_v11_v22_v32_"_s, "_v12_v22_v31_"_s, "_v12_v22_v32_"_s});
+
+	BOOST_TEST(demapper(map_result, "__", t1()).size() == 1);
+	check_vec_eq(demapper(map_result, "__", t1()).at("__"), map_names);
+	BOOST_TEST(demapper(map_result, "__", t1()).at("__").size() == 8);
 }
 BOOST_AUTO_TEST_SUITE_END() // tree_map_from
 
