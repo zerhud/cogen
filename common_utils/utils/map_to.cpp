@@ -53,6 +53,33 @@ gen_utils::map_to::result_t gen_utils::map_to::operator()
 	return result;
 }
 
+gen_utils::map_to::result_inputs_t gen_utils::map_to::operator()
+(std::pmr::string tmpl, const input& data)
+{
+	result_inputs_t ret;
+	auto all_data = data.all();
+	while(!all_data.empty()) {
+		if(ret.empty())
+			ret = map_to_input({{tmpl,data}}, *all_data.back(), false);
+		else ret = map_to_input(ret, *all_data.back(), true);
+		all_data.pop_back();
+	}
+	return ret;
+}
+
+gen_utils::map_to::result_inputs_t gen_utils::map_to::map_to_input(
+        const result_inputs_t& src, const tree& data, const bool addi)
+{
+	result_inputs_t cur;
+	for(auto& [t,i]:src) {
+		for(auto& [n,r]:(*this)(t, data)) {
+			cur[n].add(std::move(r));
+			if(addi) cur[n].add(input(i));
+		}
+	}
+	return cur;
+}
+
 std::optional<std::pmr::string> gen_utils::map_to::replace(
 		std::string_view tmpl,
 		std::string_view name,

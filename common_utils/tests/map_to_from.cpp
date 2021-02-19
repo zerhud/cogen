@@ -136,6 +136,34 @@ BOOST_FIXTURE_TEST_CASE(double_use, fixture)
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.contains("_val_"));
 }
+BOOST_FIXTURE_TEST_CASE(for_input, trees_fixture)
+{
+	map_to mapper;
+	gen_utils::input all_data;
+	t1().add(t1().root(), make_node(1, "n", "n1"));
+	t1().add(t1().root(), make_node(1, "n", "n2"));
+	t2().add(t2().root(), make_node(2, "m", "m1"));
+	t2().add(t2().root(), make_node(2, "m", "m2"));
+	all_data.add(t1());
+	auto r = mapper("${n}.file", all_data);
+	BOOST_TEST(r.size() == 2);
+	BOOST_CHECK(r.contains("n1.file"));
+	BOOST_CHECK(r.contains("n2.file"));
+
+	all_data.add(t2());
+	r = mapper("${n}.file", all_data);
+	BOOST_TEST(r.size() == 2);
+	BOOST_CHECK(r.contains("n1.file"));
+	BOOST_CHECK(r.contains("n2.file"));
+	BOOST_TEST(r["n1.file"].all().size() == 2);
+
+	r = mapper("${n}_${m}", all_data);
+	BOOST_TEST(r.size() == 4);
+	BOOST_CHECK(r.contains("n1_m1"));
+	BOOST_CHECK(r.contains("n1_m2"));
+	BOOST_CHECK(r.contains("n2_m1"));
+	BOOST_CHECK(r.contains("n2_m2"));
+}
 BOOST_AUTO_TEST_SUITE_END() // tree_map_to
 
 BOOST_AUTO_TEST_SUITE(tree_map_from)
