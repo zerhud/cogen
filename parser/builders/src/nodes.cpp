@@ -88,7 +88,7 @@ builders::library::library(
 		auto strval = opts.get_value<std::pmr::string>();
 		if(name == "part") {
 			for(auto& [file, data]:ctx.generated.at(strval))
-				files.emplace_back(file);
+				;//files.emplace_back(file);
 		} else if(name == "dep") deps.emplace_back(strval);
 		else if(name == "link_lib") libs.emplace_back(strval);
 	}
@@ -107,7 +107,7 @@ boost::json::value builders::library::to_json(const gen_utils::tree& con) const
 boost::json::value builders::library::make_json_files() const
 {
 	boost::json::array ret;
-	for(auto& f:files) ret.emplace_back(f);
+	//for(auto& f:files) ret.emplace_back(f);
 	return ret;
 }
 

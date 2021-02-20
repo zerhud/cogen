@@ -43,7 +43,7 @@ public:
 class library : public base_node {
 	std::string lib;
 	boost::property_tree::ptree setts;
-	std::vector<std::string> files;
+	std::map<std::string, std::vector<std::string>> files;
 	std::vector<std::string> deps;
 	std::vector<std::string> libs;
 

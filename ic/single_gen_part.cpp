@@ -23,7 +23,8 @@ single_gen_part::single_gen_part(const provider* p)
 				"part without provider");
 }
 
-compiled_output single_gen_part::operator()(const gen_context& cur_part, input alli) const
+compiled_output single_gen_part::operator()(
+        const gen_context& cur_part, input alli) const
 {
 	assert(outside);
 	input splitted;

@@ -208,6 +208,33 @@ BOOST_FIXTURE_TEST_CASE(simple, trees_fixture)
 	check_vec_eq(demapper(map_result, "__", t1()).at("__"), map_names);
 	BOOST_TEST(demapper(map_result, "__", t1()).at("__").size() == 8);
 }
+BOOST_FIXTURE_TEST_CASE(for_input, trees_fixture)
+{
+	using gen_utils_mocks::check_vec_eq;
+	map_to mapper;
+	t1().add(*t1_root, make_node(1, "var1", "v11"));
+	t1().add(*t1_root, make_node(1, "var1", "v12"));
+	t1().add(*t1_root, make_node(1, "var2", "v21"));
+	t1().add(*t1_root, make_node(1, "var2", "v22"));
+	t2().add(*t2_root, make_node(2, "var3", "v31"));
+	t2().add(*t2_root, make_node(2, "var3", "v32"));
+	gen_utils::input all_data;
+	all_data.add(t1()).add(t2());
+
+	auto map_result = mapper("_${var1}_${var2}_${var3}_", all_data);
+	std::vector<std::pmr::string> map_names;
+	for(auto& [n,_]:map_result) map_names.emplace_back(n);
+
+	map_from demapper;
+	BOOST_TEST(demapper(map_result, "_${var1}_", all_data).size() == 2);
+	check_vec_eq(
+	    demapper(map_result, "_${var1}_", all_data).at("_v11_"),
+	    {"_v11_v21_v31_"_s, "_v11_v21_v32_"_s, "_v11_v22_v31_"_s, "_v11_v22_v32_"_s});
+	check_vec_eq(
+	    demapper(map_result, "_${var1}_", all_data).at("_v12_"),
+	    {"_v12_v21_v31_"_s, "_v12_v21_v32_"_s, "_v12_v22_v31_"_s, "_v12_v22_v32_"_s});
+	BOOST_TEST(demapper(map_result, "__", all_data).size() == 1);
+}
 BOOST_AUTO_TEST_SUITE_END() // tree_map_from
 
 BOOST_AUTO_TEST_SUITE_END() // input

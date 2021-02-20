@@ -13,8 +13,6 @@
 using gen_utils::map_from;
 
 
-//typedef std::pmr::map<std::pmr::string, tree> result_t;
-
 map_from::result_t map_from::operator()(
     const map_to::result_t& mapped,
     std::string_view tmpl,
@@ -24,6 +22,24 @@ map_from::result_t map_from::operator()(
 	for(auto& [sn,sd]:map_to()(std::pmr::string(tmpl), src)) {
 		for(auto&[mn,md]:mapped) {
 			if(md.contains(sd) == tree_compare_result::total) {
+				ret[sn].emplace_back(mn);
+				continue;
+			}
+		}
+	}
+	return ret;
+}
+
+map_from::result_t map_from::operator()(
+            const map_to::result_inputs_t& mapped,
+            std::string_view tmpl,
+            const input& src)
+{
+	result_t ret;
+	auto mr = map_to()(std::pmr::string(tmpl), src);
+	for(auto& [sn,sd]:mr) {
+		for(auto& [mn,md]:mapped) {
+			if(md.match_with(sd) == tree_compare_result::total) {
 				ret[sn].emplace_back(mn);
 				continue;
 			}
