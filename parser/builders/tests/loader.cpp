@@ -17,6 +17,7 @@
 
 using namespace std::literals;
 using boost::property_tree::ptree;
+using gen_utils_mocks::trees_fixture;
 
 boost::json::value operator "" _bj(const char* d, std::size_t l)
 {

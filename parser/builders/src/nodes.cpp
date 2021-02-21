@@ -7,6 +7,7 @@
  *************************************************************************/
 
 #include "nodes.hpp"
+#include "utils/map_from.hpp"
 
 using namespace std::literals;
 
@@ -84,11 +85,14 @@ builders::library::library(
     : lib(std::move(n))
     , setts(std::move(lsetts))
 {
+	using gen_utils::map_from;
 	for(auto& [name, opts]:lsetts) {
 		auto strval = opts.get_value<std::pmr::string>();
 		if(name == "part") {
-			for(auto& [file, data]:ctx.generated.at(strval))
-				;//files.emplace_back(file);
+			for(auto& [file, data]:ctx.generated.at(strval)) {
+			//	map_from()(data, name, fuck);
+				files.emplace_back(file);
+			}
 		} else if(name == "dep") deps.emplace_back(strval);
 		else if(name == "link_lib") libs.emplace_back(strval);
 	}
@@ -107,7 +111,7 @@ boost::json::value builders::library::to_json(const gen_utils::tree& con) const
 boost::json::value builders::library::make_json_files() const
 {
 	boost::json::array ret;
-	//for(auto& f:files) ret.emplace_back(f);
+	for(auto& f:files) ret.emplace_back(f);
 	return ret;
 }
 

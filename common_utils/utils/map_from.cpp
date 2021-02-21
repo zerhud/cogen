@@ -36,8 +36,7 @@ map_from::result_t map_from::operator()(
             const input& src)
 {
 	result_t ret;
-	auto mr = map_to()(std::pmr::string(tmpl), src);
-	for(auto& [sn,sd]:mr) {
+	for(auto& [sn,sd]:map_to()(std::pmr::string(tmpl), src)) {
 		for(auto& [mn,md]:mapped) {
 			if(md.match_with(sd) == tree_compare_result::total) {
 				ret[sn].emplace_back(mn);
