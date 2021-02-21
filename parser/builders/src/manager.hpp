@@ -16,7 +16,7 @@ class dsl_manager : public gen_utils::dsl_manager {
 public:
 	std::string_view id() const override ;
 	boost::json::value to_json(
-	        const gen_utils::compilation_context& cfg,
+	        const gen_utils::compilation_context& ctx,
 	        const gen_utils::tree& container) const override ;
 };
 

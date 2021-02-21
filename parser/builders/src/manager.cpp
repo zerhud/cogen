@@ -17,9 +17,9 @@ std::string_view builders::dsl_manager::id() const
 }
 
 boost::json::value builders::dsl_manager::to_json(
-        const gen_utils::compilation_context& cfg,
+        const gen_utils::compilation_context& ctx,
         const gen_utils::tree& container) const
 {
 	auto& root = dynamic_cast<const root_node&>(container.root());
-	return root.to_json(container);
+	return root.to_json(container, ctx);
 }

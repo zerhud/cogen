@@ -33,7 +33,7 @@ public:
 
 	[[nodiscard]] virtual std::string_view id() const =0 ;
 	[[nodiscard]] virtual boost::json::value to_json(
-	        const compilation_context& cfg, const tree& container) const =0 ;
+	        const compilation_context& ctx, const tree& container) const =0 ;
 };
 
 class data_node {

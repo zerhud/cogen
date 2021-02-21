@@ -23,13 +23,17 @@ public:
 	std::string_view link_condition() const override ;
 	std::pmr::vector<gen_utils::name_t> required_links() const override ;
 
-	virtual boost::json::value to_json(const gen_utils::tree& con) const =0;
+	virtual boost::json::value to_json(
+	        const gen_utils::tree& con,
+	        const gen_utils::compilation_context& ctx) const =0;
 };
 
 class root_node : public base_node {
 public:
 	std::string_view name() const override ;
-	boost::json::value to_json(const gen_utils::tree& con) const override ;
+	boost::json::value to_json(
+	        const gen_utils::tree& con,
+	        const gen_utils::compilation_context& ctx) const override ;
 };
 
 class project : public base_node {
@@ -37,7 +41,9 @@ class project : public base_node {
 	std::string ver;
 public:
 	project(std::string n, std::string v);
-	boost::json::value to_json(const gen_utils::tree& con) const override ;
+	boost::json::value to_json(
+	        const gen_utils::tree& con,
+	        const gen_utils::compilation_context& ctx) const override ;
 };
 
 class library : public base_node {
@@ -48,15 +54,18 @@ class library : public base_node {
 	std::vector<std::string> deps;
 	std::vector<std::string> libs;
 
-	boost::json::value make_json_files() const ;
 	boost::json::value make_json_deps() const ;
 	boost::json::value make_json_libs() const ;
+	boost::json::value make_json_files(
+	        const std::pmr::vector<std::pmr::string>& list) const ;
 public:
 	library(
 	        std::string n,
 	        boost::property_tree::ptree lsetts,
 	        const mdg::ic::gen_context& ctx);
-	boost::json::value to_json(const gen_utils::tree& con) const override ;
+	boost::json::value to_json(
+	        const gen_utils::tree& con,
+	        const gen_utils::compilation_context& ctx) const override ;
 };
 
 } // namespace builders

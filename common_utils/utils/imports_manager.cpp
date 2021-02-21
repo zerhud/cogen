@@ -7,7 +7,10 @@
  *************************************************************************/
 
 #include "imports_manager.hpp"
+
 #include "input.hpp"
+#include "map_from.hpp"
+
 #include <algorithm>
 #include <ranges>
 
@@ -20,12 +23,14 @@ auto operator | (C && c, F f)
 	return f(c);
 }
 
-imports_manager& imports_manager::operator()(const std::pmr::string& file, const input& data)
+imports_manager& imports_manager::operator()(
+        const std::pmr::string& file, const input& data)
 {
 	return add(file, data);
 }
 
-imports_manager& imports_manager::add(const std::pmr::string& file, const input& data)
+imports_manager& imports_manager::add(
+        const std::pmr::string& file, const input& data)
 {
 	all_input[file] = &data;
 	return *this;
@@ -120,7 +125,8 @@ std::pmr::vector<import_info> imports_manager::required_for_links(
 	return ret;
 }
 
-std::pmr::vector<std::pmr::string> imports_manager::self_matched(const input& file_data) const
+std::pmr::vector<std::pmr::string> imports_manager::self_matched(
+        const input& file_data) const
 {
 	std::pmr::vector<std::pmr::string> ret;
 	auto pos = matched.find(&file_data);
@@ -150,4 +156,14 @@ std::pmr::map<std::pmr::string, std::pmr::vector<gen_utils::import_file>>
 	auto req = required_for_incs(file_data);
 	for(auto& r:req) ret[r.cond].emplace_back(r.file);
 	return ret;
+}
+
+std::pmr::map<std::pmr::string, std::pmr::vector<std::pmr::string>>
+	imports_manager::map_from(
+	        std::string_view tmpl,
+	        const gen_utils::input& src) const
+{
+	gen_utils::map_to::result_inputs_t mapped;
+	for(auto& [t,i]:all_input) mapped[t]=*i;
+	return gen_utils::map_from()(mapped, tmpl, src);
 }

@@ -20,6 +20,7 @@
 #include "mocks.hpp"
 
 using namespace std::literals;
+using gen_utils_mocks::check_vec_eq;
 using gen_utils_mocks::trees_fixture;
 
 std::pmr::string operator "" _s (const char* d, std::size_t l)
@@ -210,7 +211,6 @@ BOOST_FIXTURE_TEST_CASE(simple, trees_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(for_input, trees_fixture)
 {
-	using gen_utils_mocks::check_vec_eq;
 	map_to mapper;
 	t1().add(*t1_root, make_node(1, "var1", "v11"));
 	t1().add(*t1_root, make_node(1, "var1", "v12"));
@@ -234,6 +234,19 @@ BOOST_FIXTURE_TEST_CASE(for_input, trees_fixture)
 	    demapper(map_result, "_${var1}_", all_data).at("_v12_"),
 	    {"_v12_v21_v31_"_s, "_v12_v21_v32_"_s, "_v12_v22_v31_"_s, "_v12_v22_v32_"_s});
 	BOOST_TEST(demapper(map_result, "__", all_data).size() == 1);
+}
+BOOST_FIXTURE_TEST_CASE(for_input_single_var, trees_fixture)
+{
+	t1().add(t1().root(), make_node(1, "v1", "m1"));
+	t1().add(t1().root(), make_node(1, "v1", "m2"));
+	t2().add(t2().root(), make_node(2, "v2", "n1"));
+	t2().add(t2().root(), make_node(2));
+	gen_utils::input all_data;
+	all_data.add(t1()).add(t2());
+	auto map_result = map_to()("f_${v1}", all_data);
+	auto dr = map_from()(map_result, "f_${v2}", all_data);
+	BOOST_TEST(dr.size()==1);
+	check_vec_eq(dr.at("f_n1"), {"f_m1"_s, "f_m2"_s});
 }
 BOOST_AUTO_TEST_SUITE_END() // tree_map_from
 

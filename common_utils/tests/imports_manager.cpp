@@ -12,8 +12,9 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include "mocks.hpp"
-#include "utils/imports_manager.hpp"
+#include "utils/map_to.hpp"
 #include "utils/input.hpp"
+#include "utils/imports_manager.hpp"
 
 using namespace std::literals;
 using gunc = gen_utils::name_conversion;
@@ -33,6 +34,7 @@ BOOST_AUTO_TEST_SUITE(input)
 
 BOOST_AUTO_TEST_SUITE(imports_manager_test)
 using gen_utils::imports_manager;
+using gen_utils_mocks::make_node;
 using gen_utils_mocks::trees_fixture;
 BOOST_FIXTURE_TEST_CASE(self_matched, trees_fixture)
 {
@@ -154,14 +156,11 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 BOOST_FIXTURE_TEST_CASE(all_includes, trees_fixture)
 {
 	gen_utils::input fdata1, fdata2;
-	auto t1_child1 = gen_utils_mocks::make_node(
-	            11, std::nullopt, std::nullopt, "a");
-	auto t1_child2 = gen_utils_mocks::make_node(
-	            12, std::nullopt, std::nullopt, "b");
-	auto t2_child1 = gen_utils_mocks::make_node(
+	auto t1_child1 = make_node(11, std::nullopt, std::nullopt, "a");
+	auto t1_child2 = make_node(12, std::nullopt, std::nullopt, "b");
+	auto t2_child1 = make_node(
 	            12, std::nullopt, std::nullopt, "not_used", {{"a"}, {"b"}});
-	auto t2_child2 = gen_utils_mocks::make_node(
-	            12, std::nullopt, std::nullopt, "b");
+	auto t2_child2 = make_node(12, std::nullopt, std::nullopt, "b");
 	t1().add(t1().root(), t1_child1);
 	t1().add(t1().root(), t1_child2);
 	t2().add(t2().root(), t2_child1);
@@ -192,6 +191,25 @@ BOOST_FIXTURE_TEST_CASE(all_includes, trees_fixture)
 	BOOST_TEST(incs["cond_child2"].at(0).sys == true);
 	BOOST_TEST(incs["cond_child2"].at(0).name == "sysfile");
 
+}
+BOOST_FIXTURE_TEST_CASE(map_from_forward, trees_fixture)
+{
+	t1().add(t1().root(), make_node(1, "v1", "m1"));
+	t1().add(t1().root(), make_node(1, "v1", "m2"));
+	t2().add(t2().root(), make_node(2, "v2", "n1"));
+	t2().add(t2().root(), make_node(2));
+	gen_utils::input all_data;
+	all_data.add(t1()).add(t2());
+
+	imports_manager mng;
+	auto mapped = gen_utils::map_to()("m_${v1}", all_data);
+	for(auto& [n,d]:mapped) mng(n,d);
+	mng.build();
+
+	auto mr = mng.map_from("f_${v1}", all_data);
+	BOOST_TEST(mr.size() == 2);
+	mr = mng.map_from("f_${v2}", all_data);
+	BOOST_TEST(mr.size() == 1);
 }
 BOOST_AUTO_TEST_SUITE_END() // imports_manager_test
 

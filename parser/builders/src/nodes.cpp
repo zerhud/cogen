@@ -47,12 +47,15 @@ std::string_view builders::root_node::name() const
 	return "builders"sv;
 }
 
-boost::json::value builders::root_node::to_json(const gen_utils::tree& con) const
+boost::json::value builders::root_node::to_json(
+        const gen_utils::tree& con,
+        const gen_utils::compilation_context& ctx) const
 {
 	boost::json::object ret;
 	for(auto& child:con.children(*this)) {
 		assert(dynamic_cast<const base_node*>(child.get()));
-		auto cj = static_cast<const base_node&>(*child.get()).to_json(con).as_object();
+		auto cj = static_cast<const base_node&>(*child.get())
+		        .to_json(con,ctx).as_object();
 		for(auto& jnode:cj) ret[jnode.key()] = jnode.value();
 	}
 	return ret;
@@ -64,11 +67,14 @@ builders::project::project(std::string n, std::string v)
 {
 }
 
-boost::json::value builders::project::to_json(const gen_utils::tree& con) const
+boost::json::value builders::project::to_json(
+        const gen_utils::tree& con,
+        const gen_utils::compilation_context& ctx) const
 {
 	boost::json::object libs;
 	for(auto& child:con.children(*this)) {
-		auto lib = static_cast<const base_node&>(*child).to_json(con).as_object();
+		auto lib = static_cast<const base_node&>(*child)
+		        .to_json(con,ctx).as_object();
 		for(auto& [name,val]:lib) libs[name]=std::move(val);
 	}
 	boost::json::object ret;
@@ -98,20 +104,20 @@ builders::library::library(
 	}
 }
 
-boost::json::value builders::library::to_json(const gen_utils::tree& con) const
+boost::json::value builders::library::to_json(
+        const gen_utils::tree& con,
+        const gen_utils::compilation_context& ctx) const
 {
+	assert(ctx.links);
+	assert(ctx.all_input);
 	boost::json::object ret;
-	boost::json::object& cur_lib = ret[lib].emplace_object();
-	cur_lib["files"] = make_json_files();
-	cur_lib["deps"] = make_json_deps();
-	cur_lib["link_libs"] = make_json_libs();
-	return ret;
-}
-
-boost::json::value builders::library::make_json_files() const
-{
-	boost::json::array ret;
-	for(auto& f:files) ret.emplace_back(f);
+	auto mr = ctx.links->map_from(lib, *ctx.all_input);
+	for(auto& [n,cnt]:mr) {
+		boost::json::object& cur_lib = ret[n].emplace_object();
+		cur_lib["deps"] = make_json_deps();
+		cur_lib["link_libs"] = make_json_libs();
+		cur_lib["files"] = make_json_files(cnt);
+	}
 	return ret;
 }
 
@@ -126,5 +132,13 @@ boost::json::value builders::library::make_json_libs() const
 {
 	boost::json::array ret;
 	for(auto& l:libs) ret.emplace_back(l);
+	return ret;
+}
+
+boost::json::value builders::library::make_json_files(
+        const std::pmr::vector<std::pmr::string>& list) const
+{
+	boost::json::array ret;
+	for(auto& c:list) ret.emplace_back(c);
 	return ret;
 }

@@ -27,7 +27,8 @@ part
 		project interface
 		version "0.0.1.0"
 		libraries {
-			"interface_${mod}_${mod_a}_${mod_i}" {
+			;"interface_${mod}_${mod_a}_${mod_i}" {
+			"interface" {
 				part dec
 				part header
 				part definition

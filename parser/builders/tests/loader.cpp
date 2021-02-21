@@ -30,6 +30,16 @@ boost::json::value operator "" _bj(const char* d, std::size_t l)
 	            opts);
 }
 
+gen_utils::map_to::result_inputs_t config_manager(
+        std::pmr::string tmpl,
+        gen_utils::imports_manager& mng,
+        const gen_utils::input& all_data)
+{
+	auto ret = gen_utils::map_to()(tmpl, all_data);
+	for(auto& [n,d]:ret) mng(n,d);
+	return ret;
+}
+
 BOOST_AUTO_TEST_SUITE(library)
 BOOST_AUTO_TEST_SUITE(builder_system)
 BOOST_AUTO_TEST_CASE(no_tree)
@@ -42,7 +52,7 @@ BOOST_AUTO_TEST_CASE(no_tree)
 	mdg::ic::gen_context ctx;
 	BOOST_TEST(ldr(setts, ctx).has_value() == false);
 }
-BOOST_AUTO_TEST_CASE(proj_and_lib)
+BOOST_FIXTURE_TEST_CASE(proj_and_lib, trees_fixture)
 {
 	ptree setts;
 	setts.put("project", "proj");
@@ -53,21 +63,27 @@ BOOST_AUTO_TEST_CASE(proj_and_lib)
 	setts.add("libraries.lib1.link_lib", "lib1");
 	setts.add("libraries.lib1.link_lib", "lib2");
 
-	builders::loader ldr;
+	t1().add(t1().root(), make_node(1, "a", "a1"));
+	t1().add(t1().root(), make_node(1, "a", "a2"));
+	t1().add(t1().root(), make_node(1, "b", "b1"));
 	gen_utils::input dsls;
+	dsls.add(t1());
+
+	builders::loader ldr;
 	mdg::ic::gen_context ctx;
-	ctx.generated["a"]["file_a1"] = dsls;
-	ctx.generated["a"]["file_a2"] = dsls;
-	ctx.generated["b"]["file_b0"] = dsls;
+	gen_utils::imports_manager imng;
+	ctx.generated["a"] = config_manager("file_${a}", imng, dsls);
+	ctx.generated["b"] = config_manager("file_${b}", imng, dsls);
+	imng.build();
 
 	auto result = ldr(setts, ctx);
 	BOOST_REQUIRE(result.has_value());
 	BOOST_TEST_REQUIRE(result->children(result->root()).size() == 1);
-	gen_utils::compilation_context js_ctx{.all_input = &dsls};
+	gen_utils::compilation_context js_ctx{.links = &imng, .all_input = &dsls};
 	BOOST_TEST(result->to_json(js_ctx) == R"({ "project":"proj", "version":"0.0.0.0",
 	           "libraries":{
 	             "lib1":{
-	               "files":["file_a1", "file_a2", "file_b0"],
+	               "files":["file_a1", "file_a2", "file_b1"],
 	               "deps":["dep1", "dep2"],
 	               "link_libs":["lib1", "lib2"]
 	             }
@@ -77,10 +93,10 @@ BOOST_FIXTURE_TEST_CASE(with_map_from, trees_fixture)
 {
 	ptree setts;
 	setts.put("project", "proj");
-	setts.add("libraries.lib1${v}.part", "a");
-	setts.add("libraries.lib1${v}.part", "b");
-	setts.add("libraries.lib1${v}.dep", "dep1");
-	setts.add("libraries.lib1${v}.link_lib", "lib2");
+	setts.add("libraries.lib_${v}.part", "a");
+	setts.add("libraries.lib_${v}.part", "b");
+	setts.add("libraries.lib_${v}.dep", "dep1");
+	setts.add("libraries.lib_${v}.link_lib", "lib1");
 
 	t1().add(t1().root(), make_node(1, "v", "v1"));
 	t1().add(t1().root(), make_node(1, "v", "v2"));
@@ -88,22 +104,24 @@ BOOST_FIXTURE_TEST_CASE(with_map_from, trees_fixture)
 	dsls.add(t1());
 
 	mdg::ic::gen_context ctx;
-	ctx.generated["a"] = gen_utils::map_to()("a_${v}", dsls);
-	ctx.generated["b"] = gen_utils::map_to()("b_${v}", dsls);
+	gen_utils::imports_manager imng;
+	ctx.generated["a"] = config_manager("a_${v}", imng, dsls);
+	ctx.generated["b"] = config_manager("b_${v}", imng, dsls);
+	ctx.generated["c"] = config_manager("c_${v}", imng, dsls);
 
 	builders::loader ldr;
 	auto result = ldr(setts, ctx);
 	BOOST_REQUIRE(result.has_value());
 	BOOST_TEST_REQUIRE(result->children(result->root()).size() == 1);
-	gen_utils::compilation_context js_ctx{.all_input = &dsls};
+	gen_utils::compilation_context js_ctx{.links = &imng, .all_input = &dsls};
 	BOOST_TEST(result->to_json(js_ctx) == R"({ "project":"proj", "version":"0.0.0.0",
 	           "libraries":{
-	             "lib1_v1":{
+	             "lib_v1":{
 	               "files":["a_v1", "b_v1"],
 	               "deps":["dep1"],
 	               "link_libs":["lib1"]
 	             },
-	             "lib1_v2":{
+	             "lib_v2":{
 	               "files":["a_v2", "b_v2"],
 	               "deps":["dep1"],
 	               "link_libs":["lib1"]
