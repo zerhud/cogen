@@ -44,6 +44,7 @@ struct compilation_context final {
 	compilation_config cfg;
 	const imports_manager* links = nullptr;
 	node_ptr linked_to = nullptr;
+	const input* all_input;
 };
 
 inline bool operator == (const node_pointer& l, const node_pointer& r) {
