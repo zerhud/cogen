@@ -68,6 +68,10 @@ gen_utils::imports_manager single_gen_part::make_imports(
 	for(auto& link:setts.cfg_part.links)
 		for(auto& [n,d]:setts.generated.at(link))
 			imports.add(n,d);
+	if(setts.cfg_part.links.empty()) {
+		for(auto& [link, ld]:setts.generated)
+			for(auto& [n,d]:ld) imports.add(n,d);
+	}
 	imports.build();
 	return imports;
 }
