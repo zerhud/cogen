@@ -96,8 +96,7 @@ builders::library::library(
 		auto strval = opts.get_value<std::pmr::string>();
 		if(name == "part") {
 			for(auto& [file, data]:ctx.generated.at(strval)) {
-			//	map_from()(data, name, fuck);
-				files.emplace_back(file);
+				mapped[file].add(gen_utils::input(data));
 			}
 		} else if(name == "dep") deps.emplace_back(strval);
 		else if(name == "link_lib") libs.emplace_back(strval);
@@ -111,7 +110,7 @@ boost::json::value builders::library::to_json(
 	assert(ctx.links);
 	assert(ctx.all_input);
 	boost::json::object ret;
-	auto mr = ctx.links->map_from(lib, *ctx.all_input);
+	auto mr = gen_utils::map_from()(mapped, lib, *ctx.all_input);
 	for(auto& [n,cnt]:mr) {
 		boost::json::object& cur_lib = ret[n].emplace_object();
 		cur_lib["deps"] = make_json_deps();

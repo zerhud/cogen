@@ -56,9 +56,6 @@ gen_utils::tree_compare_result input::match_with(const input& other) const
 				result = tree_compare_result::only_root;
 		}
 	}
-	if(result == tree_compare_result::total
-	        && other.storage.size() != storage.size())
-		result = tree_compare_result::partial;
 	return result;
 }
 
