@@ -26,9 +26,9 @@ part
 		file CMakeLists.txt
 		project interface
 		version "0.0.1.0"
+		import pybind11
 		libraries {
-			;"interface_${mod}_${mod_a}_${mod_i}" {
-			"interface" {
+			"interface_${mod}_${mod_a}_${mod_i}" {
 				part dec
 				part header
 				part definition

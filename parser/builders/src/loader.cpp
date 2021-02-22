@@ -25,5 +25,9 @@ std::optional<gen_utils::tree> builders::loader::operator()(
 	ret->add(ret->root(), proj);
 	for(auto& [name, opts]:setts.get_child("libraries"))
 		ret->add(*proj, std::make_shared<library>(name, opts, ctx));
+	std::vector<std::string> imports;
+	for(auto& [name,value]:setts)
+		if(name == "import") imports.emplace_back(value.get_value<std::string>());
+	ret->add(ret->root(), std::make_shared<import>(std::move(imports)));
 	return ret;
 }

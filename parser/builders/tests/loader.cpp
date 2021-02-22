@@ -56,6 +56,8 @@ BOOST_FIXTURE_TEST_CASE(proj_and_lib, trees_fixture)
 {
 	ptree setts;
 	setts.put("project", "proj");
+	setts.add("import", "lib_a");
+	setts.add("import", "lib_b");
 	setts.add("libraries.lib1.part", "a");
 	setts.add("libraries.lib1.part", "b");
 	setts.add("libraries.lib1.dep", "dep1");
@@ -78,9 +80,10 @@ BOOST_FIXTURE_TEST_CASE(proj_and_lib, trees_fixture)
 
 	auto result = ldr(setts, ctx);
 	BOOST_REQUIRE(result.has_value());
-	BOOST_TEST_REQUIRE(result->children(result->root()).size() == 1);
+	BOOST_TEST_REQUIRE(result->children(result->root()).size() == 2);
 	gen_utils::compilation_context js_ctx{.links = &imng, .all_input = &dsls};
 	BOOST_TEST(result->to_json(js_ctx) == R"({ "project":"proj", "version":"0.0.0.0",
+	           "imports":["lib_a", "lib_b"],
 	           "libraries":{
 	             "lib1":{
 	               "files":["file_a1", "file_a2", "file_b1"],
@@ -112,7 +115,7 @@ BOOST_FIXTURE_TEST_CASE(with_map_from, trees_fixture)
 	builders::loader ldr;
 	auto result = ldr(setts, ctx);
 	BOOST_REQUIRE(result.has_value());
-	BOOST_TEST_REQUIRE(result->children(result->root()).size() == 1);
+	BOOST_TEST_REQUIRE(result->children(result->root()).size() == 2);
 	gen_utils::compilation_context js_ctx{.links = &imng, .all_input = &dsls};
 	BOOST_TEST(result->to_json(js_ctx) == R"({ "project":"proj", "version":"0.0.0.0",
 	           "libraries":{

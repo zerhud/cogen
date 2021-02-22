@@ -46,6 +46,15 @@ public:
 	        const gen_utils::compilation_context& ctx) const override ;
 };
 
+class import : public base_node {
+	std::vector<std::string> value;
+public:
+	import(std::vector<std::string> v);
+	boost::json::value to_json(
+	        const gen_utils::tree& con,
+	        const gen_utils::compilation_context& ctx) const override ;
+};
+
 class library : public base_node {
 	std::string lib;
 	boost::property_tree::ptree setts;

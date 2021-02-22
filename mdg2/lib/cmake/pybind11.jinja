@@ -4,11 +4,10 @@ project(<= sd.project => VERSION <= sd.version => LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-<%- for item, value in sd.libraries.items() %>
 
-<% for dep in value.deps -%>
-find_package( <= dep => REQUIRED)
-<% endfor %><% endfor %>
+<%- for im in sd.imports %>
+find_package( <= im => REQUIRED)
+<%endfor%>
 
 <%- for item, value in sd.libraries.items() %>
 add_library("<= item =>" STATIC
@@ -18,6 +17,6 @@ add_library("<= item =>" STATIC
 set_source_files_properties(
 	<% for file in value.files if '.cpp' in file %><=file=> <%endfor%>
 	PROPERTIES COMPILE_OPTIONS "-Wno-deprecated-declarations")
-<% if value.link_libs %>target_link_libraries("<= item =>" PUBLIC	<% for dep in value.link_libs %> <= dep =><% endfor %>) <% endif %>
+<% if value.deps %>target_link_libraries("<= item =>" PUBLIC	<% for dep in value.deps %> <= dep =><% endfor %>) <% endif %>
 <% endfor %>
 

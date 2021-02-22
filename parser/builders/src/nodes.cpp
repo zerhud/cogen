@@ -141,3 +141,20 @@ boost::json::value builders::library::make_json_files(
 	for(auto& c:list) ret.emplace_back(c);
 	return ret;
 }
+
+builders::import::import(std::vector<std::string> v)
+    : value(std::move(v))
+{
+}
+
+boost::json::value builders::import::to_json(
+        const gen_utils::tree& con,
+        const gen_utils::compilation_context& ctx) const
+{
+	boost::json::object ret;
+	if(value.empty()) return ret;
+	boost::json::array vals;
+	for(auto& v:value) vals.emplace_back(v);
+	ret["imports"] = vals;
+	return ret;
+}
