@@ -212,11 +212,12 @@ BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 
 	ctx.generated["a"] = sg(ctx, all_data);
 
+	boost::json::value mincs_data = make_result_json({"v1", "v2"}, {});
+
 	ctx.cfg_part.map_tmpl = "f.cpp";
-	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "f.cpp");
+	MOCK_EXPECT(prov->generate).once().with("t", mincs_data, "f.cpp");
 	sg(ctx, all_data);
 
-	boost::json::value mincs_data = make_result_json({"v1", "v2"}, {});
 	ctx.cfg_part.links.emplace_back("a");
 	MOCK_EXPECT(prov->generate).once().with("t", mincs_data, "f.cpp");
 	ctx.generated["b"] = sg(ctx, all_data);
