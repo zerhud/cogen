@@ -10,12 +10,12 @@
 <% for mod_ver in module.vers %>
 
 <%- macro module_name(mod) %><= mod.name =>_<= mod.v.major =><= mod.v.minor =><% endmacro %>
-<%- macro obj_ref(obj, mod, cdata) %><= render.gen_namespace_name(mod, cdata) =>::<= obj.name =><% endmacro %>
+<%- macro obj_ref(obj, mod, mod_ver) %><= render.gen_namespace_name(mod, mod_ver) =>::<= obj.name =><% endmacro %>
 <%- macro def_class(obj,mod,cdata) %>
 	pybind11::class_<<= obj_ref(obj,mod,cdata) =>>(m, "<= obj.name =>")
-		<%- for cns in obj.constructors %>
+		<%- for cns in obj.ctors %>
 		.def(pybind11::init(&<=render.gen_namespace_name(mod,cdata)=>::<= render.constructor_name(cns,obj,cdata) =>))<% endfor %>
-		<%- for mem in obj.members %>
+		<%- for mem in obj.funcs %>
 		.def("<=mem.name=>", &<=obj_ref(obj,mod,cdata)=>::<=mem.name=>)<% endfor %>
 		;
 <% endmacro -%>
@@ -27,11 +27,12 @@
 <% endmacro %>
 
 PYBIND11_MODULE(<= module.name =>_<= mod_ver.major =>_<= mod_ver.minor =>, m) {
-	<%- for obj in module.content -%>
-	<% if obj.type == "function" -%>m.def("<= obj.name =>", &<= obj_ref(obj, module, cdata) =>, "<= obj.docs =>");<%- endif %>
-	<% if obj.type == "interface" -%><= def_class(obj,module,cdata) =><%- endif %>
-	<% if obj.type == "enumeration" -%><= def_enum(obj,module,cdata) =><%- endif %>
-	<% endfor %>
+	<% for obj in mod_ver.content -%>
+	<%- if obj.type == "function" -%>m.def("<= obj.name =>", &<= obj_ref(obj, module, mod_ver) =>, "<= obj.docs =>");
+	<% endif %>
+	<%- if obj.type == "interface" -%><= def_class(obj,module,mod_ver) =><%- endif %>
+	<%- if obj.type == "enum" -%><= def_enum(obj,module,mod_ver) =><%- endif %>
+	<%- endfor %>
 }
 
 <% endfor %>
