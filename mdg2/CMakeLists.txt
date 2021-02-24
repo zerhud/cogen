@@ -69,7 +69,7 @@ target_link_libraries( ${PROJECT_NAME}
 		-static-libgcc -static-libstdc++
 	)
 
-if(ENABLE_TESTS)
+if(ENABLE_TESTS AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 	enable_testing()
 	add_test(NAME mdg2_cpp_decl COMMAND python3 -m pytest "${CMAKE_CURRENT_SOURCE_DIR}/tests/cpp_decl.py")
 	add_test(NAME mdg2_results COMMAND python3 -m pytest "${CMAKE_CURRENT_SOURCE_DIR}/tests/results.py")
