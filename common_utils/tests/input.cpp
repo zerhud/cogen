@@ -162,14 +162,28 @@ BOOST_FIXTURE_TEST_CASE(few_childs, fixture)
 	tree().add(*child1, child11);
 	tree().add(*child1, child12);
 
-	auto tc = tree().copy_if([child2, child12](auto &n) {
+	auto tc = tree().copy_if([child2, child12](auto& n) {
 		return !(&n == child2.get() || &n == child12.get());
 	});
-	BOOST_CHECK( tc.has_value()) ;
-	BOOST_TEST_REQUIRE(tc.value().children(tc->root()).size()==1);
-	BOOST_TEST(tc.value().children(tc->root())[0] == child1);
-	BOOST_TEST(tc.value().children(*child1).size() == 1);
-	BOOST_TEST(tc.value().children(*child1).at(0) == child11);
+	BOOST_REQUIRE( tc.has_value()) ;
+	BOOST_TEST_REQUIRE(tc->children(tc->root()).size()==1);
+	BOOST_TEST(tc->children(tc->root())[0] == child1);
+	BOOST_TEST(tc->children(*child1).size() == 1);
+	BOOST_TEST(tc->children(*child1).at(0) == child11);
+
+	auto child121 = make_node(111);
+	tree().add(*child2, make_node(201));
+	tree().add(*child12, child121);
+
+	tc = tree().copy_if([child1](auto& n){ return &n != child1.get(); });
+	BOOST_REQUIRE(tc.has_value());
+	BOOST_TEST_REQUIRE(tc->children(tc->root()).size()==1);
+	BOOST_TEST(tc->children(tc->root())[0] == child2);
+	BOOST_CHECK_THROW(tc->children(*child1).size(), std::exception);
+	BOOST_TEST(tc->children(*child2).size() == 1);
+	BOOST_TEST(*tc->children(*child2).at(0)->version() == 201);
+	BOOST_CHECK(!tc->node_exists(child12.get()));
+	BOOST_CHECK(!tc->node_exists(child121.get()));
 }
 BOOST_FIXTURE_TEST_CASE(getters, fixture)
 {

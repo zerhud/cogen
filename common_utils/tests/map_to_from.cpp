@@ -165,6 +165,26 @@ BOOST_FIXTURE_TEST_CASE(for_input, trees_fixture)
 	BOOST_CHECK(r.contains("n2_m1"));
 	BOOST_CHECK(r.contains("n2_m2"));
 }
+BOOST_FIXTURE_TEST_CASE(few_levels, trees_fixture)
+{
+	auto mod1 = make_node(1, "mod", "mod1");
+	auto mod2 = make_node(1, "mod", "mod2");
+	t1().add(t1().root(), mod1);
+	t1().add(t1().root(), mod2);
+	auto m1_va1 = make_node(1, "a", "1");
+	auto m2_va1 = make_node(1, "a", "1");
+	t1().add(*mod1, m1_va1); // mod1->1
+	t1().add(*mod2, m2_va1); // mod2->2
+	auto m1_i0 = make_node(1, "i", "0");
+	auto m2_i1 = make_node(1, "i", "1");
+	t1().add(*m1_va1, m1_i0); // mod1->1->0
+	t1().add(*m2_va1, m2_i1); // mod2->1->1
+
+	auto r = map_to()("_${mod}_${a}_${i}_", t1());
+	BOOST_TEST(r.size() == 2);
+	BOOST_CHECK(r.contains("_mod1_1_0_"));
+	BOOST_CHECK(r.contains("_mod2_1_1_"));
+}
 BOOST_AUTO_TEST_SUITE_END() // tree_map_to
 
 BOOST_AUTO_TEST_SUITE(tree_map_from)

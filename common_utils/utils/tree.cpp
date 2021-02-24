@@ -214,7 +214,7 @@ std::optional<tree> tree::copy_if(const tree::copy_condition& cond) const
 
 	ret.emplace(store[0], dmanager);
 	ret->root_ver = root_ver;
-	for(auto& e:edges) if(cond(*e.parent)) {
+	for(auto& e:edges) if(ret->node_exists(e.parent) && cond(*e.parent)) {
 		auto& ce = ret->edges.emplace_back(edge{e.parent, {}});
 		for(auto& c:e.children) if(cond(*c)) {
 			ret->store.emplace_back(c);
