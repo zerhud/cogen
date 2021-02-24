@@ -184,6 +184,11 @@ BOOST_FIXTURE_TEST_CASE(few_levels, trees_fixture)
 	BOOST_TEST(r.size() == 2);
 	BOOST_CHECK(r.contains("_mod1_1_0_"));
 	BOOST_CHECK(r.contains("_mod2_1_1_"));
+
+	r = map_to()("_${i}_${mod}_${a}_${i}_", t1());
+	BOOST_TEST(r.size() == 2);
+	BOOST_CHECK(r.contains("_0_mod1_1_0_"));
+	BOOST_CHECK(r.contains("_1_mod2_1_1_"));
 }
 BOOST_AUTO_TEST_SUITE_END() // tree_map_to
 
