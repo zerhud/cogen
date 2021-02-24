@@ -29,14 +29,22 @@ void ix3::utils::traverser::trav_module(const ast::module& mod, trav_direction d
 			});
 		},
 		[this](ast::record& o){
-		    inner_trav(o, [this,&o](){
+			inner_trav(o, [this,&o](){
 				for(auto&i:o.members) { on_obj(i); }
 			});
 		},
 		[this](ast::interface& o){
-		    inner_trav(o, [this,&o](){
-				for(auto& m:o.mem_funcs)    { on_obj(m); }
-				for(auto& c:o.constructors) { on_obj(c); }
+			inner_trav(o, [this,&o](){
+				for(auto& c:o.constructors) {
+					inner_trav(c, [this,&c] {
+						for(auto&p:c.params) on_obj(p);
+					});
+				}
+				for(auto& m:o.mem_funcs)    {
+					inner_trav(m, [this,&m] {
+						for(auto&p:m.params) on_obj(p);
+					});
+				}
 			});
 		},
 	};

@@ -1,0 +1,38 @@
+defaults {
+	naming underscore
+}
+part
+{
+	dec {
+		tmpl cpp/declarations.jinja
+		file declarations.hpp
+	}
+	header {
+		inc_part dec
+		tmpl cpp/header.jinja
+		file module.hpp
+		filter {
+			sel interface
+			sel record
+		}
+	}
+	definition {
+		inc_part dec
+		inc_part header
+		tmpl cpp/definitions.jinja
+		file module.cpp
+	}
+	cmake {
+		tmpl cmake/plain.jinja
+		file CMakeLists.txt
+		project interface
+		version "0.0.1.0"
+		libraries {
+			interface {
+				part dec
+				part header
+				part definition
+			}
+		}
+	}
+}

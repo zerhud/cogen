@@ -9,18 +9,6 @@ option(ENABLE_TODO "enable todo warnings in debug mode" ON)
 option(ENABLE_TESTS "enable tests.. it depends on turtle library" ON)
 option(LOW_MEMORY "assume we don't have efough memroty for complie grammars (gcc optimizations)" ON)
 
-# lohman json
-set(lohman_json_file "${CMAKE_BINARY_DIR}/nlohman/json.hpp")
-set(lohman_json_url "https://github.com/nlohmann/json/raw/develop/single_include/nlohmann/json.hpp")
-add_custom_command(OUTPUT ${lohman_json_file}
-	COMMAND "${CMAKE_COMMAND}"
-		-Durl="${lohman_json_url}" -Dout="${lohman_json_file}"
-		-Denv_var="nlohman_json_header"
-		-P "${CMAKE_CURRENT_LIST_DIR}/cmake/download_or_get.cmake"
-	DEPENDS
-		"${CMAKE_CURRENT_LIST_DIR}/cmake/download_or_get.cmake")
-add_custom_target(generate_nlohman DEPENDS ${lohman_json_file})
-
 if(ENABLE_TESTS)
 	find_file(turtle turtle/mock.hpp)
 	get_filename_component(turtle "${turtle}" DIRECTORY)
@@ -30,6 +18,11 @@ endif()
 
 # turtle uses auto_ptr if not defined
 # BOOST_BIND_GLOBAL_PLACEHOLDERS for boost warging about bind placehodlers
-add_compile_definitions(BOOST_NO_AUTO_PTR BOOST_BIND_GLOBAL_PLACEHOLDERS)
+# BOOST_JSON_STANDALONE for boost.json can read the std::string_view
+add_compile_definitions(BOOST_NO_AUTO_PTR BOOST_BIND_GLOBAL_PLACEHOLDERS BOOST_JSON_STANDALONE)
 add_subdirectory(common_utils)
 add_subdirectory(ic)
+add_subdirectory(parser/ix3)
+add_subdirectory(parser/standard_types)
+add_subdirectory(parser/builders)
+add_subdirectory(mdg2)

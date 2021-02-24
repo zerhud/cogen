@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(generation_utils VERSION 0.1.0.0 LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(Boost_USE_STATIC_LIBS   ON)
+find_package(Boost COMPONENTS json REQUIRED)
+#find_package(boost_json REQUIRED)
 
 file(
     GLOB_RECURSE src
@@ -18,21 +22,28 @@ list(FILTER src EXCLUDE REGEX "tests/.*")
 list(FILTER hdr EXCLUDE REGEX "tests/.*")
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/" FILES ${src} ${hdr})
 
-add_library(${PROJECT_NAME} ${src} ${hdr})
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR})
+add_library(${PROJECT_NAME} STATIC ${src} ${hdr})
+target_include_directories(${PROJECT_NAME}
+    PUBLIC ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(${PROJECT_NAME} PUBLIC Boost::json
+		-static-libgcc -static-libstdc++)
 
 if(ENABLE_TESTS)
+	set(Boost_USE_STATIC_LIBS   OFF)
 	find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 	macro(add_unit_test tname path lib)
 		set(src_list "${path}${tname}.cpp" tests/mocks.hpp)
 		add_executable(gu_${tname}_test ${src_list})
 		source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/${path}" FILES ${src_list})
-		target_link_libraries(gu_${tname}_test PRIVATE ${PROJECT_NAME} ${Boost_LIBRARIES})
+		target_link_libraries(gu_${tname}_test PRIVATE ${PROJECT_NAME} ${Boost_LIBRARIES} )
 		target_include_directories(gu_${tname}_test PRIVATE ${turtle} ${Boost_INCLUDE_DIR})
 		add_test(NAME gu_${tname} COMMAND gu_${tname}_test)
 	endmacro()
 
 	add_unit_test(naming "tests/" "")
 	add_unit_test(input "tests/" "")
+	add_unit_test(imports_manager "tests/" "")
+	add_unit_test(split_by_ver "tests/" "")
+	add_unit_test(map_to_from "tests/" "")
 endif()

@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <variant>
 #include "ix3/ast/file.hpp"
 
 namespace ix3::utils {
@@ -27,13 +28,20 @@ public:
 	virtual ~traverser() noexcept =default ;
 protected:
 	enum class trav_direction { paret_first, child_first } ;
-	typedef std::variant<ast::module*, ast::record*, ast::interface*, ast::function*, ast::enumeration*> parent_t;
+	typedef std::variant<
+	   ast::module*,
+	   ast::record*,
+	   ast::interface*,
+	   ast::function*,
+	   ast::constructor*,
+	   ast::enumeration*> parent_t;
 
 	ast::module& module() ;
-	void trav_module(const ast::module& mod, trav_direction direction = trav_direction::child_first) ;
+	void trav_module(
+	        const ast::module& mod,
+	        trav_direction direction = trav_direction::child_first) ;
 
 	std::string path() const ;
-	std::vector<ast::meta::set> meta_stack() const ;
 
 	template<typename P>
 	P* parent(std::size_t ind)
@@ -62,6 +70,8 @@ private:
 	virtual void on_obj(ast::meta::depricated& obj)    { (void)obj; }
 	virtual void on_obj(ast::meta::documentation& obj) { (void)obj; }
 
+	virtual void pop_parent() {}
+
 	template<typename T, typename... Args>
 	std::string make_path(T&& v1, Args... v)
 	{
@@ -75,7 +85,7 @@ private:
 	template<typename O, typename Fnc>
 	void inner_trav(O& obj, const Fnc& fnc)
 	{
-		make_path(cur_mod_.name, obj.name);
+		if constexpr (requires{obj.name;}) make_path(cur_mod_.name, obj.name);
 		if(cur_direction==trav_direction::paret_first)
 			on_obj(obj);
 
@@ -85,6 +95,8 @@ private:
 
 		if(cur_direction==trav_direction::child_first)
 			on_obj(obj);
+
+		pop_parent();
 	}
 
 	trav_direction cur_direction = trav_direction::child_first;

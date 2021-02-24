@@ -17,13 +17,16 @@
 #include "grammar/all.hpp"
 #include "utils/checker.hpp"
 #include "utils/meta.hpp"
-#include "utils/selector.hpp"
 
 namespace ast = ix3::ast;
 namespace txt = ix3::text;
 namespace udt = boost::unit_test::data;
 using namespace std::literals;
 using ix3::utils::checker;
+
+BOOST_AUTO_TEST_SUITE(ix3)
+BOOST_AUTO_TEST_SUITE(utils)
+BOOST_AUTO_TEST_SUITE(gain_ast_checker)
 
 BOOST_AUTO_TEST_CASE(few_modules)
 {
@@ -105,24 +108,6 @@ BOOST_AUTO_TEST_CASE(unite)
 	BOOST_TEST( ast::get<ast::meta::documentation>(mods[0].meta_params).has_value() );
 }
 
-BOOST_DATA_TEST_CASE(
-	  selector
-	, udt::make(
-		 ast::module_content(ast::function{})
-		,ast::enumeration{}
-		,ast::record{}
-		,ast::interface{}
-		,ast::record{}
-		)
-	^ udt::make(
-		 ix3::utils::selector::function
-		,ix3::utils::selector::enumeration
-		,ix3::utils::selector::record
-		,ix3::utils::selector::interface
-		,ix3::utils::selector::interface
-		)
-	^ udt::make(true, true, true, true, false)
-	, content, selector, result)
-{
-	BOOST_TEST( ix3::utils::is_selected(content, selector) == result );
-}
+BOOST_AUTO_TEST_SUITE_END() // gain_ast_checker
+BOOST_AUTO_TEST_SUITE_END() // utils
+BOOST_AUTO_TEST_SUITE_END() // ix3

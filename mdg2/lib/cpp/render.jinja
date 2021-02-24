@@ -1,0 +1,58 @@
+<%- macro gen_namespace_name(module, mod_ver) -%>
+<= module.name =>_<= mod_ver.major =>_<= mod_ver.minor =>
+<%- endmacro %>
+
+<% macro type(obj) -%>
+<% if obj.ix3 %><=ix3_type(obj.ix3)=><% else -%>
+<= obj.cpp =><% if obj.subs[0] is defined %><<% for st in obj.subs %><= type(st) =><= ", " if not loop.last =><% endfor %>><% endif %>
+<%-endif%>
+<%- endmacro %>
+
+<% macro ix3_type(obj) -%>
+<= gen_namespace_name(obj.mod, obj.mod_ver) =>::<= obj.name =>_ptr
+<%- endmacro %>
+
+<%- macro function_header(obj) -%>
+<= decl_meta_params(obj) -=>
+<= decl_depricated(obj) -=>
+<= "static " if obj.static =><=- type(obj.return) => <= obj.name =>(<= fparam(obj.params) =>)<= " const" if obj.mutable == False =>
+<%- endmacro %>
+
+<%- macro fparam(params) -%>
+<% for param in params %><= type(param.param_t) => <= param.name =><= ", " if not loop.last =><% endfor %>
+<%- endmacro %>
+
+<%- macro decl_depricated(obj) -%>
+<%- if obj.meta and obj.meta.depricated %>[[deprecated<% if obj.meta.depricated.msg != '' %>("<= obj.meta.depricated.msg =>")<% endif %>]] <% endif %>
+<%- endmacro %>
+
+<%- macro decl_meta_params(obj) -%>
+<%- if obj.meta and obj.meta.doc -%>///  <= obj.meta.doc -=>
+<% endif -%>
+<%- endmacro %>
+
+<%- macro includes(incs) -%>
+<% for (from, list) in incs.items() if from == "cpp"  or from == "ix3" %>
+<% for info in list %>
+#include <= '<' if info.sys else '"' =><= info.file =><= '>' if info.sys else '"' =>
+<%- endfor -%>
+<%- endfor -%>
+<%- endmacro -%>
+
+<%- macro ptr(obj) -%><= obj | apply_sufix('ptr') =><% endmacro -%>
+
+
+<%- macro interface(obj) -%>
+class <= decl_depricated(obj) =><= obj.name => {
+public:
+	virtual ~<= obj.name =>() noexcept =default;
+	<% for fnc in obj.members %>
+	virtual <= function_header(fnc) => =0 ;
+	<% endfor %>
+};
+<% endmacro -%>
+
+<%- macro constructor_name(cns, obj, cdata) -%><= cdata.ctor_prefix =><= obj.name =><% endmacro -%>
+
+<% macro enum(obj, module, cdata) -%>
+<% endmacro -%>

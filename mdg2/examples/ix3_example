@@ -1,0 +1,26 @@
+include "ix3_example_inc"
+include "ix3_example_inc_dir"
+
+module mod v1.0:
+
+string foo(+i8 p);
+i64 bar(+list<string> p1);
+enum etest +auto_io { one, two }
+
+# doc string
+interface i +ex {
+	constructor(+i8 p1);
+	void do_some() mutable;
+	list<string> get_strings() const ;
+}
+
+@v 1.1 @depricated v1.1 ("test depricated and version")
+record some_rec {
+	+i64 filed1;
+}
+
+module test_two v2.0:
+
+mod.i fnc();
+
+inc_mod.in_other_file other_fnc();

@@ -24,6 +24,9 @@ namespace ast = ix3::ast;
 namespace txt = ix3::text;
 namespace utf = boost::unit_test;
 
+BOOST_AUTO_TEST_SUITE(ix3)
+BOOST_AUTO_TEST_SUITE(ast_tests)
+
 BOOST_AUTO_TEST_CASE(include_st)
 {
 	ast::include_st result;
@@ -52,3 +55,5 @@ BOOST_AUTO_TEST_CASE(module)
 	BOOST_TEST( result.content.size() == 2 );
 }
 
+BOOST_AUTO_TEST_SUITE_END() // ast_tests
+BOOST_AUTO_TEST_SUITE_END() // ix3

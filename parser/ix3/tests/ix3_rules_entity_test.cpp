@@ -24,6 +24,9 @@ namespace ast = ix3::ast;
 namespace txt = ix3::text;
 namespace utf = boost::unit_test;
 
+BOOST_AUTO_TEST_SUITE(ix3)
+BOOST_AUTO_TEST_SUITE(ast_tests)
+
 BOOST_AUTO_TEST_CASE(enumeration)
 {
 	ast::enumeration result;
@@ -89,9 +92,12 @@ BOOST_AUTO_TEST_CASE(interface_diff_exi,
 	//      in ast we can mix order in flags.
 	ast::interface result;
 
-	std::string data = "interface i +ex +i { type foo(); }"s;
+	std::string data = "interface ii +ex +i { type foo(); }"s;
 	BOOST_CHECK_NO_THROW( result = txt::parse(txt::interface, data) );
 	BOOST_TEST( result.name == "i"s );
 	BOOST_TEST( result.use_as_exception );
 	BOOST_TEST( result.realization_in_client );
 }
+
+BOOST_AUTO_TEST_SUITE_END() // ast_tests
+BOOST_AUTO_TEST_SUITE_END() // ix3

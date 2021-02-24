@@ -1,0 +1,39 @@
+i8 {
+	cpp {
+		file cinttypes
+		sys true
+		replace std::int8_t
+	}
+}
+
+i32 {
+	cpp {
+		file cinttypes
+		sys true
+		replace std::int32_t
+	}
+}
+
+i64 {
+	cpp {
+		file cinttypes
+		sys true
+		replace std::int64_t
+	}
+}
+
+string {
+	cpp {
+		file string
+		sys true
+		replace std::pmr::string
+	}
+}
+
+list {
+	cpp {
+		file vector
+		sys true
+		replace std::pmr::vector
+	}
+}

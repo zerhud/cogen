@@ -22,7 +22,7 @@ class meta_version_class;
 class meta_depricated_class;
 class meta_documentation_class;
 
-const x3::rule<meta_set_class, ast::meta::set> meta_set = "meta_set";
+const x3::rule<meta_set_class, std::vector<ast::meta::set::parameter_t>> meta_set = "meta_set";
 const x3::rule<meta_version_class, ast::meta::oapi> meta_oapi = "meta_oapi";
 const x3::rule<meta_version_class, ast::meta::version> meta_version = "meta_version";
 const x3::rule<meta_depricated_class, ast::meta::depricated> meta_depricated = "meta_depricated";

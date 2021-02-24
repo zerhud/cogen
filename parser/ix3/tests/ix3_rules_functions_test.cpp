@@ -21,6 +21,9 @@ using namespace std::literals;
 namespace ast = ix3::ast;
 namespace txt = ix3::text;
 
+BOOST_AUTO_TEST_SUITE(ix3)
+BOOST_AUTO_TEST_SUITE(ast_tests)
+
 BOOST_AUTO_TEST_CASE(function)
 {
 	ast::function result;
@@ -54,3 +57,5 @@ BOOST_AUTO_TEST_CASE(function)
 	BOOST_TEST( result.return_type.name.at(0) == "rtype"s );
 }
 
+BOOST_AUTO_TEST_SUITE_END() // ast_tests
+BOOST_AUTO_TEST_SUITE_END() // ix3

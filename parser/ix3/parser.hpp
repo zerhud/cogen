@@ -16,6 +16,9 @@ namespace ix3 {
 
 class parser {
 public:
+	using include_solver =
+	    std::function<std::filesystem::path(const std::filesystem::path&)>;
+
 	parser(const parser&) =delete ;
 	parser& operator = (const parser&) =delete ;
 
@@ -23,7 +26,7 @@ public:
 	parser& operator = (parser&& other) noexcept =default ;
 
 	parser() noexcept ;
-	parser(std::vector<std::filesystem::path> incs);
+	parser(include_solver is);
 	virtual ~parser() noexcept =default ;
 
 	void parse(std::istream& input, std::string fn) ;
@@ -36,7 +39,7 @@ private:
 	std::filesystem::path search_file(const std::filesystem::path& f) const ;
 	bool already_loaded(const std::filesystem::path& p) const ;
 
-	std::vector<std::filesystem::path> includes_dir;
+	include_solver solve_inc;
 	std::vector<std::filesystem::path> cur_dir;
 	std::vector<std::filesystem::path> loaded_files;
 

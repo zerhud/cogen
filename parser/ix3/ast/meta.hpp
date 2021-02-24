@@ -24,8 +24,8 @@ namespace meta {
 	bool operator == (const version& left, const version& right) noexcept ;
 
 	struct version : meta_parameter, x3::position_tagged {
-		std::int64_t major_v;
-		std::int64_t minor_v;
+		std::int32_t major_v;
+		std::int32_t minor_v;
 		~version() noexcept override =default ;
 		std::string_view name() const override ;
 		std::string value() const override ;
@@ -53,8 +53,10 @@ namespace meta {
 		std::string value() const override ;
 	};
 
-	struct set {
+	struct set : x3::position_tagged {
 		typedef variant_t<version, depricated, documentation, oapi> parameter_t;
+		set& operator = (std::vector<parameter_t> v) noexcept ;
+
 		std::vector<parameter_t> cnt;
 	};
 } // namespace meta
