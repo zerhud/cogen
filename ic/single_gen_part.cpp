@@ -100,11 +100,14 @@ void single_gen_part::add_includes_to_result(
 	boost::json::object& incs = result["includes"].emplace_object();
 	for(auto& [cond, files]:imports.all_includes(data)) {
 		boost::json::array& far = incs[cond].emplace_array();
-		for(auto& f:files) {
-			boost::json::object fi;
-			fi["file"] = f.name;
-			fi["sys"] = f.sys;
-			far.emplace_back(std::move(fi));
-		}
+		for(auto& f:files) far.emplace_back(to_json(f));
 	}
+}
+
+boost::json::object single_gen_part::to_json(const gen_utils::import_file& f) const
+{
+	boost::json::object ret;
+	ret["file"] = f.name;
+	ret["sys"] = f.sys;
+	return ret;
 }
