@@ -158,12 +158,16 @@ std::pmr::map<std::pmr::string, std::pmr::vector<gen_utils::import_file>>
 	return ret;
 }
 
-std::pmr::map<std::pmr::string, std::pmr::vector<std::pmr::string>>
-	imports_manager::map_from(
+std::pmr::map<std::pmr::string, std::pmr::vector<gen_utils::import_file>> imports_manager::map_from(
 	        std::string_view tmpl,
-	        const gen_utils::input& src) const
+	        const gen_utils::tree& src) const
 {
 	gen_utils::map_to::result_inputs_t mapped;
 	for(auto& [t,i]:all_input) mapped[t]=*i;
-	return gen_utils::map_from()(mapped, tmpl, src);
+	input isrc;
+	isrc.add(src);
+	auto result = gen_utils::map_from()(mapped, tmpl, isrc);
+	std::pmr::map<std::pmr::string, std::pmr::vector<import_file>> ret;
+	for(auto& [k,v]:result) for(auto& f:v) ret[k].emplace_back(import_file{false, f});
+	return ret;
 }

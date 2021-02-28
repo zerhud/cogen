@@ -206,10 +206,20 @@ BOOST_FIXTURE_TEST_CASE(map_from_forward, trees_fixture)
 	for(auto& [n,d]:mapped) mng(n,d);
 	mng.build();
 
-	auto mr = mng.map_from("f_${v1}", all_data);
+	auto mr = mng.map_from("f_${v1}", t1());
 	BOOST_TEST(mr.size() == 2);
-	mr = mng.map_from("f_${v2}", all_data);
+	BOOST_TEST(mr.at("f_m1").size() == 1);
+	gen_utils_mocks::check_vec_eq(mr.at("f_m1"),
+	    {gen_utils::import_file{false,"m_m1"_s}});
+	BOOST_TEST(mr.at("f_m2").size() == 1);
+	gen_utils_mocks::check_vec_eq(mr.at("f_m2"),
+	    {gen_utils::import_file{false,"m_m2"_s}});
+
+	mr = mng.map_from("f_${v2}", t2());
 	BOOST_TEST(mr.size() == 1);
+	gen_utils_mocks::check_vec_eq(mr.at("f_n1"),
+	    {gen_utils::import_file{false,"m_m1"_s},
+	    gen_utils::import_file{false,"m_m2"_s}});
 }
 BOOST_AUTO_TEST_SUITE_END() // imports_manager_test
 
