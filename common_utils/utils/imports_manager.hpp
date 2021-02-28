@@ -60,8 +60,8 @@ public:
 	std::pmr::map<std::pmr::string, std::pmr::vector<import_file>>
 		all_includes(const input& file_data) const ;
 
-	std::pmr::map<std::pmr::string,std::pmr::vector<std::pmr::string>> map_from(
-	        std::string_view tmpl, const input& src) const ;
+	std::pmr::map<std::pmr::string,std::pmr::vector<import_file>> map_from(
+	        std::string_view tmpl, const tree& src) const ;
 };
 
 } // namespace gen_utils
