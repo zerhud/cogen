@@ -273,5 +273,29 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	        "file");
 	ctx.generated["part2"] = sg(ctx, other_data);
 }
+BOOST_FIXTURE_TEST_CASE(crossed_includes, single_gen_part_fixture)
+{
+	t1.add(t1.root(), make_node(100, "v1", "n1"));
+	t1.add(t1.root(), make_node(110, "v1", "n2"));
+	t2.add(t2.root(), make_node(210, "v2", "m1"));
+	gen_utils::input all_data;
+	all_data.add(t1).add(t2);
+
+	single_gen_part part(prov.get());
+	gen_context ctx{{"${v1}"_s, "t"_s, {}, false, *compile_cfg.get()}, {}};
+
+	expect_empty_result(*t1_dsl, *t2_dsl);
+	MOCK_EXPECT(prov->generate).exactly(2);
+	ctx.generated["p1"] = part(ctx, all_data);
+
+	ctx.cfg_part.links.emplace_back("p1");
+	MOCK_EXPECT(prov->generate).once()
+	        .with("t", make_result_json(
+	            {},
+	            {{"t1_dsl", {"v1", "vector"}}},
+	            "{\"t2_dsl\":{}}"_bj),
+	        "file");
+	ctx.generated["p2"] = part(ctx, all_data);
+}
 BOOST_AUTO_TEST_SUITE_END() // single_gen_part
 BOOST_AUTO_TEST_SUITE_END() // input_configurator
