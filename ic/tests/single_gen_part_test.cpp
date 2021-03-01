@@ -18,6 +18,7 @@
 
 using namespace std::literals;
 using gunc = gen_utils::name_conversion;
+namespace utf = boost::unit_test;
 
 std::pmr::string operator "" _s (const char* d, std::size_t l)
 {
@@ -273,7 +274,7 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	        "file");
 	ctx.generated["part2"] = sg(ctx, other_data);
 }
-BOOST_FIXTURE_TEST_CASE(crossed_includes, single_gen_part_fixture)
+BOOST_FIXTURE_TEST_CASE(crossed_includes, single_gen_part_fixture, *utf::disabled())
 {
 	t1.add(t1.root(), make_node(100, "v1", "n1"));
 	t1.add(t1.root(), make_node(110, "v1", "n2"));
