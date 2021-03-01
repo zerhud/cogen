@@ -50,90 +50,89 @@ BOOST_AUTO_TEST_SUITE(input)
 using gen_utils::map_to;
 using gen_utils::map_from;
 using gen_utils_mocks::make_node;
-using fixture = gen_utils_mocks::base_tree_fixture;
 using gen_utils_mocks::trees_fixture;
 
 BOOST_AUTO_TEST_SUITE(tree_map_to)
-BOOST_FIXTURE_TEST_CASE(one_var, fixture)
+BOOST_FIXTURE_TEST_CASE(one_var, trees_fixture)
 {
 	map_to mapper;
-	main_node = make_node(1, "var", "val");
-	auto r = mapper("_${var}_", tree());
+	t1_root = make_node(1, "var", "val");
+	auto r = mapper("_${var}_", t1());
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.contains("_val_"));
 }
-BOOST_FIXTURE_TEST_CASE(tmpl_diff_from_var_name, fixture)
+BOOST_FIXTURE_TEST_CASE(tmpl_diff_from_var_name, trees_fixture)
 {
 	map_to mapper;
-	main_node = make_node(1, "var", "val");
-	auto r = mapper("_${var1}_", tree());
+	t1_root = make_node(1, "var", "val");
+	auto r = mapper("_${var1}_", t1());
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.contains("_${var1}_"));
 }
-BOOST_FIXTURE_TEST_CASE(_3_node_1_tmpl, fixture)
+BOOST_FIXTURE_TEST_CASE(_3_node_1_tmpl, trees_fixture)
 {
 	map_to mapper;
-	main_node = make_node(1, "var1", "val1");
+	t1_root = make_node(1, "var1", "val1");
 	auto node2 = make_node(std::nullopt, "var2", "val2");
 	auto node3 = make_node(std::nullopt, "var3", "val3");
-	tree().add(tree().root(), node2);
-	tree().add(tree().root(), node3);
-	auto r = mapper("_${var1}_", tree());
+	t1().add(t1().root(), node2);
+	t1().add(t1().root(), node3);
+	auto r = mapper("_${var1}_", t1());
 	BOOST_TEST(r.size() == 1) ;
 	BOOST_CHECK(r.contains("_val1_")) ;
 }
-BOOST_FIXTURE_TEST_CASE(few_vars, fixture)
+BOOST_FIXTURE_TEST_CASE(few_vars, trees_fixture)
 {
 	map_to mapper;
-	main_node = make_node(1, "var1", "val1");
+	t1_root = make_node(1, "var1", "val1");
 	auto node_2 = make_node(std::nullopt, "var2", "val2");
 	auto node_21 = make_node(std::nullopt, "var2", "val21");
 	auto node_3 = make_node(std::nullopt, "var3", "val3");
 	auto node_31 = make_node(std::nullopt, "var3", "val31");
-	tree().add(tree().root(), node_2);
-	tree().add(tree().root(), node_3);
-	tree().add(*node_3, node_31);
-	tree().add(*node_2, node_21);
-	auto r = mapper("_${var1}_${var2}_${var3}_${var1}_", tree());
+	t1().add(t1().root(), node_2);
+	t1().add(t1().root(), node_3);
+	t1().add(*node_3, node_31);
+	t1().add(*node_2, node_21);
+	auto r = mapper("_${var1}_${var2}_${var3}_${var1}_", t1());
 	BOOST_TEST(r.size()==4);
 	BOOST_CHECK(r.contains("_val1_val2_val3_val1_"));
 	BOOST_CHECK(r.contains("_val1_val2_val31_val1_"));
 	BOOST_CHECK(r.contains("_val1_val21_val3_val1_"));
 	BOOST_CHECK(r.contains("_val1_val21_val31_val1_"));
 }
-BOOST_FIXTURE_TEST_CASE(no_var, fixture)
+BOOST_FIXTURE_TEST_CASE(no_var, trees_fixture)
 {
 	map_to mapper;
-	main_node = make_node(1, "var1", "val1");
-	auto r = mapper("_${var1}_${var2}_", tree());
+	t1_root = make_node(1, "var1", "val1");
+	auto r = mapper("_${var1}_${var2}_", t1());
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.contains("_val1_${var2}_"));
 }
-BOOST_FIXTURE_TEST_CASE(no_any_var, fixture)
+BOOST_FIXTURE_TEST_CASE(no_any_var, trees_fixture)
 {
 	map_to mapper;
-	main_node = make_node(1);
-	auto r = mapper("_${var1}_${var2}_", tree());
+	t1_root = make_node(1);
+	auto r = mapper("_${var1}_${var2}_", t1());
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.contains("_${var1}_${var2}_"));
 }
-BOOST_FIXTURE_TEST_CASE(no_var_no_ref, fixture)
+BOOST_FIXTURE_TEST_CASE(no_var_no_ref, trees_fixture)
 {
 	map_to mapper;
-	main_node = make_node(1);
-	auto r = mapper("_xxx_", tree());
+	t1_root = make_node(1);
+	auto r = mapper("_xxx_", t1());
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.contains("_xxx_"));
 }
-BOOST_FIXTURE_TEST_CASE(double_use, fixture)
+BOOST_FIXTURE_TEST_CASE(double_use, trees_fixture)
 {
 	map_to mapper;
-	main_node = make_node(1, "var", "val");
-	auto r = mapper("_xxx_", tree());
+	t1_root = make_node(1, "var", "val");
+	auto r = mapper("_xxx_", t1());
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.contains("_xxx_"));
 
-	r = mapper("_${var}_", tree());
+	r = mapper("_${var}_", t1());
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.contains("_val_"));
 }

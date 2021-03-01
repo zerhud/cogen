@@ -74,24 +74,6 @@ std::shared_ptr<gen_utils_mocks::data_node> make_node(
 	return ret;
 }
 
-struct base_tree_fixture {
-	std::shared_ptr<gen_utils_mocks::dsl_manager> dmanager=
-			std::make_shared<gen_utils_mocks::dsl_manager>();
-	std::shared_ptr<gen_utils_mocks::data_node> main_node;
-	std::optional<gen_utils::tree> _tree;
-
-	gen_utils::tree& tree() {
-		if(!_tree) _tree.emplace(main_node, dmanager);
-		return *_tree;
-	}
-
-	base_tree_fixture() {
-		using namespace std::literals;
-		MOCK_EXPECT(dmanager->id).returns("data_id"sv);
-		main_node = make_node(100);
-	}
-};
-
 struct trees_fixture {
 	std::shared_ptr<gen_utils_mocks::data_node> t1_root, t2_root, t3_root;
 	std::shared_ptr<gen_utils_mocks::dsl_manager> t1_dsl, t2_dsl, t3_dsl;
