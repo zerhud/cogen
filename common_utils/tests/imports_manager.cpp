@@ -30,7 +30,6 @@ BOOST_AUTO_TEST_SUITE(input)
 BOOST_AUTO_TEST_SUITE(imports_manager_test)
 using gen_utils::variable;
 using gen_utils::imports_manager;
-using gen_utils_mocks::make_node;
 using gen_utils_mocks::mk_node;
 using gen_utils_mocks::mk_tree;
 using gen_utils_mocks::trees_fixture;

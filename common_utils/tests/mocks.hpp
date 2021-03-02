@@ -112,25 +112,6 @@ std::vector<std::shared_ptr<data_node>> mk_tree(
 	return created_nodes;
 }
 
-std::shared_ptr<gen_utils_mocks::data_node> make_node(
-		std::optional<std::uint64_t> v
-		, std::optional<std::pmr::string> name=std::nullopt
-		, std::optional<std::pmr::string> value=std::nullopt
-		, std::optional<std::pmr::string> node_name=std::nullopt
-		, std::pmr::vector<gen_utils::name_t> links={}
-)
-{
-	assert( (!name && !value) || (name && value) );
-	auto ret = std::make_shared<gen_utils_mocks::data_node>();
-	MOCK_EXPECT(ret->version).returns(v);
-	if(name) MOCK_EXPECT(ret->node_var)
-				.returns(gen_utils::variable{*name, *value});
-	else MOCK_EXPECT(ret->node_var).returns(std::nullopt);
-	MOCK_EXPECT(ret->required_links).returns(links);
-	if(node_name) MOCK_EXPECT(ret->name).returns(*node_name);
-	return ret;
-}
-
 struct trees_fixture {
 	std::shared_ptr<gen_utils_mocks::data_node> t1_root, t2_root, t3_root;
 	std::shared_ptr<gen_utils_mocks::dsl_manager> t1_dsl, t2_dsl, t3_dsl;
@@ -152,9 +133,9 @@ struct trees_fixture {
 	}
 
 	trees_fixture()
-	    : t1_root(gen_utils_mocks::make_node(1, std::nullopt, std::nullopt, "t1r"))
-	    , t2_root(gen_utils_mocks::make_node(2, std::nullopt, std::nullopt, "t2r"))
-	    , t3_root(gen_utils_mocks::make_node(3, std::nullopt, std::nullopt, "t3r"))
+	    : t1_root(gen_utils_mocks::mk_node({.version=1, .name="t1r"}))
+	    , t2_root(gen_utils_mocks::mk_node({.version=2, .name="t2r"}))
+	    , t3_root(gen_utils_mocks::mk_node({.version=3, .name="t3r"}))
 	    , t1_dsl(std::make_shared<gen_utils_mocks::dsl_manager>())
 	    , t2_dsl(std::make_shared<gen_utils_mocks::dsl_manager>())
 	    , t3_dsl(std::make_shared<gen_utils_mocks::dsl_manager>())

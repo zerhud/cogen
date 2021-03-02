@@ -23,7 +23,6 @@ using namespace std::literals;
 BOOST_AUTO_TEST_SUITE(input)
 BOOST_AUTO_TEST_SUITE(version_splitter)
 using gen_utils::split_by_ver;
-using gen_utils_mocks::make_node;
 using gen_utils_mocks::mk_node;
 using gen_utils_mocks::mk_tree;
 using gen_utils_mocks::trees_fixture;

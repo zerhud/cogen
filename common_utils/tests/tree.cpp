@@ -23,7 +23,6 @@ using gen_utils_mocks::check_vec_eq;
 BOOST_AUTO_TEST_SUITE(input)
 using gen_utils_mocks::mk_tree;
 using gen_utils_mocks::mk_node;
-using gen_utils_mocks::make_node;
 
 BOOST_AUTO_TEST_SUITE(tree)
 using gen_utils::variable;
@@ -102,12 +101,12 @@ BOOST_FIXTURE_TEST_CASE(no_parent, trees_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(cannot_add_low_version, trees_fixture)
 {
-	auto bad_node = make_node(t1().root_version()-1);
+	auto bad_node = mk_node({.version=t1().root_version()-1});
 	BOOST_CHECK_THROW(t1().add(t1().root(), bad_node), std::exception);
 }
 BOOST_FIXTURE_TEST_CASE(adding_twice, trees_fixture)
 {
-	auto bad_node = make_node(std::nullopt);
+	auto bad_node = mk_node({});
 	t1().add(t1().root(), bad_node);
 	BOOST_CHECK_THROW(t1().add(t1().root(), bad_node), std::exception);
 }
@@ -281,7 +280,7 @@ BOOST_FIXTURE_TEST_CASE(contains_two_child, trees_fixture)
 	t2.add(t2.root(), c2);
 	BOOST_CHECK(t1().contains(t2) == gen_utils::tree_compare_result::partial);
 
-	t1().add(t1().root(), make_node(103));
+	t1().add(t1().root(), mk_node({.version=103}));
 	BOOST_CHECK(t1().contains(t2) == gen_utils::tree_compare_result::partial);
 }
 BOOST_FIXTURE_TEST_CASE(search, trees_fixture)

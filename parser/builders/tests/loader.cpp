@@ -17,7 +17,9 @@
 #include "utils/map_to.hpp"
 
 using namespace std::literals;
-using gen_utils_mocks::make_node;
+using gen_utils::variable;
+using gen_utils_mocks::mk_tree;
+using gen_utils_mocks::mk_node;
 using boost::property_tree::ptree;
 using gen_utils_mocks::trees_fixture;
 
@@ -65,9 +67,11 @@ BOOST_FIXTURE_TEST_CASE(proj_and_lib, trees_fixture)
 	setts.add("libraries.lib1.link_lib", "lib1");
 	setts.add("libraries.lib1.link_lib", "lib2");
 
-	t1().add(t1().root(), make_node(1, "a", "a1"));
-	t1().add(t1().root(), make_node(1, "a", "a2"));
-	t1().add(t1().root(), make_node(1, "b", "b1"));
+	mk_tree(t1(), {
+	            {std::nullopt, {.version=1, .node_var=variable{"a", "a1"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"a", "a2"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"b", "b1"}}}
+	        });
 	gen_utils::input dsls;
 	dsls.add(t1());
 
@@ -101,8 +105,10 @@ BOOST_FIXTURE_TEST_CASE(with_map_from, trees_fixture)
 	setts.add("libraries.lib_${v}.dep", "dep1");
 	setts.add("libraries.lib_${v}.link_lib", "lib1");
 
-	t1().add(t1().root(), make_node(1, "v", "v1"));
-	t1().add(t1().root(), make_node(1, "v", "v2"));
+	mk_tree(t1(), {
+	            {std::nullopt, {.version=1, .node_var=variable{"v", "v1"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"v", "v2"}}}
+	        });
 	gen_utils::input dsls;
 	dsls.add(t1());
 

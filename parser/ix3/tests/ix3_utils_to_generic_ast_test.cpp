@@ -393,11 +393,18 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	auto mod = extract_mver(tree);
 	BOOST_TEST(tree.children(*mod).size()==1);
 
-	auto std_i8 = gen_utils_mocks::make_node(10, std::nullopt, std::nullopt, "");
-	auto i8_cpp = gen_utils_mocks::make_node(11, std::nullopt, std::nullopt, "i8");
-	auto i8_js = gen_utils_mocks::make_node(12, std::nullopt, std::nullopt, "i8");
-	auto list_cpp = gen_utils_mocks::make_node(12, std::nullopt, std::nullopt, "list");
 	auto std_dsl = std::make_shared<gen_utils_mocks::dsl_manager>();
+	gen_utils::tree std_types(gen_utils_mocks::mk_node({.version=1}), std_dsl);
+	auto nodes = gen_utils_mocks::mk_tree(std_types, {
+	  /* 0 */   {std::nullopt, {.version=10, .name=""}}
+	  /* 1 */ , { 0, {.version=11, .name="i8", .link_cond="cpp"}}
+	  /* 2 */ , { 0, {.version=12, .name="i8", .link_cond="js"}}
+	  /* 3 */ , {std::nullopt, {.version=13, .name="list", .link_cond="cpp"}}
+	        });
+	auto i8_cpp = nodes[1];
+	auto i8_js = nodes[2];
+	auto list_cpp = nodes[3];
+
 	MOCK_EXPECT(std_dsl->id).returns("std_types");
 	MOCK_EXPECT(std_dsl->to_json).calls(
 	            [&i8_cpp, &i8_js, &list_cpp](const gu_ctx& ctx, const gu_tree& con){
@@ -408,17 +415,6 @@ BOOST_AUTO_TEST_CASE(standard_types)
 		if(ctx.linked_to == list_cpp) ret = "std::vector"s;
 		return ret;
 	});
-	MOCK_EXPECT(i8_cpp->link_condition).returns("cpp");
-	MOCK_EXPECT(i8_js->link_condition).returns("js");
-	MOCK_EXPECT(list_cpp->link_condition).returns("cpp");
-	MOCK_EXPECT(i8_cpp->imports_modification).returns(std::nullopt);
-	MOCK_EXPECT(i8_js->imports_modification).returns(std::nullopt);
-	MOCK_EXPECT(list_cpp->imports_modification).returns(std::nullopt);
-	gen_utils::tree std_types(gen_utils_mocks::make_node(1), std_dsl);
-	std_types.add(std_types.root(), std_i8);
-	std_types.add(*std_i8, i8_cpp);
-	std_types.add(*std_i8, i8_js);
-	std_types.add(std_types.root(), list_cpp);
 	gen_utils::imports_manager im;
 	gen_utils::input file_data;
 	file_data.add(std_types);

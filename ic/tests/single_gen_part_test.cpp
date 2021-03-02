@@ -33,9 +33,9 @@ struct single_gen_part_fixture {
 	std::shared_ptr<gen_utils_mocks::dsl_manager> t1_dsl = std::make_shared<gen_utils_mocks::dsl_manager>();
 	std::shared_ptr<gen_utils_mocks::dsl_manager> t2_dsl = std::make_shared<gen_utils_mocks::dsl_manager>();
 	std::shared_ptr<gen_utils_mocks::dsl_manager> t3_dsl = std::make_shared<gen_utils_mocks::dsl_manager>();
-	std::shared_ptr<gen_utils_mocks::data_node> t1_root_node = gen_utils_mocks::make_node(0);
-	std::shared_ptr<gen_utils_mocks::data_node> t2_root_node = gen_utils_mocks::make_node(0);
-	std::shared_ptr<gen_utils_mocks::data_node> t3_root_node = gen_utils_mocks::make_node(0);
+	std::shared_ptr<gen_utils_mocks::data_node> t1_root_node = gen_utils_mocks::mk_node({.version=0});
+	std::shared_ptr<gen_utils_mocks::data_node> t2_root_node = gen_utils_mocks::mk_node({.version=0});
+	std::shared_ptr<gen_utils_mocks::data_node> t3_root_node = gen_utils_mocks::mk_node({.version=0});
 	gen_utils::tree t1, t2, t3;
 
 	std::unique_ptr<gen_utils::compilation_config> compile_cfg
@@ -99,7 +99,9 @@ struct single_gen_part_fixture {
 BOOST_AUTO_TEST_SUITE(input_configurator)
 BOOST_AUTO_TEST_SUITE(single_gen_part)
 
-using gen_utils_mocks::make_node;
+using gen_utils::variable;
+using gen_utils_mocks::mk_tree;
+using gen_utils_mocks::mk_node;
 
 using mic::gen_context;
 using mic::single_gen_part;
@@ -119,12 +121,17 @@ auto make_adata(std::string t1, std::string t2)
 
 BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 {
-	single_gen_part sg(prov.get());
-	t1.add(t1.root(), make_node(1, "n", "n1"));
-	t1.add(t1.root(), make_node(1, "n", "n2"));
-	t2.add(t2.root(), make_node(2, "m", "m1"));
-	t2.add(t2.root(), make_node(2, "m", "m2"));
+	mk_tree(t1, {
+	            {std::nullopt, {.version=1, .node_var=variable{"n", "n1"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"n", "n2"}}}
+	        });
+	mk_tree(t2, {
+	            {std::nullopt, {.version=1, .node_var=variable{"m", "m1"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"m", "m2"}}}
+	        });
+
 	all_data.add(t1);
+	single_gen_part sg(prov.get());
 	auto jsoner = [this](auto& ctx, const gen_utils::tree& src){
 		BOOST_TEST(&src != &t1);
 		BOOST_CHECK(ctx.cfg.naming.size() == 1);
@@ -150,12 +157,17 @@ BOOST_FIXTURE_TEST_CASE(main_rules, single_gen_part_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(main_rules_map_to_both, single_gen_part_fixture)
 {
-	single_gen_part sg(prov.get());
-	t1.add(t1.root(), make_node(1, "n", "n1"));
-	t1.add(t1.root(), make_node(1, "n", "n2"));
-	t2.add(t2.root(), make_node(2, "m", "m1"));
-	t2.add(t2.root(), make_node(2, "m", "m2"));
+	mk_tree(t1, {
+	            {std::nullopt, {.version=1, .node_var=variable{"n", "n1"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"n", "n2"}}}
+	        });
+	mk_tree(t2, {
+	            {std::nullopt, {.version=1, .node_var=variable{"m", "m1"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"m", "m2"}}}
+	        });
+
 	all_data.add(t1).add(t2);
+	single_gen_part sg(prov.get());
 	auto jsoner = [this](auto& ctx, const gen_utils::tree& src){
 		BOOST_TEST(&src != &t1);
 		BOOST_CHECK(ctx.cfg.naming.size() == 1);
@@ -179,8 +191,11 @@ BOOST_FIXTURE_TEST_CASE(main_rules_map_to_both, single_gen_part_fixture)
 BOOST_FIXTURE_TEST_CASE(split_by_version, single_gen_part_fixture)
 {
 	single_gen_part sg(prov.get());
-	t1.add(t1.root(), make_node(1));
-	t1.add(t1.root(), make_node(2));
+	mk_tree(t1, {
+	            {std::nullopt, {.version=1}}
+	          , {std::nullopt, {.version=2}}
+	        });
+
 	all_data.add(t1);
 
 	std::size_t cnt=0;
@@ -196,10 +211,12 @@ BOOST_FIXTURE_TEST_CASE(split_by_version, single_gen_part_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 {
-	single_gen_part sg(prov.get());
-	t1.add(t1.root(), make_node(1, "n", "v1"));
-	t1.add(t1.root(), make_node(1, "n", "v2"));
+	mk_tree(t1, {
+	            {std::nullopt, {.version=1, .node_var=variable{"n", "v1"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"n", "v2"}}}
+	        });
 	all_data.add(t1);
+	single_gen_part sg(prov.get());
 	expect_empty_result(*t1_dsl);
 	auto empty_data = make_result_json({},{});
 	MOCK_EXPECT(prov->generate).once().with("t", empty_data, "v1");
@@ -227,21 +244,19 @@ BOOST_FIXTURE_TEST_CASE(matched_includes, single_gen_part_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 {
+	using gen_utils::import_file;
 	single_gen_part sg(prov.get());
-	auto t1_child1 = make_node(1, "n", "v1", "t1_a");
-	auto t1_child2 = make_node(1, "n", "v2", "t1_b");
-	auto t1_child3 = make_node(1, "n", "v2", "t1_c");
-	MOCK_EXPECT(t1_child1->link_condition).returns("cond1");
-	MOCK_EXPECT(t1_child2->link_condition).returns("cond1");
-	MOCK_EXPECT(t1_child3->link_condition).returns("cond1");
-	MOCK_EXPECT(t1_child1->imports_modification).returns(std::nullopt);
-	MOCK_EXPECT(t1_child2->imports_modification)
-	        .returns(gen_utils::import_file{false, "vector"});
-	MOCK_EXPECT(t1_child3->imports_modification)
-	        .returns(gen_utils::import_file{false, "vector"});
-	t1.add(t1.root(), t1_child1);
-	t1.add(t1.root(), t1_child2);
-	t1.add(t1.root(), t1_child3);
+	mk_tree(t1, {
+	            {std::nullopt, {
+	                 .version=1, .name="t1_a", .node_var=variable{"n", "v1"},
+	                 .link_cond="cond1"}}
+	          , {std::nullopt, {
+	                 .version=1, .name="t1_b", .node_var=variable{"n", "v2"},
+	                 .link_cond="cond1", .import_mods=import_file{false, "vector"}}}
+	          , {std::nullopt, {
+	                 .version=1, .name="t1_c", .node_var=variable{"n", "v2"},
+	                 .link_cond="cond1", .import_mods=import_file{false, "vector"}}}
+	        });
 	all_data.add(t1);
 	expect_empty_result(*t1_dsl, *t2_dsl);
 
@@ -254,9 +269,8 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	BOOST_TEST(ctx.generated["part1"]["v1"].conf().naming.size() == 2);
 	BOOST_CHECK(ctx.generated["part1"]["v1"].conf().naming.at(1) == gunc::camel_case);
 
-	t2.add( t2.root(), make_node(
-	            2, std::nullopt, std::nullopt,
-	            "t2_a", {{"t1_a"}, {"t1_b"}, {"t1_c"}}));
+	t2.add( t2.root(), mk_node({.version=2, .name="t2_a",
+	                            .links={{"t1_a"}, {"t1_b"}, {"t1_c"}}}));
 	gen_utils::input other_data;
 	other_data.add(t2);
 	ctx.cfg_part.map_tmpl = "file";
@@ -271,9 +285,12 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(crossed_includes, single_gen_part_fixture, *utf::disabled())
 {
-	t1.add(t1.root(), make_node(100, "v1", "n1"));
-	t1.add(t1.root(), make_node(110, "v1", "n2"));
-	t2.add(t2.root(), make_node(210, "v2", "m1"));
+	mk_tree(t1, {
+	            {std::nullopt, {.version=100, .node_var=variable{"v1", "n1"}}}
+	          , {std::nullopt, {.version=100, .node_var=variable{"v1", "n2"}}}
+	        });
+	mk_tree(t2,{{std::nullopt, {.version=210, .node_var=variable{"v2", "m1"}}}});
+
 	gen_utils::input all_data;
 	all_data.add(t1).add(t2);
 
