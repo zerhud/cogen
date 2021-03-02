@@ -28,6 +28,7 @@ boost::json::value operator "" _bj(const char* d, std::size_t l)
 BOOST_AUTO_TEST_SUITE(input)
 
 BOOST_AUTO_TEST_SUITE(imports_manager_test)
+using gen_utils::variable;
 using gen_utils::imports_manager;
 using gen_utils_mocks::make_node;
 using gen_utils_mocks::mk_node;
@@ -144,26 +145,18 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 BOOST_FIXTURE_TEST_CASE(all_includes, trees_fixture)
 {
 	gen_utils::input fdata1, fdata2;
-	auto t1_child1 = make_node(11, std::nullopt, std::nullopt, "a");
-	auto t1_child2 = make_node(12, std::nullopt, std::nullopt, "b");
-	auto t2_child1 = make_node(
-	            12, std::nullopt, std::nullopt, "not_used", {{"a"}, {"b"}});
-	auto t2_child2 = make_node(12, std::nullopt, std::nullopt, "b");
-	t1().add(t1().root(), t1_child1);
-	t1().add(t1().root(), t1_child2);
-	t2().add(t2().root(), t2_child1);
-	t2().add(t2().root(), t2_child2);
-	fdata1.add(t1());
-	fdata2.add(t2());
-	fdata1.conf().naming.clear();
+	mk_tree(t1(), {
+	      {std::nullopt, {.version=11, .name="a", .link_cond="cond_child1"}}
+	    , {std::nullopt, {.version=12, .name="b", .link_cond="cond_child2",
+	             .import_mods=gen_utils::import_file{true, "sysfile"}}}
+	        });
+	mk_tree(t2(), {
+	      {std::nullopt, {.version=12, .name="not_used", .links={{"a"}, {"b"}}}}
+	    , {std::nullopt, {.version=12, .name="b", .link_cond="cond_child2_t2"}}
+	        });
 
-	MOCK_EXPECT(t1_child1->link_condition).returns("cond_child1"sv);
-	MOCK_EXPECT(t1_child2->link_condition).returns("cond_child2"sv);
-	MOCK_EXPECT(t2_child2->link_condition).returns("cond_child2_t2"sv);
-	MOCK_EXPECT(t1_child1->imports_modification).returns(std::nullopt);
-	MOCK_EXPECT(t1_child2->imports_modification)
-	        .returns(gen_utils::import_file{true, "sysfile"});
-	MOCK_EXPECT(t2_child2->imports_modification).returns(std::nullopt);
+	fdata1.add(t1()).conf().naming.clear();
+	fdata2.add(t2());
 
 	imports_manager mng1;
 	mng1("f1", fdata1)("f2", fdata2).build();
@@ -182,10 +175,15 @@ BOOST_FIXTURE_TEST_CASE(all_includes, trees_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(map_from_forward, trees_fixture)
 {
-	t1().add(t1().root(), make_node(1, "v1", "m1"));
-	t1().add(t1().root(), make_node(1, "v1", "m2"));
-	t2().add(t2().root(), make_node(2, "v2", "n1"));
-	t2().add(t2().root(), make_node(2));
+	mk_tree(t1(), {
+	            {std::nullopt, {.version=1, .node_var=variable{"v1", "m1"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"v1", "m2"}}}
+	        });
+	mk_tree(t2(), {
+	            {std::nullopt, {.version=2, .node_var=variable{"v2", "n1"}}}
+	          , {std::nullopt, {.version=2}}
+	        });
+
 	gen_utils::input all_data;
 	all_data.add(t1()).add(t2());
 
