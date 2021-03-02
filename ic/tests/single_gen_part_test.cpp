@@ -274,7 +274,7 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	        "file");
 	ctx.generated["part2"] = sg(ctx, other_data);
 }
-BOOST_FIXTURE_TEST_CASE(crossed_includes, single_gen_part_fixture, *utf::disabled())
+BOOST_FIXTURE_TEST_CASE(crossed_includes, single_gen_part_fixture)
 {
 	mk_tree(t1, {
 	            {std::nullopt, {.version=100, .node_var=variable{"v1", "n1"}}}
@@ -292,13 +292,16 @@ BOOST_FIXTURE_TEST_CASE(crossed_includes, single_gen_part_fixture, *utf::disable
 	MOCK_EXPECT(prov->generate).exactly(2);
 	ctx.generated["p1"] = part(ctx, all_data);
 
+	ctx.cfg_part.map_tmpl = "f_${v1}";
 	ctx.cfg_part.links.emplace_back("p1");
 	MOCK_EXPECT(prov->generate).once()
-	        .with("t", make_result_json(
-	            {},
-	            {{"t1_dsl", {"v1", "vector"}}},
-	            "{\"t2_dsl\":{}}"_bj),
-	        "file");
+	        .with("t", make_result_json( {"n2"}, {},
+	            R"({"t1_dsl":{},"t2_dsl":{}})"_bj),
+	        "f_n1");
+	MOCK_EXPECT(prov->generate).once()
+	        .with("t", make_result_json( {"n1"}, {},
+	            R"({"t1_dsl":{},"t2_dsl":{}})"_bj),
+	        "f_n2");
 	ctx.generated["p2"] = part(ctx, all_data);
 }
 BOOST_AUTO_TEST_SUITE_END() // single_gen_part
