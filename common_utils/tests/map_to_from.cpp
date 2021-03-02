@@ -47,7 +47,7 @@ using gen_utils::map_from;
 using gen_utils::variable;
 using gen_utils_mocks::mk_node;
 using gen_utils_mocks::mk_tree;
-using gen_utils_mocks::make_node;
+using gen_utils_mocks::check_vec_eq;
 using gen_utils_mocks::trees_fixture;
 
 BOOST_AUTO_TEST_SUITE(tree_map_to)
@@ -186,17 +186,16 @@ BOOST_AUTO_TEST_SUITE_END() // tree_map_to
 BOOST_AUTO_TEST_SUITE(tree_map_from)
 BOOST_FIXTURE_TEST_CASE(simple, trees_fixture)
 {
-	using gen_utils_mocks::check_vec_eq;
+	mk_tree(t1(), {
+	            {std::nullopt, {.version=1, .node_var=variable{"var1", "v11"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"var1", "v12"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"var2", "v21"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"var2", "v22"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"var3", "v31"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"var3", "v32"}}}
+	        });
 
-	map_to mapper;
-	t1().add(*t1_root, make_node(1, "var1", "v11"));
-	t1().add(*t1_root, make_node(1, "var1", "v12"));
-	t1().add(*t1_root, make_node(1, "var2", "v21"));
-	t1().add(*t1_root, make_node(1, "var2", "v22"));
-	t1().add(*t1_root, make_node(1, "var3", "v31"));
-	t1().add(*t1_root, make_node(1, "var3", "v32"));
-
-	auto map_result = mapper("_${var1}_${var2}_${var3}_", t1());
+	auto map_result = map_to()("_${var1}_${var2}_${var3}_", t1());
 	std::vector<std::pmr::string> map_names;
 	for(auto& [n,_]:map_result) map_names.emplace_back(n);
 
@@ -227,18 +226,24 @@ BOOST_FIXTURE_TEST_CASE(simple, trees_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(for_input, trees_fixture)
 {
-	map_to mapper;
-	t1().add(*t1_root, make_node(1, "var1", "v11"));
-	t1().add(*t1_root, make_node(1, "var1", "v12"));
-	t1().add(*t1_root, make_node(1, "var2", "v21"));
-	t1().add(*t1_root, make_node(1, "var2", "v22"));
-	t2().add(*t2_root, make_node(2, "var3", "v31"));
-	t2().add(*t2_root, make_node(2, "var3", "v32"));
-	t3().add(*t3_root, make_node(3, "var4", "v41"));
+	mk_tree(t1(), {
+	            {std::nullopt, {.version=1, .node_var=variable{"var1", "v11"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"var1", "v12"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"var2", "v21"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"var2", "v22"}}}
+	        });
+	mk_tree(t2(), {
+	            {std::nullopt, {.version=2, .node_var=variable{"var3", "v31"}}}
+	          , {std::nullopt, {.version=2, .node_var=variable{"var3", "v32"}}}
+	        });
+	mk_tree(t3(), {
+	            {std::nullopt, {.version=3, .node_var=variable{"var4", "v41"}}}
+	        });
+
 	gen_utils::input all_data;
 	all_data.add(t1()).add(t2());
 
-	auto map_result = mapper("_${var1}_${var2}_${var3}_", all_data);
+	auto map_result = map_to()("_${var1}_${var2}_${var3}_", all_data);
 	std::vector<std::pmr::string> map_names;
 	for(auto& [n,_]:map_result) map_names.emplace_back(n);
 
@@ -259,10 +264,15 @@ BOOST_FIXTURE_TEST_CASE(for_input, trees_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(for_input_single_var, trees_fixture)
 {
-	t1().add(t1().root(), make_node(1, "v1", "m1"));
-	t1().add(t1().root(), make_node(1, "v1", "m2"));
-	t2().add(t2().root(), make_node(2, "v2", "n1"));
-	t2().add(t2().root(), make_node(2));
+	mk_tree(t1(), {
+	            {std::nullopt, {.version=1, .node_var=variable{"v1", "m1"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"v1", "m2"}}}
+	        });
+	mk_tree(t2(), {
+	            {std::nullopt, {.version=2, .node_var=variable{"v2", "n1"}}}
+	          , {std::nullopt, {.version=2}}
+	        });
+
 	gen_utils::input all_data;
 	all_data.add(t1()).add(t2());
 
