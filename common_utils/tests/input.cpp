@@ -314,14 +314,12 @@ BOOST_FIXTURE_TEST_CASE(search, trees_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(merge, trees_fixture)
 {
-	auto c1 = make_node(101);
-	auto c2 = make_node(102);
-	auto c3 = make_node(103);
-	auto c4 = make_node(104);
-	t1().add(t1().root(), c1);
+	auto c1 = mk_node(t1(), t1().root(), {.version=101});
+	auto c2 = mk_node({.version=102});
+	auto c3 = mk_node({.version=103});
+	auto c4 = mk_node({.version=104});
 	
-	gen_utils::tree t1_c =
-		*t1().copy_if([](auto& c){ return true; });
+	gen_utils::tree t1_c = *t1().copy_if([](auto&){ return true; });
 	t1_c.add(t1_c.root(), c2).add(*c2, c3).add(*c3, c4);
 
 	t1().merge(t1_c);
@@ -337,16 +335,13 @@ BOOST_FIXTURE_TEST_CASE(merge, trees_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(parent, trees_fixture)
 {
-	auto c1 = make_node(110);
-	auto c2 = make_node(120);
+	auto c1 = mk_node({.version=110});
+	auto c2 = mk_node({.version=120});
 	BOOST_CHECK_THROW(t1().parent(*c1), std::exception);
-	t1().add(t1().root(), c1);
-	t1().add(t1().root(), c2);
+	t1().add(t1().root(), c1, c2);
 
-	auto c12 = make_node(111);
-	auto c13 = make_node(std::nullopt);
-	t1().add(*c1, c12);
-	t1().add(*c1, c13);
+	auto c12 = mk_node(t1(), *c1, {.version=111});
+	auto c13 = mk_node(t1(), *c1, {});
 
 	BOOST_TEST(t1().parent(t1().root()) == nullptr);
 	BOOST_TEST(t1().parent(*c2) == &t1().root());
