@@ -19,12 +19,9 @@
 
 using namespace std::literals;
 using gen_utils_mocks::trees_fixture;
-using gen_utils_mocks::check_vec_eq;
 
 BOOST_AUTO_TEST_SUITE(input)
-using gen_utils_mocks::mk_tree;
-using gen_utils_mocks::mk_node;
-using gen_utils_mocks::make_node;
+
 BOOST_AUTO_TEST_SUITE(input)
 using ic_input = gen_utils::input;
 BOOST_AUTO_TEST_CASE(getters)
@@ -79,8 +76,7 @@ BOOST_AUTO_TEST_CASE(adding_other)
 	gen_utils::tree t3(n1, m1);
 
 	ic_input i1, i2;
-	i1.add(t1);
-	i1.add(t2);
+	i1.add(t1).add(t2);
 
 	BOOST_TEST(i1.all().size()==2);
 	BOOST_TEST(i2.all().size()==0);
