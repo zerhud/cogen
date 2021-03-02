@@ -20,11 +20,6 @@ using namespace std::literals;
 using gunc = gen_utils::name_conversion;
 namespace utf = boost::unit_test;
 
-std::pmr::string operator "" _s (const char* d, std::size_t l)
-{
-	return std::pmr::string(d, l);
-}
-
 boost::json::value operator "" _bj(const char* d, std::size_t l)
 {
 	boost::json::parse_options opts{.allow_trailing_commas=true};

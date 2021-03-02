@@ -20,11 +20,6 @@
 
 using namespace std::literals;
 
-std::pmr::string operator "" _s (const char* d, std::size_t l)
-{
-	return std::pmr::string(d, l);
-}
-
 BOOST_AUTO_TEST_SUITE(input)
 BOOST_AUTO_TEST_SUITE(version_splitter)
 using gen_utils::split_by_ver;

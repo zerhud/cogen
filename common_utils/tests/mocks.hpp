@@ -11,6 +11,11 @@
 #include <turtle/mock.hpp>
 #include "utils/tree.hpp"
 
+std::pmr::string operator "" _s (const char* d, std::size_t l)
+{
+	return std::pmr::string(d, l);
+}
+
 namespace gen_utils_mocks {
 
 MOCK_BASE_CLASS(dsl_manager, gen_utils::dsl_manager)

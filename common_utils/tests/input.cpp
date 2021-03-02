@@ -21,11 +21,6 @@ using namespace std::literals;
 using gen_utils_mocks::trees_fixture;
 using gen_utils_mocks::check_vec_eq;
 
-std::pmr::string operator "" _s (const char* d, std::size_t l)
-{
-	return std::pmr::string(d, l);
-}
-
 BOOST_AUTO_TEST_SUITE(input)
 using gen_utils_mocks::mk_tree;
 using gen_utils_mocks::mk_node;

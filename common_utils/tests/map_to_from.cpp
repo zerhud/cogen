@@ -23,11 +23,6 @@ using namespace std::literals;
 using gen_utils_mocks::check_vec_eq;
 using gen_utils_mocks::trees_fixture;
 
-std::pmr::string operator "" _s (const char* d, std::size_t l)
-{
-	return std::pmr::string(d, l);
-}
-
 std::ostream& operator << (std::ostream& out, const gen_utils::map_to::result_t& mr)
 {
 	out << "map " << mr.size() << ": ";
