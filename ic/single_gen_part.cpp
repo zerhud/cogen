@@ -44,12 +44,31 @@ compiled_output single_gen_part::operator()(
 	gen_utils::imports_manager imports = make_imports(cur_part, compiled);
 	for(auto& [n,d]:compiled) {
 		d.conf() = cur_part.cfg_part.compilation;
+		auto jdata = make_json(cur_part, d, imports).as_object();
+		auto mincs = imports.map_from(
+		            cur_part.cfg_part.map_tmpl,
+		            select(cur_part.cfg_part, d));
+		auto& jincs = jdata["includes"].emplace_object();
+		for(auto& [cond,files]:imports.all_includes(d)) {
+			auto& jar = jincs[cond].emplace_array();
+			for(auto& f:files) jar.emplace_back(to_json(f));
+		}
+		if(mincs.contains(n)) {
+			auto& jar = jincs["self"].emplace_array();
+			for(auto& f:mincs[n]) jar.emplace_back(to_json(f));
+		}
 		outside->generate(
 		            cur_part.cfg_part.tmpl_file,
-		            make_json(cur_part, d, imports),
-		            n);
+		            jdata, n);
 	}
 	return compiled;
+}
+
+const gen_utils::tree& single_gen_part::select(
+    const gen_config& setts, const gen_utils::input& data) const
+{
+	for(auto& it:data.all()) if(it->data_id()==setts.map_from) return *it;
+	throw std::runtime_error(("cannot map from for \"" + setts.map_from + '"').c_str());
 }
 
 compiled_output single_gen_part::compile(
@@ -64,7 +83,6 @@ gen_utils::imports_manager single_gen_part::make_imports(
         const compiled_output& result) const
 {
 	gen_utils::imports_manager imports;
-	for(auto& [n,d]:result) imports.add(n, d);
 	for(auto& link:setts.cfg_part.links)
 		for(auto& [n,d]:setts.generated.at(link))
 			imports.add(n,d);
@@ -88,8 +106,18 @@ boost::json::value single_gen_part::make_json(
 	boost::json::object result;
 	boost::json::object& data_ar = result["data"].emplace_object();
 	for(auto& it:data.all()) data_ar[it->data_id()] = it->to_json(ctx);
-	add_includes_to_result(result, data, imports);
 	return result;
+}
+
+void single_gen_part::add_includes_to_result(
+        boost::json::object &result,
+        gen_utils::imports_manager::incs_map_t incs) const
+{
+	boost::json::object& jincs = result["includes"].emplace_object();
+	for(auto& [cond, files]:incs) {
+		boost::json::array& far = jincs[cond].emplace_array();
+		for(auto& f:files) far.emplace_back(to_json(f));
+	}
 }
 
 void single_gen_part::add_includes_to_result(

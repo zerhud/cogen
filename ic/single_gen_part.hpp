@@ -21,6 +21,8 @@ typedef std::pmr::map<std::pmr::string, gen_utils::input> compiled_output;
 
 class single_gen_part final {
 	const provider* outside;
+	const gen_utils::tree& select(
+	        const gen_config& setts, const gen_utils::input& data) const ;
 	boost::json::object to_json(const gen_utils::import_file& f) const ;
 	compiled_output compile(const gen_context& setts,
 	                        const gen_utils::input& data) const ;
@@ -31,6 +33,10 @@ class single_gen_part final {
 	gen_utils::imports_manager make_imports(
 	        const gen_context& setts,
 	        const compiled_output& result) const ;
+	void add_includes_to_result(
+	        boost::json::object& result,
+	        gen_utils::imports_manager::incs_map_t incs
+	        ) const ;
 	void add_includes_to_result(
 	        boost::json::object& result,
 	        const gen_utils::input& data,
@@ -47,6 +53,7 @@ struct gen_config {
 	std::pmr::vector<std::pmr::string> links;
 	bool split_by_version = false;
 	gen_utils::compilation_config compilation;
+	std::pmr::string map_from = "ix3";
 };
 
 struct gen_context {
