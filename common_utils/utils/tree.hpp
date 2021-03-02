@@ -75,6 +75,14 @@ public:
 	[[nodiscard]] std::string_view data_id() const ;
 	[[nodiscard]] const data_node& root() const ;
 
+	template<typename... Args>
+	tree& add(const data_node& par, node_ptr c1, Args... children)
+	{
+		static_assert(0 < sizeof...(children));
+		add(par, std::move(c1));
+		return add(par, std::forward<Args>(children)...);
+	}
+
 	tree& add(const data_node& par, node_ptr child);
 	[[nodiscard]] std::pmr::vector<node_ptr> children(const data_node& par) const ;
 	[[nodiscard]] tree_compare_result contains(const tree& other) const ;

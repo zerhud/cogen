@@ -55,6 +55,58 @@ void check_vec_eq(const VecLeft& l, std::initializer_list<T> r)
 	}
 }
 
+struct node_info {
+	std::optional<std::uint64_t> version;
+	std::optional<std::pmr::string> name;
+	std::optional<gen_utils::variable> node_var;
+	std::pmr::vector<gen_utils::name_t> links;
+	std::optional<std::pmr::string> link_cond;
+	std::optional<gen_utils::import_file> import_mods;
+};
+
+struct node_st_info {
+	std::optional<std::int64_t> parent;
+	node_info child_data;
+};
+
+std::shared_ptr<gen_utils_mocks::data_node> mk_node(const node_info& data)
+{
+	auto ret = std::make_shared<gen_utils_mocks::data_node>();
+	MOCK_EXPECT(ret->version).returns(data.version);
+	if(data.name) MOCK_EXPECT(ret->name).returns(data.name.value());
+	MOCK_EXPECT(ret->node_var).returns(data.node_var);
+	MOCK_EXPECT(ret->required_links).returns(data.links);
+	MOCK_EXPECT(ret->imports_modification).returns(data.import_mods);
+	if(data.link_cond) MOCK_EXPECT(ret->link_condition).returns(*data.link_cond);
+	else MOCK_EXPECT(ret->link_condition).returns("");
+	return ret;
+}
+
+std::vector<std::shared_ptr<data_node>> mk_tree(
+        gen_utils::tree& con, std::vector<node_st_info> nodes)
+{
+	std::vector<std::shared_ptr<data_node>> created_nodes;
+	for(auto& n:nodes) created_nodes.emplace_back(mk_node(n.child_data));
+	for(std::size_t i=0;i<nodes.size();++i) {
+		auto pi = nodes[i].parent;
+		const gen_utils::data_node* par = nullptr;
+		if(!pi.has_value()) par = &con.root();
+		else  par = created_nodes.at(0 <= *pi ? *pi : i + *pi).get();
+		con.add(*par, created_nodes[i]);
+	}
+	return created_nodes;
+}
+
+std::shared_ptr<data_node> mk_node(
+        gen_utils::tree& con,
+        const gen_utils::data_node& par,
+        const node_info& data)
+{
+	auto ret = mk_node(data);
+	con.add(par, ret);
+	return ret;
+}
+
 std::shared_ptr<gen_utils_mocks::data_node> make_node(
 		std::optional<std::uint64_t> v
 		, std::optional<std::pmr::string> name=std::nullopt
