@@ -44,6 +44,9 @@ BOOST_AUTO_TEST_SUITE(input)
 
 using gen_utils::map_to;
 using gen_utils::map_from;
+using gen_utils::variable;
+using gen_utils_mocks::mk_node;
+using gen_utils_mocks::mk_tree;
 using gen_utils_mocks::make_node;
 using gen_utils_mocks::trees_fixture;
 
@@ -51,7 +54,7 @@ BOOST_AUTO_TEST_SUITE(tree_map_to)
 BOOST_FIXTURE_TEST_CASE(one_var, trees_fixture)
 {
 	map_to mapper;
-	t1_root = make_node(1, "var", "val");
+	t1_root = mk_node({.version=1, .node_var=variable{"var", "val"}});
 	auto r = mapper("_${var}_", t1());
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.contains("_val_"));
@@ -59,7 +62,7 @@ BOOST_FIXTURE_TEST_CASE(one_var, trees_fixture)
 BOOST_FIXTURE_TEST_CASE(tmpl_diff_from_var_name, trees_fixture)
 {
 	map_to mapper;
-	t1_root = make_node(1, "var", "val");
+	t1_root = mk_node({.version=1, .node_var=variable{"var", "val"}});
 	auto r = mapper("_${var1}_", t1());
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.contains("_${var1}_"));
@@ -67,28 +70,25 @@ BOOST_FIXTURE_TEST_CASE(tmpl_diff_from_var_name, trees_fixture)
 BOOST_FIXTURE_TEST_CASE(_3_node_1_tmpl, trees_fixture)
 {
 	map_to mapper;
-	t1_root = make_node(1, "var1", "val1");
-	auto node2 = make_node(std::nullopt, "var2", "val2");
-	auto node3 = make_node(std::nullopt, "var3", "val3");
-	t1().add(t1().root(), node2);
-	t1().add(t1().root(), node3);
+	t1_root = mk_node({.version=1, .node_var=variable{"var1", "val1"}});
+	mk_tree(t1(), {
+	            {std::nullopt, {.node_var = variable{"var2", "val2"}}},
+	            {std::nullopt, {.node_var = variable{"var3", "val3"}}}
+	        });
 	auto r = mapper("_${var1}_", t1());
 	BOOST_TEST(r.size() == 1) ;
 	BOOST_CHECK(r.contains("_val1_")) ;
 }
 BOOST_FIXTURE_TEST_CASE(few_vars, trees_fixture)
 {
-	map_to mapper;
-	t1_root = make_node(1, "var1", "val1");
-	auto node_2 = make_node(std::nullopt, "var2", "val2");
-	auto node_21 = make_node(std::nullopt, "var2", "val21");
-	auto node_3 = make_node(std::nullopt, "var3", "val3");
-	auto node_31 = make_node(std::nullopt, "var3", "val31");
-	t1().add(t1().root(), node_2);
-	t1().add(t1().root(), node_3);
-	t1().add(*node_3, node_31);
-	t1().add(*node_2, node_21);
-	auto r = mapper("_${var1}_${var2}_${var3}_${var1}_", t1());
+	mk_tree(t1(), {
+	            {std::nullopt, {.node_var=variable{"var1", "val1"}}}
+	          , {std::nullopt, {.node_var=variable{"var2", "val2"}}}
+	          , { -1, {.node_var=variable{"var2", "val21"}}}
+	          , {std::nullopt, {.node_var=variable{"var3", "val3"}}}
+	          , { -1, {.node_var=variable{"var3", "val31"}}}
+	        });
+	auto r = map_to()("_${var1}_${var2}_${var3}_${var1}_", t1());
 	BOOST_TEST(r.size()==4);
 	BOOST_CHECK(r.contains("_val1_val2_val3_val1_"));
 	BOOST_CHECK(r.contains("_val1_val2_val31_val1_"));
@@ -97,32 +97,29 @@ BOOST_FIXTURE_TEST_CASE(few_vars, trees_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(no_var, trees_fixture)
 {
-	map_to mapper;
-	t1_root = make_node(1, "var1", "val1");
-	auto r = mapper("_${var1}_${var2}_", t1());
+	t1_root = mk_node({.version=1, .node_var=variable{"var1", "val1"}});
+	auto r = map_to()("_${var1}_${var2}_", t1());
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.contains("_val1_${var2}_"));
 }
 BOOST_FIXTURE_TEST_CASE(no_any_var, trees_fixture)
 {
-	map_to mapper;
-	t1_root = make_node(1);
-	auto r = mapper("_${var1}_${var2}_", t1());
+	t1_root = mk_node({.version=1});
+	auto r = map_to()("_${var1}_${var2}_", t1());
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.contains("_${var1}_${var2}_"));
 }
 BOOST_FIXTURE_TEST_CASE(no_var_no_ref, trees_fixture)
 {
-	map_to mapper;
-	t1_root = make_node(1);
-	auto r = mapper("_xxx_", t1());
+	t1_root = mk_node({.version=1});
+	auto r = map_to()("_xxx_", t1());
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.contains("_xxx_"));
 }
 BOOST_FIXTURE_TEST_CASE(double_use, trees_fixture)
 {
 	map_to mapper;
-	t1_root = make_node(1, "var", "val");
+	t1_root = mk_node({.version=1, .node_var=variable{"var", "val"}});
 	auto r = mapper("_xxx_", t1());
 	BOOST_TEST(r.size()==1);
 	BOOST_CHECK(r.contains("_xxx_"));
@@ -135,17 +132,21 @@ BOOST_FIXTURE_TEST_CASE(for_input, trees_fixture)
 {
 	map_to mapper;
 	gen_utils::input all_data;
-	t1().add(t1().root(), make_node(1, "n", "n1"));
-	t1().add(t1().root(), make_node(1, "n", "n2"));
-	t2().add(t2().root(), make_node(2, "m", "m1"));
-	t2().add(t2().root(), make_node(2, "m", "m2"));
+	mk_tree(t1(), {
+	            {std::nullopt, {.version=1, .node_var=variable{"n", "n1"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"n", "n2"}}}
+	          , {std::nullopt, {.version=2, .node_var=variable{"m", "m1"}}}
+	          , {std::nullopt, {.version=2, .node_var=variable{"m", "m2"}}}
+	        });
 	all_data.add(t1());
 	auto r = mapper("${n}.file", all_data);
 	BOOST_TEST(r.size() == 2);
 	BOOST_CHECK(r.contains("n1.file"));
 	BOOST_CHECK(r.contains("n2.file"));
 
+	mk_tree(t2(), {{std::nullopt, {}}, {0, {}}, {std::nullopt, {}}});
 	all_data.add(t2());
+
 	r = mapper("${n}.file", all_data);
 	BOOST_TEST(r.size() == 2);
 	BOOST_CHECK(r.contains("n1.file"));
@@ -161,28 +162,24 @@ BOOST_FIXTURE_TEST_CASE(for_input, trees_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(few_levels, trees_fixture)
 {
-	auto mod1 = make_node(1, "mod", "mod1");
-	auto mod2 = make_node(1, "mod", "mod2");
-	t1().add(t1().root(), mod1);
-	t1().add(t1().root(), mod2);
-	auto m1_va1 = make_node(1, "a", "1");
-	auto m2_va1 = make_node(1, "a", "1");
-	t1().add(*mod1, m1_va1); // mod1->1
-	t1().add(*mod2, m2_va1); // mod2->2
-	auto m1_i0 = make_node(1, "i", "0");
-	auto m2_i1 = make_node(1, "i", "1");
-	t1().add(*m1_va1, m1_i0); // mod1->1->0
-	t1().add(*m2_va1, m2_i1); // mod2->1->1
+	mk_tree(t1(), {
+	            {std::nullopt, {.version=1, .node_var=variable{"mod", "mod1"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"mod", "mod2"}}}
+	          , { 0, {.version=1, .node_var=variable{"a", "1"}}}
+	          , {-1, {.version=1, .node_var=variable{"i", "0"}}}
+	          , { 1, {.version=1, .node_var=variable{"a", "2"}}}
+	          , {-1, {.version=1, .node_var=variable{"i", "1"}}}
+	        });
 
 	auto r = map_to()("_${mod}_${a}_${i}_", t1());
 	BOOST_TEST(r.size() == 2);
 	BOOST_CHECK(r.contains("_mod1_1_0_"));
-	BOOST_CHECK(r.contains("_mod2_1_1_"));
+	BOOST_CHECK(r.contains("_mod2_2_1_"));
 
 	r = map_to()("_${i}_${mod}_${a}_${i}_", t1());
 	BOOST_TEST(r.size() == 2);
 	BOOST_CHECK(r.contains("_0_mod1_1_0_"));
-	BOOST_CHECK(r.contains("_1_mod2_1_1_"));
+	BOOST_CHECK(r.contains("_1_mod2_2_1_"));
 }
 BOOST_AUTO_TEST_SUITE_END() // tree_map_to
 
