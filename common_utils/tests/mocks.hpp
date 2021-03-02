@@ -82,6 +82,16 @@ std::shared_ptr<gen_utils_mocks::data_node> mk_node(const node_info& data)
 	return ret;
 }
 
+std::shared_ptr<data_node> mk_node(
+        gen_utils::tree& con,
+        const gen_utils::data_node& par,
+        const node_info& data)
+{
+	auto ret = mk_node(data);
+	con.add(par, ret);
+	return ret;
+}
+
 std::vector<std::shared_ptr<data_node>> mk_tree(
         gen_utils::tree& con, std::vector<node_st_info> nodes)
 {
@@ -95,16 +105,6 @@ std::vector<std::shared_ptr<data_node>> mk_tree(
 		con.add(*par, created_nodes[i]);
 	}
 	return created_nodes;
-}
-
-std::shared_ptr<data_node> mk_node(
-        gen_utils::tree& con,
-        const gen_utils::data_node& par,
-        const node_info& data)
-{
-	auto ret = mk_node(data);
-	con.add(par, ret);
-	return ret;
 }
 
 std::shared_ptr<gen_utils_mocks::data_node> make_node(

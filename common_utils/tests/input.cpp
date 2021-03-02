@@ -280,10 +280,8 @@ BOOST_FIXTURE_TEST_CASE(contains, trees_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(contains_two_child, trees_fixture)
 {
-	auto c1 = make_node(101);
-	auto c2 = make_node(102);
-	t1().add(t1().root(), c1);
-	t1().add(t1().root(), c2);
+	t1().add(t1().root(), mk_node({.version=101}));
+	auto c2 = mk_node(t1(), t1().root(), {.version=102});
 	gen_utils::tree t2(t1_root, t1_dsl);
 	t2.add(t2.root(), c2);
 	BOOST_CHECK(t1().contains(t2) == gen_utils::tree_compare_result::partial);
@@ -293,32 +291,26 @@ BOOST_FIXTURE_TEST_CASE(contains_two_child, trees_fixture)
 }
 BOOST_FIXTURE_TEST_CASE(search, trees_fixture)
 {
-	t1_root = make_node(100, std::nullopt, std::nullopt, "m");
-	auto node_b = make_node(120, std::nullopt, std::nullopt, "b");
-	auto node_a = make_node(110, std::nullopt, std::nullopt, "a");
-	auto node_c = make_node(121, std::nullopt, std::nullopt, "c");
-	auto node_c2 = make_node(121, std::nullopt, std::nullopt, "c");
-	auto node_c3 = make_node(131, std::nullopt, std::nullopt, "c");
-	auto node_c3_par = make_node(130, std::nullopt, std::nullopt, "c3_par");
-	t1().add(t1().root(), node_a);
-	t1().add(t1().root(), node_b);
-	t1().add(t1().root(), node_c3_par);
-	t1().add(*node_b, node_c);
-	t1().add(*node_b, node_c2);
-	t1().add(*node_c3_par, node_c3);
+	t1_root = mk_node({.version=100, .name="m"});
+	auto nodes = mk_tree(t1(), {
+	            /* 0 */      {std::nullopt, {.name="a"}}
+	            /* 1 */    , {std::nullopt, {.name="c3_par"}}
+	            /* 2 */    , {std::nullopt, {.name="b"}}
+	            /* 3 */    , {-1, {.name="c"}}
+	            /* 4 */    , {-2, {.name="c"}}
+	            /* 5 */    , { 1, {.name="c"}}
+	                     });
 
 	BOOST_TEST(t1().search({}).size() == 0);
 	BOOST_TEST(t1().search({"m"}).size() == 0, "root cannot to be found");
 	BOOST_TEST(t1().search({"d"}).size() == 0);
 	BOOST_TEST(t1().search({"a", "c"}).size() == 0);
 
-	BOOST_TEST(t1().search({"a"}).at(0) == node_a);
-	BOOST_TEST(t1().search({"b"}).at(0) == node_b);
-	BOOST_TEST(t1().search({"c"}).at(0) == node_c);
-	BOOST_TEST(t1().search({"c"}).at(1) == node_c2);
-	BOOST_TEST(t1().search({"c"}).at(2) == node_c3);
-	BOOST_TEST(t1().search({"b", "c"}).at(0) == node_c);
-	BOOST_TEST(t1().search({"b", "c"}).at(1) == node_c2);
+	check_vec_eq(t1().search({"c"}), {nodes[3], nodes[4], nodes[5]});
+	check_vec_eq(t1().search({"b", "c"}), {nodes[3], nodes[4]});
+
+	BOOST_TEST(t1().search({"a"}).at(0) == nodes[0]);
+	BOOST_TEST(t1().search({"b"}).at(0) == nodes[2]);
 }
 BOOST_FIXTURE_TEST_CASE(merge, trees_fixture)
 {
