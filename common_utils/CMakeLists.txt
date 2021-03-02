@@ -42,6 +42,7 @@ if(ENABLE_TESTS)
 	endmacro()
 
 	add_unit_test(naming "tests/" "")
+	add_unit_test(tree "tests/" "")
 	add_unit_test(input "tests/" "")
 	add_unit_test(imports_manager "tests/" "")
 	add_unit_test(split_by_ver "tests/" "")
