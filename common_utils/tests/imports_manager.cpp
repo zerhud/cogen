@@ -30,12 +30,13 @@ BOOST_AUTO_TEST_SUITE(input)
 BOOST_AUTO_TEST_SUITE(imports_manager_test)
 using gen_utils::imports_manager;
 using gen_utils_mocks::make_node;
+using gen_utils_mocks::mk_node;
+using gen_utils_mocks::mk_tree;
 using gen_utils_mocks::trees_fixture;
 BOOST_FIXTURE_TEST_CASE(self_matched, trees_fixture)
 {
 	gen_utils::input fdata1, fdata2;
-	auto t1_child1 = gen_utils_mocks::make_node(11);
-	t1().add(t1().root(), t1_child1);
+	auto t1_child1 = mk_node(t1(), t1().root(), {.version=11});
 	fdata1.add(t1());
 	fdata2.add(t1());
 
@@ -51,9 +52,8 @@ BOOST_FIXTURE_TEST_CASE(self_matched, trees_fixture)
 	BOOST_TEST(r1.at(0) == "b");
 	BOOST_TEST(r2.at(0) == "a");
 
-	auto t1_child2 = gen_utils_mocks::make_node(12);
-	t2().add(t2().root(), t1_child1);
-	t2().add(t2().root(), t1_child2);
+	auto t1_child2 = mk_node({.version=12});
+	t2().add(t2().root(), t1_child1, t1_child2);
 	auto sep_t1 = t2().copy_if(
 	            [this, &t1_child2](const gen_utils::data_node& n){
 		return &n == t2_root.get() || &n == t1_child2.get(); });
@@ -74,29 +74,22 @@ BOOST_FIXTURE_TEST_CASE(self_matched, trees_fixture)
 BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 {
 	gen_utils::input fdata1, fdata2;
-	auto t1_child1 = gen_utils_mocks::make_node(
-	            11, std::nullopt, std::nullopt, "a");
-	auto t1_child2 = gen_utils_mocks::make_node(
-	            12, std::nullopt, std::nullopt, "b");
-	auto t2_child1 = gen_utils_mocks::make_node(
-	            12, std::nullopt, std::nullopt, "not_used", {{"a"}, {"b"}});
-	auto t2_child2 = gen_utils_mocks::make_node(
-	            12, std::nullopt, std::nullopt, "b");
-	t1().add(t1().root(), t1_child1);
-	t1().add(t1().root(), t1_child2);
-	t2().add(t2().root(), t2_child1);
-	t2().add(t2().root(), t2_child2);
+	auto t1_child1 = mk_node(t1(), t1().root(), {.version=11, .name="a",
+	                                             .link_cond="cond_child1"});
+	auto t1_child2 = mk_node(
+	            t1(), t1().root(),
+	            {.version=12, .name="b", .link_cond="cond_child2",
+	             .import_mods=gen_utils::import_file{true, "sysfile"}});
+	auto t2_child1 = mk_tree(t2(), {
+	            {std::nullopt, {
+	                 .version=12, .name="not_used", .links={{"a"}, {"b"}}}}
+	          , {std::nullopt, {
+	                 .version=12, .name="b", .link_cond="cond_child2_t2"}}
+	         })[0];
+
 	fdata1.add(t1());
 	fdata2.add(t2());
 	fdata1.conf().naming.clear();
-
-	MOCK_EXPECT(t1_child1->link_condition).returns("cond_child1"sv);
-	MOCK_EXPECT(t1_child2->link_condition).returns("cond_child2"sv);
-	MOCK_EXPECT(t2_child2->link_condition).returns("cond_child2_t2"sv);
-	MOCK_EXPECT(t1_child1->imports_modification).returns(std::nullopt);
-	MOCK_EXPECT(t1_child2->imports_modification)
-	        .returns(gen_utils::import_file{true, "sysfile"});
-	MOCK_EXPECT(t2_child2->imports_modification).returns(std::nullopt);
 
 	imports_manager mng1;
 	mng1("f1", fdata1)("f2", fdata2).build();
