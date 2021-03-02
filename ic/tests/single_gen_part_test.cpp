@@ -20,15 +20,6 @@ using namespace std::literals;
 using gunc = gen_utils::name_conversion;
 namespace utf = boost::unit_test;
 
-boost::json::value operator "" _bj(const char* d, std::size_t l)
-{
-	boost::json::parse_options opts{.allow_trailing_commas=true};
-	return boost::json::parse(
-	            boost::json::string_view(d,l),
-	            boost::json::storage_ptr(),
-	            opts);
-}
-
 struct single_gen_part_fixture {
 	std::shared_ptr<gen_utils_mocks::dsl_manager> t1_dsl = std::make_shared<gen_utils_mocks::dsl_manager>();
 	std::shared_ptr<gen_utils_mocks::dsl_manager> t2_dsl = std::make_shared<gen_utils_mocks::dsl_manager>();

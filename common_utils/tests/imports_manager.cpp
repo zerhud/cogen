@@ -19,12 +19,6 @@
 using namespace std::literals;
 using gunc = gen_utils::name_conversion;
 
-boost::json::value operator "" _bj(const char* d, std::size_t l)
-{
-	return boost::json::parse(boost::json::string_view(d,l));
-}
-
-
 BOOST_AUTO_TEST_SUITE(input)
 
 BOOST_AUTO_TEST_SUITE(imports_manager_test)

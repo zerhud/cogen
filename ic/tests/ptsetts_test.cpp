@@ -20,11 +20,6 @@ using ic_ptsetts = mdg::ic::ptsetts;
 using boost::property_tree::ptree;
 
 
-boost::json::value operator "" _bj(const char* d, std::size_t l)
-{
-	return boost::json::parse(boost::json::string_view(d,l));
-}
-
 BOOST_AUTO_TEST_SUITE(input_configurator)
 BOOST_AUTO_TEST_SUITE(ptsetts)
 BOOST_AUTO_TEST_CASE(ptarray)

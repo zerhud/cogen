@@ -23,15 +23,6 @@ using gen_utils_mocks::mk_node;
 using boost::property_tree::ptree;
 using gen_utils_mocks::trees_fixture;
 
-boost::json::value operator "" _bj(const char* d, std::size_t l)
-{
-	boost::json::parse_options opts{.allow_trailing_commas=true};
-	return boost::json::parse(
-	            boost::json::string_view(d,l),
-	            boost::json::storage_ptr(),
-	            opts);
-}
-
 gen_utils::map_to::result_inputs_t config_manager(
         std::pmr::string tmpl,
         gen_utils::imports_manager& mng,

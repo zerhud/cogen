@@ -16,6 +16,15 @@ std::pmr::string operator "" _s (const char* d, std::size_t l)
 	return std::pmr::string(d, l);
 }
 
+boost::json::value operator "" _bj(const char* d, std::size_t l)
+{
+	boost::json::parse_options opts{.allow_trailing_commas=true};
+	return boost::json::parse(
+	            boost::json::string_view(d,l),
+	            boost::json::storage_ptr(),
+	            opts);
+}
+
 namespace gen_utils_mocks {
 
 MOCK_BASE_CLASS(dsl_manager, gen_utils::dsl_manager)

@@ -44,22 +44,13 @@ boost::json::array make_json_array(const std::vector<T>& list)
 	return ret;
 }
 
-boost::json::object operator "" _bj(const char* d, std::size_t l)
+boost::json::object operator "" _bjo(const char* d, std::size_t l)
 {
 	boost::json::parse_options opts{.allow_trailing_commas=true};
 	return boost::json::parse(
 	            boost::json::string_view(d,l),
 	            boost::json::storage_ptr(),
 	            opts).as_object();
-}
-
-boost::json::value operator "" _bjs(const char* d, std::size_t l)
-{
-	boost::json::parse_options opts{.allow_trailing_commas=true};
-	return boost::json::parse(
-	            boost::json::string_view(d,l),
-	            boost::json::storage_ptr(),
-	            opts);
 }
 
 BOOST_AUTO_TEST_SUITE(ix3)
@@ -210,19 +201,19 @@ BOOST_AUTO_TEST_CASE(empty_modules)
 	           R"([{"name":"mod1", "orig_name":"mod1","naming":["as_is"],"vers":[
 	                 {"type":"version","minor":1,"major":1,"name":"mod1_v1_1","content":[]},
 	                 {"type":"version","minor":2,"major":1,"name":"mod1_v1_2","content":[]}
-	              ]}])"_bjs);
+	              ]}])"_bj);
 	ctx.cfg.naming.emplace_back(gen_utils::name_conversion::title_case);
 	BOOST_TEST(tree.to_json(ctx) ==
 	           R"([{"name":["mod1","Mod1"],"naming":["as_is","title_case"],"orig_name":"mod1","vers":[
 	                 {"type":"version","minor":1,"major":1,"name":"mod1_v1_1","content":[]},
 	                 {"type":"version","minor":2,"major":1,"name":"mod1_v1_2","content":[]}
-	              ]}])"_bjs);
+	              ]}])"_bj);
 	ctx.cfg.naming.clear();
 	BOOST_TEST(tree.to_json(ctx) ==
 	           R"([{"name":"mod1","naming":["as_is"],"orig_name":"mod1","vers":[
 	                 {"type":"version","minor":1,"major":1,"name":"mod1_v1_1","content":[]},
 	                 {"type":"version","minor":2,"major":1,"name":"mod1_v1_2","content":[]}
-	              ]}])"_bjs);
+	              ]}])"_bj);
 }
 BOOST_AUTO_TEST_CASE(records)
 {
@@ -251,12 +242,12 @@ BOOST_AUTO_TEST_CASE(records)
 	        required_links().at(0).at(0) == "int");
 
 	boost::json::array fields;
-	auto rec_js = make_valid_json("{\"is_exception\":false}"_bj, "record").as_object();
+	auto rec_js = make_valid_json("{\"is_exception\":false}"_bjo, "record").as_object();
 	fields.emplace_back(make_valid_json(R"({"req":false,"param_t":
-	                        {"type":"type","name":["int"],"subs":[]}})"_bj,
+	                        {"type":"type","name":["int"],"subs":[]}})"_bjo,
 	                        "record_item", "f1", {"f1"}));
 	fields.emplace_back(make_valid_json(R"({"req":true,"param_t":
-	                        {"type":"type","name":["int"],"subs":[]}})"_bj,
+	                        {"type":"type","name":["int"],"subs":[]}})"_bjo,
 	                        "record_item", "f2", {"f2"}));
 	rec_js["fields"] = fields;
 	BOOST_TEST(make_json(*rec, tree) == rec_js);
@@ -300,21 +291,21 @@ BOOST_AUTO_TEST_CASE(functions)
 	BOOST_CHECK(!foo_params.at(1)->version().has_value());
 
 	auto bar_js = make_valid_json(
-	            R"({"return":{"type":"type", "name":["int"], "subs":[]}})"_bj,
+	            R"({"return":{"type":"type", "name":["int"], "subs":[]}})"_bjo,
 	            "function").as_object();
 	bar_js["params"].emplace_array().emplace_back(make_valid_json(
 	            R"({"req":true,"param_t":
-	            {"type":"type", "name":["u8"], "subs":[]}})"_bj,
+	            {"type":"type", "name":["u8"], "subs":[]}})"_bjo,
 	            "function_parameter", "b", {"b"}));
 	BOOST_TEST(make_json(*bar, tree) == bar_js);
 	BOOST_TEST(make_json(*foo_params.at(0), tree) == 
 	               R"({ "type":"type","name":["int"],"subs":[] })"_bj);
 	BOOST_TEST(make_json(*foo_params.at(1), tree) == make_valid_json(
-	               R"({"param_t":{"type":"type", "name":["string"], "subs":[]},"req":false})"_bj,
+	               R"({"param_t":{"type":"type", "name":["string"], "subs":[]},"req":false})"_bjo,
 	               "function_parameter", "bar", {"bar"}));
 	BOOST_TEST(make_json(*foo_params.at(2), tree) == make_valid_json(
 	               R"({"param_t":{"type":"type", "name":["list"], "subs":[
-	                 {"type":"type", "name":["string"], "subs":[]}]},"req":true})"_bj,
+	                 {"type":"type", "name":["string"], "subs":[]}]},"req":true})"_bjo,
 	               "function_parameter", "baz", {"baz"}));
 
 	gen_utils::compilation_context ctx;
@@ -441,11 +432,11 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	                     "name":["i8"],
 	                     "subs":[]
 	                   }
-	                 ]} })"_bj, "function", "foo", {"foo"}).as_object();
+	                 ]} })"_bjo, "function", "foo", {"foo"}).as_object();
 	vj["params"].emplace_array().emplace_back(make_valid_json(
 	                R"({ "req":true, "param_t":{ "type":"type",
 	                   "cpp":"std::vector", "name":["list"], "subs":[] }
-	               })"_bj, "function_parameter", "a", {"a"}));
+	               })"_bjo, "function_parameter", "a", {"a"}));
 	BOOST_TEST(json == vj);
 }
 BOOST_AUTO_TEST_CASE(enums)
@@ -469,14 +460,14 @@ BOOST_AUTO_TEST_CASE(enums)
 	               R"({"auto_io":true, "as_flags":false,"members":[
 	                   {"name":"one", "io":"one"},
 	                   {"name":"two", "io":"test"}
-	               ]})"_bj, "enum", "bar_baz", {"bar_baz"}, {"as_is"}));
+	               ]})"_bjo, "enum", "bar_baz", {"bar_baz"}, {"as_is"}));
 
 	gen_utils::compilation_context ctx;
 	ctx.linked_to = e;
 	BOOST_TEST(tree.to_json(ctx) ==
 	           R"({"type":"enum","name":"bar_baz", "orig_name":"bar_baz",
 	           "mod_ver":{"major":1,"minor":1}, "naming":["as_is"],
-	           "mod":{"orig_name":"mod1","name":"mod1","naming":["as_is"]}})"_bj);
+	           "mod":{"orig_name":"mod1","name":"mod1","naming":["as_is"]}})"_bjo);
 
 	check_naming(*e, tree, {"BarBaz"s, "BarBaz"s, "bar_baz"s});
 }
@@ -490,13 +481,13 @@ BOOST_AUTO_TEST_CASE(places)
 	gen_utils::compilation_context ctx;
 	auto tree = to_generic_ast()(ast.modules);
 	auto ejs = make_valid_json(R"({"auto_io":false,"as_flags":false,
-	                           "members":[{"name":"o","io":"o"}]})"_bj,
+	                           "members":[{"name":"o","io":"o"}]})"_bjo,
 	                           "enum", "z", {"z"});
 	auto ijs = make_valid_json(R"({"ex":true,"rinvert":false,
-	                           "ctors":[],"funcs":[]})"_bj, "interface");
-	auto vjs = R"({"type":"version","minor":1,"major":1,"name":"mod1_v1_1"})"_bj;
+	                           "ctors":[],"funcs":[]})"_bjo, "interface");
+	auto vjs = R"({"type":"version","minor":1,"major":1,"name":"mod1_v1_1"})"_bjo;
 	vjs["content"] = make_json_array(ejs, ijs);
-	auto mjs = R"({"name":"mod1", "orig_name":"mod1", "naming":["as_is"]})"_bj;
+	auto mjs = R"({"name":"mod1", "orig_name":"mod1", "naming":["as_is"]})"_bjo;
 	mjs["vers"] = make_json_array(vjs);
 
 	BOOST_TEST(tree.to_json(ctx) == make_json_array(mjs));
@@ -523,16 +514,16 @@ BOOST_AUTO_TEST_CASE(interface)
 	BOOST_TEST(e->required_links().size() == 0);
 	BOOST_TEST(e->link_condition() == "ix3"sv);
 
-	auto igjs = make_valid_json(R"({"ex":true, "rinvert":false})"_bj, "interface").as_object();
-	auto ctorjs = R"({"type":"ctor"})"_bj;
+	auto igjs = make_valid_json(R"({"ex":true, "rinvert":false})"_bjo, "interface").as_object();
+	auto ctorjs = R"({"type":"ctor"})"_bjo;
 	auto ctor_p1_js = make_valid_json(
-	            R"({"req":true,"param_t":{"type":"type", "name":["i8"], "subs":[]}})"_bj,
+	            R"({"req":true,"param_t":{"type":"type", "name":["i8"], "subs":[]}})"_bjo,
 	            "function_parameter", "a", {"a"}).as_object();
 	auto f1_p1_js = make_valid_json(
-	            R"({"req":true,"param_t":{"type":"type", "name":["i9"], "subs":[]}})"_bj,
+	            R"({"req":true,"param_t":{"type":"type", "name":["i9"], "subs":[]}})"_bjo,
 	            "function_parameter", "b", {"b"}).as_object();
 	auto funcs_f1_js = make_valid_json(
-	            R"({"return":{"type":"type", "name":["i8"], "subs":[]}})"_bj,
+	            R"({"return":{"type":"type", "name":["i8"], "subs":[]}})"_bjo,
 	            "function", "foo", {"foo"}).as_object();
 	funcs_f1_js["params"] = make_json_array(f1_p1_js);
 	ctorjs["params"] = make_json_array(ctor_p1_js);
@@ -540,7 +531,7 @@ BOOST_AUTO_TEST_CASE(interface)
 	igjs["funcs"] = make_json_array(funcs_f1_js);
 	BOOST_TEST(make_json(*e, tree) == igjs);
 
-	auto ijs = make_valid_json("{}"_bj, "interface").as_object();
+	auto ijs = make_valid_json("{}"_bjo, "interface").as_object();
 	ijs["mod_ver"] = R"({"major":1,"minor":1})"_bj;
 	ijs["mod"] = R"({"orig_name":"mod1","name":"mod1","naming":["as_is"]})"_bj;
 	gen_utils::compilation_context ctx;
