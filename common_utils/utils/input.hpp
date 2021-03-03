@@ -30,6 +30,7 @@ public:
 
 	[[nodiscard]] std::pmr::vector<const tree*> select(
 			std::string_view id) const ;
+	[[nodiscard]] bool contains(const tree* data) const ;
 
 	[[nodiscard]] std::pmr::vector<const tree*> all() const ;
 

@@ -32,6 +32,12 @@ std::pmr::vector<const gen_utils::tree*> input::select(std::string_view id) cons
 	return ret;
 }
 
+bool input::contains(const tree* data) const
+{
+	auto list = select(data->data_id());
+	return std::ranges::find(list, data) != list.end();
+}
+
 std::pmr::vector<const gen_utils::tree*> input::all() const
 {
 	std::pmr::vector<const tree*> ret;

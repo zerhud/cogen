@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(adding_other)
 	i2.add(std::move(i1));
 	BOOST_TEST(i2.all().size()==2);
 }
-BOOST_AUTO_TEST_CASE(contains)
+BOOST_AUTO_TEST_CASE(match_with)
 {
 	auto m1 = std::make_shared<gen_utils_mocks::dsl_manager>();
 	auto m2 = std::make_shared<gen_utils_mocks::dsl_manager>();
@@ -134,6 +134,14 @@ BOOST_FIXTURE_TEST_CASE(modify, trees_fixture)
 	BOOST_TEST(iresult.all().at(1)->data_id() == "t1_id");
 	BOOST_TEST(iresult.all().at(2)->data_id() == "t2_id");
 	BOOST_TEST(iresult.all().at(3)->data_id() == "t2_id");
+}
+BOOST_FIXTURE_TEST_CASE(contains, trees_fixture)
+{
+	ic_input i;
+	i.add(t1()).add(t2());
+	BOOST_CHECK(  i.contains(i.select(t1().data_id()).at(0)) );
+	BOOST_CHECK(  i.contains(i.select(t2().data_id()).at(0)) );
+	BOOST_CHECK( !i.contains(&t2()) );
 }
 BOOST_AUTO_TEST_SUITE_END() // input
 
