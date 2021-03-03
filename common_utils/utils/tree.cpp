@@ -83,22 +83,18 @@ std::pmr::vector<node_ptr> tree::children(const data_node& par) const
 
 tree_compare_result tree::contains(const tree& other) const
 {
+	using tcr = tree_compare_result;
 	if(data_id() != other.data_id())
-		return tree_compare_result::not_comparable;
+		return tcr::not_comparable;
 	if(&root() != &other.root())
-		return tree_compare_result::none;
+		return tcr::none;
 	std::size_t match_count = 0;
-	for(auto& sn:store) {
+	for(auto& sn:store)
 		if(other.node_exists(sn.get())) ++match_count;
-		else if(1 < match_count) break;
-	}
-	if(match_count == 1)
-		return store.size() == 1
-		        ? tree_compare_result::total
-		        : tree_compare_result::only_root;
-	return match_count == other.store.size()
-	          ? tree_compare_result::total
-	          : tree_compare_result::partial;
+	return match_count == 1
+	     ? (store.size() == 1 ? tcr::total : tcr::only_root)
+	     : (match_count == other.store.size() ? tcr::total : tcr::partial)
+	     ;
 }
 
 std::pmr::vector<node_ptr> tree::search(name_t n) const

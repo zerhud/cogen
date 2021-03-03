@@ -261,6 +261,7 @@ BOOST_FIXTURE_TEST_CASE(contains, trees_fixture)
 	BOOST_CHECK(other_t1.contains(t1()) == gen_utils::tree_compare_result::partial);
 	other_t1.add(*c1, nodes[1]);
 	BOOST_CHECK(t1().contains(other_t1) == gen_utils::tree_compare_result::total);
+	BOOST_CHECK(t1().contains(other_t1) == gen_utils::tree_compare_result::total);
 
 	gen_utils::tree t3(c1, t1_dsl);
 	gen_utils::tree t3_eq(c1, t1_dsl);
@@ -276,6 +277,27 @@ BOOST_FIXTURE_TEST_CASE(contains, trees_fixture)
 	t1().add(t1().root(), mk_node({}));
 	BOOST_CHECK(t1().contains(other_t1) == gen_utils::tree_compare_result::total);
 	BOOST_CHECK(other_t1.contains(t1()) == gen_utils::tree_compare_result::partial);
+}
+BOOST_FIXTURE_TEST_CASE(contains_with_diff_order, trees_fixture)
+{
+	auto nodes = mk_tree(t1(), {
+	            {std::nullopt, {.version = 200}},
+	            {std::nullopt, {.version = 300}},
+	            {0, {}}
+	        });
+	gen_utils::tree other_t1(t1_root, t1_dsl);
+	other_t1.add(other_t1.root(), nodes[1], nodes[0]);
+
+	auto c301 = mk_node({.version=301});
+	t1().add(t1().root(), c301);
+	other_t1.add(other_t1.root(), c301);
+
+	BOOST_CHECK(t1().contains(other_t1) == gen_utils::tree_compare_result::total);
+	BOOST_CHECK(other_t1.contains(t1()) == gen_utils::tree_compare_result::partial);
+
+	other_t1.add(*nodes[0], nodes[2]);
+	BOOST_CHECK(t1().contains(other_t1) == gen_utils::tree_compare_result::total);
+	BOOST_CHECK(other_t1.contains(t1()) == gen_utils::tree_compare_result::total);
 }
 BOOST_FIXTURE_TEST_CASE(contains_two_child, trees_fixture)
 {
