@@ -110,7 +110,8 @@ boost::json::value builders::library::to_json(
 	assert(ctx.links);
 	assert(ctx.all_input);
 	boost::json::object ret;
-	auto mr = gen_utils::map_from()(mapped, lib, *ctx.all_input);
+	gen_utils::map_from::result_t mr;
+	mr = gen_utils::map_from()(mapped, lib, *ctx.all_input);
 	for(auto& [n,cnt]:mr) {
 		boost::json::object& cur_lib = ret[n].emplace_object();
 		cur_lib["deps"] = make_json_deps();

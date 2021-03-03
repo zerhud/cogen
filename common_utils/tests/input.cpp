@@ -84,37 +84,6 @@ BOOST_AUTO_TEST_CASE(adding_other)
 	i2.add(std::move(i1));
 	BOOST_TEST(i2.all().size()==2);
 }
-BOOST_AUTO_TEST_CASE(match_with)
-{
-	auto m1 = std::make_shared<gen_utils_mocks::dsl_manager>();
-	auto m2 = std::make_shared<gen_utils_mocks::dsl_manager>();
-	auto m3 = std::make_shared<gen_utils_mocks::dsl_manager>();
-	MOCK_EXPECT(m1->id).returns("id1");
-	MOCK_EXPECT(m2->id).returns("id2");
-	MOCK_EXPECT(m3->id).returns("id3");
-	auto t3_r = gen_utils_mocks::mk_node({.version=3});
-	gen_utils::tree t1(gen_utils_mocks::mk_node({.version=1}), m1);
-	gen_utils::tree t2(gen_utils_mocks::mk_node({.version=2}), m2);
-	gen_utils::tree t3(t3_r, m3);
-	gen_utils::tree t4(t3_r, m3);
-	t3.add(t3.root(), gen_utils_mocks::mk_node({.version=31}));
-
-	ic_input i1, i2, i3;
-	BOOST_CHECK( i1.match_with(i2) == gen_utils::tree_compare_result::total );
-
-	i1.add(t1);
-	i2.add(t3);
-	i3.add(t4);
-
-	BOOST_CHECK( i1.match_with(i2) == gen_utils::tree_compare_result::none );
-
-	i1.add(t3); // i1 - t1, t3
-	BOOST_CHECK( i1.match_with(i2) == gen_utils::tree_compare_result::total );
-	BOOST_CHECK( i2.match_with(i3) == gen_utils::tree_compare_result::only_root );
-
-	i2.add(t1); // t2 - t3, t1
-	BOOST_CHECK( i1.match_with(i2) == gen_utils::tree_compare_result::total );
-}
 BOOST_FIXTURE_TEST_CASE(modify, trees_fixture)
 {
 	ic_input isrc;

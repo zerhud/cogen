@@ -288,7 +288,7 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	ctx.cfg_part.links.emplace_back("part1");
 	MOCK_EXPECT(prov->generate).once()
 	        .with("t", make_result_json(
-	            {},
+	            {"v1", "v2"},
 	            {{"cond1", {"v1", "vector"}}},
 	            "{\"t2_dsl\":{}}"_bj),
 	        "file");

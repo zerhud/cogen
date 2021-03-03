@@ -38,21 +38,6 @@ imports_manager& imports_manager::add(
 
 void imports_manager::build()
 {
-	matched.clear();
-	scan_self_matched();
-}
-
-void imports_manager::scan_self_matched()
-{
-	using tcr = tree_compare_result;
-	for(auto& [from, fd]:all_input) {
-		for(auto& [to, td]:all_input) {
-			if(from == to) continue;
-			tcr r = fd->match_with(*td);
-			if(r==tcr::total || r==tcr::partial)
-				matched[fd].emplace_back(to);
-		}
-	}
 }
 
 std::pmr::vector<import_info> imports_manager::required_for(
@@ -122,15 +107,6 @@ std::pmr::vector<import_info> imports_manager::required_for_links(
 			}
 		}
 	}
-	return ret;
-}
-
-std::pmr::vector<std::pmr::string> imports_manager::self_matched(
-        const input& file_data) const
-{
-	std::pmr::vector<std::pmr::string> ret;
-	auto pos = matched.find(&file_data);
-	if(pos!=matched.end()) for(auto& f:pos->second) ret.emplace_back(f);
 	return ret;
 }
 

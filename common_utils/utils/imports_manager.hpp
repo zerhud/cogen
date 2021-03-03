@@ -37,9 +37,7 @@ inline const bool operator < (const import_info& l, const import_info& r)
 
 class imports_manager final {
 	std::pmr::map<std::pmr::string, const input*> all_input;
-	std::pmr::map<const input*, std::pmr::vector<std::pmr::string>> matched;
 
-	void scan_self_matched();
 	std::pmr::vector<import_info> required_for_scan(
 	        const tree& src, const data_node& par) const ;
 	std::pmr::vector<import_info> required_for_links(
@@ -57,7 +55,6 @@ public:
 	imports_manager& add(const std::pmr::string& file, const input& data);
 	std::pmr::vector<import_info> required_for(const input& file_data) const ;
 	std::pmr::vector<import_info> required_for(const tree& file_data) const ;
-	std::pmr::vector<std::pmr::string> self_matched(const input& file_data) const ;
 
 	incs_map_t required_includes(const input& file_data) const ;
 	incs_map_t mapped_includes(std::string_view tmpl, const tree& src) const ;

@@ -34,9 +34,6 @@ public:
 
 	[[nodiscard]] std::pmr::vector<const tree*> all() const ;
 
-	[[nodiscard]]
-	tree_compare_result match_with(const input& other) const ;
-
 	compilation_config& conf() ;
 	const compilation_config& conf() const ;
 

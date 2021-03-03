@@ -14,6 +14,10 @@
 namespace gen_utils {
 
 class map_from {
+	bool has(const input& where, const tree& what) const ;
+	bool contains(const input& where, const tree& what) const ;
+	bool contains(const tree& what, const input& where) const ;
+	bool matched(const input& gotten, const input& mapped) const ;
 public:
 	typedef std::pmr::map<std::pmr::string,std::pmr::vector<std::pmr::string>> result_t;
 	[[nodiscard]]  result_t operator()(

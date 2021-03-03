@@ -255,8 +255,11 @@ BOOST_FIXTURE_TEST_CASE(for_input, trees_fixture)
 	check_vec_eq(
 	    demapper(map_result, "_${var1}_", all_data).at("_v12_"),
 	    {"_v12_v21_v31_"_s, "_v12_v21_v32_"_s, "_v12_v22_v31_"_s, "_v12_v22_v32_"_s});
+
 	BOOST_TEST(demapper(map_result, "__", all_data).size() == 1);
+
 	all_data.add(t3());
+
 	BOOST_TEST(demapper(map_result, "_${var1}_", all_data).size() == 2);
 	check_vec_eq(
 	    demapper(map_result, "_${var1}_", all_data).at("_v12_"),
@@ -272,9 +275,10 @@ BOOST_FIXTURE_TEST_CASE(for_input_single_var, trees_fixture)
 	            {std::nullopt, {.version=2, .node_var=variable{"v2", "n1"}}}
 	          , {std::nullopt, {.version=2}}
 	        });
+	mk_tree(t3(), {{},{},{}});
 
 	gen_utils::input all_data;
-	all_data.add(t1()).add(t2());
+	all_data.add(t1()).add(t2()).add(t3());
 
 	auto map_result = map_to()("f_${v1}", all_data);
 
@@ -285,6 +289,23 @@ BOOST_FIXTURE_TEST_CASE(for_input_single_var, trees_fixture)
 	dr = map_from()(map_result, "f", all_data);
 	BOOST_TEST(dr.size()==1);
 	check_vec_eq(dr.at("f"), {"f_m1"_s, "f_m2"_s});
+}
+BOOST_FIXTURE_TEST_CASE(crossed_trees, trees_fixture)
+{
+	mk_tree(t1(), {
+	            {std::nullopt, {.version=1, .node_var=variable{"v1", "m1"}}}
+	          , {std::nullopt, {.version=1, .node_var=variable{"v1", "m2"}}}
+	        });
+	mk_tree(t2(), {{},{}});
+	gen_utils::input all_data;
+	all_data.add(t1()).add(t2());
+
+	auto map_result = map_to()("to_${v1}", all_data);
+
+	auto dr = map_from()(map_result, "f_${v1}", all_data);
+	BOOST_TEST(dr.size()==2);
+	check_vec_eq(dr.at("f_m1"), {"to_m1"_s});
+	check_vec_eq(dr.at("f_m2"), {"to_m2"_s});
 }
 BOOST_AUTO_TEST_SUITE_END() // tree_map_from
 

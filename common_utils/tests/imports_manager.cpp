@@ -27,44 +27,6 @@ using gen_utils::imports_manager;
 using gen_utils_mocks::mk_node;
 using gen_utils_mocks::mk_tree;
 using gen_utils_mocks::trees_fixture;
-BOOST_FIXTURE_TEST_CASE(self_matched, trees_fixture)
-{
-	gen_utils::input fdata1, fdata2;
-	auto t1_child1 = mk_node(t1(), t1().root(), {.version=11});
-	fdata1.add(t1());
-	fdata2.add(t1());
-
-	fdata1.conf().naming.clear();
-	fdata2.conf().naming.emplace_back(gunc::camel_case);
-
-	imports_manager mng1;
-	mng1.add("a", fdata1).add("b", fdata2).build();
-	auto r1 = mng1.self_matched(fdata1);
-	auto r2 = mng1.self_matched(fdata2);
-	BOOST_TEST_REQUIRE(r1.size()==1);
-	BOOST_TEST_REQUIRE(r2.size()==1);
-	BOOST_TEST(r1.at(0) == "b");
-	BOOST_TEST(r2.at(0) == "a");
-
-	auto t1_child2 = mk_node({.version=12});
-	t2().add(t2().root(), t1_child1, t1_child2);
-	auto sep_t1 = t2().copy_if(
-	            [this, &t1_child2](const gen_utils::data_node& n){
-		return &n == t2_root.get() || &n == t1_child2.get(); });
-	auto sep_t2 = t2().copy_if(
-	            [this, &t1_child1](const gen_utils::data_node& n){
-		return &n == t2_root.get() || &n == t1_child1.get(); });
-	gen_utils::input fdata3, fdata4, fdata5;
-	fdata3.add(sep_t1.value());
-	fdata4.add(sep_t2.value());
-	fdata5.add(t2());
-	imports_manager mng2;
-	mng2("a", fdata5)("b", fdata3)("c", fdata4).build();
-	auto r3 = mng2.self_matched(fdata5);
-	BOOST_TEST_REQUIRE(r3.size()==2);
-	BOOST_TEST(r3.at(0) == "b");
-	BOOST_TEST(r3.at(1) == "c");
-}
 BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 {
 	gen_utils::input fdata1, fdata2;

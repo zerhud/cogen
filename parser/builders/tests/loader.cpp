@@ -7,7 +7,7 @@
  *************************************************************************/
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE standard_types_parser
+#define BOOST_TEST_MODULE builders
 
 #include <iomanip>
 #include <boost/test/included/unit_test.hpp>
@@ -114,7 +114,8 @@ BOOST_FIXTURE_TEST_CASE(with_map_from, trees_fixture)
 	BOOST_REQUIRE(result.has_value());
 	BOOST_TEST_REQUIRE(result->children(result->root()).size() == 2);
 	gen_utils::compilation_context js_ctx{.links = &imng, .all_input = &dsls};
-	BOOST_TEST(result->to_json(js_ctx) == R"({ "project":"proj", "version":"0.0.0.0",
+
+	auto right_result = R"({ "project":"proj", "version":"0.0.0.0",
 	           "libraries":{
 	             "lib_v1":{
 	               "files":["a_v1", "b_v1"],
@@ -126,7 +127,23 @@ BOOST_FIXTURE_TEST_CASE(with_map_from, trees_fixture)
 	               "deps":["dep1"],
 	               "link_libs":["lib1"]
 	             }
-	           }})"_bj);
+	           }})"_bj;
+
+	BOOST_TEST_CONTEXT("with single tree") {
+		BOOST_TEST(result->to_json(js_ctx) == right_result);
+	}
+
+	mk_tree(t2(), {{},{}});
+	dsls.add(t2());
+	ctx.generated.clear();
+	ctx.generated["a"] = config_manager("a_${v}", imng, dsls);
+	ctx.generated["b"] = config_manager("b_${v}", imng, dsls);
+	ctx.generated["c"] = config_manager("c_${v}", imng, dsls);
+	result = ldr(setts, ctx);
+
+	BOOST_TEST_CONTEXT("with few trees") {
+		BOOST_TEST(result->to_json(js_ctx) == right_result);
+	}
 }
 BOOST_AUTO_TEST_SUITE_END() // builder_system
 BOOST_AUTO_TEST_SUITE_END() // library

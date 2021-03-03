@@ -46,25 +46,6 @@ std::pmr::vector<const gen_utils::tree*> input::all() const
 	return ret;
 }
 
-gen_utils::tree_compare_result input::match_with(const input& other) const
-{
-	tree_compare_result result = tree_compare_result::none;
-	if(storage.empty() && other.storage.empty())
-		return tree_compare_result::total;
-	for(auto& ot:other.storage) {
-		for(auto& st:storage) {
-			auto r = st.contains(ot);
-			if( r == tree_compare_result::partial )
-				return tree_compare_result::partial;
-			if( r == tree_compare_result::total )
-				result = tree_compare_result::total;
-			else if( r== tree_compare_result::only_root )
-				result = tree_compare_result::only_root;
-		}
-	}
-	return result;
-}
-
 gen_utils::compilation_config& input::conf()
 {
 	return cur_conf;

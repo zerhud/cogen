@@ -55,7 +55,11 @@ template<typename VecLeft, typename VecRight>
 void check_vec_eq(const VecLeft& l, const VecRight& r)
 {
 	BOOST_TEST( l.size() == r.size() );
-	for(auto& i:l) BOOST_CHECK( vec_contains(r, i) );
+	for(auto& i:l) {
+		BOOST_TEST_CONTEXT("checing " << i) {
+			BOOST_CHECK( vec_contains(r, i) );
+		}
+	}
 }
 
 template<typename VecLeft, typename T>
