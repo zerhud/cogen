@@ -96,7 +96,7 @@ tree_compare_result tree::contains(const tree& other) const
 		return store.size() == 1
 		        ? tree_compare_result::total
 		        : tree_compare_result::only_root;
-	return match_count == store.size()
+	return match_count == other.store.size()
 	          ? tree_compare_result::total
 	          : tree_compare_result::partial;
 }

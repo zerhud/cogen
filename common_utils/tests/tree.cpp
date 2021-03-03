@@ -257,7 +257,8 @@ BOOST_FIXTURE_TEST_CASE(contains, trees_fixture)
 	gen_utils::tree other_t1(t1_root, t1_dsl);
 	BOOST_CHECK(t1().contains(other_t1) == gen_utils::tree_compare_result::only_root);
 	other_t1.add(other_t1.root(), c1);
-	BOOST_CHECK(t1().contains(other_t1) == gen_utils::tree_compare_result::partial);
+	BOOST_CHECK(t1().contains(other_t1) == gen_utils::tree_compare_result::total);
+	BOOST_CHECK(other_t1.contains(t1()) == gen_utils::tree_compare_result::partial);
 	other_t1.add(*c1, nodes[1]);
 	BOOST_CHECK(t1().contains(other_t1) == gen_utils::tree_compare_result::total);
 
@@ -271,6 +272,10 @@ BOOST_FIXTURE_TEST_CASE(contains, trees_fixture)
 	MOCK_EXPECT(t4dm->id).returns("tt");
 	gen_utils::tree t4(c1, t4dm);
 	BOOST_CHECK(t1().contains(t4) == gen_utils::tree_compare_result::not_comparable);
+
+	t1().add(t1().root(), mk_node({}));
+	BOOST_CHECK(t1().contains(other_t1) == gen_utils::tree_compare_result::total);
+	BOOST_CHECK(other_t1.contains(t1()) == gen_utils::tree_compare_result::partial);
 }
 BOOST_FIXTURE_TEST_CASE(contains_two_child, trees_fixture)
 {
@@ -278,10 +283,12 @@ BOOST_FIXTURE_TEST_CASE(contains_two_child, trees_fixture)
 	auto c2 = mk_node(t1(), t1().root(), {.version=102});
 	gen_utils::tree t2(t1_root, t1_dsl);
 	t2.add(t2.root(), c2);
-	BOOST_CHECK(t1().contains(t2) == gen_utils::tree_compare_result::partial);
+	BOOST_CHECK(t1().contains(t2) == gen_utils::tree_compare_result::total);
+	BOOST_CHECK(t2.contains(t1()) == gen_utils::tree_compare_result::partial);
 
 	t1().add(t1().root(), mk_node({.version=103}));
-	BOOST_CHECK(t1().contains(t2) == gen_utils::tree_compare_result::partial);
+	BOOST_CHECK(t1().contains(t2) == gen_utils::tree_compare_result::total);
+	BOOST_CHECK(t2.contains(t1()) == gen_utils::tree_compare_result::partial);
 }
 BOOST_FIXTURE_TEST_CASE(search, trees_fixture)
 {
