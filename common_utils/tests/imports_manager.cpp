@@ -135,7 +135,7 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	BOOST_TEST(r3[1].cond == "cond_child2");
 	BOOST_TEST(r3[1].cfg.naming.size() == 0);
 }
-BOOST_FIXTURE_TEST_CASE(all_includes, trees_fixture)
+BOOST_FIXTURE_TEST_CASE(required_includes, trees_fixture)
 {
 	gen_utils::input fdata1, fdata2;
 	mk_tree(t1(), {
@@ -154,7 +154,7 @@ BOOST_FIXTURE_TEST_CASE(all_includes, trees_fixture)
 	imports_manager mng1;
 	mng1("f1", fdata1)("f2", fdata2).build();
 
-	auto incs = mng1.all_includes(fdata2);
+	auto incs = mng1.required_includes(fdata2);
 	BOOST_TEST(incs.size() == 2);
 	BOOST_TEST(incs["cond_child1"].size() == 1);
 	BOOST_TEST(incs["cond_child2"].size() == 1);
@@ -166,7 +166,7 @@ BOOST_FIXTURE_TEST_CASE(all_includes, trees_fixture)
 	BOOST_TEST(incs["cond_child2"].at(0).name == "sysfile");
 
 }
-BOOST_FIXTURE_TEST_CASE(map_from_forward, trees_fixture)
+BOOST_FIXTURE_TEST_CASE(mapped_includes, trees_fixture)
 {
 	mk_tree(t1(), {
 	            {std::nullopt, {.version=1, .node_var=variable{"v1", "m1"}}}
@@ -185,7 +185,7 @@ BOOST_FIXTURE_TEST_CASE(map_from_forward, trees_fixture)
 	for(auto& [n,d]:mapped) mng(n,d);
 	mng.build();
 
-	auto mr = mng.map_from("f_${v1}", t1());
+	auto mr = mng.mapped_includes("f_${v1}", t1());
 	BOOST_TEST(mr.size() == 2);
 	BOOST_TEST(mr.at("f_m1").size() == 1);
 	gen_utils_mocks::check_vec_eq(mr.at("f_m1"),
@@ -194,7 +194,7 @@ BOOST_FIXTURE_TEST_CASE(map_from_forward, trees_fixture)
 	gen_utils_mocks::check_vec_eq(mr.at("f_m2"),
 	    {gen_utils::import_file{false,"m_m2"_s}});
 
-	mr = mng.map_from("f_${v2}", t2());
+	mr = mng.mapped_includes("f_${v2}", t2());
 	BOOST_TEST(mr.size() == 1);
 	gen_utils_mocks::check_vec_eq(mr.at("f_n1"),
 	    {gen_utils::import_file{false,"m_m1"_s},

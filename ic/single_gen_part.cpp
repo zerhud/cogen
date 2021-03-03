@@ -45,11 +45,11 @@ compiled_output single_gen_part::operator()(
 	for(auto& [n,d]:compiled) {
 		d.conf() = cur_part.cfg_part.compilation;
 		auto jdata = make_json(cur_part, d, imports).as_object();
-		auto mincs = imports.map_from(
+		auto mincs = imports.mapped_includes(
 		            cur_part.cfg_part.map_tmpl,
 		            select(cur_part.cfg_part, d));
 		auto& jincs = jdata["includes"].emplace_object();
-		for(auto& [cond,files]:imports.all_includes(d)) {
+		for(auto& [cond,files]:imports.required_includes(d)) {
 			auto& jar = jincs[cond].emplace_array();
 			for(auto& f:files) jar.emplace_back(to_json(f));
 		}
@@ -127,7 +127,7 @@ void single_gen_part::add_includes_to_result(
         const gen_utils::imports_manager& imports) const
 {
 	boost::json::object& incs = result["includes"].emplace_object();
-	for(auto& [cond, files]:imports.all_includes(data)) {
+	for(auto& [cond, files]:imports.required_includes(data)) {
 		boost::json::array& far = incs[cond].emplace_array();
 		for(auto& f:files) far.emplace_back(to_json(f));
 	}

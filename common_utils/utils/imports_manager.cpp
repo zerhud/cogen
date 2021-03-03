@@ -147,7 +147,7 @@ std::pmr::vector<import_info> imports_manager::unique(
 	return src;
 }
 
-imports_manager::incs_map_t imports_manager::all_includes(
+imports_manager::incs_map_t imports_manager::required_includes(
 	        const input& file_data) const
 {
 	std::pmr::map<std::pmr::string, std::pmr::vector<import_file>> ret;
@@ -156,7 +156,7 @@ imports_manager::incs_map_t imports_manager::all_includes(
 	return ret;
 }
 
-imports_manager::incs_map_t imports_manager::map_from(
+imports_manager::incs_map_t imports_manager::mapped_includes(
 	        std::string_view tmpl,
 	        const gen_utils::tree& src) const
 {
