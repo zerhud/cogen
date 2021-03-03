@@ -83,6 +83,7 @@ gen_utils::imports_manager single_gen_part::make_imports(
         const compiled_output& result) const
 {
 	gen_utils::imports_manager imports;
+	for(auto& [n,d]:result) imports.add(n, d);
 	for(auto& link:setts.cfg_part.links)
 		for(auto& [n,d]:setts.generated.at(link))
 			imports.add(n,d);

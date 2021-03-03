@@ -161,7 +161,7 @@ imports_manager::incs_map_t imports_manager::map_from(
 	        const gen_utils::tree& src) const
 {
 	gen_utils::map_to::result_inputs_t mapped;
-	for(auto& [t,i]:all_input) mapped[t]=*i;
+	for(auto& [t,i]:all_input) if(!i->contains(&src)) mapped[t]=*i;
 	input isrc;
 	isrc.add(src);
 	auto result = gen_utils::map_from()(mapped, tmpl, isrc);
