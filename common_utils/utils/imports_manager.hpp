@@ -57,7 +57,7 @@ public:
 	std::pmr::vector<import_info> required_for(const tree& file_data) const ;
 
 	incs_map_t required_includes(const input& file_data) const ;
-	incs_map_t mapped_includes(std::string_view tmpl, const tree& src) const ;
+	incs_map_t mapped_includes(std::string_view tmpl, const input& src) const ;
 };
 
 } // namespace gen_utils

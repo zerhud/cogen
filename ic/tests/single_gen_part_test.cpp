@@ -89,7 +89,6 @@ struct single_gen_part_fixture {
 	mic::gen_context mk_context(
 	        std::string_view tmpl
 	      , std::pmr::vector<std::pmr::string> links={}
-	      , std::string_view map_from = "t1_dsl"
 	      , std::string_view src_file = "t"
 	        ) const
 	{
@@ -98,7 +97,6 @@ struct single_gen_part_fixture {
 				.tmpl_file = std::pmr::string(src_file),
 				.links=links,
 				.compilation = *compile_cfg,
-				.map_from=std::pmr::string(map_from)
 			}, {}};
 	}
 };
@@ -284,7 +282,6 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	gen_utils::input other_data;
 	other_data.add(t2);
 	ctx.cfg_part.map_tmpl = "file";
-	ctx.cfg_part.map_from = "t2_dsl";
 	ctx.cfg_part.links.emplace_back("part1");
 	MOCK_EXPECT(prov->generate).once()
 	        .with("t", make_result_json(

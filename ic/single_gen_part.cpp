@@ -33,9 +33,7 @@ compiled_output single_gen_part::operator()(
 	for(auto& [n,d]:compiled) {
 		d.conf() = cur_part.cfg_part.compilation;
 		auto jdata = make_json(cur_part, d, imports).as_object();
-		auto mincs = imports.mapped_includes(
-		            cur_part.cfg_part.map_tmpl,
-		            select(cur_part.cfg_part, d));
+		auto mincs = imports.mapped_includes(cur_part.cfg_part.map_tmpl, d);
 		auto& jincs = jdata["includes"].emplace_object();
 		for(auto& [cond,files]:imports.required_includes(d)) {
 			auto& jar = jincs[cond].emplace_array();
@@ -71,13 +69,6 @@ compiled_output single_gen_part::compile(
 {
 	gen_utils::map_to mapper;
 	return mapper(setts.cfg_part.map_tmpl, data);
-}
-
-const gen_utils::tree& single_gen_part::select(
-    const gen_config& setts, const gen_utils::input& data) const
-{
-	for(auto& it:data.all()) if(it->data_id()==setts.map_from) return *it;
-	throw std::runtime_error(("cannot map from for \"" + setts.map_from + '"').c_str());
 }
 
 gen_utils::imports_manager single_gen_part::make_imports(

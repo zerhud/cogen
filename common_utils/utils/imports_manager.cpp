@@ -134,13 +134,11 @@ imports_manager::incs_map_t imports_manager::required_includes(
 
 imports_manager::incs_map_t imports_manager::mapped_includes(
 	        std::string_view tmpl,
-	        const gen_utils::tree& src) const
+	        const gen_utils::input& src) const
 {
 	gen_utils::map_to::result_inputs_t mapped;
-	for(auto& [t,i]:all_input) if(!i->contains(&src)) mapped[t]=*i;
-	input isrc;
-	isrc.add(src);
-	auto result = gen_utils::map_from()(mapped, tmpl, isrc);
+	for(auto& [t,i]:all_input) if(i != &src) mapped[t]=*i;
+	auto result = gen_utils::map_from()(mapped, tmpl, src);
 	std::pmr::map<std::pmr::string, std::pmr::vector<import_file>> ret;
 	for(auto& [k,v]:result) for(auto& f:v) ret[k].emplace_back(import_file{false, f});
 	return ret;

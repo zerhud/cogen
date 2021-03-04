@@ -23,8 +23,6 @@ class single_gen_part final {
 	const provider* outside;
 	gen_utils::input split_by_vers(
 	        const gen_config& setts, gen_utils::input data) const ;
-	const gen_utils::tree& select(
-	        const gen_config& setts, const gen_utils::input& data) const ;
 	boost::json::object to_json(const gen_utils::import_file& f) const ;
 	compiled_output compile(const gen_context& setts,
 	                        const gen_utils::input& data) const ;
@@ -55,7 +53,6 @@ struct gen_config {
 	std::pmr::vector<std::pmr::string> links;
 	bool split_by_version = false;
 	gen_utils::compilation_config compilation;
-	std::pmr::string map_from = "ix3";
 };
 
 struct gen_context {

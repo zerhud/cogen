@@ -147,7 +147,9 @@ BOOST_FIXTURE_TEST_CASE(mapped_includes, trees_fixture)
 	for(auto& [n,d]:mapped) mng(n,d);
 	mng.build();
 
-	auto mr = mng.mapped_includes("f_${v1}", t1());
+	BOOST_TEST(mng.mapped_includes("${v1}", mapped["m_m1"]).size()==0);
+
+	auto mr = mng.mapped_includes("f_${v1}", all_data);
 	BOOST_TEST(mr.size() == 2);
 	BOOST_TEST(mr.at("f_m1").size() == 1);
 	gen_utils_mocks::check_vec_eq(mr.at("f_m1"),
@@ -156,7 +158,16 @@ BOOST_FIXTURE_TEST_CASE(mapped_includes, trees_fixture)
 	gen_utils_mocks::check_vec_eq(mr.at("f_m2"),
 	    {gen_utils::import_file{false,"m_m2"_s}});
 
-	mr = mng.mapped_includes("f_${v2}", t2());
+	mr = mng.mapped_includes("f_${v1}", gen_utils::input().add(t1()));
+	BOOST_TEST(mr.size() == 2);
+	BOOST_TEST(mr.at("f_m1").size() == 1);
+	gen_utils_mocks::check_vec_eq(mr.at("f_m1"),
+	    {gen_utils::import_file{false,"m_m1"_s}});
+	BOOST_TEST(mr.at("f_m2").size() == 1);
+	gen_utils_mocks::check_vec_eq(mr.at("f_m2"),
+	    {gen_utils::import_file{false,"m_m2"_s}});
+
+	mr = mng.mapped_includes("f_${v2}", gen_utils::input().add(t2()));
 	BOOST_TEST(mr.size() == 1);
 	gen_utils_mocks::check_vec_eq(mr.at("f_n1"),
 	    {gen_utils::import_file{false,"m_m1"_s},
