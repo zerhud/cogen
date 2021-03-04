@@ -24,23 +24,18 @@ class single_gen_part final {
 	gen_utils::input split_by_vers(
 	        const gen_config& setts, gen_utils::input data) const ;
 	boost::json::object to_json(const gen_utils::import_file& f) const ;
-	compiled_output compile(const gen_context& setts,
-	                        const gen_utils::input& data) const ;
-	boost::json::value make_json(
+	boost::json::value make_json_result(
 	        const gen_context& setts,
 	        const gen_utils::input& data,
 	        const gen_utils::imports_manager& imports) const ;
 	gen_utils::imports_manager make_imports(
 	        const gen_context& setts,
 	        const compiled_output& result) const ;
-	void add_includes_to_result(
-	        boost::json::object& result,
-	        gen_utils::imports_manager::incs_map_t incs
+	boost::json::object add_includes_to_result(
+	        boost::json::object result,
+	        gen_utils::imports_manager::incs_map_t required,
+	        std::pmr::vector<gen_utils::import_file> mapped
 	        ) const ;
-	void add_includes_to_result(
-	        boost::json::object& result,
-	        const gen_utils::input& data,
-	        const gen_utils::imports_manager& imports) const ;
 public:
 	single_gen_part(const provider* p);
 	compiled_output operator()(const gen_context& cur_part,

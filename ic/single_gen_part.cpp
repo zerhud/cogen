@@ -28,21 +28,14 @@ compiled_output single_gen_part::operator()(
 {
 	assert(outside);
 	input splitted = split_by_vers(cur_part.cfg_part, std::move(alli));
-	auto compiled = compile(cur_part, splitted);
+	auto compiled = gen_utils::map_to()(cur_part.cfg_part.map_tmpl, splitted);
 	gen_utils::imports_manager imports = make_imports(cur_part, compiled);
 	for(auto& [n,d]:compiled) {
 		d.conf() = cur_part.cfg_part.compilation;
-		auto jdata = make_json(cur_part, d, imports).as_object();
-		auto mincs = imports.mapped_includes(cur_part.cfg_part.map_tmpl, d);
-		auto& jincs = jdata["includes"].emplace_object();
-		for(auto& [cond,files]:imports.required_includes(d)) {
-			auto& jar = jincs[cond].emplace_array();
-			for(auto& f:files) jar.emplace_back(to_json(f));
-		}
-		if(mincs.contains(n)) {
-			auto& jar = jincs["self"].emplace_array();
-			for(auto& f:mincs[n]) jar.emplace_back(to_json(f));
-		}
+		auto jdata = add_includes_to_result(
+		            make_json_result(cur_part, d, imports).as_object(),
+		            imports.required_includes(d),
+		            imports.mapped_includes(cur_part.cfg_part.map_tmpl,d)[n]);
 		outside->generate(
 		            cur_part.cfg_part.tmpl_file,
 		            jdata, n);
@@ -64,13 +57,6 @@ gen_utils::input single_gen_part::split_by_vers(
 	});
 }
 
-compiled_output single_gen_part::compile(
-        const gen_context& setts, const input& data) const
-{
-	gen_utils::map_to mapper;
-	return mapper(setts.cfg_part.map_tmpl, data);
-}
-
 gen_utils::imports_manager single_gen_part::make_imports(
         const mdg::ic::gen_context& setts,
         const compiled_output& result) const
@@ -88,7 +74,7 @@ gen_utils::imports_manager single_gen_part::make_imports(
 	return imports;
 }
 
-boost::json::value single_gen_part::make_json(
+boost::json::value single_gen_part::make_json_result(
         const gen_context& setts,
         const input& data,
         const gen_utils::imports_manager& imports) const
@@ -103,27 +89,21 @@ boost::json::value single_gen_part::make_json(
 	return result;
 }
 
-void single_gen_part::add_includes_to_result(
-        boost::json::object &result,
-        gen_utils::imports_manager::incs_map_t incs) const
+boost::json::object single_gen_part::add_includes_to_result(
+        boost::json::object result,
+        gen_utils::imports_manager::incs_map_t required,
+        std::pmr::vector<gen_utils::import_file> mapped) const
 {
 	boost::json::object& jincs = result["includes"].emplace_object();
-	for(auto& [cond, files]:incs) {
+	for(auto& [cond, files]:required) {
 		boost::json::array& far = jincs[cond].emplace_array();
 		for(auto& f:files) far.emplace_back(to_json(f));
 	}
-}
-
-void single_gen_part::add_includes_to_result(
-        boost::json::object& result,
-        const gen_utils::input& data,
-        const gen_utils::imports_manager& imports) const
-{
-	boost::json::object& incs = result["includes"].emplace_object();
-	for(auto& [cond, files]:imports.required_includes(data)) {
-		boost::json::array& far = incs[cond].emplace_array();
-		for(auto& f:files) far.emplace_back(to_json(f));
+	if(!mapped.empty()) {
+		auto& jar = jincs["self"].emplace_array();
+		for(auto& f:mapped) jar.emplace_back(to_json(f));
 	}
+	return result;
 }
 
 boost::json::object single_gen_part::to_json(const gen_utils::import_file& f) const
