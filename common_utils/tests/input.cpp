@@ -18,6 +18,7 @@
 #include "mocks.hpp"
 
 using namespace std::literals;
+using gen_utils_mocks::mk_tree;
 using gen_utils_mocks::trees_fixture;
 
 BOOST_AUTO_TEST_SUITE(input)
@@ -111,6 +112,29 @@ BOOST_FIXTURE_TEST_CASE(contains, trees_fixture)
 	BOOST_CHECK(  i.contains(i.select(t1().data_id()).at(0)) );
 	BOOST_CHECK(  i.contains(i.select(t2().data_id()).at(0)) );
 	BOOST_CHECK( !i.contains(&t2()) );
+}
+BOOST_FIXTURE_TEST_CASE(moving, trees_fixture)
+{
+	using tcr = gen_utils::tree_compare_result;
+	using nc = gen_utils::name_conversion;
+	mk_tree(t1(), {{},{}});
+	mk_tree(t2(), {{},{}});
+	ic_input from, to;
+	from
+	        .add(t1())
+	        .add(t2())
+	        .conf().naming.emplace_back(nc::camel_case);
+
+	to = std::move(from);
+	BOOST_TEST_REQUIRE(to.all().size() == 2);
+	BOOST_CHECK(to.all()[0]->contains(t1()) == tcr::total);
+	BOOST_CHECK(to.all()[1]->contains(t2()) == tcr::total);
+	BOOST_CHECK(t1().contains(*to.all()[0]) == tcr::total);
+	BOOST_CHECK(t2().contains(*to.all()[1]) == tcr::total);
+
+	BOOST_TEST_REQUIRE(to.conf().naming.size() == 2);
+	BOOST_TEST(to_string(to.conf().naming[0]) == to_string(nc::as_is));
+	BOOST_TEST(to_string(to.conf().naming[1]) == to_string(nc::camel_case));
 }
 BOOST_AUTO_TEST_SUITE_END() // input
 
