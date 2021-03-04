@@ -19,6 +19,13 @@
 		.def("<=mem.name=>", &<=obj_ref(obj,mod,cdata)=>::<=mem.name=>)<% endfor %>
 		;
 <% endmacro -%>
+<%- macro def_struct(obj,mod,cdata) %>
+	pybind11::class_<<= obj_ref(obj,mod,cdata) =>>(m, "<= obj.name =>")
+		.def(py::init())
+		<%- for f in obj.fields %>
+		.def_readwrite("<=f.name=>", &<=obj_ref(obj,mod,cdata)=>::<=f.name=>)<% endfor %>
+		;
+<% endmacro -%>
 <%- macro def_enum(obj,mod,cdata) %>
 	pybind11::enum_<<= obj_ref(obj,mod,cdata) =>>(m, "<= obj.name =>")
 		<%- for mem in obj.members %>
@@ -31,6 +38,7 @@ PYBIND11_MODULE(<= module.name =>_<= mod_ver.major =>_<= mod_ver.minor =>, m) {
 	<%- if obj.type == "function" -%>m.def("<= obj.name =>", &<= obj_ref(obj, module, mod_ver) =>, "<= obj.docs =>");
 	<% endif %>
 	<%- if obj.type == "interface" -%><= def_class(obj,module,mod_ver) =><%- endif %>
+	<%- if obj.type == "record" -%><= def_struct(obj,module,mod_ver) =><%- endif %>
 	<%- if obj.type == "enum" -%><= def_enum(obj,module,mod_ver) =><%- endif %>
 	<%- endfor %>
 }
