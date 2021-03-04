@@ -27,19 +27,7 @@ compiled_output single_gen_part::operator()(
         const gen_context& cur_part, input alli) const
 {
 	assert(outside);
-	input splitted;
-	if(!cur_part.cfg_part.split_by_version)
-		splitted = std::move(alli);
-	else {
-		splitted = alli.modify([](const gen_utils::tree& t){
-				auto splited = gen_utils::split_by_ver{}(t);
-				assert(!splited.empty());
-				auto first = splited.begin();
-				for(auto pos = first+1;pos!=splited.end();++pos)
-					first->merge(*pos);
-				return std::pmr::vector<gen_utils::tree>{*first};
-			});
-	}
+	input splitted = split_by_vers(cur_part.cfg_part, std::move(alli));
 	auto compiled = compile(cur_part, splitted);
 	gen_utils::imports_manager imports = make_imports(cur_part, compiled);
 	for(auto& [n,d]:compiled) {
@@ -64,11 +52,18 @@ compiled_output single_gen_part::operator()(
 	return compiled;
 }
 
-const gen_utils::tree& single_gen_part::select(
-    const gen_config& setts, const gen_utils::input& data) const
+gen_utils::input single_gen_part::split_by_vers(
+    const gen_config& setts, gen_utils::input data) const
 {
-	for(auto& it:data.all()) if(it->data_id()==setts.map_from) return *it;
-	throw std::runtime_error(("cannot map from for \"" + setts.map_from + '"').c_str());
+	if(!setts.split_by_version) return data;
+	return data.modify([](const gen_utils::tree& t){
+		auto splited = gen_utils::split_by_ver{}(t);
+		assert(!splited.empty());
+		auto first = splited.begin();
+		for(auto pos = first+1;pos!=splited.end();++pos)
+			first->merge(*pos);
+		return std::pmr::vector<gen_utils::tree>{*first};
+	});
 }
 
 compiled_output single_gen_part::compile(
@@ -76,6 +71,13 @@ compiled_output single_gen_part::compile(
 {
 	gen_utils::map_to mapper;
 	return mapper(setts.cfg_part.map_tmpl, data);
+}
+
+const gen_utils::tree& single_gen_part::select(
+    const gen_config& setts, const gen_utils::input& data) const
+{
+	for(auto& it:data.all()) if(it->data_id()==setts.map_from) return *it;
+	throw std::runtime_error(("cannot map from for \"" + setts.map_from + '"').c_str());
 }
 
 gen_utils::imports_manager single_gen_part::make_imports(

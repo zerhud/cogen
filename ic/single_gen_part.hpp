@@ -21,6 +21,8 @@ typedef std::pmr::map<std::pmr::string, gen_utils::input> compiled_output;
 
 class single_gen_part final {
 	const provider* outside;
+	gen_utils::input split_by_vers(
+	        const gen_config& setts, gen_utils::input data) const ;
 	const gen_utils::tree& select(
 	        const gen_config& setts, const gen_utils::input& data) const ;
 	boost::json::object to_json(const gen_utils::import_file& f) const ;

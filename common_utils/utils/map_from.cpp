@@ -47,20 +47,6 @@ map_from::result_t map_from::operator()(
 	return ret;
 }
 
-bool map_from::contains(const tree& what, const input& where) const
-{
-	for(auto t:where.all())
-		if(what.contains(*t) == tcr::total) return true;
-	return false;
-}
-
-bool map_from::contains(const gen_utils::input& where, const gen_utils::tree& what) const
-{
-	for(auto t:where.all())
-		if(t->contains(what) == tcr::total) return true;
-	return false;
-}
-
 bool map_from::matched(
         const gen_utils::input& gotten,
         const gen_utils::input& mapped) const
@@ -78,5 +64,19 @@ bool map_from::has(const input& where, const tree& what) const
 		tcr r = t->contains(what);
 		if(r != tcr::none && r != tcr::not_comparable) return true;
 	}
+	return false;
+}
+
+bool map_from::contains(const tree& what, const input& where) const
+{
+	for(auto t:where.all())
+		if(what.contains(*t) == tcr::total) return true;
+	return false;
+}
+
+bool map_from::contains(const gen_utils::input& where, const gen_utils::tree& what) const
+{
+	for(auto t:where.all())
+		if(t->contains(what) == tcr::total) return true;
 	return false;
 }
