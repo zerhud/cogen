@@ -4,7 +4,8 @@
 
 <% macro type(obj) -%>
 <% if obj.ix3 %><=ix3_type(obj.ix3)=><% else -%>
-<= obj.cpp =><% if obj.subs[0] is defined %><<% for st in obj.subs %><= type(st) =><= ", " if not loop.last =><% endfor %>><% endif %>
+<%if obj.cpp is defined %><= obj.cpp =><% if obj.subs[0] is defined %><<% for st in obj.subs %><= type(st) =><= ", " if not loop.last =><% endfor %>><% endif %>
+<%-else-%><=obj.name[0]=><%endif%>
 <%-endif%>
 <%- endmacro %>
 
@@ -32,7 +33,7 @@
 <%- endmacro %>
 
 <%- macro includes(incs) -%>
-<% for (from, list) in incs.items() if from == "cpp"  or from == "self" %>
+<% for (from, list) in incs.items() if from == "cpp"  or from == "self" or from == "ix3" %>
 <% for info in list %>
 #include <= '<' if info.sys else '"' =><= info.file =><= '>' if info.sys else '"' =>
 <%- endfor -%>
@@ -46,7 +47,7 @@
 class <= decl_depricated(obj) =><= obj.name => {
 public:
 	virtual ~<= obj.name =>() noexcept =default;
-	<% for fnc in obj.members %>
+	<% for fnc in obj.funcs %>
 	virtual <= function_header(fnc) => =0 ;
 	<% endfor %>
 };

@@ -15,9 +15,16 @@ part
 		tmpl cpp/definitions.jinja
 		file "${mod}_${mod_a}_${mod_i}/module.cpp"
 	}
+	pybind_header {
+		inc_part dec
+		inc_part header
+		file "${mod}_${mod_a}_${mod_i}/pybind.hpp"
+		tmpl cpp/cpppy_header.jinja
+	}
 	pybind {
 		inc_part dec
 		inc_part header
+		inc_part pybind_header
 		file "${mod}_${mod_a}_${mod_i}/pybind.cpp"
 		tmpl cpp/cpppy.jinja
 	}

@@ -3,8 +3,11 @@
 // this file contains realization of helpers function
 
 #include <cassert>
+#include <memory_resource>
 #include <pybind11/pybind11.h>
 <= render.includes(cdata.includes) =>
+
+namespace py = pybind11;
 
 <% for module in cdata.data.ix3 -%>
 <% for mod_ver in module.vers %>
@@ -12,9 +15,8 @@
 <%- macro module_name(mod) %><= mod.name =>_<= mod.v.major =><= mod.v.minor =><% endmacro %>
 <%- macro obj_ref(obj, mod, mod_ver) %><= render.gen_namespace_name(mod, mod_ver) =>::<= obj.name =><% endmacro %>
 <%- macro def_class(obj,mod,cdata) %>
+	<% for ctor in obj.ctors %>m.def("<=obj|apply_prefix("create")=>", &<=render.gen_namespace_name(mod,cdata)=>::<=obj|apply_prefix("create")=> );<%endfor%>
 	pybind11::class_<<= obj_ref(obj,mod,cdata) =>>(m, "<= obj.name =>")
-		<%- for cns in obj.ctors %>
-		.def(pybind11::init(&<=render.gen_namespace_name(mod,cdata)=>::<= render.constructor_name(cns,obj,cdata) =>))<% endfor %>
 		<%- for mem in obj.funcs %>
 		.def("<=mem.name=>", &<=obj_ref(obj,mod,cdata)=>::<=mem.name=>)<% endfor %>
 		;

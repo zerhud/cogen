@@ -58,6 +58,7 @@ copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cpp/header.jinja" "${build_lib_dir}/
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cpp/render.jinja" "${build_lib_dir}/cpp/render.jinja")
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cpp/definitions.jinja" "${build_lib_dir}/cpp/definitions.jinja")
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cpp/cpppy.jinja" "${build_lib_dir}/cpp/cpppy.jinja")
+copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cpp/cpppy_header.jinja" "${build_lib_dir}/cpp/cpppy_header.jinja")
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cmake/plain.jinja" "${build_lib_dir}/cmake/plain.jinja")
 copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cmake/pybind11.jinja" "${build_lib_dir}/cmake/pybind11.jinja")
 

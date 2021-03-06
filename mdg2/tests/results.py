@@ -28,7 +28,7 @@ def test_cpp_decl():
 def test_cpp_py():
     build_dir = test_dir + '/build'
     py_dir = test_dir + '/gen'
-    r_mdg = sp.run(mdg_run + cpp_py + ['-o', test_dir])
+    r_mdg = sp.run(mdg_run + cpp_py + ['-o', py_dir])
     os.mkdir(build_dir)
     r_cmake = sp.run(['cmake', '../gen'], cwd = build_dir)
     r_make = sp.run(['cmake', '--build', '.'], cwd = build_dir)
