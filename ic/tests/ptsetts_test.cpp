@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(map_tmpl)
 	BOOST_TEST_REQUIRE(a_setts.cfg_part.links.size() == 2);
 	BOOST_TEST(a_setts.cfg_part.links.at(0) == "b");
 	BOOST_TEST(a_setts.cfg_part.links.at(1) == "c");
-	BOOST_CHECK(a_setts.cfg_part.compilation.naming.at(0) == gen_utils::name_conversion::as_is);
+	BOOST_CHECK(a_setts.cfg_part.compilation.naming.size() == 1);
 	BOOST_CHECK_THROW(obj.part_setts("b"sv), std::exception);
 	BOOST_CHECK_NO_THROW(obj.part_setts("c"sv));
 	BOOST_TEST(obj.part_setts("c"sv).split_by_version == true);
