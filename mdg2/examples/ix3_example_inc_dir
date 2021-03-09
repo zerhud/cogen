@@ -2,3 +2,10 @@ module external_module v1.1:
 
 enum external_enum {ex_one, ex_two}
 string gen_str(+external_enum val);
+
+record varius_data {
+	-string message;
+	+i64 int_data;
+}
+
+void fill_data(+varius_data d, -string msg);

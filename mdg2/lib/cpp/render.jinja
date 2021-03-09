@@ -5,12 +5,13 @@
 <% macro type(obj) -%>
 <% if obj.ix3 %><=ix3_type(obj.ix3)=><% else -%>
 <%if obj.cpp is defined %><= obj.cpp =><% if obj.subs[0] is defined %><<% for st in obj.subs %><= type(st) =><= ", " if not loop.last =><% endfor %>><% endif %>
-<%-else-%><=obj.name[0]=><%endif%>
+<%-else-%><=obj|name=><%endif%>
 <%-endif%>
 <%- endmacro %>
 
 <% macro ix3_type(obj) -%>
-<= gen_namespace_name(obj.mod, obj.mod_ver) =>::<= obj.name =>_ptr
+<= gen_namespace_name(obj.mod, obj.mod_ver) =>::<= obj|name =>
+<=- "_ptr" if obj.type!="enum"=>
 <%- endmacro %>
 
 <%- macro function_header(obj) -%>
@@ -20,7 +21,8 @@
 <%- endmacro %>
 
 <%- macro fparam(params) -%>
-<% for param in params %><= type(param.param_t) => <= param|name =><= ", " if not loop.last =><% endfor %>
+<% for param in params %><= "std::optional<" if not param.req =>
+<=- type(param.param_t) =><=">" if not param.req=> <= param|name =><= ", " if not loop.last =><% endfor %>
 <%- endmacro %>
 
 <%- macro decl_depricated(obj) -%>
