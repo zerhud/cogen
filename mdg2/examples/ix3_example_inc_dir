@@ -1,3 +1,4 @@
-module mod_in_dir v1.1:
+module external_module v1.1:
 
-i8 some_fnc_in_dir();
+enum external_enum {ex_one, ex_two}
+string gen_str(+external_enum val);

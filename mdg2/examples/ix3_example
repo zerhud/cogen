@@ -1,26 +1,27 @@
-include "ix3_example_inc"
 include "ix3_example_inc_dir"
 
 module mod v1.0:
 
-string foo(+i8 p);
-i64 bar(+list<string> p1);
+
 enum etest +auto_io { one, two }
 
-# doc string
-interface i +ex {
-	constructor(+i8 p1);
-	void do_some() mutable;
-	list<string> get_strings() const ;
+record echo_mesage {
+	+i64 param1;
+	+i64 param2;
+	-string msg;
 }
 
-@v 1.1 @depricated v1.1 ("test depricated and version")
-record some_rec {
-	+i64 filed1;
+# callback interface for echo service
+interface echo_callback +i {
+	void on_message(+string msg) mutable;
 }
 
-module test_two v2.0:
+interface echo_service {
+	constructor(+i64 start_form, +echo_callback cb);
+	void generate(+echo_mesage msg) const;
+}
 
-mod.i fnc();
+module combine_module v2.0:
 
-inc_mod.in_other_file other_fnc();
+string combine(+list<external_module.external_enum> what);
+
