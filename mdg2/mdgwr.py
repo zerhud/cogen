@@ -15,21 +15,26 @@ def template_loader(name):
             return open(cur_path).read()
     return None
 
+def extract_name(obj, ind):
+    if isinstance(obj['name'], list):
+        return obj['name'][ind]
+    return obj['name']
+
 def apply_sufix(obj, sufix, nind=0):
     naming = obj['naming'][nind]
     if naming == "underscore" or naming == "as_is":
-        return obj['name'] + '_' + sufix
+        return extract_name(obj,nind) + '_' + sufix
     if naming == "title_case" or naming == "camel_case":
-        return obj["name"] + sufix.title()
-    return obj['name'] + sufix
+        return extract_name(obj,nind) + sufix.title()
+    return extract_name(obj,nind) + sufix
 
 def apply_prefix(obj, prefix, nind=0):
     naming = obj['naming'][nind]
-    if naming == "underscore": return prefix + '_' + obj['name']
-    if naming == "title_case": return prefix.title() + obj["name"]
+    if naming == "underscore": return prefix + '_' + extract_name(obj,nind)
+    if naming == "title_case": return prefix.title() + extract_name(obj,nind)
     if naming == "camel_case":
-        return prefix.title() + obj["name"][:1].upper() + obj["name"][1:]
-    return prefix + obj['name']
+        return prefix.title() + extract_name(obj,nind)[:1].upper() + extract_name(obj,nind)[1:]
+    return prefix + extract_name(obj,nind)
 
 jinja_env = jinja2.Environment(
     block_start_string = '<%',

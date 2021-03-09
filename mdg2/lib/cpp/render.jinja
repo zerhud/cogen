@@ -1,6 +1,9 @@
 <%- macro gen_namespace_name(module, mod_ver) -%>
 <= module.name =>_<= mod_ver.major =>_<= mod_ver.minor =>
 <%- endmacro %>
+<%- macro gen_namespace_name(module, mod_ver, ind) -%>
+<= module.name[ind] =>_<= mod_ver.major =>_<= mod_ver.minor =>
+<%- endmacro %>
 
 <% macro type(obj) -%>
 <% if obj.ix3 %><=ix3_type(obj.ix3)=><% else -%>
@@ -21,6 +24,9 @@
 
 <%- macro fparam(params) -%>
 <% for param in params %><= type(param.param_t) => <= param.name =><= ", " if not loop.last =><% endfor %>
+<%- endmacro %>
+<%- macro fparam_bridge(params, ind) -%>
+<% for param in params %><= type(param.param_t) => <= param.name[ind] =><= ", " if not loop.last =><% endfor %>
 <%- endmacro %>
 
 <%- macro decl_depricated(obj) -%>

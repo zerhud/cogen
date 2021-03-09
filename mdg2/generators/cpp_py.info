@@ -3,23 +3,28 @@ part
 	dec {
 		tmpl cpp/declarations.jinja
 		file "${mod}_${mod_a}_${mod_i}/declarations.hpp"
+		naming underscore
 	}
 	header {
 		inc_part dec
 		tmpl cpp/header.jinja
 		file "${mod}_${mod_a}_${mod_i}/module.hpp"
+		naming underscore
 	}
 	definition {
 		inc_part dec
 		inc_part header
 		tmpl cpp/definitions.jinja
 		file "${mod}_${mod_a}_${mod_i}/module.cpp"
+		naming underscore
 	}
 	pybind_header {
 		inc_part dec
 		inc_part header
 		file "${mod}_${mod_a}_${mod_i}/pybind.hpp"
 		tmpl cpp/cpppy_header.jinja
+		naming underscore
+		naming camel_case
 	}
 	pybind {
 		inc_part dec
@@ -27,6 +32,8 @@ part
 		inc_part pybind_header
 		file "${mod}_${mod_a}_${mod_i}/pybind.cpp"
 		tmpl cpp/cpppy.jinja
+		naming underscore
+		naming camel_case
 	}
 	cmake {
 		tmpl cmake/pybind11.jinja

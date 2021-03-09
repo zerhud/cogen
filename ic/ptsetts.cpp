@@ -53,7 +53,7 @@ void ptsetts::config_compilation(
 			            cfg.naming.emplace_back());
 	}
 	if(cfg.naming.empty())
-		cfg.naming.emplace_back(gen_utils::name_conversion::underscore);
+		cfg.naming.emplace_back(gen_utils::name_conversion::as_is);
 }
 
 void ptsetts::conf_links(const std::string& path, gen_config& cfg) const
