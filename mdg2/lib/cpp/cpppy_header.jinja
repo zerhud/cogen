@@ -10,7 +10,7 @@
 <% for mod_ver in module.vers %>
 namespace <= render.gen_namespace_name(module, mod_ver) => {
 	<% for obj in mod_ver.content if obj.type == "interface" -%>
-	<%for ctor in obj.ctors %><=render.ptr(obj)=> <= obj | apply_prefix("create")=>(<=render.fparam_bridge(ctor.params)=>);<%- endfor %>
+	<%for ctor in obj.ctors %><=render.ptr(obj)=> <= obj | apply_prefix("create")=>(<=render.fparam(ctor.params)=>);<%- endfor %>
 	<% endfor %>
 } // namespace <= render.gen_namespace_name(module, mod_ver) =>
 <%endfor%>

@@ -15,9 +15,9 @@ def template_loader(name):
             return open(cur_path).read()
     return None
 
-def extract_name(obj, ind):
+def extract_name(obj, ind=-1):
     if isinstance(obj['name'], list):
-        return obj['name'][ind]
+        return obj['name'][ind if 0 < ind else 0]
     return obj['name']
 
 def apply_sufix(obj, sufix, nind=0):
@@ -52,6 +52,7 @@ jinja_env = jinja2.Environment(
 
 jinja_env.filters["apply_sufix"] = apply_sufix
 jinja_env.filters["apply_prefix"] = apply_prefix
+jinja_env.filters["name"] = extract_name
 
 def gen_file(src, to, data):
     print(src + "\t → \t" + to)
