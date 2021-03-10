@@ -24,6 +24,7 @@ class executer {
 	gen_utils::input user_data;
 
 	void set_options();
+	bool can_continue() const ;
 
 	void print_help() const ;
 	void dir_mode() const ;
