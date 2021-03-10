@@ -5,6 +5,7 @@
 #include <cassert>
 #include <memory_resource>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 <= render.includes(cdata.includes) =>
 
 namespace py = pybind11;
@@ -14,15 +15,16 @@ namespace py = pybind11;
 
 <%- macro module_name(mod) %><= mod|name(1) =>_<= mod.v.major =><= mod.v.minor =><% endmacro %>
 <%- macro obj_ref(obj, mod, mod_ver) %><= render.gen_namespace_name(mod, mod_ver) =>::<= obj|name =><% endmacro %>
+<%- macro ptr_ref(obj, mod, mod_ver) %><= render.gen_namespace_name(mod, mod_ver) =>::<= render.ptr(obj) =><% endmacro %>
 <%- macro def_class(obj,mod,cdata) %>
 	<% for ctor in obj.ctors %>m.def("<=obj|apply_prefix("create",1)=>", &<=render.gen_namespace_name(mod,cdata)=>::<=obj|apply_prefix("create")=> );<%endfor%>
-	pybind11::class_<<= obj_ref(obj,mod,cdata) =>>(m, "<= obj|name(1) =>")
+	pybind11::class_<<= obj_ref(obj,mod,cdata) =>, <=ptr_ref(obj,mod,cdata)=>>(m, "<= obj|name(1) =>")
 		<%- for mem in obj.funcs %>
 		.def("<=mem|name(1)=>", &<=obj_ref(obj,mod,cdata)=>::<=mem|name=>)<% endfor %>
 		;
 <% endmacro -%>
 <%- macro def_struct(obj,mod,cdata) %>
-	pybind11::class_<<= obj_ref(obj,mod,cdata) =>>(m, "<= obj|name(1) =>")
+	pybind11::class_<<= obj_ref(obj,mod,cdata) =>, <=ptr_ref(obj,mod,cdata)=>>(m, "<= obj|name(1) =>")
 		.def(py::init())
 		<%- for f in obj.fields %>
 		.def_readwrite("<=f|name(1)=>", &<=obj_ref(obj,mod,cdata)=>::<=f|name=>)<% endfor %>
@@ -35,7 +37,7 @@ namespace py = pybind11;
 		;
 <% endmacro %>
 
-PYBIND11_MODULE(<= module|name =>_<= mod_ver.major =>_<= mod_ver.minor =>, m) {
+PYBIND11_MODULE(<= module|name =>, m) {
 	<% for obj in mod_ver.content -%>
 	<%- if obj.type == "function" -%>m.def("<= obj|name(1) =>", &<= obj_ref(obj, module, mod_ver) =>, "<= obj.docs =>");
 	<% endif %>

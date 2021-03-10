@@ -1,5 +1,5 @@
 <% set sd = cdata.data.builders -%>
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 project(<= sd.project => VERSION <= sd.version => LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -11,14 +11,15 @@ find_package(<= im => REQUIRED)
 <%endfor%>
 
 <%- for item, value in sd.libraries.items() %>
-add_library("<= item =>" STATIC
+add_library("<= item =>" INTERFACE)
+target_sources("<= item =>" INTERFACE
 <% for file in value.files %>	<= file =>
-<% endfor -%>
-)
+<% endfor %>)
 set_source_files_properties(
 	<% for file in value.files if '.cpp' in file %><=file=> <%endfor%>
 	PROPERTIES COMPILE_OPTIONS "-Wno-deprecated-declarations")
-<% if value.deps %>target_link_libraries("<= item =>" PUBLIC <% for dep in value.deps %> <= dep =><% endfor %>) <% endif %>
-target_include_directories("<= item =>" PRIVATE "${CMAKE_CURRENT_LIST_DIR}" "${PYTHON_INCLUDE_DIRS}")
+<% if value.deps %>target_link_libraries("<= item =>" INTERFACE <% for dep in value.deps %> <= dep =><% endfor %>) <% endif %>
+target_include_directories("<= item =>" INTERFACE "${CMAKE_CURRENT_LIST_DIR}" "${PYTHON_INCLUDE_DIRS}")
+set_target_properties("<= item =>" PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 <% endfor %>
 

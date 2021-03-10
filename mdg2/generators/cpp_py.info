@@ -47,7 +47,6 @@ part
 				part header
 				part definition
 				part pybind
-				dep pybind11
 			}
 		}
 	}

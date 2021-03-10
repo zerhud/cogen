@@ -1,6 +1,6 @@
 module external_module v1.1:
 
-enum external_enum {ex_one, ex_two}
+enum external_enum +auto_io {ex_one, ex_two}
 string gen_str(+external_enum val);
 
 record varius_data {
