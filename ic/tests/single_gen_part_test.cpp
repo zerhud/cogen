@@ -291,6 +291,43 @@ BOOST_FIXTURE_TEST_CASE(required_includes, single_gen_part_fixture)
 	        "file");
 	ctx.generated["part2"] = sg(ctx, other_data);
 }
+BOOST_FIXTURE_TEST_CASE(must_not_include_own_part, single_gen_part_fixture)
+{
+	mk_tree(t1, {
+	            {std::nullopt, {
+	                 .version=100, .name="b", .node_var=variable{"v1", "n1"}}}
+	          , {std::nullopt, {
+	                 .version=100, .name="a",
+	                 .node_var=variable{"v1", "n2"}, .link_cond="cnd"}}
+	        });
+	mk_tree(t2,{
+	            {std::nullopt, {
+	                 .version=210, .name="c",
+	                 .node_var=variable{"v2", "m1"}, .links={{"a"}}}}
+	          , {std::nullopt, {
+	                 .version=211, .name="d",
+	                 .node_var=variable{"v2", "m2"}, .links={{"a"}}}}
+	        });
+	gen_utils::input all_data;
+	all_data.add(t1).add(t2);
+
+	single_gen_part part(prov.get());
+	gen_context ctx = mk_context("${v1}"sv);
+
+	expect_empty_result(*t1_dsl, *t2_dsl);
+
+	MOCK_EXPECT(prov->generate).exactly(2);
+	ctx.generated["p1"] = part(ctx, all_data);
+
+	ctx.cfg_part.map_tmpl = "f_${v2}";
+	ctx.cfg_part.links.emplace_back("p1");
+	auto edata = R"({"t1_dsl":{},"t2_dsl":{}})"_bj;
+	MOCK_EXPECT(prov->generate).once()
+	        .with("t", make_result_json( {}, {{"cnd",{"n2"}}}, edata), "f_m1");
+	MOCK_EXPECT(prov->generate).once()
+	        .with("t", make_result_json( {}, {{"cnd",{"n2"}}}, edata), "f_m2");
+	ctx.generated["p2"] = part(ctx, all_data);
+}
 BOOST_FIXTURE_TEST_CASE(crossed_includes, single_gen_part_fixture)
 {
 	mk_tree(t1, {

@@ -62,7 +62,7 @@ gen_utils::imports_manager single_gen_part::make_imports(
         const compiled_output& result) const
 {
 	gen_utils::imports_manager imports;
-	for(auto& [n,d]:result) imports.add(n, d);
+	for(auto& [n,d]:result) imports.add("", d);
 	for(auto& link:setts.cfg_part.links)
 		for(auto& [n,d]:setts.generated.at(link))
 			imports.add(n,d);
@@ -97,7 +97,7 @@ boost::json::object single_gen_part::add_includes_to_result(
 	boost::json::object& jincs = result["includes"].emplace_object();
 	for(auto& [cond, files]:required) {
 		boost::json::array& far = jincs[cond].emplace_array();
-		for(auto& f:files) far.emplace_back(to_json(f));
+		for(auto& f:files) if(!f.name.empty()) far.emplace_back(to_json(f));
 	}
 	if(!mapped.empty()) {
 		auto& jar = jincs["self"].emplace_array();
