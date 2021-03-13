@@ -315,7 +315,6 @@ BOOST_FIXTURE_TEST_CASE(must_not_include_own_part, single_gen_part_fixture)
 	gen_context ctx = mk_context("${v1}"sv);
 
 	expect_empty_result(*t1_dsl, *t2_dsl);
-
 	MOCK_EXPECT(prov->generate).exactly(2);
 	ctx.generated["p1"] = part(ctx, all_data);
 
@@ -327,6 +326,35 @@ BOOST_FIXTURE_TEST_CASE(must_not_include_own_part, single_gen_part_fixture)
 	MOCK_EXPECT(prov->generate).once()
 	        .with("t", make_result_json( {}, {{"cnd",{"n2"}}}, edata), "f_m2");
 	ctx.generated["p2"] = part(ctx, all_data);
+}
+BOOST_FIXTURE_TEST_CASE(must_link_to_own_part, single_gen_part_fixture)
+{
+	auto nodes = mk_tree(t1, {
+	            {std::nullopt, {
+	                 .version=100, .name="b", .node_var=variable{"v1", "n1"}}}
+	          , {std::nullopt, {
+	                 .version=100, .name="a",
+	                 .node_var=variable{"v1", "n2"}, .links={{"b"}},
+	                 .link_cond="cnd"
+	                 }}
+	        });
+	gen_utils::input all_data;
+	all_data.add(t1);
+	single_gen_part part(prov.get());
+	gen_context ctx = mk_context("${v1}"sv);
+	std::size_t count=0;
+	MOCK_EXPECT(t1_dsl->to_json).calls(
+	            [&nodes,&count](auto& ctx, const gen_utils::tree& con) mutable {
+		BOOST_TEST_REQUIRE(ctx.links != nullptr);
+		auto req = ctx.links->required_for(con);
+		BOOST_TEST(req.size()==count++);
+		if(!req.empty()) {
+			BOOST_TEST(req.at(0).to.node == nodes.at(0));
+			BOOST_TEST(req.at(0).from.node == nodes.at(1));
+		}
+		return boost::json::object{}; });
+	MOCK_EXPECT(prov->generate).exactly(2);
+	ctx.generated["p1"] = part(ctx, all_data);
 }
 BOOST_FIXTURE_TEST_CASE(crossed_includes, single_gen_part_fixture)
 {
