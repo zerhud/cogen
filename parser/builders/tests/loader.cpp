@@ -24,12 +24,13 @@ using boost::property_tree::ptree;
 using gen_utils_mocks::trees_fixture;
 
 gen_utils::map_to::result_inputs_t config_manager(
+        std::pmr::string part,
         std::pmr::string tmpl,
         gen_utils::imports_manager& mng,
         const gen_utils::input& all_data)
 {
 	auto ret = gen_utils::map_to()(tmpl, all_data);
-	for(auto& [n,d]:ret) mng(n,d);
+	for(auto& [n,d]:ret) mng(part, n,d);
 	return ret;
 }
 
@@ -69,8 +70,8 @@ BOOST_FIXTURE_TEST_CASE(proj_and_lib, trees_fixture)
 	builders::loader ldr;
 	mdg::ic::gen_context ctx;
 	gen_utils::imports_manager imng;
-	ctx.generated["a"] = config_manager("file_${a}", imng, dsls);
-	ctx.generated["b"] = config_manager("file_${b}", imng, dsls);
+	ctx.generated["a"] = config_manager("a", "file_${a}", imng, dsls);
+	ctx.generated["b"] = config_manager("b", "file_${b}", imng, dsls);
 	imng.build();
 
 	auto result = ldr(setts, ctx);
@@ -105,9 +106,9 @@ BOOST_FIXTURE_TEST_CASE(with_map_from, trees_fixture)
 
 	mdg::ic::gen_context ctx;
 	gen_utils::imports_manager imng;
-	ctx.generated["a"] = config_manager("a_${v}", imng, dsls);
-	ctx.generated["b"] = config_manager("b_${v}", imng, dsls);
-	ctx.generated["c"] = config_manager("c_${v}", imng, dsls);
+	ctx.generated["a"] = config_manager("a", "a_${v}", imng, dsls);
+	ctx.generated["b"] = config_manager("b", "b_${v}", imng, dsls);
+	ctx.generated["c"] = config_manager("c", "c_${v}", imng, dsls);
 
 	builders::loader ldr;
 	auto result = ldr(setts, ctx);
@@ -136,9 +137,9 @@ BOOST_FIXTURE_TEST_CASE(with_map_from, trees_fixture)
 	mk_tree(t2(), {{},{}});
 	dsls.add(t2());
 	ctx.generated.clear();
-	ctx.generated["a"] = config_manager("a_${v}", imng, dsls);
-	ctx.generated["b"] = config_manager("b_${v}", imng, dsls);
-	ctx.generated["c"] = config_manager("c_${v}", imng, dsls);
+	ctx.generated["a"] = config_manager("a", "a_${v}", imng, dsls);
+	ctx.generated["b"] = config_manager("b", "b_${v}", imng, dsls);
+	ctx.generated["c"] = config_manager("c", "c_${v}", imng, dsls);
 	result = ldr(setts, ctx);
 
 	BOOST_TEST_CONTEXT("with few trees") {

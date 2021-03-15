@@ -36,7 +36,13 @@ inline const bool operator < (const import_info& l, const import_info& r)
 }
 
 class imports_manager final {
-	std::pmr::map<std::pmr::string, const input*> all_input;
+	struct input_info {
+		std::pmr::string file;
+		std::pmr::string part;
+		const input* data;
+	};
+
+	std::pmr::vector<input_info> input_store;
 
 	std::pmr::vector<import_info> required_for_scan(
 	        const tree& src, const data_node& par) const ;
@@ -51,8 +57,13 @@ public:
 	using  incs_map_t = std::pmr::map<std::pmr::string, std::pmr::vector<import_file>>;
 
 	void build();
-	imports_manager& operator()(const std::pmr::string& file, const input& data);
-	imports_manager& add(const std::pmr::string& file, const input& data);
+	imports_manager& operator()(const std::pmr::string& part,
+	                            const std::pmr::string& file,
+	                            const input& data);
+	imports_manager& add(const std::pmr::string& part,
+	                     const std::pmr::string& file,
+	                     const input& data);
+
 	std::pmr::vector<import_info> required_for(const input& file_data) const ;
 	std::pmr::vector<import_info> required_for(const tree& file_data) const ;
 

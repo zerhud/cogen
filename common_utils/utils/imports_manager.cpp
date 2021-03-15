@@ -24,15 +24,19 @@ auto operator | (C && c, F f)
 }
 
 imports_manager& imports_manager::operator()(
-        const std::pmr::string& file, const input& data)
+        const std::pmr::string& part,
+        const std::pmr::string& file,
+        const input& data)
 {
-	return add(file, data);
+	return add(part, file, data);
 }
 
 imports_manager& imports_manager::add(
-        const std::pmr::string& file, const input& data)
+        const std::pmr::string& part,
+        const std::pmr::string& file,
+        const input& data)
 {
-	all_input[file] = &data;
+	input_store.emplace_back(input_info{.file=file,.part=part,.data=&data});
 	return *this;
 }
 
@@ -61,11 +65,10 @@ std::pmr::vector<import_info> imports_manager::required_for_incs(
         const input& file_data) const
 {
 	auto ret = required_for(file_data) | unique;
-	for(auto& [file, data]:all_input) if(data==&file_data) {
-		auto pos = std::find_if(
-				ret.begin(),ret.end(),
-				[&file](auto& i){return i.file.name==file;});
-		if(pos!=ret.end()) ret.erase(pos);
+	std::pmr::string cur_part;
+	for(auto& [file, part, data]:input_store) if(data==&file_data) cur_part = part;
+	for(auto& [file, part, data]:input_store) if(part==cur_part) {
+		std::erase_if(ret, [&file](const import_info& i){return i.file.name==file;});
 	}
 	return ret;
 }
@@ -87,7 +90,7 @@ std::pmr::vector<import_info> imports_manager::required_for_links(
     const tree& src, node_ptr cur) const
 {
 	std::pmr::vector<import_info> ret;
-	for(auto& [in_name, in]:all_input) {
+	for(auto& [in_name, part_name, in]:input_store) {
 		for(auto& in_tree:in->all()) {
 			auto requests = cur->required_links();
 			for(auto& req:requests) {
@@ -137,7 +140,7 @@ imports_manager::incs_map_t imports_manager::mapped_includes(
 	        const gen_utils::input& src) const
 {
 	gen_utils::map_to::result_inputs_t mapped;
-	for(auto& [t,i]:all_input) if(i != &src) mapped[t]=*i;
+	for(auto& [t,p,i]:input_store) if(i != &src) mapped[t]=*i;
 	auto result = gen_utils::map_from()(mapped, tmpl, src);
 	std::pmr::map<std::pmr::string, std::pmr::vector<import_file>> ret;
 	for(auto& [k,v]:result) for(auto& f:v) ret[k].emplace_back(import_file{false, f});

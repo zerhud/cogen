@@ -410,7 +410,7 @@ BOOST_AUTO_TEST_CASE(standard_types)
 	gen_utils::input file_data;
 	file_data.add(std_types);
 	file_data.add(tree);
-	im("file", file_data).build();
+	im("", "file", file_data).build();
 
 	auto foo = tree.children(*mod).at(0);
 
@@ -603,7 +603,7 @@ BOOST_AUTO_TEST_CASE(lelf_links)
 	auto foo = tree_f2.children(*mod).at(0);
 
 	gen_utils::imports_manager imng;
-	imng.add("f1", f1).add("f2", f2).build();
+	imng.add("", "f1", f1).add("", "f2", f2).build();
 	BOOST_TEST(imng.required_for(f2).size()==1);
 	BOOST_TEST(imng.required_for(f2).at(0).file.name=="f1");
 

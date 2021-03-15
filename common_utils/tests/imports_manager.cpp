@@ -48,7 +48,7 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	fdata1.conf().naming.clear();
 
 	imports_manager mng1;
-	mng1("f1", fdata1)("f2", fdata2).build();
+	mng1("p1", "f1", fdata1)("p1", "f2", fdata2).build();
 
 	BOOST_TEST(mng1.required_for(fdata1).size() == 0);
 
@@ -114,7 +114,7 @@ BOOST_FIXTURE_TEST_CASE(required_includes, trees_fixture)
 	fdata2.add(t2());
 
 	imports_manager mng1;
-	mng1("f1", fdata1)("f2", fdata2).build();
+	mng1("p1", "f1", fdata1)("p2", "f2", fdata2).build();
 
 	auto incs = mng1.required_includes(fdata2);
 	BOOST_TEST(incs.size() == 2);
@@ -144,7 +144,7 @@ BOOST_FIXTURE_TEST_CASE(mapped_includes, trees_fixture)
 
 	imports_manager mng;
 	auto mapped = gen_utils::map_to()("m_${v1}", all_data);
-	for(auto& [n,d]:mapped) mng(n,d);
+	for(auto& [n,d]:mapped) mng("p1", n,d);
 	mng.build();
 
 	BOOST_TEST(mng.mapped_includes("${v1}", mapped["m_m1"]).size()==0);
@@ -172,6 +172,28 @@ BOOST_FIXTURE_TEST_CASE(mapped_includes, trees_fixture)
 	gen_utils_mocks::check_vec_eq(mr.at("f_n1"),
 	    {gen_utils::import_file{false,"m_m1"_s},
 	    gen_utils::import_file{false,"m_m2"_s}});
+}
+BOOST_FIXTURE_TEST_CASE(exclude_own_part, trees_fixture)
+{
+	gen_utils::input fdata1, fdata2;
+	mk_tree(t1(), {
+	      {std::nullopt, {.version=11, .name="a", .link_cond="cond_child1"}}
+	    , {std::nullopt, {.version=12, .name="b", .link_cond="cond_child2",
+	             .import_mods=gen_utils::import_file{true, "sysfile"}}}
+	        });
+	mk_tree(t2(), {
+	      {std::nullopt, {.version=12, .name="not_used", .links={{"a"}, {"b"}}}}
+	    , {std::nullopt, {.version=12, .name="b", .link_cond="cond_child2_t2"}}
+	        });
+
+	fdata1.add(t1()).conf().naming.clear();
+	fdata2.add(t2());
+
+	imports_manager mng1;
+	mng1("p1", "f1", fdata1)("p1", "f2", fdata2).build();
+	BOOST_TEST(mng1.required_for(fdata2).size() == 3);
+	BOOST_TEST(mng1.required_includes(fdata2).size() == 1);
+	BOOST_TEST(mng1.required_includes(fdata2).at("cond_child2").front().name == "sysfile");
 }
 BOOST_AUTO_TEST_SUITE_END() // imports_manager_test
 
