@@ -50,6 +50,8 @@ class imports_manager final {
 	        const tree& src, node_ptr cur) const ;
 	std::pmr::vector<import_info> required_for_incs(
 	        const input& file_data) const ;
+	std::pmr::vector<import_info> remove_own_part(
+	        const input& file_data, std::pmr::vector<import_info> src) const ;
 
 	static std::pmr::vector<import_info> unique(
 	        std::pmr::vector<import_info> src);

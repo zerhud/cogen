@@ -65,12 +65,18 @@ std::pmr::vector<import_info> imports_manager::required_for_incs(
         const input& file_data) const
 {
 	auto ret = required_for(file_data) | unique;
+	return remove_own_part(file_data, ret);
+}
+
+std::pmr::vector<import_info> imports_manager::remove_own_part(
+    const input& file_data, std::pmr::vector<import_info> src) const
+{
 	std::pmr::string cur_part;
 	for(auto& [file, part, data]:input_store) if(data==&file_data) cur_part = part;
 	for(auto& [file, part, data]:input_store) if(part==cur_part) {
-		std::erase_if(ret, [&file](const import_info& i){return i.file.name==file;});
+		std::erase_if(src, [&file](const import_info& i){return i.file.name==file;});
 	}
-	return ret;
+	return src;
 }
 
 std::pmr::vector<import_info> imports_manager::required_for_scan(
