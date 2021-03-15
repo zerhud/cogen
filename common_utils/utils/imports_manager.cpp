@@ -61,13 +61,6 @@ std::pmr::vector<import_info> imports_manager::required_for(
 	return required_for_scan(file_data, file_data.root());
 }
 
-std::pmr::vector<import_info> imports_manager::required_for_incs(
-        const input& file_data) const
-{
-	auto ret = required_for(file_data) | unique;
-	return remove_own_part(file_data, ret);
-}
-
 std::pmr::vector<import_info> imports_manager::remove_own_part(
     const input& file_data, std::pmr::vector<import_info> src) const
 {
@@ -136,7 +129,16 @@ imports_manager::incs_map_t imports_manager::required_includes(
 	        const input& file_data) const
 {
 	std::pmr::map<std::pmr::string, std::pmr::vector<import_file>> ret;
-	auto req = required_for_incs(file_data);
+	auto req = remove_own_part(file_data, required_for(file_data) | unique);
+	for(auto& r:req) ret[r.cond].emplace_back(r.file);
+	return ret;
+}
+
+imports_manager::incs_map_t imports_manager::required_includes_with_own(
+	        const input& file_data) const
+{
+	std::pmr::map<std::pmr::string, std::pmr::vector<import_file>> ret;
+	auto req = required_for(file_data) | unique;
 	for(auto& r:req) ret[r.cond].emplace_back(r.file);
 	return ret;
 }

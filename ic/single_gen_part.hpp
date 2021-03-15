@@ -47,6 +47,7 @@ struct gen_config {
 	std::pmr::string tmpl_file;
 	std::pmr::vector<std::pmr::string> links;
 	bool split_by_version = false;
+	bool include_own_part = false;
 	gen_utils::compilation_config compilation;
 };
 

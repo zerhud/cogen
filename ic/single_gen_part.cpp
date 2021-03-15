@@ -34,7 +34,9 @@ compiled_output single_gen_part::operator()(
 		d.conf() = cur_part.cfg_part.compilation;
 		auto jdata = add_includes_to_result(
 		            make_json_result(cur_part, d, imports).as_object(),
-		            imports.required_includes(d),
+		            cur_part.cfg_part.include_own_part
+		                ? imports.required_includes_with_own(d)
+		                : imports.required_includes(d),
 		            imports.mapped_includes(cur_part.cfg_part.map_tmpl,d)[n]);
 		outside->generate(
 		            cur_part.cfg_part.tmpl_file,

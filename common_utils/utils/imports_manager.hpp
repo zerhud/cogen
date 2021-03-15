@@ -48,8 +48,6 @@ class imports_manager final {
 	        const tree& src, const data_node& par) const ;
 	std::pmr::vector<import_info> required_for_links(
 	        const tree& src, node_ptr cur) const ;
-	std::pmr::vector<import_info> required_for_incs(
-	        const input& file_data) const ;
 	std::pmr::vector<import_info> remove_own_part(
 	        const input& file_data, std::pmr::vector<import_info> src) const ;
 
@@ -70,6 +68,7 @@ public:
 	std::pmr::vector<import_info> required_for(const tree& file_data) const ;
 
 	incs_map_t required_includes(const input& file_data) const ;
+	incs_map_t required_includes_with_own(const input& file_data) const ;
 	incs_map_t mapped_includes(std::string_view tmpl, const input& src) const ;
 };
 

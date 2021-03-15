@@ -126,7 +126,26 @@ BOOST_FIXTURE_TEST_CASE(required_includes, trees_fixture)
 
 	BOOST_TEST(incs["cond_child2"].at(0).sys == true);
 	BOOST_TEST(incs["cond_child2"].at(0).name == "sysfile");
+}
+BOOST_FIXTURE_TEST_CASE(required_includes_with_own, trees_fixture)
+{
+	mk_tree(t1(), {
+	      {std::nullopt, {.version=11, .name="a", .link_cond="cond_child1"}}
+	    , {std::nullopt, {.version=12, .name="b", .links={{"a"}}}},
+	        });
 
+	gen_utils::input fdata1;
+	fdata1.add(t1());
+
+	imports_manager mng1;
+	mng1("p1", "f1", fdata1);
+
+	auto incs = mng1.required_includes_with_own(fdata1);
+	BOOST_TEST(incs.size() == 1);
+	BOOST_TEST(incs["cond_child1"].size() == 1);
+
+	BOOST_TEST(incs["cond_child1"].at(0).sys == false);
+	BOOST_TEST(incs["cond_child1"].at(0).name == "f1");
 }
 BOOST_FIXTURE_TEST_CASE(mapped_includes, trees_fixture)
 {
