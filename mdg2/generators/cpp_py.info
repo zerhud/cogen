@@ -1,7 +1,6 @@
 part
 {
 	dec {
-		self_inc true
 		tmpl cpp/declarations.jinja
 		file "${mod}_${mod_a}_${mod_i}/declarations.hpp"
 		naming underscore
@@ -13,6 +12,7 @@ part
 		naming underscore
 	}
 	definition {
+		self_inc false
 		inc_part dec
 		inc_part header
 		tmpl cpp/definitions.jinja
@@ -28,6 +28,7 @@ part
 		naming camel_case
 	}
 	pybind {
+		self_inc false
 		inc_part dec
 		inc_part header
 		inc_part pybind_header

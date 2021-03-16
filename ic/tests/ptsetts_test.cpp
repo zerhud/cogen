@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(map_tmpl)
 	setts.put("part.c.tmpl", "v_tmpl");
 	setts.put("part.c.split_by_version", true);
 	setts.put("part.c.naming", "title_case");
-	setts.put("part.c.self_inc", true);
+	setts.put("part.c.self_inc", false);
 	ic_ptsetts obj(setts);
 	BOOST_TEST(obj.parts().size() == 3);
 	mic::gen_context a_setts;
@@ -61,14 +61,14 @@ BOOST_AUTO_TEST_CASE(map_tmpl)
 	BOOST_TEST_REQUIRE(a_setts.cfg_part.links.size() == 2);
 	BOOST_TEST(a_setts.cfg_part.links.at(0) == "b");
 	BOOST_TEST(a_setts.cfg_part.links.at(1) == "c");
-	BOOST_TEST(a_setts.cfg_part.include_own_part == false);
+	BOOST_TEST(a_setts.cfg_part.include_own_part == true);
 	BOOST_CHECK(a_setts.cfg_part.compilation.naming.size() == 1);
 	BOOST_CHECK_THROW(obj.part_setts("b"sv), std::exception);
 	BOOST_CHECK_NO_THROW(obj.part_setts("c"sv));
 	BOOST_TEST(obj.part_setts("c"sv).split_by_version == true);
 	BOOST_TEST(obj.part_setts("c"sv).compilation.naming.size() == 1);
 	BOOST_CHECK(obj.part_setts("c"sv).compilation.naming.at(0) == gen_utils::name_conversion::title_case);
-	BOOST_TEST(obj.part_setts("c"sv).include_own_part == true);
+	BOOST_TEST(obj.part_setts("c"sv).include_own_part == false);
 }
 BOOST_AUTO_TEST_CASE(generic_ast_tree)
 {
