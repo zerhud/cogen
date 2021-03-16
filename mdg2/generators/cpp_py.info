@@ -1,6 +1,7 @@
 part
 {
 	dec {
+		self_inc true
 		tmpl cpp/declarations.jinja
 		file "${mod}_${mod_a}_${mod_i}/declarations.hpp"
 		naming underscore
