@@ -72,6 +72,15 @@ std::pmr::vector<import_info> imports_manager::remove_own_part(
 	return src;
 }
 
+std::pmr::vector<import_info> imports_manager::remove_itself(
+    const input& file_data, std::pmr::vector<import_info> src) const
+{
+	for(auto& [file, part, data]:input_store) if(data==&file_data) {
+		std::erase_if(src, [&file](const import_info& i){return i.file.name==file;});
+	}
+	return src;
+}
+
 std::pmr::vector<import_info> imports_manager::required_for_scan(
     const tree& src, const data_node& par) const
 {
@@ -138,7 +147,7 @@ imports_manager::incs_map_t imports_manager::required_includes_with_own(
 	        const input& file_data) const
 {
 	std::pmr::map<std::pmr::string, std::pmr::vector<import_file>> ret;
-	auto req = required_for(file_data) | unique;
+	auto req = remove_itself(file_data, required_for(file_data) | unique);
 	for(auto& r:req) ret[r.cond].emplace_back(r.file);
 	return ret;
 }

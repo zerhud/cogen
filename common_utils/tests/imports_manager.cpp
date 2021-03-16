@@ -130,6 +130,34 @@ BOOST_FIXTURE_TEST_CASE(required_includes, trees_fixture)
 BOOST_FIXTURE_TEST_CASE(required_includes_with_own, trees_fixture)
 {
 	mk_tree(t1(), {
+	      {std::nullopt, {.version=11, .name="a",
+	       .node_var=variable{"v", "vv1"}, .link_cond="cond_child1"} }
+	    , {std::nullopt, {.version=12, .name="b",
+	       .node_var=variable{"v", "vv2"}, .links={{"a"}} } }
+	        });
+
+	auto mapped = gen_utils::map_to()("${v}", t1());
+	gen_utils::input fdata1, fdata2;
+	fdata1.add(mapped.at("vv1"));
+	fdata2.add(mapped.at("vv2"));
+
+	imports_manager mng1;
+	mng1("p1", "f1", fdata1);
+	mng1("p1", "f2", fdata2);
+
+	auto incs = mng1.required_includes_with_own(fdata1);
+	BOOST_TEST(incs.size() == 0);
+
+	incs = mng1.required_includes_with_own(fdata2);
+	BOOST_TEST(incs.size() == 1);
+	BOOST_TEST(incs["cond_child1"].size() == 1);
+
+	BOOST_TEST(incs["cond_child1"].at(0).sys == false);
+	BOOST_TEST(incs["cond_child1"].at(0).name == "f1");
+}
+BOOST_FIXTURE_TEST_CASE(never_include_itself, trees_fixture)
+{
+	mk_tree(t1(), {
 	      {std::nullopt, {.version=11, .name="a", .link_cond="cond_child1"}}
 	    , {std::nullopt, {.version=12, .name="b", .links={{"a"}}}},
 	        });
@@ -140,12 +168,8 @@ BOOST_FIXTURE_TEST_CASE(required_includes_with_own, trees_fixture)
 	imports_manager mng1;
 	mng1("p1", "f1", fdata1);
 
-	auto incs = mng1.required_includes_with_own(fdata1);
-	BOOST_TEST(incs.size() == 1);
-	BOOST_TEST(incs["cond_child1"].size() == 1);
-
-	BOOST_TEST(incs["cond_child1"].at(0).sys == false);
-	BOOST_TEST(incs["cond_child1"].at(0).name == "f1");
+	BOOST_TEST(mng1.required_includes(fdata1).size() == 0);
+	BOOST_TEST(mng1.required_includes_with_own(fdata1).size() == 0);
 }
 BOOST_FIXTURE_TEST_CASE(mapped_includes, trees_fixture)
 {
