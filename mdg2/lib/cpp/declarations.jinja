@@ -6,14 +6,14 @@
 #include <optional>
 #include <memory_resource>
 <= render.includes(cdata.includes) =>
+<%- set mod_export = cdata.data.ptsetts.export_macro %>
+<% if cdata.data.ptsetts.export_macro is not undefined %>
+#if !defined(<=mod_export=>)
+# define <=mod_export=>
+#endif
+<%endif%>
 
 <% for module in cdata.data.ix3 -%>
-<% set mod_export = module.name|upper + '_EXPORT' -%>
-#if defined(<= module.name|upper =>_BUILDING)
-#  define <= mod_export => __declspec(dllexport)
-#else
-#  define <= mod_export => __declspec(dllimport)
-#endif
 <% for mod_ver in module.vers -%>
 
 <= render.decl_meta_params(module) =>
