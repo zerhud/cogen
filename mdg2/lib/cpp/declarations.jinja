@@ -8,12 +8,18 @@
 <= render.includes(cdata.includes) =>
 
 <% for module in cdata.data.ix3 -%>
-<% for mod_ver in module.vers %>
+<% set mod_export = module.name|upper + '_EXPORT' -%>
+#if defined(<= module.name|upper =>_BUILDING)
+#  define <= mod_export => __declspec(dllexport)
+#else
+#  define <= mod_export => __declspec(dllimport)
+#endif
+<% for mod_ver in module.vers -%>
 
 <= render.decl_meta_params(module) =>
 namespace <= render.gen_namespace_name(module, mod_ver) => {
 	<%- for obj in mod_ver.content %>
-	<% if obj.type == "function" -%><= render.function_header(obj) =>;
+	<% if obj.type == "function" -%><= mod_export => <= render.function_header(obj) =>;
 	<%- elif obj.type == "enum" -%>
 	<= render.decl_meta_params(obj) =>
 	enum class <= render.decl_depricated(obj) =><= obj.name =>
@@ -21,8 +27,8 @@ namespace <= render.gen_namespace_name(module, mod_ver) => {
 		<% for mem in obj.members -%><= mem.name =><=- ", " if not loop.last =><%- endfor %>
 	};
 	<% if obj.auto_io -%>
-	std::string to_string(<= obj.name => v);
-	std::wstring to_wstring(<= obj.name => v);
+	<= mod_export => std::string to_string(<= obj.name => v);
+	<= mod_export => std::wstring to_wstring(<= obj.name => v);
 	template<typename S> std::enable_if_t<std::is_same_v<char,typename S::char_type>,S&> operator << (S& out, <= obj.name => o) { return out << to_string(o); }
 	template<typename S> std::enable_if_t<std::is_same_v<wchar_t,typename S::char_type>,S&> operator << (S& out, <= obj.name => o) { return out << to_wstring(o); }
 	<%- endif -%>
@@ -30,7 +36,7 @@ namespace <= render.gen_namespace_name(module, mod_ver) => {
 	<= render.decl_meta_params(obj) =>
 	class <= render.decl_depricated(obj) =><= obj.name => ;
 	using <= render.ptr(obj) => = std::shared_ptr<<= obj.name =>>;
-	<% for cnst in obj.constructors %>std::unique_ptr<<= obj.name =>> <= render.constructor_name(cnst,obj,cdata) =>(<=render.fparam(cnst.params)=>);<% endfor %>
+	<% for cnst in obj.constructors %><= mod_export => std::unique_ptr<<= obj.name =>> <= render.constructor_name(cnst,obj,cdata) =>(<=render.fparam(cnst.params)=>);<% endfor %>
 	<%- elif obj.type == "record" -%>
 	<= render.decl_meta_params(obj) =>
 	struct <= render.decl_depricated(obj) =><= obj.name => ;
