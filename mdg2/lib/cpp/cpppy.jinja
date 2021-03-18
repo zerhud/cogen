@@ -18,7 +18,14 @@ namespace py = pybind11;
 <%- macro ptr_ref(obj, mod, mod_ver) %><= render.gen_namespace_name(mod, mod_ver) =>::<= render.ptr(obj) =><% endmacro %>
 <%- macro def_class(obj,mod,cdata) %>
 	<% for ctor in obj.ctors %>m.def("<=obj|apply_prefix("create",1)=>", &<=render.gen_namespace_name(mod,cdata)=>::<=obj|apply_prefix("create")=> );<%endfor%>
-	pybind11::class_<<= obj_ref(obj,mod,cdata) =>, <=ptr_ref(obj,mod,cdata)=>>(m, "<= obj|name(1) =>")
+	pybind11::class_<<=obj_ref(obj,mod,cdata)=>, <=ptr_ref(obj,mod,cdata)=>>(m, "<= obj|name(1) =><= '_base' if obj.rinvert =>")
+		<%- for mem in obj.funcs %>
+		.def("<=mem|name(1)=>", &<=obj_ref(obj,mod,cdata)=>::<=mem|name=>)<% endfor %>
+		;
+<% endmacro -%>
+<% macro def_invert_class(obj, mod, cdata, ref) %>
+	pybind11::class_<<=obj_ref(obj,mod,cdata)=>, <=ref=>, <=ptr_ref(obj,mod,cdata)=>>(m, "<= obj|name(1) =>")
+		<= '.def(py::init())' =>
 		<%- for mem in obj.funcs %>
 		.def("<=mem|name(1)=>", &<=obj_ref(obj,mod,cdata)=>::<=mem|name=>)<% endfor %>
 		;
@@ -37,11 +44,27 @@ namespace py = pybind11;
 		;
 <% endmacro %>
 
+<% for obj in mod_ver.content if obj.type == "interface" and obj.rinvert -%>
+class <=module|name=>_<=obj|name=>
+	: public <= obj_ref(obj,module,mod_ver) =>
+	, public std::enable_shared_from_this<<=module|name=>_<=obj|name=>> {
+public:
+	<=module|name=>_<=obj|name=>() noexcept =default ;
+	<%- for mem in obj.funcs %>
+	<=render.function_header(mem)=> override {
+		 PYBIND11_OVERRIDE_PURE(<=render.type(mem.return)=>, <= obj_ref(obj,module,mod_ver) =>, <=mem|name(1)=>
+		 <%for p in mem.params%>, <=p|name=><%endfor%>
+		 );
+	}<% endfor %>
+};
+<% endfor %>
+
 PYBIND11_MODULE(<= module|name =>, m) {
 	<% for obj in mod_ver.content -%>
 	<%- if obj.type == "function" -%>m.def("<= obj|name(1) =>", &<= obj_ref(obj, module, mod_ver) =>, "<= obj.docs =>");
 	<% endif %>
-	<%- if obj.type == "interface" -%><= def_class(obj,module,mod_ver) =><%- endif %>
+	<%- if obj.type == "interface" and not obj.rinvert -%><= def_class(obj,module,mod_ver) =><%- endif %>
+	<%- if obj.type == "interface" and obj.rinvert -%><= def_invert_class(obj,module,mod_ver,module|name+'_'+obj|name) =><%- endif %>
 	<%- if obj.type == "record" -%><= def_struct(obj,module,mod_ver) =><%- endif %>
 	<%- if obj.type == "enum" -%><= def_enum(obj,module,mod_ver) =><%- endif %>
 	<%- endfor %>
