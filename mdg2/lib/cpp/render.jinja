@@ -34,26 +34,19 @@
 <% endif -%>
 <%- endmacro %>
 
+<%- macro include_one(info) -%>
+#include <= '<' if info.sys else '"' =><= info.file =><= '>' if info.sys else '"' =>
+<%- endmacro -%>
+
 <%- macro includes(incs) -%>
 <% for (from, list) in incs.items() if from == "cpp"  or from == "self" or from == "ix3" %>
 <% for info in list %>
-#include <= '<' if info.sys else '"' =><= info.file =><= '>' if info.sys else '"' =>
+<= include_one(info) =>
 <%- endfor -%>
 <%- endfor -%>
 <%- endmacro -%>
 
 <%- macro ptr(obj) -%><= obj | apply_sufix('ptr') =><% endmacro -%>
-
-
-<%- macro interface(obj) -%>
-class <= decl_depricated(obj) =><= obj.name => {
-public:
-	virtual ~<= obj.name =>() noexcept =default;
-	<% for fnc in obj.funcs %>
-	virtual <= function_header(fnc) => =0 ;
-	<% endfor %>
-};
-<% endmacro -%>
 
 <%- macro constructor_name(cns, obj, cdata) -%><= cdata.ctor_prefix =><= obj.name =><% endmacro -%>
 

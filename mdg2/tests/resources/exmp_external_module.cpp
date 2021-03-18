@@ -1,5 +1,3 @@
-#include <external_module_export.h>
-#define DLL_EXPORT EXTERNAL_MODULE_EXPORT
 #include "external_module_1_1/module.hpp"
 
 namespace em = external_module_1_1;

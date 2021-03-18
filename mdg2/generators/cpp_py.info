@@ -4,13 +4,18 @@ part
 		tmpl cpp/declarations.jinja
 		file "${mod}_${mod_a}_${mod_i}/declarations.hpp"
 		naming underscore
-		export_macro DLL_EXPORT
+		export_macro PYBIND11_EXPORT
+		include {
+			file "pybind11/pybind11.h"
+			sys true
+		}
 	}
 	header {
 		inc_part dec
 		tmpl cpp/header.jinja
 		file "${mod}_${mod_a}_${mod_i}/module.hpp"
 		naming underscore
+		export_macro PYBIND11_EXPORT
 	}
 	definition {
 		self_inc false
@@ -27,6 +32,7 @@ part
 		tmpl cpp/cpppy_header.jinja
 		naming underscore
 		naming camel_case
+		export_macro PYBIND11_EXPORT
 	}
 	pybind {
 		self_inc false

@@ -1,5 +1,3 @@
-#include <mod_export.h>
-#define DLL_EXPORT MOD_EXPORT
 #include "mod_1_0/module.hpp"
 #include "mod_1_0/pybind.hpp"
 

@@ -6,12 +6,8 @@
 #include <optional>
 #include <memory_resource>
 <= render.includes(cdata.includes) =>
-<%- set mod_export = cdata.data.ptsetts.export_macro %>
-<% if cdata.data.ptsetts.export_macro is not undefined %>
-#if !defined(<=mod_export=>)
-# define <=mod_export=>
-#endif
-<%endif%>
+<= render.include_one(cdata.data.ptsetts.include) if cdata.data.ptsetts.include is defined =>
+<%- set mod_export = cdata.data.ptsetts.export_macro|upper %>
 
 <% for module in cdata.data.ix3 -%>
 <% for mod_ver in module.vers -%>
@@ -22,7 +18,7 @@ namespace <= render.gen_namespace_name(module, mod_ver) => {
 	<% if obj.type == "function" -%><= mod_export => <= render.function_header(obj) =>;
 	<%- elif obj.type == "enum" -%>
 	<= render.decl_meta_params(obj) =>
-	enum class <= render.decl_depricated(obj) =><= obj.name =>
+	enum class <= mod_export => <= render.decl_depricated(obj) =><= obj.name =>
 	{
 		<% for mem in obj.members -%><= mem.name =><=- ", " if not loop.last =><%- endfor %>
 	};

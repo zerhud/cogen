@@ -5,15 +5,24 @@
 #include <optional>
 #include <memory_resource>
 <= render.includes(cdata.includes) =>
+<%- set mod_export = cdata.data.ptsetts.export_macro|upper %>
 
 <% for module in cdata.data.ix3 -%>
 <% for mod_ver in module.vers %>
 
 namespace <= render.gen_namespace_name(module, mod_ver) => {
 
-<% for obj in mod_ver.content if obj.type == "interface" %><= render.interface(obj) =><% endfor %>
+<% for obj in mod_ver.content if obj.type == "interface" -%>
+class <= render.decl_depricated(obj) => <= mod_export => <= obj.name => {
+public:
+	virtual ~<= obj.name =>() noexcept =default;
+	<% for fnc in obj.funcs %>
+	virtual <= render.function_header(fnc) => =0 ;
+	<% endfor %>
+};
+<% endfor %>
 <% for obj in mod_ver.content if obj.type == "record" -%>
-struct <= render.decl_depricated(obj) =><= obj.name => {
+struct <= render.decl_depricated(obj) => <= mod_export => <= obj.name => {
 <%- for mem in obj.fields %>
 	<= render.decl_meta_params(mem) =>
 	<= "std::optional<" if not mem.req =><= render.type(mem.param_t) =><= ">" if not mem.req=> <= mem.name =>;
