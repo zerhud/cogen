@@ -8,10 +8,10 @@
 
 #include "searcher.hpp"
 
-using mdg2::searcher;
+using cogen::searcher;
 namespace fs = std::filesystem;
 
-std::ostream& mdg2::operator << (std::ostream& out, const searcher& obj)
+std::ostream& cogen::operator << (std::ostream& out, const searcher& obj)
 {
 	out << "search in " << obj.pathes.size() << " directories" << std::endl;
 	for(auto& p:obj.pathes) out << "\t" << p << std::endl;

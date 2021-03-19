@@ -14,7 +14,7 @@
 #include "ic/single_gen_part.hpp"
 #include "ic/ptsetts.hpp"
 
-namespace mdg2 {
+namespace cogen {
 
 class executer {
 	boost::program_options::options_description desc;

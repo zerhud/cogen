@@ -8,7 +8,7 @@
 
 #include "path_config.hpp"
 
-using mdg2::path_config;
+using cogen::path_config;
 namespace fs = std::filesystem;
 
 path_config::path_config(const std::filesystem::path& exe_path)

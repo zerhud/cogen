@@ -11,7 +11,7 @@
 #include "ic/provider.hpp"
 #include "path_config.hpp"
 
-namespace mdg2 {
+namespace cogen {
 
 class json_provider : public mdg::ic::provider {
 	mutable boost::json::array all_data;

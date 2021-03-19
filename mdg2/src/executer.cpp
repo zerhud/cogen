@@ -17,8 +17,8 @@
 #include "standard_types/src/loader.hpp"
 #include "builders/src/loader.hpp"
 
-using namespace mdg2;
-using mdg2::path_config;
+using namespace cogen;
+using cogen::path_config;
 using namespace std::literals;
 namespace fs = std::filesystem;
 namespace po = boost::program_options;

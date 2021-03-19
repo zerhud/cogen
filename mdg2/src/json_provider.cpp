@@ -8,7 +8,7 @@
 
 #include "json_provider.hpp"
 
-using mdg2::json_provider;
+using cogen::json_provider;
 
 json_provider::json_provider(const path_config& pcfg)
 	: pathes(pcfg)

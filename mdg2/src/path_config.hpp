@@ -12,7 +12,7 @@
 
 #include "searcher.hpp"
 
-namespace mdg2 {
+namespace cogen {
 
 class path_config final {
 	std::filesystem::path self_path;

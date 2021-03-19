@@ -12,7 +12,7 @@
 #include <ostream>
 #include <filesystem>
 
-namespace mdg2 {
+namespace cogen {
 
 class searcher;
 std::ostream& operator << (std::ostream& out, const searcher& obj);
