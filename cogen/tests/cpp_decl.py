@@ -1,7 +1,7 @@
 import subprocess as sp
 import json
 
-ix3_example_opts = ['-iix3=ix3_example', '-gcpp_decl', '-Ietc/mdg2/examples/incs']
+ix3_example_opts = ['-iix3=ix3_example', '-gcpp_decl', '-Ietc/cogen/examples/incs']
 
 def check_example_json(result, tmpl, out):
     assert 'file' in result[0]
@@ -23,17 +23,17 @@ def check_example_data(result, count=3):
     assert 'ix3' in data
 
 def test_wrong_mode():
-    r=sp.run(['./mdg2', '-m', 'wrong'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
+    r=sp.run(['./cogen', '-m', 'wrong'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
     assert r.stdout == b'';
     assert r.stderr == b'wrong generation mode "wrong"\n'
 
 def test_no_dir_yet():
-    r=sp.run(['./mdg2', '-m', 'dir'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
+    r=sp.run(['./cogen', '-m', 'dir'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
     assert r.stdout == b'';
     assert r.stderr == b'dir mode are not ready yet\n'
 
 def test_simple_config():
-    r=sp.run(['./mdg2', '-m', 'json', '-o', 'outdir'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
+    r=sp.run(['./cogen', '-m', 'json', '-o', 'outdir'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
     assert r.stderr == b''
     result = json.loads(r.stdout)
     assert len(result) == 4

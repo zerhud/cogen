@@ -3,7 +3,7 @@ import shutil
 import os
 
 test_dir = 'test_dir'
-mdg_run = ['./mdgwr.py', '-iix3=ix3_example', '-Ietc/mdg2/examples/incs']
+cogen_run = ['./cogenwr.py', '-iix3=ix3_example', '-Ietc/cogen/examples/incs']
 cpp_decl = ['-gcpp_decl']
 cpp_py = ['-gcpp_py']
 
@@ -25,7 +25,7 @@ def copy_resource_to_test(src, dest=''):
 
 def test_cpp_decl():
     build_dir = test_dir + '/build'
-    r_mdg = sp.run(mdg_run + cpp_decl + ['-o', test_dir])
+    r_cogen = sp.run(cogen_run + cpp_decl + ['-o', test_dir])
     os.mkdir(build_dir)
     r_cmake = sp.run(['cmake', '..'], cwd = build_dir)
     r_make = sp.run(['cmake', '--build', '.'], cwd = build_dir)
@@ -35,7 +35,7 @@ def test_cpp_decl():
 def test_cpp_py():
     build_dir = test_dir + '/build'
     py_dir = test_dir + '/gen'
-    r_mdg = sp.run(mdg_run + cpp_py + ['-o', py_dir])
+    r_cogen = sp.run(cogen_run + cpp_py + ['-o', py_dir])
     os.mkdir(build_dir)
     copy_resource_to_test('exmp_mod.cpp')
     copy_resource_to_test('exmp_combine_module.cpp')

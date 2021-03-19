@@ -6,7 +6,7 @@ import json
 import jinja2
 import subprocess as sp
 
-current_template_place = './etc/mdg2/lib/'
+current_template_place = './etc/cogen/lib/'
 
 def template_loader(name):
     print('serach ' + name + ' in ' + os.path.abspath(current_template_place))
@@ -69,8 +69,8 @@ if __name__ == "__main__":
     self_path = os.path.dirname(os.path.realpath(__file__))
     current_template_place = self_path + '/' + current_template_place
     print('self path ' + self_path)
-    main_file = os.path.join(self_path, "mdg2")
-    mdg = sp.run([main_file, '-m', 'json'] + sys.argv, stdout=sp.PIPE)
-    parsed = json.loads(mdg.stdout)
+    main_file = os.path.join(self_path, "cogen")
+    cogen = sp.run([main_file, '-m', 'json'] + sys.argv, stdout=sp.PIPE)
+    parsed = json.loads(cogen.stdout)
     for p in parsed:
         gen_file(p['file'], p['out_file'], p['data'])
