@@ -13,7 +13,7 @@
 #include "provider.hpp"
 #include "utils/input.hpp"
 
-namespace mdg::ic {
+namespace cogen::ic {
 
 struct gen_config;
 struct gen_context;
@@ -56,4 +56,4 @@ struct gen_context {
 	std::pmr::map<std::pmr::string, compiled_output> generated;
 };
 
-} // namespace mdg::ic
+} // namespace cogen::ic

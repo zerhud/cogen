@@ -9,7 +9,7 @@
 #include "ptsetts.hpp"
 #include <boost/property_tree/json_parser.hpp>
 
-using mdg::ic::ptsetts;
+using cogen::ic::ptsetts;
 using namespace std::literals;
 
 ptsetts::ptsetts(boost::property_tree::ptree s)
@@ -30,7 +30,7 @@ std::pmr::vector<std::pmr::string> ptsetts::parts() const
 	return ret;
 }
 
-mdg::ic::gen_config ptsetts::part_setts(std::string_view p) const
+cogen::ic::gen_config ptsetts::part_setts(std::string_view p) const
 {
 	gen_config ret;
 	auto path = "part."s+std::string(p);

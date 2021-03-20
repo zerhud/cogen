@@ -13,9 +13,8 @@
 
 using namespace std::literals;
 
-std::optional<gen_utils::tree> builders::loader::operator()(
-    boost::property_tree::ptree setts,
-    const mdg::ic::gen_context& ctx) const
+std::optional<gen_utils::tree> builders::loader::operator()(boost::property_tree::ptree setts,
+    const cogen::ic::gen_context& ctx) const
 {
 	std::optional<gen_utils::tree> ret;
 	auto pch = setts.get_optional<std::string>("project"s);

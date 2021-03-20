@@ -14,7 +14,7 @@
 
 #include "single_gen_part.hpp"
 
-namespace mdg::ic {
+namespace cogen::ic {
 
 class ptsetts final {
 	boost::property_tree::ptree setts;
@@ -31,4 +31,4 @@ public:
 	gen_utils::tree generic_ast(std::string_view p) const ;
 };
 
-} // namespace mdg::ic
+} // namespace cogen::ic

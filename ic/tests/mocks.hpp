@@ -12,7 +12,7 @@
 #include "ic/provider.hpp"
 #include "common_utils/tests/mocks.hpp"
 
-namespace mic = mdg::ic;
+namespace mic = cogen::ic;
 
 namespace icmocks {
 

@@ -13,7 +13,7 @@
 
 namespace cogen {
 
-class json_provider : public mdg::ic::provider {
+class json_provider : public cogen::ic::provider {
 	mutable boost::json::array all_data;
 	std::filesystem::path outdir;
 	const path_config& pathes;
@@ -27,5 +27,5 @@ public:
 	boost::json::value result() const ;
 };
 
-} // namespace mdg2
+} // namespace cogen
 

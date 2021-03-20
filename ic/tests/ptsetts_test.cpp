@@ -16,7 +16,7 @@
 #include "ic/ptsetts.hpp"
 
 using namespace std::literals;
-using ic_ptsetts = mdg::ic::ptsetts;
+using ic_ptsetts = cogen::ic::ptsetts;
 using boost::property_tree::ptree;
 
 

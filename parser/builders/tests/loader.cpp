@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(no_tree)
 	setts.put("file", "CMakeLists.txt");
 
 	builders::loader ldr;
-	mdg::ic::gen_context ctx;
+	cogen::ic::gen_context ctx;
 	BOOST_TEST(ldr(setts, ctx).has_value() == false);
 }
 BOOST_FIXTURE_TEST_CASE(proj_and_lib, trees_fixture)
@@ -68,7 +68,7 @@ BOOST_FIXTURE_TEST_CASE(proj_and_lib, trees_fixture)
 	dsls.add(t1());
 
 	builders::loader ldr;
-	mdg::ic::gen_context ctx;
+	cogen::ic::gen_context ctx;
 	gen_utils::imports_manager imng;
 	ctx.generated["a"] = config_manager("a", "file_${a}", imng, dsls);
 	ctx.generated["b"] = config_manager("b", "file_${b}", imng, dsls);
@@ -104,7 +104,7 @@ BOOST_FIXTURE_TEST_CASE(with_map_from, trees_fixture)
 	gen_utils::input dsls;
 	dsls.add(t1());
 
-	mdg::ic::gen_context ctx;
+	cogen::ic::gen_context ctx;
 	gen_utils::imports_manager imng;
 	ctx.generated["a"] = config_manager("a", "a_${v}", imng, dsls);
 	ctx.generated["b"] = config_manager("b", "b_${v}", imng, dsls);

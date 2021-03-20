@@ -12,7 +12,7 @@
 #include <boost/json.hpp>
 #include "declarations.hpp"
 
-namespace mdg::ic {
+namespace cogen::ic {
 
 class provider {
 public:
@@ -24,4 +24,4 @@ public:
 	    std::string_view out_file) const =0 ;
 };
 
-} // namespace mdg::ic
+} // namespace cogen::ic

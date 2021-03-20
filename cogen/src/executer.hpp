@@ -28,7 +28,7 @@ class executer {
 
 	void print_help() const ;
 	void dir_mode() const ;
-	void json_mode(const mdg::ic::ptsetts& setts) const ;
+	void json_mode(const cogen::ic::ptsetts& setts) const ;
 	void load_inputs() ;
 	void load_inludes() ;
 	boost::property_tree::ptree load_settings() const ;
@@ -37,5 +37,5 @@ public:
 	int operator()() ;
 };
 
-} // namespace mdg2
+} // namespace cogen
 

@@ -24,7 +24,7 @@ namespace fs = std::filesystem;
 namespace po = boost::program_options;
 
 executer::executer(path_config pc, int argc, char** argv)
-	: desc("mdg2 options")
+    : desc("cogen options")
 	, pathes(std::move(pc))
 {
 	assert(0 < argc);
@@ -52,7 +52,7 @@ int executer::operator()()
 		print_help(), std::exit(0);
 	load_inludes();
 	load_inputs();
-	mdg::ic::ptsetts setts(load_settings());
+	cogen::ic::ptsetts setts(load_settings());
 	if(opt_vars["gmode"].as<std::string>()=="json")
 		json_mode(setts);
 	else if(opt_vars["gmode"].as<std::string>()=="dir")
@@ -113,12 +113,12 @@ void executer::dir_mode() const
 	std::cerr << "dir mode are not ready yet" << std::endl;
 }
 
-void executer::json_mode(const mdg::ic::ptsetts& setts) const
+void executer::json_mode(const ic::ptsetts& setts) const
 {
 	json_provider json_out(pathes);
 	json_out.output_dir(opt_vars["outdir"].as<std::string>());
-	mdg::ic::single_gen_part part(&json_out);
-	mdg::ic::gen_context ctx;
+	cogen::ic::single_gen_part part(&json_out);
+	cogen::ic::gen_context ctx;
 	builders::loader bld_ldr;
 	for(auto& pname:setts.parts()) {
 		ctx.cfg_part = setts.part_setts(pname);

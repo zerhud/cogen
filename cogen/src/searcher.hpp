@@ -33,5 +33,5 @@ public:
 };
 
 
-} // namespace mdg2
+} // namespace cogen
 

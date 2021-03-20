@@ -71,7 +71,7 @@ public:
 	library(
 	        std::string n,
 	        boost::property_tree::ptree lsetts,
-	        const mdg::ic::gen_context& ctx);
+	        const cogen::ic::gen_context& ctx);
 	boost::json::value to_json(
 	        const gen_utils::tree& con,
 	        const gen_utils::compilation_context& ctx) const override ;

@@ -10,8 +10,8 @@
 
 #include <memory>
 
-namespace mdg::ic {
+namespace cogen::ic {
 
 class provider;
 
-} // namespace mdg::ic
+} // namespace cogen::ic

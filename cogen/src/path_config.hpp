@@ -36,4 +36,4 @@ public:
 	std::filesystem::path library(const std::filesystem::path& fn) const ;
 };
 
-} // namespace mdg2
+} // namespace cogen

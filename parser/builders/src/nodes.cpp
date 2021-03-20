@@ -84,10 +84,9 @@ boost::json::value builders::project::to_json(
 	return ret;
 }
 
-builders::library::library(
-        std::string n,
+builders::library::library(std::string n,
         boost::property_tree::ptree lsetts,
-        const mdg::ic::gen_context& ctx)
+        const cogen::ic::gen_context& ctx)
     : lib(std::move(n))
     , setts(std::move(lsetts))
 {

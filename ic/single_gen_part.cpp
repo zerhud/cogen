@@ -11,8 +11,8 @@
 #include "utils/split_by_ver.hpp"
 
 using gen_utils::input;
-using mdg::ic::single_gen_part;
-using mdg::ic::compiled_output;
+using cogen::ic::single_gen_part;
+using cogen::ic::compiled_output;
 
 single_gen_part::single_gen_part(const provider* p)
 	: outside(std::move(p))
@@ -60,7 +60,7 @@ gen_utils::input single_gen_part::split_by_vers(
 }
 
 gen_utils::imports_manager single_gen_part::make_imports(
-        const mdg::ic::gen_context& setts,
+        const cogen::ic::gen_context& setts,
         const compiled_output& result) const
 {
 	gen_utils::imports_manager imports;

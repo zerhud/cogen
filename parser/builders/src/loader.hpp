@@ -20,7 +20,7 @@ class loader {
 public:
 	std::optional<gen_utils::tree> operator()(
 	        boost::property_tree::ptree setts,
-	        const mdg::ic::gen_context& ctx) const ;
+	        const cogen::ic::gen_context& ctx) const ;
 };
 
 } // namespace builders
