@@ -1,6 +1,6 @@
 /*************************************************************************
  * Copyright © 2020 Hudyaev Alexy <hudyaev.alexy@gmail.com>
- * This file is part of modegen.
+ * This file is part of cogen.
  * Distributed under the GNU Affero General Public License.
  * See accompanying file copying (at the root of this repository)
  * or <http://www.gnu.org/licenses/> for details
@@ -56,4 +56,4 @@ struct gen_context {
 	std::pmr::map<std::pmr::string, compiled_output> generated;
 };
 
-} // namespace modegen::ic
+} // namespace mdg::ic
