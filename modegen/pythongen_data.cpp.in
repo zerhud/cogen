@@ -1,7 +1,0 @@
-#include <string>
-#include "modegen/pythongen.hpp"
-
-using namespace std::literals;
-
-std::string modegen::generation::python_evaluator::template_script = R"-(@tscript_cnt@)-"s;
-std::string modegen::generation::python_evaluator::set_jinja_script = R"-(@jinja_env_cnt@)-"s;
