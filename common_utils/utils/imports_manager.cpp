@@ -99,24 +99,42 @@ std::pmr::vector<import_info> imports_manager::required_for_links(
 {
 	std::pmr::vector<import_info> ret;
 	for(auto& [in_name, part_name, in]:input_store) {
-		for(auto& in_tree:in->all()) {
-			auto requests = cur->required_links();
-			for(auto& req:requests) {
-				auto found_list = in_tree->search(req);
-				for(auto& to:found_list) {
-					auto mod = to->imports_modification();
-					import_file link{ false, in_name };
-					if(mod) link = *mod;
-					ret.emplace_back(
-					            import_info{
-					                {to, in_tree},
-					                {cur, &src},
-					                link,
-					                std::pmr::string(to->link_condition()),
-							in->conf()});
-				}
-			}
+		auto found = search_links(in->all(), cur->required_links(), in_name);
+		for(auto& f:found) ret.emplace_back(std::move(f)).cfg = in->conf();
+	}
+	for(auto& r:ret) r.from = node_pointer{cur, &src};
+	return ret;
+}
+
+std::pmr::vector<import_info> imports_manager::search_links(
+      std::pmr::vector<const tree*> in_list
+    , std::pmr::vector<gen_utils::name_t> required_links
+    , const std::pmr::string& in_name) const
+{
+	std::pmr::vector<import_info> ret;
+	for(auto&& in_tree:in_list) {
+		for(auto& req: required_links) {
+			auto found = search_links(*in_tree, req, in_name);
+			ret.insert(ret.end(), found.begin(),found.end());
 		}
+	}
+	return ret;
+}
+
+std::pmr::vector<import_info> imports_manager::search_links(
+          const tree& in_tree
+        , gen_utils::name_t req
+        , const std::pmr::string& in_name) const
+{
+	std::pmr::vector<import_info> ret;
+	std::pmr::vector<gen_utils::node_ptr> found_list = in_tree.search(req);
+	for(auto& to:found_list) {
+		auto mod = to->imports_modification();
+		ret.emplace_back(import_info{
+		                     .to={to, &in_tree},
+		                     .file=mod ? *mod : import_file{false, in_name},
+		                     .cond=std::pmr::string(to->link_condition())
+		                 });
 	}
 	return ret;
 }
