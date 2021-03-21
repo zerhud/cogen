@@ -43,6 +43,7 @@ void executer::set_options()
 	    ("gmode,m", po::value<std::string>()->default_value("json"), "generation mode (\"json\" for generate json and \"dir\" to generate files)")
 	    ("input,i", po::value<std::vector<std::string>>(), "input (foramt like -iix3=some_file). use - for read from std input")
 	    ("include,I", po::value<std::vector<std::string>>(), "search path for input dsl (common for all inputs)")
+	    ("types", po::value<std::string>()->default_value("standard_types.info"), "file for translate types for different languages")
 	    ;
 }
 
