@@ -50,9 +50,9 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	imports_manager mng1;
 	mng1("p1", "f1", fdata1)("p1", "f2", fdata2).build();
 
-	BOOST_TEST(mng1.required_for(fdata1).size() == 0);
+	BOOST_TEST(mng1.required_for(t1()).size() == 0);
 
-	auto r2 = mng1.required_for(fdata2);
+	auto r2 = mng1.required_for(t2());
 
 	BOOST_TEST_REQUIRE(r2.size() == 3);
 	BOOST_TEST(r2[0].from.node == t2_child1);
@@ -234,7 +234,7 @@ BOOST_FIXTURE_TEST_CASE(exclude_own_part, trees_fixture)
 
 	imports_manager mng1;
 	mng1("p1", "f1", fdata1)("p1", "f2", fdata2).build();
-	BOOST_TEST(mng1.required_for(fdata2).size() == 3);
+	BOOST_TEST(mng1.required_for(t2()).size() == 3);
 	BOOST_TEST(mng1.required_includes(fdata2).size() == 1);
 	BOOST_TEST(mng1.required_includes(fdata2).at("cond_child2").front().name == "sysfile");
 }

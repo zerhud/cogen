@@ -52,6 +52,7 @@ class imports_manager final {
 	        const input& file_data, std::pmr::vector<import_info> src) const ;
 	std::pmr::vector<import_info> remove_itself(
 	        const input& file_data, std::pmr::vector<import_info> src) const ;
+	std::pmr::vector<import_info> required_for(const input& file_data) const ;
 
 	static std::pmr::vector<import_info> unique(
 	        std::pmr::vector<import_info> src);
@@ -66,7 +67,6 @@ public:
 	                     const std::pmr::string& file,
 	                     const input& data);
 
-	std::pmr::vector<import_info> required_for(const input& file_data) const ;
 	std::pmr::vector<import_info> required_for(const tree& file_data) const ;
 
 	incs_map_t required_includes(const input& file_data) const ;

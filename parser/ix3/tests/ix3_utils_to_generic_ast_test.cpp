@@ -604,8 +604,8 @@ BOOST_AUTO_TEST_CASE(lelf_links)
 
 	gen_utils::imports_manager imng;
 	imng.add("", "f1", f1).add("", "f2", f2).build();
-	BOOST_TEST(imng.required_for(f2).size()==1);
-	BOOST_TEST(imng.required_for(f2).at(0).file.name=="f1");
+	BOOST_TEST(imng.required_for(tree_f2).size()==1);
+	BOOST_TEST(imng.required_for(tree_f2).at(0).file.name=="f1");
 
 	gen_utils::compilation_context ctx;
 	ctx.links = &imng;
