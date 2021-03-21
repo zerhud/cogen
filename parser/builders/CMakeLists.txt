@@ -48,7 +48,6 @@ if(enable_tests)
 		unset(name)
 	endmacro()
 
-	add_unit_test(generic_ast "tests/" "${PROJECT_NAME}")
 	add_unit_test(loader "tests/" "${PROJECT_NAME}")
 endif()
 
