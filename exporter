@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+nix-build --arg nixpkgs 'import<nixos-unstable>{}'
+PP=$(readelf -d result/bin/cogen|grep RUNPATH|awk -F [ '{print $2}' | sed 's/.$//')
+
+mkdir export
+cp -rt export result/*
+
+chmod +w export/bin/cogen
+patchelf --set-rpath "$PP,/lib/x86_64-linux-gnu/" export/bin/cogen
+chmod -w export/bin/cogen
+
+tar -czf export.tar.gz export
+chmod -R 777 export
+rm -fr export
+
