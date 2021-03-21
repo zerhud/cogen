@@ -77,3 +77,14 @@ if(ENABLE_TESTS AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 		"${CMAKE_CURRENT_LIST_DIR}/tests/resources/__init__.py"
 		"${CMAKE_CURRENT_BINARY_DIR}/__init__.py")
 endif()
+
+install(TARGETS ${PROJECT_NAME}
+	CONFIGURATIONS Release ""
+	RUNTIME DESTINATION bin
+	COMPONENT cogen)
+install(PROGRAMS "${CMAKE_CURRENT_LIST_DIR}/cogenwr.py"
+	DESTINATION bin
+	COMPONENT cogen)
+install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/etc/"
+	DESTINATION etc
+	COMPONENT library)
