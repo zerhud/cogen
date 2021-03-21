@@ -45,40 +45,9 @@ void imports_manager::build()
 }
 
 std::pmr::vector<import_info> imports_manager::required_for(
-        const input& file_data) const
-{
-	std::pmr::vector<import_info> ret;
-	for(auto& dt:file_data.all()) {
-		auto dt_result = required_for_scan(*dt, dt->root());
-		ret.insert(ret.end(), dt_result.begin(), dt_result.end());
-	}
-	return ret;
-}
-
-std::pmr::vector<import_info> imports_manager::required_for(
         const tree& file_data) const
 {
 	return required_for_scan(file_data, file_data.root());
-}
-
-std::pmr::vector<import_info> imports_manager::remove_own_part(
-    const input& file_data, std::pmr::vector<import_info> src) const
-{
-	std::pmr::string cur_part;
-	for(auto& [file, part, data]:input_store) if(data==&file_data) cur_part = part;
-	for(auto& [file, part, data]:input_store) if(part==cur_part) {
-		std::erase_if(src, [&file](const import_info& i){return i.file.name==file;});
-	}
-	return src;
-}
-
-std::pmr::vector<import_info> imports_manager::remove_itself(
-    const input& file_data, std::pmr::vector<import_info> src) const
-{
-	for(auto& [file, part, data]:input_store) if(data==&file_data) {
-		std::erase_if(src, [&file](const import_info& i){return i.file.name==file;});
-	}
-	return src;
 }
 
 std::pmr::vector<import_info> imports_manager::required_for_scan(
@@ -139,6 +108,55 @@ std::pmr::vector<import_info> imports_manager::search_links(
 	return ret;
 }
 
+imports_manager::incs_map_t imports_manager::required_includes(
+            const input& file_data) const
+{
+	std::pmr::map<std::pmr::string, std::pmr::vector<import_file>> ret;
+	auto req = remove_own_part(file_data, required_for(file_data) | unique);
+	for(auto& r:req) ret[r.cond].emplace_back(r.file);
+	return ret;
+}
+
+imports_manager::incs_map_t imports_manager::required_includes_with_own(
+            const input& file_data) const
+{
+	std::pmr::map<std::pmr::string, std::pmr::vector<import_file>> ret;
+	auto req = remove_itself(file_data, required_for(file_data) | unique);
+	for(auto& r:req) ret[r.cond].emplace_back(r.file);
+	return ret;
+}
+
+std::pmr::vector<import_info> imports_manager::required_for(
+        const input& file_data) const
+{
+	std::pmr::vector<import_info> ret;
+	for(auto& dt:file_data.all()) {
+		auto dt_result = required_for_scan(*dt, dt->root());
+		ret.insert(ret.end(), dt_result.begin(), dt_result.end());
+	}
+	return ret;
+}
+
+std::pmr::vector<import_info> imports_manager::remove_own_part(
+    const input& file_data, std::pmr::vector<import_info> src) const
+{
+	std::pmr::string cur_part;
+	for(auto& [file, part, data]:input_store) if(data==&file_data) cur_part = part;
+	for(auto& [file, part, data]:input_store) if(part==cur_part) {
+		std::erase_if(src, [&file](const import_info& i){return i.file.name==file;});
+	}
+	return src;
+}
+
+std::pmr::vector<import_info> imports_manager::remove_itself(
+    const input& file_data, std::pmr::vector<import_info> src) const
+{
+	for(auto& [file, part, data]:input_store) if(data==&file_data) {
+		std::erase_if(src, [&file](const import_info& i){return i.file.name==file;});
+	}
+	return src;
+}
+
 std::pmr::vector<import_info> imports_manager::unique(
             std::pmr::vector<import_info> src)
 {
@@ -150,24 +168,6 @@ std::pmr::vector<import_info> imports_manager::unique(
 	auto [f,t] = std::ranges::unique(src, comparater);
 	src.erase(f,t);
 	return src;
-}
-
-imports_manager::incs_map_t imports_manager::required_includes(
-	        const input& file_data) const
-{
-	std::pmr::map<std::pmr::string, std::pmr::vector<import_file>> ret;
-	auto req = remove_own_part(file_data, required_for(file_data) | unique);
-	for(auto& r:req) ret[r.cond].emplace_back(r.file);
-	return ret;
-}
-
-imports_manager::incs_map_t imports_manager::required_includes_with_own(
-	        const input& file_data) const
-{
-	std::pmr::map<std::pmr::string, std::pmr::vector<import_file>> ret;
-	auto req = remove_itself(file_data, required_for(file_data) | unique);
-	for(auto& r:req) ret[r.cond].emplace_back(r.file);
-	return ret;
 }
 
 imports_manager::incs_map_t imports_manager::mapped_includes(

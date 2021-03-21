@@ -67,13 +67,13 @@ class imports_manager final {
 public:
 	using  incs_map_t = std::pmr::map<std::pmr::string, std::pmr::vector<import_file>>;
 
-	void build();
 	imports_manager& operator()(const std::pmr::string& part,
 	                            const std::pmr::string& file,
 	                            const input& data);
 	imports_manager& add(const std::pmr::string& part,
 	                     const std::pmr::string& file,
 	                     const input& data);
+	void build();
 
 	std::pmr::vector<import_info> required_for(const tree& file_data) const ;
 
