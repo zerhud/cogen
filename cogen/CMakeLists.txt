@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(Boost_USE_STATIC_LIBS   ON)
-find_package(cppjinja REQUIRED)
+#find_package(cppjinja REQUIRED)
 find_package(Boost COMPONENTS program_options REQUIRED)
 
 file(
