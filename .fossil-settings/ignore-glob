@@ -9,3 +9,4 @@ cbuild/*
 build-cov/*
 *.user
 tmp/*
+result/*

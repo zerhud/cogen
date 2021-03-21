@@ -5,7 +5,8 @@
 }:
 let
   version = "alfa";
-  commit = "f399e80659";
+  commit = "9c563ca825";
+            
   boost = nixBoost.override{ enableShared = true; enableStatic = true; };
   turtle = stdenv.mkDerivation {
     name = "turtle";
@@ -21,7 +22,7 @@ in stdenv.mkDerivation {
   name = "cogen";
   src = builtins.fetchTarball{
     url = "http://cpphttpx.org/repos/cogen/tarball/" + commit + "/cogen-" + commit + ".tar.gz";
-    sha256 = "09j1087mjc3jlppqbyk698cnkppl8awymfcc46f1r8grpjs5qplw";
+    sha256 = "08963xcf7iyhmgzw0bjc8kay6f1b4m9b3gbliyf0vciq6b7xc0bl";
   };
   CTEST_OUTPUT_ON_FAILURE=1;
   PYTHONDONTWRITEBYTECODE=1;
