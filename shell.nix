@@ -4,4 +4,4 @@
   stdenv = pkgs.gcc10Stdenv;
   #stdenv = pkgs.llvmPackages_10.stdenv;
   enable_clcov=true;
-}).modegen
+}).cogen
