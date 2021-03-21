@@ -48,7 +48,7 @@ BOOST_FIXTURE_TEST_CASE(required_for, trees_fixture)
 	fdata1.conf().naming.clear();
 
 	imports_manager mng1;
-	mng1("p1", "f1", fdata1)("p1", "f2", fdata2).build();
+	mng1("p1", "f1", fdata1)("p1", "f2", fdata2);
 
 	BOOST_TEST(mng1.required_for(t1()).size() == 0);
 
@@ -114,7 +114,7 @@ BOOST_FIXTURE_TEST_CASE(required_includes, trees_fixture)
 	fdata2.add(t2());
 
 	imports_manager mng1;
-	mng1("p1", "f1", fdata1)("p2", "f2", fdata2).build();
+	mng1("p1", "f1", fdata1)("p2", "f2", fdata2);
 
 	auto incs = mng1.required_includes(fdata2);
 	BOOST_TEST(incs.size() == 2);
@@ -188,7 +188,6 @@ BOOST_FIXTURE_TEST_CASE(mapped_includes, trees_fixture)
 	imports_manager mng;
 	auto mapped = gen_utils::map_to()("m_${v1}", all_data);
 	for(auto& [n,d]:mapped) mng("p1", n,d);
-	mng.build();
 
 	BOOST_TEST(mng.mapped_includes("${v1}", mapped["m_m1"]).size()==0);
 
@@ -233,7 +232,7 @@ BOOST_FIXTURE_TEST_CASE(exclude_own_part, trees_fixture)
 	fdata2.add(t2());
 
 	imports_manager mng1;
-	mng1("p1", "f1", fdata1)("p1", "f2", fdata2).build();
+	mng1("p1", "f1", fdata1)("p1", "f2", fdata2);
 	BOOST_TEST(mng1.required_for(t2()).size() == 3);
 	BOOST_TEST(mng1.required_includes(fdata2).size() == 1);
 	BOOST_TEST(mng1.required_includes(fdata2).at("cond_child2").front().name == "sysfile");

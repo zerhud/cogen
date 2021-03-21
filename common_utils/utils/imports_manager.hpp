@@ -73,7 +73,6 @@ public:
 	imports_manager& add(const std::pmr::string& part,
 	                     const std::pmr::string& file,
 	                     const input& data);
-	void build();
 
 	std::pmr::vector<import_info> required_for(const tree& file_data) const ;
 

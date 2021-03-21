@@ -72,7 +72,6 @@ BOOST_FIXTURE_TEST_CASE(proj_and_lib, trees_fixture)
 	gen_utils::imports_manager imng;
 	ctx.generated["a"] = config_manager("a", "file_${a}", imng, dsls);
 	ctx.generated["b"] = config_manager("b", "file_${b}", imng, dsls);
-	imng.build();
 
 	auto result = ldr(setts, ctx);
 	BOOST_REQUIRE(result.has_value());

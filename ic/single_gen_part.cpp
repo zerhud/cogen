@@ -72,7 +72,6 @@ gen_utils::imports_manager single_gen_part::make_imports(
 		for(auto& [link, ld]:setts.generated)
 			for(auto& [n,d]:ld) imports.add(link, n,d);
 	}
-	imports.build();
 	return imports;
 }
 

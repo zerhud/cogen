@@ -40,10 +40,6 @@ imports_manager& imports_manager::add(
 	return *this;
 }
 
-void imports_manager::build()
-{
-}
-
 std::pmr::vector<import_info> imports_manager::required_for(
         const tree& file_data) const
 {
