@@ -15,24 +15,9 @@ path_config::path_config(const std::filesystem::path& exe_path)
 {
 	program_name = exe_path.stem();
 	self_path = fs::absolute(exe_path.parent_path()).lexically_normal();
-	data_pathes.add(".").add(xmpl_dir());
-	gens_pathes.add(".").add(gens_dir());
-	libs_pathes.add(etc_dir() / "lib");
-}
-
-std::filesystem::path path_config::xmpl_dir() const
-{
-	return etc_dir() / "examples";
-}
-
-std::filesystem::path path_config::gens_dir() const
-{
-	return etc_dir() / "generators";
-}
-
-std::filesystem::path path_config::tmpl_dir() const
-{
-	return etc_dir() / "tmpls";
+	data_pathes.add(".").add(etc_dir() / "examples");
+	gens_pathes.add(".").add(etc_dir() / "generators");
+	libs_pathes.add(".").add(etc_dir() / "lib");
 }
 
 std::filesystem::path path_config::etc_dir() const

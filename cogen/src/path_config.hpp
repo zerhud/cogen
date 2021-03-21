@@ -23,9 +23,6 @@ class path_config final {
 	searcher libs_pathes;
 
 	std::filesystem::path etc_dir() const ;
-	std::filesystem::path xmpl_dir() const ;
-	std::filesystem::path tmpl_dir() const ;
-	std::filesystem::path gens_dir() const ;
 public:
 	path_config(const std::filesystem::path& exe_path);
 
