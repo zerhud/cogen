@@ -14,6 +14,21 @@
 
 namespace ix3::text {
 
+struct error_handler
+{
+	template <typename Iterator, typename Exception, typename Context>
+	x3::error_handler_result on_error(
+	        Iterator& first, Iterator const& last
+	      , Exception const& x, Context const& context)
+	{
+		auto& error_handler = x3::get<x3::error_handler_tag>(context).get();
+		std::string message = "Error! Expecting: " + x.which() + " here:";
+		error_handler(x.where(), message);
+		return x3::error_handler_result::fail;
+	}
+};
+
+
 extern decltype(x3::char_)& char_;
 extern decltype(x3::space)& space;
 using boost::spirit::x3::lit;

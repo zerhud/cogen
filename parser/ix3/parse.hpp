@@ -20,7 +20,10 @@ namespace ix3::text {
 
 	namespace x3 = boost::spirit::x3;
 
-	struct parser_env {};
+	struct parser_env
+	{
+		std::ostream& error_out = std::cerr;
+	};
 
 	using iterator_type = std::string_view::const_iterator;
 	using error_handler_type = x3::error_handler<iterator_type>;
@@ -38,7 +41,7 @@ namespace ix3::text {
 	auto make_grammar(const Parser& parser, Env&& env, ErrHndl& eh)
 	{
 		return
-			x3::with<x3::error_handler_tag,std::reference_wrapper<ErrHndl>>(std::ref(eh))
+			x3::with<x3::error_handler_tag>(std::ref(eh))
 			[
 				boost::spirit::x3::with<Env,Env>(std::move(env))
 				[
@@ -49,12 +52,19 @@ namespace ix3::text {
 	}
 
 	template<typename Id, typename Attribute, typename Iterator>
-	Attribute parse(boost::spirit::x3::rule<Id, Attribute> rule, Iterator begin, Iterator end, parser_env&& env=parser_env{})
+	Attribute parse(
+	        boost::spirit::x3::rule<Id, Attribute> rule,
+	        Iterator begin, Iterator end,
+	        parser_env&& env=parser_env{})
 	{
 		Attribute result;
 		//error_handler_type eh(begin, end, std::cerr);
-		x3::error_handler<Iterator> eh(begin, end, std::cerr);
-		bool success = boost::spirit::x3::phrase_parse(begin, end, make_grammar(rule, std::move(env), eh), boost::spirit::x3::space, result);
+		x3::error_handler eh(begin, end, env.error_out);
+		bool success = boost::spirit::x3::phrase_parse(
+		            begin, end,
+		            make_grammar(rule, std::move(env), eh),
+		            boost::spirit::x3::space,
+		            result);
 
 		if(!success) throw std::runtime_error("cannot parse");
 		if(begin!=end) throw std::runtime_error("parse not finished");
@@ -63,7 +73,10 @@ namespace ix3::text {
 	}
 
 	template<typename Id, typename Attribute>
-	Attribute parse(boost::spirit::x3::rule<Id, Attribute> rule, std::string_view data, parser_env&& env=parser_env{})
+	Attribute parse(
+	        boost::spirit::x3::rule<Id, Attribute> rule,
+	        std::string_view data,
+	        parser_env&& env=parser_env{})
 	{
 		//auto end = boost::u8_to_u32_iterator(data.end());
 		//auto begin = boost::u8_to_u32_iterator(data.begin());

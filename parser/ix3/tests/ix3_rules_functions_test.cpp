@@ -57,5 +57,10 @@ BOOST_AUTO_TEST_CASE(function)
 	BOOST_TEST( result.return_type.name.at(0) == "rtype"s );
 }
 
+BOOST_AUTO_TEST_CASE(wrong_functions)
+{
+	BOOST_CHECK_THROW(txt::parse(txt::function, "void foo(i8 a)"), std::exception);
+}
+
 BOOST_AUTO_TEST_SUITE_END() // ast_tests
 BOOST_AUTO_TEST_SUITE_END() // ix3
