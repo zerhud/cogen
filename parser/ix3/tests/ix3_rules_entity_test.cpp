@@ -73,9 +73,14 @@ BOOST_AUTO_TEST_CASE(interface)
 {
 	ast::interface result;
 
-	std::string data = "interface i +i +ex { type foo(); }"s;
+	std::string data = "interface i { }"s;
 	BOOST_CHECK_NO_THROW( result = txt::parse(txt::interface, data) );
 	BOOST_TEST( result.name == "i"s );
+	BOOST_TEST( result.mem_funcs.size() == 0 );
+	BOOST_TEST( result.constructors.size() == 0 );
+
+	data = "interface i +i +ex { type foo() ; }"s;
+	BOOST_CHECK_NO_THROW( result = txt::parse(txt::interface, data) );
 	BOOST_TEST( result.use_as_exception );
 	BOOST_TEST( result.realization_in_client );
 	BOOST_TEST( result.mem_funcs.size() == 1 );

@@ -28,14 +28,14 @@ auto const record_def = meta_set
 	;
 
 auto const interface_def = meta_set
-	>> lit("interface")
-	>> single_variable_name
-	>> -(lit("+i") >> attr(true))
-	>> -(lit("+ex") >> attr(true))
-	>> '{'
-	>> *(constructor >> ';')
-	>> *(function >> ';')
-	>> '}'
+    >> lit("interface")
+    > single_variable_name
+    >> -(lit("+i") >> attr(true))
+    >> -(lit("+ex") >> attr(true))
+    > lit('{')
+    >> *(constructor > ';')
+    >> *(function > ';')
+    > lit('}')
 	;
 
 auto const enumeration_def = meta_set
@@ -47,11 +47,11 @@ auto const enumeration_def = meta_set
 	>> '}'
 	;
 
-class  record_class : x3::annotate_on_success {} ;
-class  interface_class : x3::annotate_on_success {} ;
-class  enumeration_class : x3::annotate_on_success {} ;
-class  record_item_class : x3::annotate_on_success {} ;
-class  enum_element_class : x3::annotate_on_success {} ;
+struct record_class : text::error_handler, x3::annotate_on_success {} ;
+struct interface_class : text::error_handler, x3::annotate_on_success {} ;
+struct enumeration_class : text::error_handler, x3::annotate_on_success {} ;
+struct record_item_class : text::error_handler, x3::annotate_on_success {} ;
+struct enum_element_class : text::error_handler, x3::annotate_on_success {} ;
 
 BOOST_SPIRIT_DEFINE( record )
 BOOST_SPIRIT_DEFINE( interface )

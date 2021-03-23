@@ -16,11 +16,11 @@ namespace ix3::text {
 
 namespace x3 = boost::spirit::x3;
 
-class record_class;
-class interface_class;
-class enumeration_class;
-class record_item_class;
-class enum_element_class;
+struct record_class;
+struct interface_class;
+struct enumeration_class;
+struct record_item_class;
+struct enum_element_class;
 
 const x3::rule<record_class,      ast::record> record = "record";
 const x3::rule<interface_class,   ast::interface> interface = "interface";

@@ -21,13 +21,13 @@ auto const is_static_def = lit("static") >> attr(true);
 auto const is_mutable_def = (lit("mutable") >> attr(true)) | (lit("const") >> attr(false));
 
 auto const function_parameter_def = is_required > type > single_variable_name;
-auto const constructor_def = meta_set >> lit("constructor") >> omit['('] >> -(function_parameter % ',') >> omit[')'];
+auto const constructor_def = meta_set >> lit("constructor") > omit['('] > -(function_parameter % ',') > omit[')'];
 auto const function_def =
        meta_set
-    > -is_static
-    > type
-    > single_variable_name
-    > '(' > -(function_parameter % ',') > ')'
+    >> -is_static
+    >> type
+    >> single_variable_name
+    >> '(' > -(function_parameter % ',') > ')'
     > -is_mutable
     ;
 
@@ -37,7 +37,7 @@ struct  is_mutable_clas : x3::annotate_on_success {} ;
 
 struct  function_class : text::error_handler, x3::annotate_on_success {} ;
 struct  constructor_class : text::error_handler, x3::annotate_on_success {} ;
-struct  function_parameter_class : text::error_handler, x3::annotate_on_success {} ;
+struct  function_parameter_class : x3::annotate_on_success {} ;
 
 BOOST_SPIRIT_DEFINE( is_static )
 BOOST_SPIRIT_DEFINE( is_mutable )

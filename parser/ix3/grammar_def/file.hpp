@@ -19,26 +19,24 @@
 
 namespace ix3::text {
 
-auto const include_st_def   = lit("include") >> quoted2_string;
+auto const include_st_def   = lit("include") > quoted2_string;
 auto const file_content_def = *(include_st) >> *(module);
 
 auto const module_def = meta_set
-	>> lit("module")
-	>> single_variable_name
-	>> meta_version
-	>> ':'
-	>> *(record | (function >> ';') | interface | enumeration)
+    >> lit("module")
+    > single_variable_name
+    > meta_version
+    > ':'
+    > *(record | (function >> ';') | interface | enumeration)
 	;
 
 
-class  module_class : x3::annotate_on_success {} ;
-class  include_st_class : x3::annotate_on_success {} ;
-class  file_content_class : x3::annotate_on_success {} ;
+struct module_class : text::error_handler, x3::annotate_on_success {} ;
+struct include_st_class : text::error_handler, x3::annotate_on_success {} ;
+struct file_content_class : text::error_handler, x3::annotate_on_success {} ;
 
 BOOST_SPIRIT_DEFINE( module )
 BOOST_SPIRIT_DEFINE( include_st )
 BOOST_SPIRIT_DEFINE( file_content )
 
 } // namespace ix3::text
-
-

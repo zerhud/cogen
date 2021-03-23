@@ -16,9 +16,9 @@ namespace ix3::text {
 
 namespace x3 = boost::spirit::x3;
 
-class module_class;
-class include_st_class;
-class file_content_class;
+struct module_class;
+struct include_st_class;
+struct file_content_class;
 
 const x3::rule<module_class, ast::module> module = "module";
 const x3::rule<include_st_class, ast::include_st> include_st = "include_st";

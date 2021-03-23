@@ -10,6 +10,7 @@
 
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 
+#include "env.hpp"
 #include "grammar/common.hpp"
 
 namespace ix3::text {
@@ -22,8 +23,9 @@ struct error_handler
 	      , Exception const& x, Context const& context)
 	{
 		auto& error_handler = x3::get<x3::error_handler_tag>(context).get();
-		std::string message = "Error! Expecting: " + x.which() + " here:";
-		error_handler(x.where(), message);
+		auto& env = x3::get<parser_env_tag>(context).get();
+		error_handler(x.where(), env.msg(x.which()));
+		env.on_error();
 		return x3::error_handler_result::fail;
 	}
 };

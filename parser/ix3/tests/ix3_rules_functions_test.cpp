@@ -13,6 +13,7 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include "mocks.hpp"
 #include "parse.hpp"
 #include "grammar/functions.hpp"
 #include "operators/functions.hpp"
@@ -59,7 +60,16 @@ BOOST_AUTO_TEST_CASE(function)
 
 BOOST_AUTO_TEST_CASE(wrong_functions)
 {
-	BOOST_CHECK_THROW(txt::parse(txt::function, "void foo(i8 a)"), std::exception);
+	std::stringstream out;
+	ix3_mocks::parser_env env;
+	MOCK_EXPECT(env.out).returns(std::ref(out));
+	MOCK_EXPECT(env.file_name).returns("test_file");
+	MOCK_EXPECT(env.on_err).once();
+	MOCK_EXPECT(env.on_err_msg);
+	MOCK_EXPECT(env.msg).once().returns("test exception");
+	BOOST_CHECK_NO_THROW(txt::parse(txt::function, "void foo(i8 a)", env));
+	BOOST_TEST(out.str().find("test_file"s)!=std::string::npos);
+	BOOST_TEST(out.str().find("test exception"s)!=std::string::npos);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // ast_tests

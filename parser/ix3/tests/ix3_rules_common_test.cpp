@@ -13,6 +13,7 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include "mocks.hpp"
 #include "parse.hpp"
 #include "grammar/common.hpp"
 #include "operators/common.hpp"
@@ -42,7 +43,12 @@ BOOST_AUTO_TEST_CASE(type)
 	BOOST_TEST( result.sub_types.size() == 0 );
 
 	data = "li st"s;
-	BOOST_CHECK_THROW( result = txt::parse(txt::type, data), std::exception );
+	std::stringstream out;
+	ix3_mocks::parser_env env;
+	MOCK_EXPECT(env.out).returns(std::ref(out));
+	MOCK_EXPECT(env.file_name).returns("");
+	MOCK_EXPECT(env.on_err_msg).once().with("parse not finished");
+	BOOST_CHECK_NO_THROW( txt::parse(txt::type, data, env) );
 
 	data = "list<a,b>"s;
 	BOOST_CHECK_NO_THROW( result = txt::parse(txt::type, data) );

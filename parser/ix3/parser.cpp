@@ -28,7 +28,8 @@ ix3::ast::file_content ix3::parser::parse_stream(std::istream& input) const
 	std::string data;
 	while(begin!=end) data.push_back(*begin++); 
 
-	return text::parse(text::file_content, data, text::parser_env{});
+	text::cerr_throw_env env;
+	return text::parse(text::file_content, data, env);
 }
 
 void ix3::parser::parse(std::istream& input, std::string fn)
