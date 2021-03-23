@@ -16,11 +16,11 @@ namespace ix3::text {
 
 namespace x3 = boost::spirit::x3;
 
-class meta_set_class;
-class meat_oapi_class;
-class meta_version_class;
-class meta_depricated_class;
-class meta_documentation_class;
+struct meta_set_class;
+struct meat_oapi_class;
+struct meta_version_class;
+struct meta_depricated_class;
+struct meta_documentation_class;
 
 const x3::rule<meta_set_class, std::vector<ast::meta::set::parameter_t>> meta_set = "meta_set";
 const x3::rule<meta_version_class, ast::meta::oapi> meta_oapi = "meta_oapi";

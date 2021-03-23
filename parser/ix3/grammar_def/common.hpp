@@ -41,23 +41,23 @@ using boost::spirit::x3::lexeme;
 
 auto const quoted_string_1_def = *(char_ >> !lit('\'') | lit("\\'") >> x3::attr('\'')) >> char_;
 auto const quoted_string_2_def = *(char_ >> !lit('"') | lit("\\\"") >> x3::attr('"')) >> char_;
-auto const quoted1_string_def = lexeme[lit("'") >> -quoted_string_1_def >> lit("'")];
-auto const quoted2_string_def = lexeme[lit("\"") >> -quoted_string_2_def >> lit("\"")];
+auto const quoted1_string_def = lexeme[lit("'") >> -quoted_string_1_def > lit("'")];
+auto const quoted2_string_def = lexeme[lit("\"") >> -quoted_string_2_def > lit("\"")];
 
 auto const single_variable_name_def = lexeme[char_("A-Za-z_") >> *char_("0-9A-Za-z_")];
 auto const variable_name_def = single_variable_name % '.';
 
-auto const type_def = variable_name >> -(lit('<') >> type % ',' >> lit('>'));
+auto const type_def = variable_name >> -(lit('<') >> type % ',' > lit('>'));
 
 auto const is_required_def = omit['-'] >> attr(false) | omit['+'] >> attr(true);
 
-class type_class           : x3::annotate_on_success {};
-class variable_name_class  : x3::annotate_on_success {};
-class quoted1_string_class : x3::annotate_on_success {};
-class quoted2_string_class : x3::annotate_on_success {};
-class single_variable_name_class   : x3::annotate_on_success {};
+struct type_class           : error_handler, x3::annotate_on_success {};
+struct variable_name_class  : error_handler, x3::annotate_on_success {};
+struct quoted1_string_class : error_handler, x3::annotate_on_success {};
+struct quoted2_string_class : error_handler, x3::annotate_on_success {};
+struct single_variable_name_class   : error_handler, x3::annotate_on_success {};
 
-class is_required_class : x3::annotate_on_success {} ;
+struct is_required_class : x3::annotate_on_success {} ;
 
 BOOST_SPIRIT_DEFINE( type )
 BOOST_SPIRIT_DEFINE( variable_name )

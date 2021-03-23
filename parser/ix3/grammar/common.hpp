@@ -16,13 +16,13 @@ namespace ix3::text {
 
 namespace x3 = boost::spirit::x3;
 
-class quoted1_string_class;
-class quoted2_string_class;
-class single_variable_name_class;
-class variable_name_class;
-class type_class;
+struct quoted1_string_class;
+struct quoted2_string_class;
+struct single_variable_name_class;
+struct variable_name_class;
+struct type_class;
 
-class is_required_class;
+struct is_required_class;
 
 const x3::rule<quoted1_string_class, ast::quoted1_string> quoted1_string = "quoted1_string";
 const x3::rule<quoted2_string_class, ast::quoted2_string> quoted2_string = "quoted2_string";

@@ -18,14 +18,14 @@ namespace ix3::text {
 auto const meta_set_def = *((x3::omit['@'] >> meta_version) | meta_depricated | meta_documentation | meta_oapi);
 auto const meta_oapi_def = lexeme[lit("@oapi") >> omit[+space] >> single_variable_name] >> lit("=") >> (quoted2_string | single_variable_name);
 auto const meta_version_def = 'v' >> x3::int_ >> '.' >> x3::int_;
-auto const meta_depricated_def = lit("@depricated") >> meta_version >> '(' >> quoted2_string >> ')';
+auto const meta_depricated_def = lit("@depricated") > meta_version > '(' > quoted2_string > ')';
 auto const meta_documentation_def = '#' >> lexeme[ *(char_ - x3::eol) >> x3::eol ];
 
-class meta_set : x3::annotate_on_success {} ;
-class meta_oapi : x3::annotate_on_success {} ;
-class meta_version : x3::annotate_on_success {} ;
-class meta_depricated : x3::annotate_on_success {} ;
-class meta_documentation : x3::annotate_on_success {} ;
+struct meta_set_class : x3::annotate_on_success {} ;
+struct meta_oapi_class : x3::annotate_on_success {} ;
+struct meta_version_class : text::error_handler, x3::annotate_on_success {} ;
+struct meta_depricated_class : text::error_handler, x3::annotate_on_success {} ;
+struct meta_documentation_class : x3::annotate_on_success {} ;
 
 BOOST_SPIRIT_DEFINE( meta_set  )
 BOOST_SPIRIT_DEFINE( meta_oapi  )

@@ -13,6 +13,7 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include "mocks.hpp"
 #include "parse.hpp"
 #include "grammar/meta.hpp"
 //#include "operators/meta.hpp"
@@ -56,6 +57,14 @@ BOOST_AUTO_TEST_CASE(depricated)
 	BOOST_TEST( result.message == "kuku kuku"s );
 	BOOST_TEST( result.since.major_v == 1 );
 	BOOST_TEST( result.since.minor_v == 1 );
+
+	ix3_mocks::parser_env_info env_info{
+		.file="tst", .msg="meta_version", .msg_ret="right_msg"};
+	auto env = ix3_mocks::create_env(env_info);
+	data = "@depricated v1. (\"kuku kuku\")";
+	result = txt::parse(txt::meta_depricated, data, *env);
+	BOOST_TEST(env_info.out.str().find("v1.")!=std::string::npos);
+	BOOST_TEST(env_info.out.str().find("right_msg")!=std::string::npos);
 }
 
 BOOST_AUTO_TEST_CASE(oapi)
