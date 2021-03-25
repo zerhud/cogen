@@ -8,6 +8,7 @@ cp -rt export result/*
 
 chmod +w export/bin/cogen
 patchelf --set-rpath "$PP,/lib/x86_64-linux-gnu/" export/bin/cogen
+patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 export/bin/cogen
 chmod -w export/bin/cogen
 
 tar -czf export.tar.gz export
