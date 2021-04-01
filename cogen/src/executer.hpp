@@ -26,12 +26,14 @@ class executer {
 	void set_options();
 	bool can_continue() const ;
 
+	std::unique_ptr<std::ostream> create_out_file(std::string fn) const ;
 	void print_help() const ;
-	void dir_mode() const ;
+	void dir_mode(const ic::ptsetts& setts) const ;
 	void json_mode(const cogen::ic::ptsetts& setts) const ;
 	void load_inputs() ;
 	void load_inludes() ;
 	boost::property_tree::ptree load_settings() const ;
+	json_provider create_json(const ic::ptsetts& setts) const ;
 public:
 	executer(path_config pc, int argc, char** argv);
 	int operator()() ;

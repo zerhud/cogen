@@ -8,14 +8,11 @@
 
 #include "src/executer.hpp"
 #include "single_gen_part.hpp"
-//#include "cppjinja/evtree/evtree.hpp"
-//#include "cppjinja/parser/parse.hpp"
 
 int main(int argc,char** argv)
 {
 	assert(0 < argc);
 	cogen::path_config pcfg(argv[0]);
 	cogen::executer exe(std::move(pcfg), argc, argv);
-	//cppjinja::evtree ev;
 	return exe();
 }

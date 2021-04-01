@@ -17,6 +17,11 @@
 #include "standard_types/src/loader.hpp"
 #include "builders/src/loader.hpp"
 
+#include "cppjinja/evtree/evtree.hpp"
+#include "cppjinja/parser/parse.hpp"
+#include "cppjinja/loader/parser.hpp"
+#include "jinja_json_prov.hpp"
+
 using namespace cogen;
 using cogen::path_config;
 using namespace std::literals;
@@ -57,7 +62,7 @@ int executer::operator()()
 	if(opt_vars["gmode"].as<std::string>()=="json")
 		json_mode(setts);
 	else if(opt_vars["gmode"].as<std::string>()=="dir")
-		dir_mode();
+		dir_mode(setts);
 	else {
 		std::cerr
 			<< "wrong generation mode "
@@ -109,12 +114,35 @@ void executer::load_inludes()
 			pathes.add_input_data(inc);
 }
 
-void executer::dir_mode() const
+void executer::dir_mode(const ic::ptsetts& setts) const
 {
-	std::cerr << "dir mode are not ready yet" << std::endl;
+	boost::json::value data = create_json(setts).result();
+	for(auto& part_data:data.as_array()) {
+		cppjinja::evtree ev;
+		cppjinja::parser jparse{{}};
+		boost::json::object& pd = part_data.as_object();
+		std::cout << "parse " << pd["file"] << std::endl;
+		jparse.parse(pd["file"].as_string().c_str());
+		for(auto& t:jparse.tmpls()) ev.add_tmpl(t);
+		ev.render(
+		        *create_out_file(pd["out_file"].as_string().c_str()),
+		        jinja_json_prov(pd["data"]),
+		        pd["out_file"].as_string().c_str());
+	}
+}
+
+std::unique_ptr<std::ostream> executer::create_out_file(std::string fn) const
+{
+	auto ret = std::make_unique<std::fstream>(fn);
+	return ret;
 }
 
 void executer::json_mode(const ic::ptsetts& setts) const
+{
+	std::cout << create_json(setts).result() << std::endl;
+}
+
+json_provider executer::create_json(const ic::ptsetts& setts) const
 {
 	json_provider json_out(pathes);
 	json_out.output_dir(opt_vars["outdir"].as<std::string>());
@@ -129,7 +157,7 @@ void executer::json_mode(const ic::ptsetts& setts) const
 			pd.add(*bld);
 		ctx.generated[pname] = part(ctx, std::move(pd));
 	}
-	std::cout << json_out.result() << std::endl;
+	return json_out;
 }
 
 void executer::print_help() const
