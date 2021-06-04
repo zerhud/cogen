@@ -30,7 +30,7 @@ namespace po = boost::program_options;
 
 executer::executer(path_config pc, int argc, char** argv)
     : desc("cogen options")
-	, pathes(std::move(pc))
+    , pathes(std::move(pc))
 {
 	assert(0 < argc);
 	set_options();
