@@ -16,10 +16,15 @@
 
 namespace cogen {
 
+struct program_configuration {
+	path_config pathes;
+	std::pmr::string version;
+};
+
 class executer {
 	boost::program_options::options_description desc;
 	boost::program_options::variables_map opt_vars;
-	path_config pathes;
+	program_configuration config;
 
 	gen_utils::input user_data;
 
@@ -35,7 +40,7 @@ class executer {
 	boost::property_tree::ptree load_settings() const ;
 	json_provider create_json(const ic::ptsetts& setts) const ;
 public:
-	executer(path_config pc, int argc, char** argv);
+	executer(program_configuration pc, int argc, char** argv);
 	int operator()() ;
 };
 

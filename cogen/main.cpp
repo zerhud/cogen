@@ -12,7 +12,7 @@
 int main(int argc,char** argv)
 {
 	assert(0 < argc);
-	cogen::path_config pcfg(argv[0]);
-	cogen::executer exe(std::move(pcfg), argc, argv);
+	cogen::program_configuration conf{ argv[0], "@PROJECT_VERSION@" };
+	cogen::executer exe(std::move(conf), argc, argv);
 	return exe();
 }

@@ -24,13 +24,14 @@
 
 using namespace cogen;
 using cogen::path_config;
+using cogen::program_configuration;
 using namespace std::literals;
 namespace fs = std::filesystem;
 namespace po = boost::program_options;
 
-executer::executer(path_config pc, int argc, char** argv)
+executer::executer(program_configuration pc, int argc, char** argv)
     : desc("cogen options")
-    , pathes(std::move(pc))
+    , config(std::move(pc))
 {
 	assert(0 < argc);
 	set_options();
@@ -84,7 +85,7 @@ bool executer::can_continue() const
 
 boost::property_tree::ptree executer::load_settings() const
 {
-	auto file = pathes.generator(opt_vars["generator"].as<std::string>()+".info"s);
+	auto file = config.pathes.generator(opt_vars["generator"].as<std::string>()+".info"s);
 	boost::property_tree::ptree setts_tree;
 	boost::property_tree::read_info(file.string(), setts_tree);
 	return setts_tree;
@@ -92,26 +93,26 @@ boost::property_tree::ptree executer::load_settings() const
 
 void executer::load_inputs()
 {
-	ix3::parser ix3_loader([this](const auto& f){return pathes.input_data(f);});
+	ix3::parser ix3_loader([this](const auto& f){return config.pathes.input_data(f);});
 	std::regex key_val_parser("([0-9a-zA-Z_.]+)(=(.+))?", std::regex::egrep);
 	for(auto& input:opt_vars["input"].as<std::vector<std::string>>()) {
 		std::cmatch m;
 		std::regex_match(input.data(), m, key_val_parser);
-		if(m[1] == "ix3") ix3_loader.parse(pathes.input_data(m[3].str()));
+		if(m[1] == "ix3") ix3_loader.parse(config.pathes.input_data(m[3].str()));
 		else throw std::runtime_error("parser "s + m[1].str() + " are not found"s);
 	}
 	ix3_loader.finish_loads();
 	user_data.add( ix3::utils::to_generic_ast()(ix3_loader.result()) );
 
 	std_types::loader st;
-	user_data.add( st.load_types(pathes.library("standard_types.info")) );
+	user_data.add( st.load_types(config.pathes.library("standard_types.info")) );
 }
 
 void executer::load_inludes()
 {
 	if(opt_vars.count("include"))
 		for(auto& inc:opt_vars["include"].as<std::vector<std::string>>())
-			pathes.add_input_data(inc);
+			config.pathes.add_input_data(inc);
 }
 
 void executer::dir_mode(const ic::ptsetts& setts) const
@@ -144,7 +145,7 @@ void executer::json_mode(const ic::ptsetts& setts) const
 
 json_provider executer::create_json(const ic::ptsetts& setts) const
 {
-	json_provider json_out(pathes);
+	json_provider json_out(config.pathes);
 	json_out.output_dir(opt_vars["outdir"].as<std::string>());
 	cogen::ic::single_gen_part part(&json_out);
 	cogen::ic::gen_context ctx;
@@ -163,6 +164,7 @@ json_provider executer::create_json(const ic::ptsetts& setts) const
 void executer::print_help() const
 {
 	std::cout
+		<< "version: " << config.version << std::endl
 		<< "this is a source code generator. use with options"
 		<< std::endl
 		<< desc
