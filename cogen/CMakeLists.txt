@@ -26,7 +26,12 @@ list(FILTER cogen_src EXCLUDE REGEX "tests/.*")
 list(FILTER cogen_hdr EXCLUDE REGEX "tests/.*")
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}/" FILES ${cogen_src} ${cogen_hdr})
 
-add_executable(${PROJECT_NAME} ${cogen_src} ${cogen_hdr})
+configure_file("main.cpp.in" "main.cpp")
+set(cogen_src_gen "${CMAKE_CURRENT_BINARY_DIR}/main.cpp")
+source_group(TREE "${CMAKE_CURRENT_BINARY_DIR}/" FILES ${cogen_src_gen})
+
+add_executable(${PROJECT_NAME} ${cogen_src} ${cogen_hdr} ${cogen_src_gen})
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 if("${CMAKE_BUILD_TYPE} " STREQUAL "Debug ")
 	message("== build in debug mode")
 	target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG)

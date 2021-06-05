@@ -12,7 +12,8 @@
 int main(int argc,char** argv)
 {
 	assert(0 < argc);
-	cogen::program_configuration conf{ argv[0], "@PROJECT_VERSION@" };
+	std::filesystem::path self_path = argv[0];
+	cogen::program_configuration conf{ self_path, "@PROJECT_VERSION@" };
 	cogen::executer exe(std::move(conf), argc, argv);
 	return exe();
 }
