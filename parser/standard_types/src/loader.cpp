@@ -18,7 +18,7 @@ using std_types::loader;
 
 gen_utils::tree loader::load_types(std::filesystem::path file) const
 {
-	std::fstream f(file);
+	std::fstream f(file, std::ios_base::in);
 	return load_types(f);
 }
 
