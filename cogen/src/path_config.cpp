@@ -7,6 +7,7 @@
  *************************************************************************/
 
 #include "path_config.hpp"
+#include <cassert>
 
 using cogen::path_config;
 namespace fs = std::filesystem;
@@ -32,6 +33,17 @@ std::filesystem::path path_config::etc_dir() const
 void path_config::add_input_data(std::filesystem::path p)
 {
 	data_pathes.add(p);
+}
+
+void path_config::print_pathes(std::ostream& out, avaible_pathes path) const
+{
+	if(path == avaible_pathes::input)
+		out << "input " << data_pathes;
+	else if(path == avaible_pathes::generators)
+		out << "generators " << gens_pathes;
+	else if(path == avaible_pathes::libraries)
+		out << "libraries " << libs_pathes;
+	else assert(("not all avaible pathes are matched", false));
 }
 
 std::filesystem::path path_config::input_data(const std::filesystem::path& fn) const

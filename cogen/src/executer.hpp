@@ -33,6 +33,7 @@ class executer {
 
 	std::unique_ptr<std::ostream> create_out_file(std::string fn) const ;
 	void print_help() const ;
+	cogen::avaible_pathes print_path_which() const;
 	void dir_mode(const ic::ptsetts& setts) const ;
 	void json_mode(const cogen::ic::ptsetts& setts) const ;
 	void load_inputs() ;

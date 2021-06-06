@@ -6,12 +6,13 @@ import json
 import jinja2
 import subprocess as sp
 
-current_template_place = './etc/cogen/lib/'
+current_template_place = []
 
 def template_loader(name):
-    print('serach ' + name + ' in ' + os.path.abspath(current_template_place))
-    cur_path = os.path.join(current_template_place, name)
-    if os.path.isfile(cur_path):
+    for place in current_template_place:
+        print('serach ' + name + ' in ' + str(os.path.abspath(place)))
+        cur_path = os.path.join(str(place), name)
+        if os.path.isfile(cur_path):
             return open(cur_path).read()
     return None
 
@@ -65,11 +66,22 @@ def gen_file(src, to, data):
     else:
         open(to, 'w').write(result)
 
+def get_path(main_file, which):
+    input = sp.run([main_file, '--help_pathes={}'.format(which)], stdout=sp.PIPE)
+    input_lines = input.stdout.splitlines()
+    input_lines.pop(0)
+    for line in input_lines:
+        current_template_place.append(line[2:-1])
+
+def get_pathes(main_file):
+    get_path(main_file, 'input')
+    get_path(main_file, 'libraries')
+
 if __name__ == "__main__":
     self_path = os.path.dirname(os.path.realpath(__file__))
-    current_template_place = self_path + '/' + current_template_place
     print('self path ' + self_path)
     main_file = os.path.join(self_path, "cogen")
+    get_pathes(main_file)
     cogen = sp.run([main_file, '-m', 'json'] + sys.argv, stdout=sp.PIPE)
     parsed = json.loads(cogen.stdout)
     for p in parsed:

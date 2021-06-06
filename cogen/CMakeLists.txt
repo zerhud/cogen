@@ -86,6 +86,12 @@ if(ENABLE_TESTS AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 	copy_if_diff(
 		"${CMAKE_CURRENT_LIST_DIR}/tests/resources/__init__.py"
 		"${CMAKE_CURRENT_BINARY_DIR}/__init__.py")
+
+	find_package(Boost 1.75 COMPONENTS unit_test_framework REQUIRED)
+	add_executable(cogen_utils_test tests/cogen_utils.cpp src/path_config.cpp src/searcher.cpp)
+	target_include_directories(cogen_utils_test PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+	target_link_libraries(cogen_utils_test PRIVATE ${Boost_LIBRAIES})
+	add_test(NAME cogen_utils COMMAND cogen_utils_test)
 endif()
 
 install(TARGETS ${PROJECT_NAME}

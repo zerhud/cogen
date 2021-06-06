@@ -44,6 +44,7 @@ void executer::set_options()
 {
 	desc.add_options()
 	    ("help,h", "produce this help message")
+	    ("help_pathes", po::value<std::string>(), "print pathes for item (can to be input, generators and libraries)")
 	    ("outdir,o", po::value<std::string>()->default_value("."), "directory or file where to output")
 	    ("generator,g", po::value<std::string>(), "generator (info file)")
 	    ("gmode,m", po::value<std::string>()->default_value("json"), "generation mode (\"json\" for generate json and \"dir\" to generate files)")
@@ -78,6 +79,7 @@ int executer::operator()()
 bool executer::can_continue() const
 {
 	return 0 == opt_vars.count("help")
+	    && 0 == opt_vars.count("help_pathes")
 	    && 0 <  opt_vars.count("input")
 	    && 1 == opt_vars.count("generator")
 	        ;
@@ -161,9 +163,21 @@ json_provider executer::create_json(const ic::ptsetts& setts) const
 	return json_out;
 }
 
+cogen::avaible_pathes executer::print_path_which() const
+{
+	assert(0 != opt_vars.count("help_pathes"));
+	std::string val = opt_vars["help_pathes"].as<std::string>();
+	if(val == "input") return cogen::avaible_pathes::input;
+	if(val == "generators") return cogen::avaible_pathes::generators;
+	if(val == "libraries") return cogen::avaible_pathes::libraries;
+	throw std::runtime_error("no such path avaible " + val);
+}
+
 void executer::print_help() const
 {
-	std::cout
+	if(0 != opt_vars.count("help_pathes"))
+		config.pathes.print_pathes(std::cout, print_path_which());
+	else std::cout
 		<< "version: " << config.version << std::endl
 		<< "this is a source code generator. use with options"
 		<< std::endl

@@ -34,7 +34,7 @@ const char* searcher::file_not_found::what() const noexcept
 
 searcher& searcher::add(const std::filesystem::path& path)
 {
-	pathes.emplace_back(fs::canonical(path));
+	pathes.emplace_back(path.lexically_normal());
 	return *this;
 }
 
