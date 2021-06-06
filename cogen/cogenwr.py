@@ -10,8 +10,9 @@ current_template_place = []
 
 def template_loader(name):
     for place in current_template_place:
-        print('serach ' + name + ' in ' + str(os.path.abspath(place)))
-        cur_path = os.path.join(str(place), name)
+        place = os.path.abspath(place).decode("utf-8")
+        print('serach ' + name + ' in ' + place)
+        cur_path = os.path.join(place, name)
         if os.path.isfile(cur_path):
             return open(cur_path).read()
     return None
