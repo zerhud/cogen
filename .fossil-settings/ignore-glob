@@ -1,6 +1,7 @@
 mind_map.minder
 compile_commands.json
 build/*
+bb/*
 build_/*
 _build/*
 cmake-*
