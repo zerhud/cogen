@@ -41,7 +41,7 @@ searcher& searcher::add(const std::filesystem::path& path)
 std::filesystem::path searcher::operator()(std::filesystem::path r) const
 {
 	if(r.is_absolute()) return r;
-	for(auto& p:pathes) if(fs::exists(p/r)) return p/r;
+	for(auto& p:pathes) if(fs::exists(p/r)) return fs::absolute(p/r);
 	throw file_not_found(r, *this);
 }
 
