@@ -5,6 +5,13 @@ i8 {
 		replace std::int8_t
 	}
 }
+u8 {
+	cpp {
+		file cinttypes
+		sys true
+		replace std::uint8_t
+	}
+}
 
 i32 {
 	cpp {
@@ -13,12 +20,26 @@ i32 {
 		replace std::int32_t
 	}
 }
+u32 {
+	cpp {
+		file cinttypes
+		sys true
+		replace std::uint32_t
+	}
+}
 
 i64 {
 	cpp {
 		file cinttypes
 		sys true
 		replace std::int64_t
+	}
+}
+u64 {
+	cpp {
+		file cinttypes
+		sys true
+		replace std::uint64_t
 	}
 }
 
