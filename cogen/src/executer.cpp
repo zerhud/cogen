@@ -107,7 +107,7 @@ void executer::load_inputs()
 	user_data.add( ix3::utils::to_generic_ast()(ix3_loader.result()) );
 
 	std_types::loader st;
-	user_data.add( st.load_types(config.pathes.library("standard_types.info")) );
+	user_data.add( st.load_types(config.pathes.library(opt_vars["types"].as<std::string>())) );
 }
 
 void executer::load_inludes()
