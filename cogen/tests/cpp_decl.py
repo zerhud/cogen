@@ -27,11 +27,6 @@ def test_wrong_mode():
     assert r.stdout == b'';
     assert r.stderr == b'wrong generation mode "wrong"\n'
 
-def test_no_dir_yet():
-    r=sp.run(['./cogen', '-m', 'dir'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
-    assert r.stdout == b'';
-    assert r.stderr == b'dir mode are not ready yet\n'
-
 def test_simple_config():
     r=sp.run(['./cogen', '-m', 'json', '-o', 'outdir'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
     assert r.stderr == b''
