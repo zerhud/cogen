@@ -6,13 +6,16 @@
  * or <http://www.gnu.org/licenses/> for details
  *************************************************************************/
 
+#define BOOST_DLL_USE_STD_FS
+
 #include "src/executer.hpp"
 #include "single_gen_part.hpp"
+#include <boost/dll/runtime_symbol_info.hpp>
 
 int main(int argc,char** argv)
 {
 	assert(0 < argc);
-	std::filesystem::path self_path = std::filesystem::absolute(argv[0]);
+	std::filesystem::path self_path = boost::dll::program_location();
 	cogen::program_configuration conf{ self_path, "@PROJECT_VERSION@" };
 	cogen::executer exe(std::move(conf), argc, argv);
 	return exe();

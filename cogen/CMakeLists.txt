@@ -3,7 +3,7 @@ set(build_version $ENV{build_version})
 if(NOT build_version})
 	set(build_version 0)
 endif()
-project(cogen VERSION 0.2.0.${build_version} LANGUAGES C CXX)
+project(cogen VERSION 0.2.1.${build_version} LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -73,7 +73,7 @@ copy_if_diff("${CMAKE_CURRENT_LIST_DIR}/lib/cmake/pybind11.jinja" "${build_lib_d
 
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE
-		${Boost_LIBRARIES}
+		${Boost_LIBRARIES} ${CMAKE_DL_LIBS}
 		input_configurator ix3 standard_types builders
 		cppjinja::evaluator cppjinja::loader
 		-static-libgcc -static-libstdc++
