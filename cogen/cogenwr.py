@@ -38,6 +38,13 @@ def apply_prefix(obj, prefix, nind=0):
         return prefix.title() + extract_name(obj,nind)[:1].upper() + extract_name(obj,nind)[1:]
     return prefix + extract_name(obj,nind)
 
+def unique(objs):
+    ret = []
+    for obj in objs:
+        if obj not in ret:
+            ret.append(obj)
+    return ret
+
 jinja_env = jinja2.Environment(
     block_start_string = '<%',
     block_end_string = '%>',
@@ -54,6 +61,7 @@ jinja_env = jinja2.Environment(
 
 jinja_env.filters["apply_sufix"] = apply_sufix
 jinja_env.filters["apply_prefix"] = apply_prefix
+jinja_env.filters["unique"] = unique
 jinja_env.filters["name"] = extract_name
 
 def gen_file(src, to, data):

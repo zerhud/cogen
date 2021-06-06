@@ -40,7 +40,7 @@
 
 <%- macro includes(incs) -%>
 <% for (from, list) in incs.items() if from == "cpp"  or from == "self" or from == "ix3" %>
-<% for info in list %>
+<% for info in list|unique %>
 <= include_one(info) =>
 <%- endfor -%>
 <%- endfor -%>
