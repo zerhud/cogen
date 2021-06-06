@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 set(build_version $ENV{build_version})
-if(NOT build_version})
+if(NOT build_version)
 	set(build_version 0)
 endif()
 project(cogen VERSION 0.2.1.${build_version} LANGUAGES C CXX)
