@@ -39,10 +39,8 @@
 <%- endmacro -%>
 
 <%- macro includes(incs) -%>
-<% for (from, list) in incs.items() if from == "cpp"  or from == "self" or from == "ix3" %>
-<% for info in list|unique %>
-<= include_one(info) =>
-<%- endfor -%>
+<% for list in incs.items() | select_keys(["cpp", "self", "ix3"]) | unique %>
+<= include_one(list) =>
 <%- endfor -%>
 <%- endmacro -%>
 

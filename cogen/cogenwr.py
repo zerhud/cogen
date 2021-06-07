@@ -45,6 +45,16 @@ def unique(objs):
             ret.append(obj)
     return ret
 
+def select_keys(objs, vals):
+    ret = []
+    for key, val in objs:
+        if key not in vals: continue
+        if(type(val) == type([])):
+            for v in val: ret.append(v)
+        else:
+            ret.append(val)
+    return ret
+
 jinja_env = jinja2.Environment(
     block_start_string = '<%',
     block_end_string = '%>',
@@ -63,6 +73,7 @@ jinja_env.filters["apply_sufix"] = apply_sufix
 jinja_env.filters["apply_prefix"] = apply_prefix
 jinja_env.filters["unique"] = unique
 jinja_env.filters["name"] = extract_name
+jinja_env.filters["select_keys"] = select_keys
 
 def gen_file(src, to, data):
     print(src + "\t → \t" + to)
