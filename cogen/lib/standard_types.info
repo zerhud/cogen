@@ -58,3 +58,25 @@ list {
 		replace std::pmr::vector
 	}
 }
+
+time_point {
+	cpp {
+		file chrono
+		sys true
+		replace std::chrono::system_clock::time_point
+	}
+}
+milliseconds {
+	cpp {
+		file chrono
+		sys true
+		replace std::chrono::milliseconds
+	}
+}
+seconds {
+	cpp {
+		file chrono
+		sys true
+		replace std::chrono::seconds
+	}
+}
