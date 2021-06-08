@@ -34,9 +34,12 @@
 <% endif -%>
 <%- endmacro %>
 
-<%- macro includes(incs) -%>
-<% for list in incs.items() | select_keys(["cpp", "self", "ix3"]) | unique %>
+<%- macro include_one(info) -%>
 #include <= '<' if info.sys else '"' =><= info.file =><= '>' if info.sys else '"' =>
+<%- endmacro -%>
+<%- macro includes(incs) -%>
+<% for info in incs.items() | select_keys(["cpp", "self", "ix3"]) | unique %>
+<= include_one(info) =>
 <%- endfor -%>
 <%- endmacro -%>
 
