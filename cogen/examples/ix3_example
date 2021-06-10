@@ -13,6 +13,7 @@ record echo_mesage {
 
 # callback interface for echo service
 interface echo_callback +i {
+	# produce a message
 	void on_message(+string msg) mutable;
 }
 

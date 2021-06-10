@@ -15,7 +15,10 @@
 <= render.decl_meta_params(module) =>
 namespace <= render.gen_namespace_name(module, mod_ver) => {
 	<%- for obj in mod_ver.content %>
-	<% if obj.type == "function" -%><= mod_export => <= render.function_header(obj) =>;
+	<% if obj.type == "function" -%>
+	<= render.decl_meta_params(obj) =>
+	<= render.decl_depricated(obj) =>
+	<= mod_export => <= render.function_decl(obj) =>;
 	<%- elif obj.type == "enum" -%>
 	<= render.decl_meta_params(obj) =>
 	enum class <= mod_export => <= render.decl_depricated(obj) =><= obj.name =>

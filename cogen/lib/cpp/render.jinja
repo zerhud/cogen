@@ -14,9 +14,7 @@
 <=- "_ptr" if obj.type!="enum"=>
 <%- endmacro %>
 
-<%- macro function_header(obj) -%>
-<= decl_meta_params(obj) -=>
-<= decl_depricated(obj) -=>
+<%- macro function_decl(obj) -%>
 <= "static " if obj.static =><=- type(obj.return) => <= obj|name =>(<= fparam(obj.params) =>)<= " const" if obj.mutable == False =>
 <%- endmacro %>
 

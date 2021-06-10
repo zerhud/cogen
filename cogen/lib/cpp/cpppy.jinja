@@ -51,7 +51,7 @@ class <=module|name=>_<=obj|name=>
 public:
 	<=module|name=>_<=obj|name=>() noexcept =default ;
 	<%- for mem in obj.funcs %>
-	<=render.function_header(mem)=> override {
+	<=render.function_decl(mem)=> override {
 		 PYBIND11_OVERRIDE_PURE(<=render.type(mem.return)=>, <= obj_ref(obj,module,mod_ver) =>, <=mem|name(1)=>
 		 <%for p in mem.params%>, <=p|name=><%endfor%>
 		 );

@@ -17,7 +17,9 @@ class <= render.decl_depricated(obj) => <= mod_export => <= obj.name => {
 public:
 	virtual ~<= obj.name =>() noexcept =default;
 	<% for fnc in obj.funcs %>
-	virtual <= render.function_header(fnc) => =0 ;
+	<=- render.decl_meta_params(obj) =>
+	<=- render.decl_depricated(obj) =>
+	virtual <= render.function_decl(fnc) => =0 ;
 	<% endfor %>
 };
 <% endfor %>
