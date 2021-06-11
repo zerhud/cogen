@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <optional>
 #include <boost/spirit/home/x3/support/ast/variant.hpp>
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 
