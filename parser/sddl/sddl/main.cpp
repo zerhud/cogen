@@ -18,6 +18,7 @@ namespace sddl {
 class sddl_loader : public gen_utils::generic_sdl {
 public:
 	sddl_loader() = default ;
+	bool empty() const override { return true; }
 	std::string_view name() const override { return "sddl"; }
 	void add(std::filesystem::path file) override {}
 	void finish_loads() override {}

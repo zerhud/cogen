@@ -56,12 +56,17 @@ class ix3_loader :
         public parser
       , public gen_utils::generic_sdl
 {
+	bool was_add = false;
 public:
 	ix3_loader(include_solver is) : parser(std::move(is)) {}
+	bool empty() const override { return !was_add; }
 	std::string_view name() const override { return "ix3"; }
-	void add(std::filesystem::path file) override { parse(std::move(file)); }
 	void finish_loads() override { parser::finish_loads(); }
 	gen_utils::tree data() const override { return to_generic_ast()(result()); }
+	void add(std::filesystem::path file) override {
+		was_add = true;
+		parse(std::move(file));
+	}
 };
 
 } // namespace ix3::utils

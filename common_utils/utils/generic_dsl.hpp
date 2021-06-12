@@ -25,6 +25,7 @@ public:
 class generic_sdl {
 public:
 	virtual ~generic_sdl() noexcept =default ;
+	virtual bool empty() const =0 ;
 	virtual std::string_view name() const =0 ;
 	virtual void add(std::filesystem::path file) =0;
 	virtual void finish_loads() =0 ;

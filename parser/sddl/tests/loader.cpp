@@ -26,7 +26,9 @@ BOOST_AUTO_TEST_CASE(create_dsl_returns_rigth_loader)
 {
 	auto factory = create_dsl();
 	BOOST_REQUIRE(factory!=nullptr);
-	BOOST_TEST(factory->languages([](auto){return "";}).size() == 0);
+	auto langs = factory->languages([](auto){return "";});
+	BOOST_TEST(langs.size() == 1);
+	BOOST_TEST(langs[0]->name() == "sddl");
 }
 
 BOOST_AUTO_TEST_SUITE_END() // sddl

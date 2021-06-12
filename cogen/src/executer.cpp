@@ -126,8 +126,10 @@ void executer::load_generic_inputs(gen_utils::generic_sdl& loader)
 		if(m[1].str() == loader.name())
 			loader.add(config.pathes.input_data(m[3].str()));
 	}
-	loader.finish_loads();
-	user_data.add(loader.data());
+	if(!loader.empty()) {
+		loader.finish_loads();
+		user_data.add(loader.data());
+	}
 }
 
 void executer::load_inputs()
