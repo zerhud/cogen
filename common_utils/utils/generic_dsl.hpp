@@ -15,7 +15,7 @@ namespace gen_utils {
 class generic_sdl ;
 class generic_sdl_factory {
 public:
-	typedef std::pmr::vector<std::shared_ptr<generic_sdl>> generic_sdl_container;
+	typedef std::pmr::vector<std::unique_ptr<generic_sdl>> generic_sdl_container;
 	typedef std::function<std::filesystem::path(std::filesystem::path)> path_solver;
 
 	virtual ~generic_sdl_factory() noexcept =default ;
@@ -26,7 +26,7 @@ class generic_sdl {
 public:
 	virtual ~generic_sdl() noexcept =default ;
 	virtual std::string_view name() const =0 ;
-	virtual void add(std::istream& data) =0;
+	virtual void add(std::filesystem::path file) =0;
 	virtual void finish_loads() =0 ;
 	virtual tree data() const =0 ;
 };

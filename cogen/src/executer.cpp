@@ -113,27 +113,27 @@ void executer::load_generic_inputs(const ic::ptsetts& setts)
 		assert(factory);
 		auto loaders = factory->languages(
 		            [this](const auto& f){return config.pathes.input_data(f);});
-		for(auto l:loaders) load_generic_inputs(*l);
+		for(auto& l:loaders) load_generic_inputs(*l);
 	}
 }
 
-void executer::load_generic_inputs(const gen_utils::generic_sdl& loader)
+void executer::load_generic_inputs(gen_utils::generic_sdl& loader)
 {
-	std::cout << "loading " << loader.name() << std::endl;
-}
-
-void executer::load_inputs()
-{
-	ix3::parser ix3_loader([this](const auto& f){return config.pathes.input_data(f);});
 	std::regex key_val_parser("([0-9a-zA-Z_.]+)(=(.+))?", std::regex::egrep);
 	for(auto& input:opt_vars["input"].as<std::vector<std::string>>()) {
 		std::cmatch m;
 		std::regex_match(input.data(), m, key_val_parser);
-		if(m[1] == "ix3") ix3_loader.parse(config.pathes.input_data(m[3].str()));
-		else throw std::runtime_error("parser "s + m[1].str() + " are not found"s);
+		if(m[1].str() == loader.name())
+			loader.add(config.pathes.input_data(m[3].str()));
 	}
-	ix3_loader.finish_loads();
-	user_data.add( ix3::utils::to_generic_ast()(ix3_loader.result()) );
+	loader.finish_loads();
+	user_data.add(loader.data());
+}
+
+void executer::load_inputs()
+{
+	ix3::utils::ix3_loader ix3ldr([this](const auto& f){return config.pathes.input_data(f);});
+	load_generic_inputs(ix3ldr);
 
 	std_types::loader st;
 	user_data.add( st.load_types(config.pathes.library(opt_vars["types"].as<std::string>())) );

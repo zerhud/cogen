@@ -9,8 +9,11 @@
 #pragma once
 
 #include "traverser.hpp"
+#include "ix3/parser.hpp"
 #include "ix3/ast/file.hpp"
 #include "utils/tree.hpp"
+#include "utils/generic_dsl.hpp"
+
 
 namespace ix3::utils {
 
@@ -47,6 +50,18 @@ class to_generic_ast : protected traverser {
 public:
 	to_generic_ast();
 	gen_utils::tree operator()(std::vector<ast::module> mods);
+};
+
+class ix3_loader :
+        public parser
+      , public gen_utils::generic_sdl
+{
+public:
+	ix3_loader(include_solver is) : parser(std::move(is)) {}
+	std::string_view name() const override { return "ix3"; }
+	void add(std::filesystem::path file) override { parse(std::move(file)); }
+	void finish_loads() override { parser::finish_loads(); }
+	gen_utils::tree data() const override { return to_generic_ast()(result()); }
 };
 
 } // namespace ix3::utils

@@ -43,7 +43,7 @@ class executer {
 	void json_mode(const cogen::ic::ptsetts& setts) const ;
 	void load_inputs() ;
 	void load_generic_inputs(const cogen::ic::ptsetts& setts);
-	void load_generic_inputs(const gen_utils::generic_sdl& loader);
+	void load_generic_inputs(gen_utils::generic_sdl& loader);
 	void load_inludes() ;
 	boost::property_tree::ptree load_settings() const ;
 	json_provider create_json(const ic::ptsetts& setts) const ;
