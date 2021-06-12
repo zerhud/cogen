@@ -1,8 +1,6 @@
 #include "mod_1_0/module.hpp"
 #include "mod_1_0/pybind.hpp"
 
-namespace mod = mod_1_0;
-
 class echo_srv : public mod::echo_service {
 	mod::echo_callback_ptr cb;
 	void generate(mod::echo_mesage_ptr msg) override

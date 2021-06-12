@@ -1,6 +1,6 @@
 #include "external_module_1_1/module.hpp"
 
-namespace em = external_module_1_1;
+namespace em = external_module;
 
 std::pmr::string em::gen_str(em::external_enum val)
 {
