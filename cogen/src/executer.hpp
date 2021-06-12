@@ -35,6 +35,7 @@ class executer {
 
 	void set_options();
 	bool can_continue() const ;
+	bool execute_commands() const ;
 
 	std::unique_ptr<std::ostream> create_out_file(std::string fn) const ;
 	void print_help() const ;

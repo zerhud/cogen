@@ -59,6 +59,7 @@ void executer::set_options()
 
 int executer::operator()()
 {
+	if(execute_commands()) std::exit(0);
 	if(!can_continue())
 		print_help(), std::exit(0);
 	cogen::ic::ptsetts setts(load_settings());
@@ -78,6 +79,15 @@ int executer::operator()()
 	}
 
 	return 0;
+}
+
+bool executer::execute_commands() const
+{
+	const bool cmd_ver = 0 != opt_vars.count("version");
+	const bool cmd_pth = 0 != opt_vars.count("help_pathes");
+	if(cmd_pth) config.pathes.print_pathes(std::cout, print_path_which());
+	else if(cmd_ver) std::cout << config.version << std::endl;
+	return cmd_ver || cmd_pth;
 }
 
 bool executer::can_continue() const
@@ -206,11 +216,7 @@ cogen::avaible_pathes executer::print_path_which() const
 
 void executer::print_help() const
 {
-	if(0 != opt_vars.count("help_pathes"))
-		config.pathes.print_pathes(std::cout, print_path_which());
-	else if(0 != opt_vars.count("version"))
-		std::cout << config.version << std::endl;
-	else std::cout
+	std::cout
 		<< "version: " << config.version << std::endl
 		<< "this is a source code generator. use with options"
 		<< std::endl
