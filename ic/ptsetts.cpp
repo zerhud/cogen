@@ -22,6 +22,15 @@ boost::property_tree::ptree ptsetts::part_src(std::string_view name) const
 	return setts.get_child("part."s + std::string(name));
 }
 
+std::pmr::vector<std::pmr::string> ptsetts::langs() const
+{
+	std::pmr::vector<std::pmr::string> ret;
+	for(auto& p:setts)
+		if(p.first=="langs")
+			ret.emplace_back(p.second.get_value<std::string>());
+	return ret;
+}
+
 std::pmr::vector<std::pmr::string> ptsetts::parts() const
 {
 	std::pmr::vector<std::pmr::string> ret;

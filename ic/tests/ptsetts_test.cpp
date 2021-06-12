@@ -38,6 +38,15 @@ BOOST_AUTO_TEST_CASE(ptarray)
 	BOOST_TEST(count_b==1);
 	BOOST_TEST(count_c==3);
 }
+BOOST_AUTO_TEST_CASE(plugins)
+{
+	ptree setts;
+	setts.add("langs", "dll1");
+	setts.add("langs", "dll2");
+	ic_ptsetts obj(setts);
+	BOOST_TEST(obj.langs().size() == 2);
+	gen_utils_mocks::check_vec_eq(obj.langs(), {"dll1", "dll2"});
+}
 BOOST_AUTO_TEST_CASE(map_tmpl)
 {
 	ptree setts;

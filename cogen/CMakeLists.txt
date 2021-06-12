@@ -46,6 +46,7 @@ if("${CMAKE_BUILD_TYPE} " STREQUAL "Debug ")
 	message("== build in debug mode")
 	target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG)
 endif()
+target_compile_definitions(${PROJECT_NAME} PUBLIC -DBOOST_DLL_USE_STD_FS)
 
 set(build_lib_dir "${CMAKE_CURRENT_BINARY_DIR}/etc/${PROJECT_NAME}/lib")
 set(build_examples_dir "${CMAKE_CURRENT_BINARY_DIR}/etc/${PROJECT_NAME}/examples")
@@ -88,6 +89,12 @@ target_link_libraries( ${PROJECT_NAME}
 		cppjinja::evaluator cppjinja::loader
 		-static-libgcc -static-libstdc++
 	)
+
+add_custom_command(
+	TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND "${CMAKE_COMMAND}" -E create_symlink
+		"$<TARGET_FILE:sddl>" "${build_generators_dir}/$<TARGET_FILE_NAME:sddl>"
+	   )
 
 if(ENABLE_TESTS AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 	enable_testing()

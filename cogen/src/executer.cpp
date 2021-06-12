@@ -17,6 +17,8 @@
 #include "standard_types/src/loader.hpp"
 #include "builders/src/loader.hpp"
 
+#include "utils/generic_dsl.hpp"
+
 #include "cppjinja/evtree/evtree.hpp"
 #include "cppjinja/parser/parse.hpp"
 #include "cppjinja/loader/parser.hpp"
@@ -59,9 +61,10 @@ int executer::operator()()
 {
 	if(!can_continue())
 		print_help(), std::exit(0);
+	cogen::ic::ptsetts setts(load_settings());
 	load_inludes();
 	load_inputs();
-	cogen::ic::ptsetts setts(load_settings());
+	load_generic_inputs(setts);
 	if(opt_vars["gmode"].as<std::string>()=="json")
 		json_mode(setts);
 	else if(opt_vars["gmode"].as<std::string>()=="dir")
@@ -93,6 +96,30 @@ boost::property_tree::ptree executer::load_settings() const
 	boost::property_tree::ptree setts_tree;
 	boost::property_tree::read_info(file.string(), setts_tree);
 	return setts_tree;
+}
+
+void executer::load_generic_inputs(const ic::ptsetts& setts)
+{
+	auto langs = setts.langs();
+	for(auto& lang:langs) {
+		auto dll_file = config.pathes.generator(lang);
+		boost::dll::shared_library& lib = lang_libs.emplace_back(dll_file);
+		if(!lib)
+			throw std::runtime_error("cannot load library " + std::string(lang));
+		auto creator = lib.get<gen_utils::generic_sdl_factory*()>("create_dsl");
+		if(!creator)
+			throw std::runtime_error("cannot load library's function " + std::string(lang));
+		gen_utils::generic_sdl_factory* factory = creator();
+		assert(factory);
+		auto loaders = factory->languages(
+		            [this](const auto& f){return config.pathes.input_data(f);});
+		for(auto l:loaders) load_generic_inputs(*l);
+	}
+}
+
+void executer::load_generic_inputs(const gen_utils::generic_sdl& loader)
+{
+	std::cout << "loading " << loader.name() << std::endl;
 }
 
 void executer::load_inputs()

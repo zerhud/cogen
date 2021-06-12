@@ -1,3 +1,4 @@
+langs libsddl.so
 defaults {
 	naming underscore
 }

@@ -6,8 +6,6 @@
  * or <http://www.gnu.org/licenses/> for details
  *************************************************************************/
 
-#define BOOST_DLL_USE_STD_FS
-
 #include "src/executer.hpp"
 #include "single_gen_part.hpp"
 #include <boost/dll/runtime_symbol_info.hpp>

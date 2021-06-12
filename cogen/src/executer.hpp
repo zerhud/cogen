@@ -6,6 +6,8 @@
  * or <http://www.gnu.org/licenses/> for details
  *************************************************************************/
 
+#include <list>
+#include <boost/dll.hpp>
 #include <boost/program_options.hpp>
 
 #include "path_config.hpp"
@@ -13,6 +15,7 @@
 #include "parser/ix3/parser.hpp"
 #include "ic/single_gen_part.hpp"
 #include "ic/ptsetts.hpp"
+#include "utils/generic_dsl.hpp"
 
 namespace cogen {
 
@@ -28,6 +31,8 @@ class executer {
 
 	gen_utils::input user_data;
 
+	std::list<boost::dll::shared_library> lang_libs;
+
 	void set_options();
 	bool can_continue() const ;
 
@@ -37,6 +42,8 @@ class executer {
 	void dir_mode(const ic::ptsetts& setts) const ;
 	void json_mode(const cogen::ic::ptsetts& setts) const ;
 	void load_inputs() ;
+	void load_generic_inputs(const cogen::ic::ptsetts& setts);
+	void load_generic_inputs(const gen_utils::generic_sdl& loader);
 	void load_inludes() ;
 	boost::property_tree::ptree load_settings() const ;
 	json_provider create_json(const ic::ptsetts& setts) const ;
