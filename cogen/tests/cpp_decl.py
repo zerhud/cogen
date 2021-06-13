@@ -22,6 +22,12 @@ def check_example_data(result, count=3):
     data = parsed[0]['data']['data']
     assert 'ix3' in data
 
+def test_pathes():
+    r=sp.run(['./cogen', '--which_g', 'cpp_decl.info'], stdout=sp.PIPE, stderr=sp.PIPE)
+    assert b'cogen/etc/cogen/generators/cpp_decl.info' in r.stdout;
+    r=sp.run(['./cogen', '--which_t', 'cpp/render.jinja'], stdout=sp.PIPE, stderr=sp.PIPE)
+    assert b'cogen/etc/cogen/lib/cpp/render.jinja' in r.stdout;
+
 def test_wrong_mode():
     r=sp.run(['./cogen', '-m', 'wrong'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
     assert r.stdout == b'';

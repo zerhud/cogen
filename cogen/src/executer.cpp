@@ -48,6 +48,8 @@ void executer::set_options()
 	    ("help,h", "produce this help message")
 	    ("version", "produce version message")
 	    ("help_pathes", po::value<std::string>(), "print pathes for item (can to be input, generators and libraries)")
+	    ("which_g", po::value<std::string>(), "try to find path to generator file")
+	    ("which_t", po::value<std::string>(), "try to find path to template file")
 	    ("outdir,o", po::value<std::string>()->default_value("."), "directory or file where to output")
 	    ("generator,g", po::value<std::string>(), "generator (info file)")
 	    ("gmode,m", po::value<std::string>()->default_value("json"), "generation mode (\"json\" for generate json and \"dir\" to generate files)")
@@ -85,9 +87,13 @@ bool executer::execute_commands() const
 {
 	const bool cmd_ver = 0 != opt_vars.count("version");
 	const bool cmd_pth = 0 != opt_vars.count("help_pathes");
+	const bool cmd_flg = 0 != opt_vars.count("which_g");
+	const bool cmd_flt = 0 != opt_vars.count("which_t");
 	if(cmd_pth) config.pathes.print_pathes(std::cout, print_path_which());
 	else if(cmd_ver) std::cout << config.version << std::endl;
-	return cmd_ver || cmd_pth;
+	else if(cmd_flg) std::cout << config.pathes.generator(opt_vars["which_g"].as<std::string>()) << std::endl;
+	else if(cmd_flt) std::cout << config.pathes.library(opt_vars["which_t"].as<std::string>()) << std::endl;
+	return cmd_ver || cmd_pth || cmd_flg || cmd_flt;
 }
 
 bool executer::can_continue() const
