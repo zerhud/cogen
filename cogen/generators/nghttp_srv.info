@@ -1,0 +1,19 @@
+part
+{
+	dec {
+		tmpl cpp/declarations.jinja
+		file "${mod}_${mod_a}_${mod_i}/declarations.hpp"
+		naming underscore
+		include {
+			file "pybind11/pybind11.h"
+			sys true
+		}
+	}
+	header {
+		inc_part dec
+		tmpl cpp/header.jinja
+		file "${mod}_${mod_a}_${mod_i}/module.hpp"
+		naming underscore
+	}
+}
+
