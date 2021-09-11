@@ -105,8 +105,10 @@ add_custom_command(
 
 if(ENABLE_TESTS AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 	enable_testing()
-	add_test(NAME cogen_cpp_decl COMMAND python3 -m pytest "${CMAKE_CURRENT_SOURCE_DIR}/tests/cpp_decl.py")
-	add_test(NAME cogen_results COMMAND python3 -m pytest "${CMAKE_CURRENT_SOURCE_DIR}/tests/results.py")
+	#add_test(NAME cogen_cpp_decl COMMAND python3 -m pytest "${CMAKE_CURRENT_SOURCE_DIR}/tests/cpp_decl.py")
+	#add_test(NAME cogen_results COMMAND python3 -m pytest "${CMAKE_CURRENT_SOURCE_DIR}/tests/results.py")
+	add_test(NAME cogen_cpp_decl COMMAND pytest "${CMAKE_CURRENT_SOURCE_DIR}/tests/cpp_decl.py")
+	add_test(NAME cogen_results COMMAND pytest "${CMAKE_CURRENT_SOURCE_DIR}/tests/results.py")
 	copy_if_diff(
 		"${CMAKE_CURRENT_LIST_DIR}/tests/resources/__init__.py"
 		"${CMAKE_CURRENT_BINARY_DIR}/__init__.py")

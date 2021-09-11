@@ -32,6 +32,14 @@ def test_cpp_decl():
     assert r_make.returncode == 0
     assert os.path.exists(build_dir + '/libinterface.a')
 
+#def test_cs():
+    #build_dir = test_dir + '/build'
+    #copy_resource_to_test('cs/client.cpp')
+    #copy_resource_to_test('cs/server.cpp')
+    #copy_resource_to_test('cs/cmake.cpp', 'CMakeLists.txt')
+
+    #assert 1 == 0
+
 def test_cpp_py():
     build_dir = test_dir + '/build'
     py_dir = test_dir + '/gen'
