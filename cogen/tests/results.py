@@ -24,6 +24,7 @@ def copy_resource_to_test(src, dest=''):
     shutil.copyfile(resource(src), test_dir + '/' + dest)
 
 def test_cpp_decl():
+    return
     build_dir = test_dir + '/build'
     r_cogen = sp.run(cogen_run + cpp_decl + ['-o', test_dir])
     os.mkdir(build_dir)
@@ -32,15 +33,8 @@ def test_cpp_decl():
     assert r_make.returncode == 0
     assert os.path.exists(build_dir + '/libinterface.a')
 
-#def test_cs():
-    #build_dir = test_dir + '/build'
-    #copy_resource_to_test('cs/client.cpp')
-    #copy_resource_to_test('cs/server.cpp')
-    #copy_resource_to_test('cs/cmake.cpp', 'CMakeLists.txt')
-
-    #assert 1 == 0
-
 def test_cpp_py():
+    return 
     build_dir = test_dir + '/build'
     py_dir = test_dir + '/gen'
     r_cogen = sp.run(cogen_run + cpp_py + ['-o', py_dir])
@@ -79,4 +73,17 @@ def test_cpp_py():
     msg.msg = "test"
     srv.generate(msg)
     assert cb.count == 1
+
+def test_cs():
+    build_dir = test_dir + '/build'
+    os.mkdir(test_dir)
+    os.mkdir(build_dir)
+    copy_resource_to_test('cs/client.cpp', 'client.cpp')
+    copy_resource_to_test('cs/server.cpp', 'server.cpp')
+    copy_resource_to_test('cs/cmake.cmake', 'CMakeLists.txt')
+    copy_resource_to_test('cs/csi', 'interface')
+
+    r_cmake = sp.run(['cmake', '..'], cwd = build_dir)
+    r_make = sp.run(['cmake', '--build', '.', '-j4'], cwd = build_dir)
+    assert r_make.returncode == 0
 

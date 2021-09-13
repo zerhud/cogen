@@ -1,0 +1,10 @@
+module cs v1.0:
+
+enum etest +auto_io { one, two }
+
+record echo_mesage {
+	+i64 param1;
+	+i64 param2;
+	-string msg;
+}
+
