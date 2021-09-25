@@ -11,6 +11,12 @@ part
 		file "${mod}_${mod_a}_${mod_i}/module.hpp"
 		naming underscore
 	}
+	server_header {
+		inc_part header
+		tmpl cpp/nghttp_srv_hdr.jinja
+		file "${mod}_${mod_a}_${mod_i}/server.hpp"
+		naming underscore
+	}
 	server {
 		inc_part header
 		tmpl cpp/nghttp_srv.jinja
