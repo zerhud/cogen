@@ -85,5 +85,7 @@ def test_cs():
 
     r_cmake = sp.run(['cmake', '..'], cwd = build_dir)
     r_make = sp.run(['cmake', '--build', '.', '-j4'], cwd = build_dir)
+
     assert r_make.returncode == 0
+    assert os.path.exists(build_dir + '/gen')
 

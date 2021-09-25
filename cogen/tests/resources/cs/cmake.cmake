@@ -11,6 +11,6 @@ add_custom_command(
 	COMMAND ../../cogenwr.py -iix3=../interface -o ${gen_dir} -gnghttp_srv
 	)
 
-add_executable(client client.cpp ${cs_headers})
-target_include_directories(client PRIVATE "${gen_dir}")
+add_executable(server server.cpp ${cs_headers})
+target_include_directories(server PRIVATE "${gen_dir}")
 

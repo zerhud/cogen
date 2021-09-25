@@ -86,6 +86,7 @@ copy_lib("cpp/render.jinja")
 copy_lib("cpp/definitions.jinja")
 copy_lib("cpp/cpppy.jinja")
 copy_lib("cpp/cpppy_header.jinja")
+copy_lib("cpp/nghttp_srv.jinja")
 copy_lib("cmake/plain.jinja")
 copy_lib("cmake/pybind11.jinja")
 
