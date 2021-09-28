@@ -42,6 +42,7 @@ class executer {
 	cogen::avaible_pathes print_path_which() const;
 	void dir_mode(const ic::ptsetts& setts) const ;
 	void json_mode(const cogen::ic::ptsetts& setts) const ;
+	void flist_mode(const cogen::ic::ptsetts& setts) const ;
 	void load_inputs() ;
 	void load_generic_inputs(const cogen::ic::ptsetts& setts);
 	void load_generic_inputs(gen_utils::generic_sdl& loader);

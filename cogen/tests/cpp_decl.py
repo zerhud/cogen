@@ -33,6 +33,10 @@ def test_wrong_mode():
     assert r.stdout == b'';
     assert r.stderr == b'wrong generation mode "wrong"\n'
 
+def test_flist_mode():
+    r=sp.run(['./cogen', '-m', 'flist', '-o', 'outdir'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
+    assert b'declarations.hpp\nmodule.hpp\nmodule.cpp\nCMakeLists.txt\n' == r.stdout;
+
 def test_simple_config():
     r=sp.run(['./cogen', '-m', 'json', '-o', 'outdir'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
     assert r.stderr == b''

@@ -23,6 +23,7 @@
 #include "cppjinja/parser/parse.hpp"
 #include "cppjinja/loader/parser.hpp"
 #include "jinja_json_prov.hpp"
+#include "flist_provider.hpp"
 
 using namespace cogen;
 using cogen::path_config;
@@ -72,6 +73,8 @@ int executer::operator()()
 		json_mode(setts);
 	else if(opt_vars["gmode"].as<std::string>()=="dir")
 		dir_mode(setts);
+	else if(opt_vars["gmode"].as<std::string>()=="flist")
+		flist_mode(setts);
 	else {
 		std::cerr
 			<< "wrong generation mode "
@@ -185,6 +188,25 @@ std::unique_ptr<std::ostream> executer::create_out_file(std::string fn) const
 {
 	auto ret = std::make_unique<std::fstream>(fn);
 	return ret;
+}
+
+void executer::flist_mode(const cogen::ic::ptsetts& setts) const
+{
+	flist_provider json_out(config.pathes);
+	json_out.output_dir(opt_vars["outdir"].as<std::string>());
+	cogen::ic::single_gen_part part(&json_out);
+	cogen::ic::gen_context ctx;
+	builders::loader bld_ldr;
+	for(auto& pname:setts.parts()) {
+		ctx.cfg_part = setts.part_setts(pname);
+		auto pd = user_data;
+		pd.add(setts.generic_ast(pname));
+		if(auto bld = bld_ldr(setts.part_src(pname), ctx);bld)
+			pd.add(*bld);
+		ctx.generated[pname] = part(ctx, std::move(pd));
+	}
+	for(auto& f:json_out.result())
+		std::cout << f << std::endl;
 }
 
 void executer::json_mode(const ic::ptsetts& setts) const
