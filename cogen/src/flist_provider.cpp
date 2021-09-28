@@ -15,11 +15,6 @@ flist_provider::flist_provider(const path_config& pcfg)
 {
 }
 
-void flist_provider::output_dir(const std::filesystem::path& dir)
-{
-	outdir = dir;
-}
-
 void flist_provider::generate(
 		std::filesystem::path tmpl_file,
 	        const boost::json::value& data,

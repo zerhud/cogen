@@ -192,10 +192,9 @@ std::unique_ptr<std::ostream> executer::create_out_file(std::string fn) const
 
 void executer::flist_mode(const cogen::ic::ptsetts& setts) const
 {
-	flist_provider json_out(config.pathes);
-	json_out.output_dir(opt_vars["outdir"].as<std::string>());
-	generate_to_provider(json_out, setts);
-	for(auto& f:json_out.result())
+	flist_provider flp(config.pathes);
+	generate_to_provider(flp, setts);
+	for(auto& f:flp.result())
 		std::cout << f << std::endl;
 }
 
