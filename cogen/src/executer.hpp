@@ -49,6 +49,7 @@ class executer {
 	void load_inludes() ;
 	boost::property_tree::ptree load_settings() const ;
 	json_provider create_json(const ic::ptsetts& setts) const ;
+	void generate_to_provider(ic::provider& prov, const ic::ptsetts& setts) const ;
 public:
 	executer(program_configuration pc, int argc, char** argv);
 	int operator()() ;

@@ -194,17 +194,7 @@ void executer::flist_mode(const cogen::ic::ptsetts& setts) const
 {
 	flist_provider json_out(config.pathes);
 	json_out.output_dir(opt_vars["outdir"].as<std::string>());
-	cogen::ic::single_gen_part part(&json_out);
-	cogen::ic::gen_context ctx;
-	builders::loader bld_ldr;
-	for(auto& pname:setts.parts()) {
-		ctx.cfg_part = setts.part_setts(pname);
-		auto pd = user_data;
-		pd.add(setts.generic_ast(pname));
-		if(auto bld = bld_ldr(setts.part_src(pname), ctx);bld)
-			pd.add(*bld);
-		ctx.generated[pname] = part(ctx, std::move(pd));
-	}
+	generate_to_provider(json_out, setts);
 	for(auto& f:json_out.result())
 		std::cout << f << std::endl;
 }
@@ -214,11 +204,9 @@ void executer::json_mode(const ic::ptsetts& setts) const
 	std::cout << create_json(setts).result() << std::endl;
 }
 
-json_provider executer::create_json(const ic::ptsetts& setts) const
+void executer::generate_to_provider(ic::provider& prov, const ic::ptsetts& setts) const
 {
-	json_provider json_out(config.pathes);
-	json_out.output_dir(opt_vars["outdir"].as<std::string>());
-	cogen::ic::single_gen_part part(&json_out);
+	cogen::ic::single_gen_part part(&prov);
 	cogen::ic::gen_context ctx;
 	builders::loader bld_ldr;
 	for(auto& pname:setts.parts()) {
@@ -229,6 +217,13 @@ json_provider executer::create_json(const ic::ptsetts& setts) const
 			pd.add(*bld);
 		ctx.generated[pname] = part(ctx, std::move(pd));
 	}
+}
+
+json_provider executer::create_json(const ic::ptsetts& setts) const
+{
+	json_provider json_out(config.pathes);
+	json_out.output_dir(opt_vars["outdir"].as<std::string>());
+	generate_to_provider(json_out, setts);
 	return json_out;
 }
 
