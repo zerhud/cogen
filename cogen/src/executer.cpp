@@ -12,6 +12,8 @@
 #include <cassert>
 #include <iostream>
 #include <boost/property_tree/info_parser.hpp>
+#include <boost/spirit/include/karma.hpp>
+#include <boost/spirit/include/karma_stream.hpp>
 
 #include "ix3/utils/to_generic_ast.hpp"
 #include "standard_types/src/loader.hpp"
@@ -73,8 +75,8 @@ int executer::operator()()
 		json_mode(setts);
 	else if(opt_vars["gmode"].as<std::string>()=="dir")
 		dir_mode(setts);
-	else if(opt_vars["gmode"].as<std::string>()=="flist")
-		flist_mode(setts);
+	else if(opt_vars["gmode"].as<std::string>().substr(0,5)=="flist")
+		flist_mode(setts, opt_vars["gmode"].as<std::string>().substr(5,-1));
 	else {
 		std::cerr
 			<< "wrong generation mode "
@@ -190,12 +192,15 @@ std::unique_ptr<std::ostream> executer::create_out_file(std::string fn) const
 	return ret;
 }
 
-void executer::flist_mode(const cogen::ic::ptsetts& setts) const
+void executer::flist_mode(const cogen::ic::ptsetts& setts, std::string sep) const
 {
+	using namespace boost::spirit;
+	using namespace boost::spirit::standard;
+
 	flist_provider flp(config.pathes);
 	generate_to_provider(flp, setts);
-	for(auto& f:flp.result())
-		std::cout << f << std::endl;
+	if(sep.empty()) sep = "\n";
+	std::cout << karma::format(*char_ % sep, flp.result()) << std::flush;
 }
 
 void executer::json_mode(const ic::ptsetts& setts) const
