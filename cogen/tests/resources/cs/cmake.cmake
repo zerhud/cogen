@@ -4,19 +4,17 @@ project(cs_test VERSION 0.0.0.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(nghttp REQUIRED)
-find_package(Boost REQUIRED)
+#find_package(nghttp REQUIRED)
+#find_package(Boost REQUIRED)
 
-set(gen_dir "${CMAKE_CURRENT_BINARY_DIR}/gen")
+set(gen_dir "${CMAKE_CURRENT_BINARY_DIR}/gen/")
 execute_process(
-	COMMAND ../../cogen "-mflist;" -iix3=../interface -o ${gen_dir} -gnghttp_srv
+	COMMAND ../../cogen
+		-mflist --sep=\; "--prefix=${gen_dir}"
+		-iix3=../interface -o ${gen_dir} -gnghttp_srv
 	RESULT_VARIABLE cs_sources_result
-	OUTPUT_VARIABLE cs_sources_
+	OUTPUT_VARIABLE cs_sources
 	)
-message("=== ${cs_sources_}")
-foreach(src ${cs_sources_})
-	list(APPEND cs_sources "${gen_dir}/${src}")
-endforeach()
 add_custom_command(
 	OUTPUT ${cs_sources}
 	COMMAND ../../cogenwr.py -iix3=../interface -o ${gen_dir} -gnghttp_srv

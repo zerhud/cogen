@@ -25,7 +25,9 @@ struct program_configuration {
 };
 
 class executer {
-	boost::program_options::options_description desc;
+	boost::program_options::options_description main_opts;
+	boost::program_options::options_description flist_opts;
+	boost::program_options::options_description common_opts;
 	boost::program_options::variables_map opt_vars;
 	program_configuration config;
 
@@ -42,7 +44,7 @@ class executer {
 	cogen::avaible_pathes print_path_which() const;
 	void dir_mode(const ic::ptsetts& setts) const ;
 	void json_mode(const cogen::ic::ptsetts& setts) const ;
-	void flist_mode(const cogen::ic::ptsetts& setts, std::string sep) const ;
+	void flist_mode(const cogen::ic::ptsetts& setts) const ;
 	void load_inputs() ;
 	void load_generic_inputs(const cogen::ic::ptsetts& setts);
 	void load_generic_inputs(gen_utils::generic_sdl& loader);

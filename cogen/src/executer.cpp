@@ -35,20 +35,23 @@ namespace fs = std::filesystem;
 namespace po = boost::program_options;
 
 executer::executer(program_configuration pc, int argc, char** argv)
-    : desc("cogen options")
+    : main_opts("cogen options")
+    , flist_opts("flist mod options")
     , config(std::move(pc))
 {
 	assert(0 < argc);
 	set_options();
 
-	auto opts = po::command_line_parser(argc, argv).options(desc).run();
+	auto opts = po::command_line_parser(argc, argv)
+	        .options(common_opts)
+	        .run();
 	po::store(opts, opt_vars);
 }
 
 void executer::set_options()
 {
-	desc.add_options()
-	    ("help,h", "produce this help message")
+	main_opts.add_options()
+	    ("help,h", po::value<std::string>()->implicit_value(""), "produce this help message")
 	    ("version", "produce version message")
 	    ("help_pathes", po::value<std::string>(), "print pathes for item (can to be input, generators and libraries)")
 	    ("which_g", po::value<std::string>(), "try to find path to generator file")
@@ -60,6 +63,12 @@ void executer::set_options()
 	    ("include,I", po::value<std::vector<std::string>>(), "search path for input dsl (common for all inputs)")
 	    ("types", po::value<std::string>()->default_value("standard_types.info"), "file for translate types for different languages")
 	    ;
+	flist_opts.add_options()
+	    ("sep", po::value<std::string>()->default_value("\n", "\\n"), "separator for file list")
+	    ("prefix", po::value<std::string>()->default_value(""), "prefix for each file")
+	    ("postfix", po::value<std::string>()->default_value(""), "postfix for each file")
+	    ;
+	common_opts.add(main_opts).add(flist_opts);
 }
 
 int executer::operator()()
@@ -75,8 +84,8 @@ int executer::operator()()
 		json_mode(setts);
 	else if(opt_vars["gmode"].as<std::string>()=="dir")
 		dir_mode(setts);
-	else if(opt_vars["gmode"].as<std::string>().substr(0,5)=="flist")
-		flist_mode(setts, opt_vars["gmode"].as<std::string>().substr(5,-1));
+	else if(opt_vars["gmode"].as<std::string>()=="flist")
+		flist_mode(setts);
 	else {
 		std::cerr
 			<< "wrong generation mode "
@@ -192,15 +201,18 @@ std::unique_ptr<std::ostream> executer::create_out_file(std::string fn) const
 	return ret;
 }
 
-void executer::flist_mode(const cogen::ic::ptsetts& setts, std::string sep) const
+void executer::flist_mode(const cogen::ic::ptsetts& setts) const
 {
 	using namespace boost::spirit;
 	using namespace boost::spirit::standard;
 
+	auto sep = opt_vars["sep"].as<std::string>();
+	auto pref = opt_vars["prefix"].as<std::string>();
+	auto suff = opt_vars["postfix"].as<std::string>();
 	flist_provider flp(config.pathes);
 	generate_to_provider(flp, setts);
 	if(sep.empty()) sep = "\n";
-	std::cout << karma::format(*char_ % sep, flp.result()) << std::flush;
+	std::cout << karma::format((lit(pref) << *char_ << lit(suff)) % sep, flp.result()) << std::flush;
 }
 
 void executer::json_mode(const ic::ptsetts& setts) const
@@ -247,6 +259,6 @@ void executer::print_help() const
 		<< "version: " << config.version << std::endl
 		<< "this is a source code generator. use with options"
 		<< std::endl
-		<< desc
+		<< common_opts
 		<< std::endl;
 }

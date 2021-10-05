@@ -36,8 +36,10 @@ def test_wrong_mode():
 def test_flist_mode():
     r=sp.run(['./cogen', '-m', 'flist', '-o', 'outdir'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
     assert b'declarations.hpp\nmodule.hpp\nmodule.cpp\nCMakeLists.txt' == r.stdout;
-    r=sp.run(['./cogen', '-m', 'flist;', '-o', 'outdir'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
+    r=sp.run(['./cogen', '-m', 'flist', '--sep=;', '-o', 'outdir'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
     assert b'declarations.hpp;module.hpp;module.cpp;CMakeLists.txt' == r.stdout;
+    r=sp.run(['./cogen', '-m', 'flist', '--sep=;', '--prefix=h', '-o', 'outdir'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
+    assert b'hdeclarations.hpp;hmodule.hpp;hmodule.cpp;hCMakeLists.txt' == r.stdout;
 
 def test_simple_config():
     r=sp.run(['./cogen', '-m', 'json', '-o', 'outdir'] + ix3_example_opts, stdout=sp.PIPE, stderr=sp.PIPE)
