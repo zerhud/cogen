@@ -3,6 +3,7 @@
 // this file contains full iterface's declaratinos
 
 #include <thread>
+#include <iostream>
 <= render.includes(cdata.includes) =>
 
 <% for module in cdata.data.ix3 -%>
@@ -10,11 +11,17 @@
 
 namespace <= render.gen_namespace_name(module, mod_ver) => {
 
-void step()
+void run()
+{
+	while(step());
+}
+
+bool step()
 {
 	using namespace std::literals;
 	std::cout << "Hello, world!" << std::endl;
 	std::this_thread::sleep_for(1s);
+	return true;
 }
 
 } // namespace <= render.gen_namespace_name(module, mod_ver) => 

@@ -8,3 +8,5 @@ record echo_mesage {
 	-string msg;
 }
 
+string echo(+string msg);
+

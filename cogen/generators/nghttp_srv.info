@@ -18,7 +18,7 @@ part
 		naming underscore
 	}
 	server {
-		inc_part header
+		inc_part server_header
 		tmpl cpp/nghttp_srv.jinja
 		file "${mod}_${mod_a}_${mod_i}/server.cpp"
 		naming underscore
